@@ -70,7 +70,7 @@
     <!-- Make main jar file-->
     <jar destfile="${dist}/${jar.file}" basedir="${classes}">
       <manifest>
-        <attribute name="Main-Class" value="us.kbase.scripts.ModuleBuilderß"/>
+        <attribute name="Main-Class" value="us.kbase.scripts.ModuleBuilder"/>
       </manifest>
     </jar>
     <copy todir="${classes}">
