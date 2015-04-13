@@ -623,7 +623,7 @@ public class JavaTypeGenerator {
                     appendWithComma(funcParams, getJType(param.getType(), packageParent, model)).append(" ").append(param.getJavaName());
                     appendWithComma(funcParamNames, param.getJavaName());
                 }
-                String contextType = model.ref("us.kbase.common.service.RpcContext");
+                String contextType = model.ref(utilPackage + ".RpcContext");
                 String contextField = "jsonRpcContext";
                 appendWithComma(funcParams, contextType).append("... ").append(contextField);
                 appendWithComma(funcParamNames, contextField);
@@ -652,7 +652,7 @@ public class JavaTypeGenerator {
 			                "    }"
 			                ));
                     classLines.add("");
-                    String jobStateType = model.ref("us.kbase.common.service.JobState");
+                    String jobStateType = model.ref(utilPackage + ".JobState");
                     String innerRetType = (func.getRetMultyType() == null) ? ((retType == null) ? "Object" : (listClass + "<" + retTypeName + ">")) : retTypeName;
                     printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
                     classLines.add("    public " + jobStateType + "<" + innerRetType + "> " + func.getJavaName() + "Check(String jobId) " + exceptions+ " {");
@@ -929,7 +929,7 @@ public class JavaTypeGenerator {
 				    appendWithComma(funcParams, getJType(param.getType(), packageParent, model)).append(" ").append(param.getJavaName());
 				if (func.isAuthCouldBeUsed())
 				    appendWithComma(funcParams, model.ref("us.kbase.auth.AuthToken")).append(" authPart");
-                appendWithComma(funcParams, model.ref("us.kbase.common.service.RpcContext")).append("... ").append("jsonRpcContext");
+                appendWithComma(funcParams, model.ref(utilPackage + ".RpcContext")).append("... ").append("jsonRpcContext");
 				String retTypeName = retType == null ? "void" : getJType(retType, packageParent, model);
 				classLines.add("");
 				printFuncComment(func, originalToJavaTypes, packageParent, classLines, false);
@@ -975,12 +975,15 @@ public class JavaTypeGenerator {
 				}
 			}
 			String fileType = model.ref("java.io.File");
+			String JsonServerSyslogType = model.ref(utilPackage + ".JsonServerSyslog");
 			classLines.addAll(Arrays.asList(
 					"",
 					"    public static void main(String[] args) throws Exception {",
 					"        if (args.length == 1) {",
                     "            new " + serverClassName + "().startupServer(Integer.parseInt(args[0]));",
 					"        } else if (args.length == 3) {",
+					"            " + JsonServerSyslogType + ".setStaticUseSyslog(false);",
+					"            " + JsonServerSyslogType + ".setStaticMlogFile(args[1] + \".log\");",
 					"            new " + serverClassName + "().processRpcCall(new " + fileType + "(args[0]), new " + fileType + "(args[1]), args[2]);",
 					"        } else {",
 					"            System.out.println(\"Usage: <program> <server_port>\");",
