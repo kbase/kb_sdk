@@ -1,0 +1,541 @@
+options{
+    IGNORE_CASE = false;
+    STATIC = false;
+    UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(SpecParser)
+
+package us.kbase.jkidl;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import us.kbase.kidl.KbAuthdef;
+import us.kbase.kidl.KbFuncdef;
+import us.kbase.kidl.KbList;
+import us.kbase.kidl.KbMapping;
+import us.kbase.kidl.KbModule;
+import us.kbase.kidl.KbModuleComp;
+import us.kbase.kidl.KbParameter;
+import us.kbase.kidl.KbScalar;
+import us.kbase.kidl.KbStruct;
+import us.kbase.kidl.KbStructItem;
+import us.kbase.kidl.KbTuple;
+import us.kbase.kidl.KbType;
+import us.kbase.kidl.KbTypedef;
+import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.KidlParseException;
+
+/**
+ * Do not change this file. It's automatically generated based on src/kbase/jkidl/SpecParser.jj
+ * using shell script in javacc/spec_javacc.sh . So please change parsing syntax and semantics
+ * in SpecParser.jj .
+ * @author rsutormin
+ */
+@SuppressWarnings({"unused", "serial"})
+public class SpecParser {
+	static ThreadLocal<String> lastComment = new ThreadLocal<String>();
+	static ThreadLocal<Integer> lastCommentEndLine = new ThreadLocal<Integer>();
+  
+    public static void main(String args[]) throws Exception {
+        String fileName = null;
+        if (args.length < 1) {
+            System.out.println("Usage: <program> <spec-file>");
+        	return;
+        }
+        fileName = args[0];
+        SpecParser p = null;
+        try {
+            p = new SpecParser(new DataInputStream(new FileInputStream(fileName)));
+        } catch (FileNotFoundException e) {
+            System.out.println("File " + fileName + " not found.");
+            return;
+        }
+        IncludeProvider ip = new StaticIncludeProvider();
+        Map<?,?> root = parseAsJson(p, ip);
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+		mapper.writeValue(System.out, root);
+  	}
+
+    public static Map<?,?> parseAsJson(SpecParser p, IncludeProvider ip) throws ParseException {
+    	lastComment.set(null);
+        Map<String, KbModule> root = p.SpecStatement(ip);
+        Map<String,List<Object>> ret = new LinkedHashMap<String, List<Object>>();
+        for (KbModule module : root.values()) {
+                List<Object> modList = ret.get(module.getServiceName());
+                if (modList == null) {
+                        modList = new ArrayList<Object>();
+                        ret.put(module.getServiceName(), modList);
+                }
+                modList.add(module.toJson());
+        }
+        return ret;
+    }
+    
+    public void generateParseException(KidlParseException t) throws ParseException {
+    	generateParseException(t.getMessage());
+    }
+
+    public void generateParseException(String message) throws ParseException {
+    	throw new ParseException("Error at line " + token.beginLine + ", column " + token.beginColumn + ": " + message);
+    }
+
+    public String getLastComment(Token first) {
+    	String comment = lastComment.get();
+    	lastComment.set(null);
+    	if (comment == null)
+    		return "";
+    	//if (first.beginLine > lastCommentEndLine.get() + 1)
+    	//	return "";
+    	return Utils.trim(comment);
+    }
+}
+
+PARSER_END(SpecParser)
+
+
+SKIP:
+{
+    " "
+|   "\t"
+|   "\r"
+|   "\n"
+|   "/*" : WithinComment
+}
+
+<WithinComment> SKIP :
+{
+  "*/"
+  {
+    SpecParser.lastComment.set("/*" + image);
+    SpecParser.lastCommentEndLine.set(input_stream.line);
+  }
+  : DEFAULT
+}
+
+<WithinComment> MORE :
+{
+  <~[]>
+}
+
+
+TOKEN: 
+{
+    <T_include:"#include">
+|   <T_module:"module">
+|   <T_auth:"authentication">
+|   <T_required:"required">
+|   <T_optional:"optional">
+|   <T_none:"none">
+|   <T_typedef:"typedef">
+|   <T_funcdef:"funcdef">
+|   <T_string:"string">
+|   <T_int:"int">
+|   <T_float:"float">
+|   <T_unobj:"UnspecifiedObject">
+|   <T_list:"list">
+|   <T_mapping:"mapping">
+|   <T_structure:"structure">
+|   <T_tuple:"tuple">
+|   <T_returns:"returns">
+|   <T_async:"async">
+|   <T_round_open_bracket:"(">
+|   <T_round_close_bracket:")">
+|   <T_comma:",">
+|   <T_dot:".">
+|   <T_semicolon:";">
+|   <T_colon:":">
+|   <T_figure_open_bracket:"{">
+|   <T_figure_close_bracket:"}">
+}
+
+
+TOKEN:
+{
+    < S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
+|   < #LETTER: ["a"-"z", "A"-"Z"] >
+|   < #DIGIT: ["0" - "9"] >
+|   < #SPECIAL_CHARS: "$" | "_" | "-">
+|   < INCLUDE_LITERAL: "#include" ([" ", "\t"])* "<" (~[">"])* ">">
+}
+
+/**
+ * Main parsing method. It iterates over includes and after that over modules.
+ */
+Map<String, KbModule> SpecStatement(IncludeProvider ip):
+{
+  Map<String, KbModule> ret = new LinkedHashMap<String, KbModule>();
+  Map<String, KbModule> includes = null;
+}
+{
+  { lastComment.set(null); }
+  includes = IncludeList(ip)
+  ret = ModuleList(includes)
+  <EOF>
+  { return ret; }
+}
+
+/**
+ * Method iterates over includes.
+ */
+Map<String, KbModule> IncludeList(IncludeProvider ip):
+{
+  Map<String, KbModule> ret = new LinkedHashMap<String, KbModule>();
+  Map<String, KbModule> added = null;
+  String includeLine = null;
+}
+{
+  (
+    added = Include(ip)
+    { ret.putAll(added); }
+  )*
+  { return ret; }
+}
+
+/**
+ * Method parses one include line.
+ */
+Map<String, KbModule> Include(IncludeProvider ip):
+{
+  Token pathToken;
+}
+{
+  pathToken = <INCLUDE_LITERAL>
+  {
+  	try {
+	    return ip.parseInclude(pathToken.toString()); 
+	} catch (KidlParseException ex) {
+		generateParseException(ex);
+	}
+  }
+}
+
+/**
+ * Method iterates over modules.
+ */
+Map<String, KbModule> ModuleList(Map<String, KbModule> includes):
+{
+  Map<String, KbModule> ret = new LinkedHashMap<String, KbModule>();
+  KbModule module = null;
+}
+{
+  (
+    module = Module(includes)
+    { 
+      ret.put(module.getModuleName(), module); 
+      includes.put(module.getModuleName(), module);
+    }
+  )*
+  { return ret; }
+}
+
+Token Identifier():
+{
+  Token ret = null;
+}
+{ (
+    ( ret = <S_IDENTIFIER> ) 
+    | 
+    ( ret = "required" ) 
+    |
+    ( ret = "optional" ) 
+    |
+    ( ret = "none" )
+    |
+    ( ret = "async" )
+  )
+  { return ret; }
+}
+
+/**
+ * Method parses one module. So it iterates over module components (typedefs, funcdefs and auths).
+ * They are separated by semicolon.
+ */
+KbModule Module(Map<String, KbModule> includes):
+{
+  Token first = null;
+  KbModule ret = null;
+  String comment = null;
+  Token srvToken = null;
+  Token nameToken = null;
+  KbModuleComp comp = null;
+}
+{
+  first = "module"
+  {
+	comment = getLastComment(first);
+  }
+  [
+    LOOKAHEAD (Identifier() ":")
+    srvToken = Identifier()
+    ":"
+  ]
+  nameToken = Identifier()
+  { ret = new KbModule(srvToken == null ? null : srvToken.toString(), nameToken.toString(), comment); }
+  "{"
+  (
+    (      (
+        comp = Typedef(ret, includes)
+      )
+      |
+      (
+        comp = Funcdef(ret, includes)
+      )
+	  |
+	  (		comp = Auth()
+	  )
+	)
+	";"
+    {
+      if (!(comp instanceof KbAuthdef))
+          lastComment.set(null);
+      ret.addModuleComponent(comp);
+    }  )*
+  "}"
+  ";"  { return ret; }
+}
+
+/**
+ * Method parses type definition (one of scalar, unspecified object, list, mapping, tuple, structure and 
+ * reference to another typedef).
+ */
+KbTypedef Typedef(KbModule curModule, Map<String, KbModule> includes):
+{
+  Token first;
+  String comment;
+  KbType type;
+  Token name;
+}
+{
+  first = "typedef"
+  {
+	comment = getLastComment(first);
+  }
+  type = Type(curModule, includes)
+  name = Identifier()
+  { 
+  	try {
+	  	return new KbTypedef(curModule.getModuleName(), name.toString(), type, comment); 
+	} catch (KidlParseException ex) {
+		generateParseException(ex);
+	}
+  }
+}
+
+/**
+ * Method parses nameless type definition which can be used in typedefs, funcdefs and as part of 
+ * another type. This type can be one of scalar, unspecified object, list, mapping, tuple, structure and 
+ * reference to another typedef). Structure can't be type of funcdef parameter or part of another type. 
+ */
+KbType Type(KbModule curModule, Map<String, KbModule> includes):
+{  KbType ret = null;
+  Token t = null;
+  KbType subType;
+  KbType subType2;
+  KbParameter tupleElem;
+  KbStructItem structItem;
+  Token moduleToken = null;
+  Token typeToken = null;
+}
+{
+  (
+  	(
+  	  t = "string"
+  	  { ret = new KbScalar(t.toString()); }  	)
+	|   	(
+  	  t = "int"
+  	  { ret = new KbScalar(t.toString()); }
+  	)
+	| 
+  	(
+  	  t = "float"
+  	  { ret = new KbScalar(t.toString()); }
+  	)
+	| 
+  	(
+  	  t = "UnspecifiedObject"
+  	  { ret = new KbUnspecifiedObject(); }
+  	)
+	| 
+    (
+      t = "list" "<" subType = Type(curModule, includes) ">"
+      { ret = new KbList(subType); }
+    )
+  	|
+  	(  	  t = "mapping" "<" subType = Type(curModule, includes) [Identifier()] "," 
+  	  subType2 = Type(curModule, includes) [Identifier()] ">"
+      { ret = new KbMapping(subType, subType2); }
+  	)
+  	|
+  	(
+  	  t = "tuple"
+      { ret = new KbTuple(); }
+  	  "<" tupleElem = OptNameParam(curModule, includes)
+  	  { ((KbTuple)ret).addElement(tupleElem); }
+  	  (
+  	  	"," tupleElem = OptNameParam(curModule, includes)
+      	{ ((KbTuple)ret).addElement(tupleElem); }
+  	  )* ">"
+  	)
+	|
+	(	  t = "structure"
+	  "{"
+	  { ret = new KbStruct(); }
+	  (		  structItem = StructItem(curModule, includes) ";"
+          { 
+            boolean ok = ((KbStruct)ret).addItem(structItem);
+            if (!ok)
+              generateParseException("Name duplication for field [" + structItem.getName() + "]"); 
+          }
+	  )*
+	  "}"	)
+	|
+	(
+	  [
+    	LOOKAHEAD (Identifier() ".")
+    	moduleToken = Identifier()
+    	"."
+  	  ]
+	  typeToken = Identifier()
+	)
+  )  {
+    if (ret == null) {
+    	String module = moduleToken == null ? null : moduleToken.toString();
+    	KbModule refModule = null;
+    	if (module == null || module.equals(curModule.getModuleName())) {
+    		refModule = curModule;
+    	} else {
+    		refModule = includes.get(module);
+    		if (refModule == null)
+    			generateParseException("Can not find module: " + module);
+    	}
+    	String type = typeToken.toString();
+    	ret = refModule.getNameToType().get(type);
+    	if (ret == null)
+    		generateParseException("Can not find type: " + (module == null ? "" : (module + ".")) + type);
+    } else {
+        ret.afterCreation();
+    }
+    return ret;
+  }
+}
+
+/**
+ * Element of structure. They are separated by semicolon.
+ */
+KbStructItem StructItem(KbModule curModule, Map<String, KbModule> includes):
+{  KbType type;
+  Token name;
+}
+{
+  type = Type(curModule, includes)
+  name = Identifier()
+  { return new KbStructItem(type, name.toString()); }
+}
+
+KbAuthdef Auth():
+{
+  Token t;
+}
+{
+  "authentication"
+  (
+ 	(		t = "required"
+  	)
+    |
+    (
+	  t = "optional"
+    )
+    |
+    (
+	  t = "none"
+    )
+  )
+  { return new KbAuthdef(t.toString()); }
+}
+
+/**
+ * Method parses function definition.
+ */
+KbFuncdef Funcdef(KbModule curModule, Map<String, KbModule> includes):
+{
+  Token first;
+  boolean async = false;
+  KbFuncdef ret = null;
+  String comment = null;
+  Token name;
+  List<KbParameter> args;
+  List<KbParameter> rets;
+  KbAuthdef auth;
+}
+{
+  [
+    "async"
+    { async = true; }
+  ]
+  first = "funcdef"
+  {
+	comment = getLastComment(first);
+  }
+  name = Identifier()
+  "("
+  { ret = new KbFuncdef(name.toString(), comment, async); }
+  args = OptNameParams(curModule, includes)
+  { ret.getParameters().addAll(args); }
+  ")"
+  "returns"
+  "("
+  rets = OptNameParams(curModule, includes)
+  { ret.getReturnType().addAll(rets); }
+  ")"
+  [ auth = Auth()
+  	{ ret.setAuthentication(auth.getType()); }
+  ]
+  { return ret; }
+}
+
+/**
+ * Method parses input or return parameters of function and elements of tuple.
+ */
+List<KbParameter> OptNameParams(KbModule curModule, Map<String, KbModule> includes):
+{
+  List<KbParameter> ret = new ArrayList<KbParameter>();
+  KbParameter param;
+}
+{
+  [
+  	param = OptNameParam(curModule, includes)
+  	{ ret.add(param); }
+    (
+      ","
+  	  param = OptNameParam(curModule, includes)
+  	{ ret.add(param); }
+    )*
+  ]
+  { return ret; }
+}
+
+/**
+ * Method parses one input or return parameter of function and one element of tuple.
+ */
+KbParameter OptNameParam(KbModule curModule, Map<String, KbModule> includes):
+{
+  KbType type;
+  Token nameToken;
+  String name = null;
+}
+{
+  type = Type(curModule, includes)
+  [ nameToken = Identifier()
+    { name = nameToken.toString(); }
+  ]
+  { return new KbParameter(type, name); }
+}

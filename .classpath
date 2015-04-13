@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/codemodel/codemodel-2.4.1.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kohsuke/args4j-2.0.21.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/ini4j/ini4j-0.5.2.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/jackson/jackson-annotations-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/jackson/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/jackson/jackson-databind-2.2.3.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/jetty/jetty-all-7.0.0.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/google/jsonschema2pojo-core-0.3.6.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/jna/jna-3.4.0.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/junit/junit-4.9.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/auth/kbase-auth-1380919426-d35c17d.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/servlet/servlet-api-2.5.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/syslog4j/syslog4j-0.9.46.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/velocity-1.7.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="./kbase-common-temp.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

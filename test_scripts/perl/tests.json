@@ -1,0 +1,69 @@
+{
+   "package": "TestClient",
+   "class": "Basic",
+   "tests":[
+       {
+           "method":"many_complex_params",
+           "auth":false,
+           "params": [{"test":"test"}, {}],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"one_simple_param",
+           "auth":false,
+           "params": [44],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"one_simple_param",
+           "auth":false,
+           "params": [44],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"nothing",
+           "auth":false,
+           "params": [],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"nothing",
+           "auth":false,
+           "context":"scalar",
+           "params": [],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"one_simple_param",
+           "auth":false,
+           "context":"scalar",
+           "params": [44],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"one_complex_param",
+           "auth":false,
+           "context":"scalar",
+           "params": [{"x":2}],
+           "outcome":{"status":"nomatch"}
+       },
+       {
+           "method":"one_simple_param",
+           "auth":false,
+           "params": [[]],
+           "outcome":{"status":"fail", "error":["Invalid arguments"]}
+       },
+       {
+           "method":"with_auth",
+           "auth":true,
+           "params": [44],
+           "outcome":{"status":"pass"}
+       },
+       {
+           "method":"with_auth",
+           "auth":false,
+           "params": [44],
+           "outcome":{"status":"fail", "error":["Authentication required"]}
+       }
+   ]
+}
