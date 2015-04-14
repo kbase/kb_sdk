@@ -23,11 +23,6 @@
   <property name="test.config"  value="test_scripts/test.cfg"/>
   <property name="test.script"  value="test_module_builder.sh"/>
 
-
-  <property name="out.lib"	location="${LIB_TARGET}"/>
-  <property name="out.jar"	location="${TARGET}/lib/jars/kbase"/>
-
-
   <!-- define the output jar and shell script filenames -->
   <property name="kidl.jar.file" value="kbase-kidl-parser.jar"/>
   <property name="module_builder.jar.file"	value="kbase_module_builder.jar"/>
@@ -68,7 +63,6 @@
     <mkdir dir="${dist}"/>
     <mkdir dir="${bin.local}"/>
     <mkdir dir="${test.dir}"/>
-    <mkdir dir="${out.lib}"/>
   </target>
 	
   <target name="compile" depends="init" description="compile the source">
