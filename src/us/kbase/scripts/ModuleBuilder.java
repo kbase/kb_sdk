@@ -57,7 +57,7 @@ public class ModuleBuilder {
                 a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
                 a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
                 a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
-                a.javaBuildXml, a.javaGwtPackage, true, outDir, a.jsonSchema, false);
+                a.javaBuildXml, a.javaGwtPackage, true, outDir, a.jsonSchema, a.makefile);
     }
 
     public static void generate(File specFile, String url, boolean jsClientSide, 
@@ -283,6 +283,9 @@ public class ModuleBuilder {
         @Option(name="-jsonschema",usage="JSON schema output folder, is not defined by " +
         		"default", metaVar="<json-schema>")
         String jsonSchema = null;
+
+        @Option(name="-makefile",usage="Will generate makefile templates for servers and/or java client")
+        boolean makefile = false;
 
         @Argument(metaVar="<spec-file>",required=true,usage="File *.spec for compilation into " +
         		"java classes")

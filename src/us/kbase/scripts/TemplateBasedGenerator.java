@@ -124,6 +124,8 @@ public class TemplateBasedGenerator {
             List<Map<String, Object>> modules = (List<Map<String, Object>>)context.get("modules");
             for (int modulePos = 0; modulePos < modules.size(); modulePos++) {
                 Map<String, Object> module = new LinkedHashMap<String, Object>(modules.get(modulePos));
+                perlMakefileContext.put("module", module);
+                pyMakefileContext.put("module", module);
                 List<Map<String, Object>> methods = (List<Map<String, Object>>)module.get("methods");
                 List<String> methodNames = new ArrayList<String>();
                 for (Map<String, Object> method : methods)
