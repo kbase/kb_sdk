@@ -1,28 +1,47 @@
-<project name="Module Builder" default="compile_and_bin" basedir=".">
+<project name="KBase Module Builder" default="compile_and_bin" basedir=".">
 
   <description>
-      Build file for the Module Builder
+      Java Build file for the KBase Module Builder
   </description>
 
-  <!-- set global properties that typically overwritten by Makefile -->
-  <property name="DEPLOY_RUNTIME" location="/kb/runtime"/>
-  <property name="TARGET"	location="/kb/deployment"/>
+  <!-- set global properties that need to be overwritten by the Makefile or ant invoker -->
+  <!-- property name="BIN_TARGET" location="../../bin" / -->
+  <!-- property name="BIN_LIB_TARGET" location="dist"/ -->
+
+
+  <property name="TESTCFG" location="test/test.cfg"/>
+
 
   <!-- set global properties for this build -->
   <property name="src"	location="src"/>
-  <property name="out.lib"	location="${TARGET}/lib/jars"/>
-  <property name="dist"	location="dist"/>
-  <property name="out.bin"	location="${TARGET}/bin"/>
+  <property name="dist" location="dist"/>
+  <property name="bin.local" location="bin"/>
+  <property name="classes"  location="classes"/>
+
+
+  <property name="test.dir" location="temp_test_files"/>
+  <property name="test.config"  value="test_scripts/test.cfg"/>
+  <property name="test.script"  value="test_module_builder.sh"/>
+
+
+  <property name="out.lib"	location="${LIB_TARGET}"/>
   <property name="out.jar"	location="${TARGET}/lib/jars/kbase"/>
-  <property name="classes"	location="classes"/>
-  <property name="test.dir"	location="temp_test"/>
-  <property name="jar.file"	value="kbase_module_builder.jar"/>
+
+
+  <!-- define the output jar and shell script filenames -->
   <property name="kidl.jar.file" value="kbase-kidl-parser.jar"/>
-  <property name="sh.file"	value="module_builder"/>
-  <property name="test.file"	value="test_module_builder.sh"/>
+  <property name="module_builder.jar.file"	value="kbase_module_builder.jar"/>
+  <property name="module_builder.sh.file"	value="kb-module-builder"/>
+
+
+  <!-- If the BIN_LIB_TARGET is defined, then use the jars from the target destination
+       when including the classpath for the bin -->
+  <condition property="jardir" value="${BIN_LIB_TARGET}/jars">
+    <isset property="BIN_LIB_TARGET"/>
+  </condition>
 
   <property environment="env"/>
-  <condition property="lib" value="../jars/lib/jars/">
+  <condition property="jardir" value="../jars/lib/jars/">
     <or>
       <equals arg1="${env.JENKINS_JARS_MODULE_PATH}" arg2=""/>
       <not>
@@ -31,7 +50,7 @@
     </or>
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
-  <property name="lib" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
+  <property name="jardir" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
   <condition property="commonjar" value="kbase/common/kbase-common-0.0.9.jar">
     <or>
       <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
@@ -47,17 +66,14 @@
     <!-- Create the output directory structure-->
     <mkdir dir="${classes}"/>
     <mkdir dir="${dist}"/>
+    <mkdir dir="${bin.local}"/>
     <mkdir dir="${test.dir}"/>
     <mkdir dir="${out.lib}"/>
   </target>
 	
-  <target name="copy_kidl_jar" if="EXT_KIDL_JAR">
-    <!-- copy the kidl jar to a versioned jar -->
-    <copy file="${dist}/${kidl.jar.file}" tofile="${dist}/${EXT_KIDL_JAR}"/>
-  </target>
-	
   <target name="compile" depends="init" description="compile the source">
     <!-- Compile class files-->
+    <echo>Compiling with jar directory: ${jardir}</echo>
     <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" />
     <!-- Copy resource files-->
     <copy todir="${classes}">
@@ -68,7 +84,7 @@
       </fileset>
     </copy>
     <!-- Make main jar file-->
-    <jar destfile="${dist}/${jar.file}" basedir="${classes}">
+    <jar destfile="${dist}/${module_builder.jar.file}" basedir="${classes}">
       <manifest>
         <attribute name="Main-Class" value="us.kbase.scripts.ModuleBuilder"/>
       </manifest>
@@ -92,7 +108,7 @@
   </target>
 
   <path id="compile.classpath">
-    <fileset dir="${lib}">
+    <fileset dir="${jardir}">
       <include name="kohsuke/args4j-2.0.21.jar"/>
       <include name="codemodel/codemodel-2.4.1.jar"/>
       <include name="apache_commons/commons-io-2.4.jar"/>
@@ -117,30 +133,92 @@
     </fileset>
   </path>
 
-  <target name="compile_and_bin" depends="compile,copy_kidl_jar" description="compile and create shell file in dev_container/bin" >
-    <!-- Define list of lib-jar files-->
+  <target name="copy_kidl_jar" if="EXT_KIDL_JAR">
+    <!-- copy the kidl jar to a versioned jar suitable for addition to the jars repo -->
+    <copy file="${dist}/${kidl.jar.file}" tofile="${dist}/${EXT_KIDL_JAR}"/>
+    <echo>Successfully created versioned library jar: ${EXT_KIDL_JAR}</echo>
+  </target>
+
+
+  <target name="compile_and_bin" depends="compile, copy_kidl_jar" description="compile and create shell file in the local bin directory" >
     <!-- Define absolute path to main jar file-->
     <property name="jar.absolute.path" location="${dist}/${jar.file}"/>
     <!-- Define classpath string with : delimiter from list of lib-jar files-->
     <pathconvert targetos="unix" property="lib.classpath" refid="compile.classpath"/>
     <!-- Create main shell script-->
-    <echo file="${dist}/${sh.file}">#!/bin/sh
+    <echo file="${bin.local}/${module_builder.sh.file}">#!/bin/sh
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.ModuleBuilder $@
     </echo>
-    <chmod file="${dist}/${sh.file}" perm="a+x"/>
-    <!-- Copy main shell script into dev_container bin folder-->
-    <copy todir="${out.bin}" flatten="true">
-      <fileset file="${dist}/${sh.file}"/>
-    </copy>
-    <chmod file="${out.bin}/${sh.file}" perm="a+x"/>
+    <chmod file="${bin.local}/${module_builder.sh.file}" perm="a+x"/>
+    <echo>Successfully built: ${bin.local}/${module_builder.sh.file}</echo>
   </target>
+
+
+  <target name="copy_local_bin" description="copies the module_builder binary to the BIN_TARGET">
+    <fail message="file ${bin.local}/${module_builder.sh.file} is missing- did you forget to compile or run make first?">
+        <condition>
+            <not><available file="${bin.local}/${module_builder.sh.file}" /></not>
+        </condition>
+    </fail>
+    <fail message="BIN_TARGET ant property must be set to copy the local bin script">
+        <condition>
+            <not><isset property="BIN_TARGET" /></not>
+        </condition>
+    </fail>
+    <!-- Copy main shell script into the target bin folder-->
+    <copy todir="${BIN_TARGET}" flatten="true">
+      <fileset file="${dist}/${module_builder.sh.file}"/>
+    </copy>
+    <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
+    <echo>Successfully deployed dev bin to: ${BIN_TARGET}/${module_builder.sh.file}</echo>
+  </target>
+
+
+  <!-- deploy the module builder bin to the BIN_TARGET -->
+  <target name="deploy_bin" description="deploys the module builder shell script and libs if ">
+    <!-- fail if the jar file is missing -->
+    <fail message="file ${dist}/${module_builder.jar.file} is missing- did you forget to compile or run make first?">
+        <condition><not><available file="${dist}/${module_builder.jar.file}" /></not></condition>
+    </fail>
+    <!-- fail if the targets are not set -->
+    <fail message="BIN_TARGET and BIN_LIB_TARGET ant property must be set to deploy_bin">
+        <condition>
+          <or>
+            <not><isset property="BIN_TARGET" /></not>
+            <not><isset property="BIN_LIB_TARGET" /></not>
+          </or>
+        </condition>
+    </fail>
+    <!-- fail if the jars repo is not deployed to the BIN_TARGET location -->
+    <fail message="jars folder in ${BIN_LIB_TARGET} is missing- did you forget to deploy 'jars'?">
+        <condition><not><available file="${BIN_LIB_TARGET}/jars" /></not></condition>
+    </fail>
+    <!-- copy lib to target -->
+    <copy todir="${BIN_LIB_TARGET}" flatten="true">
+      <fileset file="${dist}/${module_builder.jar.file}"/>
+    </copy>
+    <echo>Successfully deployed lib to: ${BIN_LIB_TARGET}/${module_builder.jar.file}</echo>
+    <echo>Linking against jar directory: ${jardir}</echo>
+    <property name="jar.absolute.path" location="${BIN_LIB_TARGET}/${module_builder.jar.file}"/>
+    <!-- Define classpath string with : delimiter from list of lib-jar files-->
+    <pathconvert targetos="unix" property="lib.classpath" refid="compile.classpath"/>
+    <!-- Create main shell script-->
+    <echo file="${BIN_TARGET}/${module_builder.sh.file}">#!/bin/sh
+export JAVA_HOME=${env.JAVA_HOME}
+export PATH=$JAVA_HOME/bin:$PATH
+$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.ModuleBuilder $@
+    </echo>
+    <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
+  </target>
+
 
   <target name="preparejunitreportdir" if="env.JENKINS_REPORT_DIR">
     <delete dir="${env.JENKINS_REPORT_DIR}"/>
     <mkdir dir="${env.JENKINS_REPORT_DIR}"/>
   </target>
+
 
   <target name="test" depends="compile, preparejunitreportdir" description="create test script">
     <!-- Define absolute path to main jar file-->
@@ -159,38 +237,15 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.M
     </junit>
   </target>
 
-  <target name="dist" depends="compile" description="generate the distribution" >
-    <!-- Copy main jar file into deployment lib folder-->
-    <copy todir="${out.jar}" flatten="true">
-      <fileset file="${dist}/${jar.file}"/>
-    </copy>
-    <!-- Define list of lib-jar files-->
-    <property name="absolute.lib" location="${lib}"/>
-    <!-- Define absolute path to main jar file-->
-    <property name="jar.absolute.path" location="${out.jar}/${jar.file}"/>
-    <!-- Define classpath string with : delimiter from list of lib-jar files-->
-    <pathconvert targetos="unix" property="dist.lib.classpath" refid="compile.classpath">
-      <map from="${absolute.lib}" to="${out.lib}"/>
-    </pathconvert>
-    <!-- Create main shell script-->
-    <echo file="${dist}/${sh.file}">#!/bin/sh
-export JAVA_HOME=${env.JAVA_HOME}
-export PATH=$JAVA_HOME/bin:$PATH
-$JAVA_HOME/bin/java -cp ${dist.lib.classpath}:${jar.absolute.path} us.kbase.scripts.ModuleBuilder $@
-    </echo>
-    <chmod file="${dist}/${sh.file}" perm="a+x"/>
-    <!-- Copy main shell script into deployment bin folder-->
-    <copy todir="${out.bin}" flatten="true">
-      <fileset file="${dist}/${sh.file}"/>
-    </copy>
-    <chmod file="${out.bin}/${sh.file}" perm="a+x"/>
-  </target>
 
   <target name="clean" description="clean up" >
     <!-- Clean up internal temporary files and folders-->
     <delete dir="${classes}"/>
     <delete dir="${dist}"/>
     <delete dir="${test.dir}"/>
+    <delete dir="${bin.local}"/>
   </target>
+
+
 </project>
 
