@@ -86,7 +86,7 @@ public class TypeGeneratorTest extends Assert {
 	@BeforeClass
 	public static void prepareTestConfigParams() throws Exception {
 		Properties props = new Properties();
-		InputStream is = new FileInputStream(new File("test.cfg"));
+		InputStream is = new FileInputStream(new File("test_scripts/test.cfg"));
 		props.load(is);
 		is.close();
 		for (Object key : props.keySet()) {
