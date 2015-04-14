@@ -57,7 +57,7 @@ public class ModuleBuilder {
                 a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
                 a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
                 a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
-                a.javaBuildXml, a.javaGwtPackage, true, outDir, a.jsonSchema);
+                a.javaBuildXml, a.javaGwtPackage, true, outDir, a.jsonSchema, false);
     }
 
     public static void generate(File specFile, String url, boolean jsClientSide, 
@@ -68,8 +68,10 @@ public class ModuleBuilder {
             String pyImplName, boolean javaClientSide, boolean javaServerSide, 
             String javaPackageParent, String javaSrcPath, String javaLibPath, 
             boolean javaBuildXml, String javaGwtPackage, boolean newStyle, 
-            File outDir, String jsonSchemaPath) throws Exception {
-        FileSaver javaSrcOut = new DiskFileSaver(correctRelativePath(javaSrcPath, outDir));
+            File outDir, String jsonSchemaPath, boolean createMakeFile) throws Exception {
+        FileSaver javaSrcOut = null;
+        if (javaSrcPath != null)
+            javaSrcOut = new DiskFileSaver(correctRelativePath(javaSrcPath, outDir));
         FileSaver javaLibOut = null;
         if (javaLibPath != null) {
             javaLibOut = new DiskFileSaver(correctRelativePath(javaLibPath, outDir));
@@ -91,7 +93,7 @@ public class ModuleBuilder {
                 perlPsgiName, perlEnableRetries, pyClientSide, pyClientName, pyServerSide, 
                 pyServerName, pyImplName, javaClientSide, javaServerSide, 
                 javaPackageParent, javaSrcOut, javaLibOut, buildXml, javaGwtPackage, 
-                newStyle, ip, output, jsonSchemaOut);
+                newStyle, ip, output, jsonSchemaOut, createMakeFile);
     }
 
     private static File correctRelativePath(String javaSrcPath, File outDir) {
@@ -109,7 +111,8 @@ public class ModuleBuilder {
             String pyImplName, boolean javaClientSide, boolean javaServerSide, 
             String javaPackageParent, FileSaver javaSrcDir, FileSaver javaLibDir, 
             FileSaver javaBuildXml, String javaGwtPackage, boolean newStyle, 
-            IncludeProvider ip, FileSaver output, FileSaver jsonSchemas) throws Exception {
+            IncludeProvider ip, FileSaver output, FileSaver jsonSchemas,
+            boolean createMakefile) throws Exception {
         Map<String, Map<String, String>> modelToTypeJsonSchemaReturn = null;
         if (jsonSchemas != null)
             modelToTypeJsonSchemaReturn = new TreeMap<String, Map<String, String>>();
@@ -125,6 +128,26 @@ public class ModuleBuilder {
                 }
             }
         }
+        FileSaver perlMakefile = null;
+        FileSaver pyMakefile = null;
+        FileSaver javaMakefile = null;
+        if (createMakefile) {
+            perlServerSide = TemplateBasedGenerator.genPerlServer(perlServerSide, 
+                    perlServerName, perlImplName, perlPsgiName);
+            pyServerSide = TemplateBasedGenerator.genPythonServer(pyServerSide, 
+                    pyServerName, pyImplName);
+            int srvNum = (javaServerSide ? 1 : 0) + (perlServerSide ? 1 : 0) +
+                    (pyServerSide ? 1 : 0);
+            if (perlServerSide)
+                perlMakefile = new OneFileSaver(output, "makefile." + 
+                        (srvNum > 1 ? "perl_" : "") + "template");
+            if (pyServerSide)
+                pyMakefile = new OneFileSaver(output, "makefile." + 
+                        (srvNum > 1 ? "py_" : "") + "template");
+            if (javaServerSide)
+                javaMakefile = new OneFileSaver(output, "makefile." + 
+                        (srvNum > 1 ? "java_" : "") + "template");
+        }
         if (javaServerSide)
             javaClientSide = true;
         if (javaGwtPackage != null)
@@ -132,12 +155,12 @@ public class ModuleBuilder {
         if (javaClientSide)
             JavaTypeGenerator.processSpec(services, javaSrcDir, javaPackageParent, 
                     javaServerSide, javaLibDir, javaGwtPackage, 
-                    url == null ? null : new URL(url), javaBuildXml);
+                    url == null ? null : new URL(url), javaBuildXml, javaMakefile);
         TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
-                pyServerSide, pyServerName, pyImplName, perlEnableRetries, true, 
-                ip, output);
+                pyServerSide, pyServerName, pyImplName, perlEnableRetries, newStyle, 
+                ip, output, perlMakefile, pyMakefile);
     }
 
     private static void showError(CmdLineParser parser, String message) {

@@ -50,7 +50,7 @@ import us.kbase.scripts.JavaData;
 import us.kbase.scripts.JavaFunc;
 import us.kbase.scripts.JavaModule;
 import us.kbase.scripts.JavaTypeGenerator;
-import us.kbase.scripts.TemplateBasedGenerator;
+import us.kbase.scripts.ModuleBuilder;
 import us.kbase.scripts.TextUtils;
 import us.kbase.scripts.util.ProcessHelper;
 
@@ -547,12 +547,16 @@ public class TypeGeneratorTest extends Assert {
         File serverOutDir = new File(workDir, newStyle ? "out" : "old");
         if (!serverOutDir.exists())
             serverOutDir.mkdir();
-        TemplateBasedGenerator.generate(testFile, null, true, null, 
-                true, null, true, null, null, "service.psgi", true, 
-                null, true, null, null, false, newStyle, serverOutDir);
-        TemplateBasedGenerator.generate(testFile, null, true, null, 
-                true, null, false, null, null, null, true, 
-                null, false, null, null, false, true, serverOutDir);
+        // Generate servers (old or new style)
+        ModuleBuilder.generate(testFile, null, true, null, 
+                true, null, true, null, null, "service.psgi", false, true, 
+                null, true, null, null, false, false, null, null, null, false, 
+                null, newStyle, serverOutDir, null, true);
+        // Generate clients (always new style)
+        ModuleBuilder.generate(testFile, null, true, null, 
+                true, null, false, null, null, null, false, true, 
+                null, false, null, null, false, false, null, null, null, false, 
+                null, true, serverOutDir, null, true);
         return serverOutDir;
 	}
 
@@ -622,7 +626,8 @@ public class TypeGeneratorTest extends Assert {
 		Assert.assertTrue(KidlTest.compareJsonSchemas(origSchemas, intSchemas, "Json schema for " + testFileName));
 		List<KbService> services = KidlParser.parseSpec(specFile, workDir, null, null, true);
 		JavaData parsingData = JavaTypeGenerator.processSpec(services, srcDir, testPackage,
-				true, libDir, gwtPackageName, defaultUrl);
+				true, libDir, gwtPackageName, defaultUrl, new File(workDir, "build.xml"), 
+				new File(workDir, "makefile"));
 		return parsingData;
 	}
 

@@ -8,6 +8,10 @@ import java.io.Writer;
 public class OneFileSaver implements FileSaver {
     private final FileSaver folder;
     private final String relPath;
+
+    public OneFileSaver(File file) {
+        this(new DiskFileSaver(file.getAbsoluteFile().getParentFile()), file.getName());
+    }
     
     public OneFileSaver(FileSaver folder, String relPath) {
         this.folder = folder;

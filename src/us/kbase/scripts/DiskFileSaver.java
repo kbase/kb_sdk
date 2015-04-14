@@ -14,8 +14,12 @@ public class DiskFileSaver implements FileSaver {
         this.rootDir = rootDir;
         if (this.rootDir == null)
             this.rootDir = new File(".");
+    }
+    
+    public File getRootDir() {
         if (!this.rootDir.exists())
             this.rootDir.mkdirs();
+        return rootDir;
     }
     
     @Override
@@ -42,6 +46,6 @@ public class DiskFileSaver implements FileSaver {
         if (path.isEmpty() || path.startsWith("/") || path.equals("..") || 
                 path.startsWith("../") || path.contains("/../") || path.endsWith("/.."))
             throw new IOException("Unallowed relative path: " + path);
-        return new File(rootDir, path);
+        return new File(getRootDir(), path);
     }
 }

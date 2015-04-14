@@ -137,21 +137,24 @@ public class JavaTypeGenerator {
 	public static JavaData processSpec(File specFile, File srcOutDir, String packageParent, 
 			boolean createServer, File libOutDir, String gwtPackage, URL url) throws Exception {		
 		List<KbService> services = KidlParser.parseSpec(specFile, null, null, null, true);
-		return processSpec(services, srcOutDir, packageParent, createServer, libOutDir, gwtPackage, url);
+		return processSpec(services, srcOutDir, packageParent, createServer, libOutDir, gwtPackage, url, null, null);
 	}
 	
 	public static JavaData processSpec(List<KbService> services, File srcOutDir, String packageParent, 
-			boolean createServer, File libOutDir, String gwtPackage, URL url) throws Exception {		
+			boolean createServer, File libOutDir, String gwtPackage, URL url,
+			File buildXml, File makefile) throws Exception {		
         FileSaver libOut = libOutDir == null ? null : new DiskFileSaver(libOutDir);
+        FileSaver buildXmlOut = buildXml == null ? null : new OneFileSaver(buildXml);
+        FileSaver makefileOut = buildXml == null ? null : new OneFileSaver(makefile);
 		return processSpec(services, new DiskFileSaver(srcOutDir), packageParent, 
-		        createServer, libOut, gwtPackage, url, null);
+		        createServer, libOut, gwtPackage, url, buildXmlOut, makefileOut);
 	}
 		
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-			FileSaver buildXml) throws Exception {		
+			FileSaver buildXml, FileSaver makefile) throws Exception {		
 		JavaData data = prepareDataStructures(services);
-		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml);
+		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, makefile);
 		return data;
 	}
 
@@ -202,7 +205,7 @@ public class JavaTypeGenerator {
 
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
-			FileSaver buildXml) throws Exception {
+			FileSaver buildXml, FileSaver makefile) throws Exception {
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
 		generateClientClass(data, srcOutDir, packageParent, url);
@@ -210,6 +213,7 @@ public class JavaTypeGenerator {
 			generateServerClass(data, srcOutDir, packageParent);
 		List<String> jars = checkLibs(libOutDir, createServers, buildXml);
 		generateBuildXml(data, jars, createServers, buildXml);
+		generateMakefile(data, createServers, makefile);
 		if (gwtPackage != null) {
 			GwtGenerator.generate(data, srcOutDir, gwtPackage);
 		}
@@ -401,13 +405,7 @@ public class JavaTypeGenerator {
 					break;
 				}
 			}
-            boolean anyAsync = false;
-            for (JavaFunc func : module.getFuncs()) {
-                if (func.getOriginal().isAsync()) {
-                    anyAsync = true;
-                    break;
-                }
-            }
+            boolean anyAsync = anyAsync(module);
 			List<String> classLines = new ArrayList<String>();
 			String urlClass = model.ref("java.net.URL");
 			String tokenClass = model.ref("us.kbase.auth.AuthToken");
@@ -1129,12 +1127,7 @@ public class JavaTypeGenerator {
 		            "  </target>"
 		            ));
 		    if (createServers) {
-		        boolean async = false;
-		        for (JavaFunc func : module.getFuncs())
-		            if (func.getOriginal().isAsync()) {
-		                async = true;
-		                break;
-		            }
+		        boolean async = anyAsync(module);
 		        if (async) {
 		            String shellFileName = "run_" + module.getModuleName() + "_async_job.sh";
 		            lines.addAll(Arrays.asList(
@@ -1158,6 +1151,75 @@ public class JavaTypeGenerator {
                 w.write(l + "\n");
             w.close();
 		}
+	}
+
+    private static boolean anyAsync(JavaModule module) {
+        boolean async = false;
+        for (JavaFunc func : module.getFuncs())
+            if (func.getOriginal().isAsync()) {
+                async = true;
+                break;
+            }
+        return async;
+    }
+	
+	private static void generateMakefile(JavaData data, boolean createServers, 
+	        FileSaver makefile) throws Exception {
+	    if (makefile == null)
+	        return;
+	    List<String> lines = new ArrayList<String>(Arrays.asList(
+	            "TARGET ?= /kb/deployment",
+	            "ANT = ant",
+	            "",
+	            "default: jar",
+	            "",
+	            "jar:",
+	            "\t$(ANT) compile",
+	            "",
+	            "deploy: deploy-client deploy-service deploy-scripts",
+	            "",
+	            "undeploy:",
+	            "\t@echo \"Nothing to undeploy\"",
+	            "",
+	            "deploy-client:",
+	            "\t@echo \"No deployment for client\"",
+	            "",
+	            "deploy-service:",
+	            "\t@echo \"No deployment for service\"",
+	            ""
+	            ));
+	    lines.add("deploy-scripts:");
+	    if (anyAsync(data.getModules().get(0))) {
+	        lines.add("\t$(ANT) make_async_job_script");
+	    } else {
+	        lines.add("\t@echo \"No deployment for scripts\"");
+	    }
+	    lines.addAll(Arrays.asList(
+	            "",
+	            "test: test-client test-service test-scripts",
+	            "",
+	            "test-client:",
+	            "\t@echo \"No tests for client\"",
+	            "",
+	            "test-service:"
+	            ));
+	    if (createServers) {
+            lines.add("\t$(ANT) test");
+	    } else {
+	        lines.add("\t@echo \"No tests for service\"");
+	    }
+	    lines.addAll(Arrays.asList(
+	            "",
+	            "test-scripts:",
+	            "\t@echo \"No tests for scripts\"",
+	            "",
+	            "clean:",
+	            "\t@echo \"No clean is necessary\""
+	            ));
+        Writer w = makefile.openWriter("*");
+        for (String l : lines)
+            w.write(l + "\n");
+        w.close();
 	}
 	
 	public static String checkLib(FileSaver libDir, String libName) throws Exception {
