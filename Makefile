@@ -49,6 +49,9 @@ compile:
 
 endif
 
+submodule-init:
+	git submodule init
+	git submodule update
 
 deploy: deploy-client deploy-service deploy-scripts
 
@@ -69,16 +72,18 @@ deploy-scripts:
 	fi;
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib
 
-test: test-client test-service test-scripts
+test: submodule-init
+	@echo "Running unit tests"
+	$(ANT) test
 
 test-client:
-	@echo "No tests for client"
+	@echo "No tests for client - this kbase module is not a service, and has no clients"
 
 test-service:
-	@echo "No tests for service"
+	@echo "No tests for service - this kbase module is not a service"
 
 test-scripts:
-	$(ANT) test
+	@echo "No direct tests for scripts - run unit tests with test target instead"
 
 clean:
 	$(ANT) clean
