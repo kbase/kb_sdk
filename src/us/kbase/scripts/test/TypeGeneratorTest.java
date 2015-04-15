@@ -1,5 +1,6 @@
 package us.kbase.scripts.test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -374,6 +375,11 @@ public class TypeGeneratorTest extends Assert {
         runJavaServerTest(testNum, true, testPackage, libDir, binDir, parsingData, null, portNum);
     }
 
+    @Test
+    public void testServerAuth() throws Exception {
+        startTest(15);
+    }
+    
     private Server startJobService(File binDir, File tempDir) throws Exception {
         Server jettyServer = new Server(findFreePort());
 	    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -722,10 +728,13 @@ public class TypeGeneratorTest extends Assert {
 	    runJavaClientTest(testNum, testPackage, parsingData, libDir, binDir, portNum, needClientServer);
 	    if (outDir != null) {
             String resourceName = "Test" + testNum + ".config.properties";
-	        if (!checkForClientConfig(resourceName)) {
+            String clientConfigText = checkForClientConfig(resourceName);
+	        if (clientConfigText == null) {
 	            System.err.println("- Perl/Python/JavaScript client tests are skipped (" + resourceName + "not found)");	
 	            return;
 	        }
+	        if (clientConfigText.isEmpty())
+                return;
 	        System.out.println("- Perl client -> " + serverType + " server");
 	        runPerlClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
 	        System.out.println("- Python client -> " + serverType + " server");
@@ -883,12 +892,14 @@ public class TypeGeneratorTest extends Assert {
             System.out.println("  (time=" + (System.currentTimeMillis() - time) + " ms)");
     }
 
-    private static boolean checkForClientConfig(String resourceName) throws Exception {
+    private static String checkForClientConfig(String resourceName) throws Exception {
         InputStream configIs = TypeGeneratorTest.class.getResourceAsStream(resourceName);
         if (configIs == null)
-            return false;
+            return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        TextUtils.copyStreams(configIs, baos);
         configIs.close();
-        return true;
+        return new String(baos.toByteArray());
     }
     
     private static void runJsClientTest(int testNum, String testPackage, JavaData parsingData, 
