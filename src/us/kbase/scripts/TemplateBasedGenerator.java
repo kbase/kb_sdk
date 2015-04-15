@@ -61,6 +61,9 @@ public class TemplateBasedGenerator {
             genPerl = true;
             if (perlServerName == null)
                 perlServerName = service.getName() + "Server";
+            if (perlPsgiName == null) {
+            	perlPsgiName = service.getName() + ".psgi";
+            }
         }
         if (genPerl && perlClientName == null)
             perlClientName = service.getName() + "Client";
