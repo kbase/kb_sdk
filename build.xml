@@ -113,13 +113,13 @@
       <include name="jetty/jetty-all-7.0.0.jar"/>
       <include name="jna/jna-3.4.0.jar"/>
       <include name="google/jsonschema2pojo-core-0.3.6.jar"/>
+      <include name="google/guava-14.0.1.jar"/>
       <include name="junit/junit-4.9.jar"/>
       <include name="kbase/auth/kbase-auth-1380919426-d35c17d.jar"/>
       <include name="servlet/servlet-api-2.5.jar"/>
       <include name="syslog4j/syslog4j-0.9.46.jar"/>
       <include name="apache_commons/commons-lang-2.4.jar"/>
       <include name="apache_commons/velocity-1.7.jar"/>
-      <include name="apache_commons/commons-collections-3.2.1.jar"/>
       <!-- include name="${commonjar}"/ -->
     </fileset>
     <fileset dir=".">
@@ -136,7 +136,7 @@
 
   <target name="compile_and_bin" depends="compile, copy_kidl_jar" description="compile and create shell file in the local bin directory" >
     <!-- Define absolute path to main jar file-->
-    <property name="jar.absolute.path" location="${dist}/${jar.file}"/>
+    <property name="jar.absolute.path" location="${dist}/${module_builder.jar.file}"/>
     <!-- Define classpath string with : delimiter from list of lib-jar files-->
     <pathconvert targetos="unix" property="lib.classpath" refid="compile.classpath"/>
     <!-- Create main shell script-->
@@ -162,7 +162,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.M
         </condition>
     </fail>
     <!-- Copy main shell script into the target bin folder-->
-    <copy todir="${BIN_TARGET}" flatten="true">
+    <copy todir="${BIN_TARGET}" flatten="true" verbose="true">
       <fileset file="${dist}/${module_builder.sh.file}"/>
     </copy>
     <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
@@ -191,7 +191,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.M
     </fail>
     <!-- copy lib to target -->
     <copy todir="${BIN_LIB_TARGET}" flatten="true">
-      <fileset file="${dist}/${module_builder.jar.file}"/>
+      <fileset file="${bin.local}/${module_builder.jar.file}"/>
     </copy>
     <echo>Successfully deployed lib to: ${BIN_LIB_TARGET}/${module_builder.jar.file}</echo>
     <echo>Linking against jar directory: ${jardir}</echo>

@@ -36,7 +36,7 @@ TARGET ?= /kb/deployment
 # inside dev_container, we build and copy to dev_container/bin
 compile:
 	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR)
-	$(ANT) copy_local_bin -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -DBIN_TARGET=$(TOP_DIR)/bin
+	$(ANT) copy_local_bin -DBIN_TARGET=$(TOP_DIR)/bin
 
 
 else
@@ -73,6 +73,7 @@ deploy-scripts:
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib
 
 test: submodule-init
+	@# todo: remove perl typecomp tests and add it as a separate target
 	@echo "Running unit tests"
 	$(ANT) test
 
