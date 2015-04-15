@@ -52,6 +52,7 @@ import us.kbase.scripts.JavaFunc;
 import us.kbase.scripts.JavaModule;
 import us.kbase.scripts.JavaTypeGenerator;
 import us.kbase.scripts.ModuleBuilder;
+import us.kbase.scripts.RunCompileCommand;
 import us.kbase.scripts.TextUtils;
 import us.kbase.scripts.util.ProcessHelper;
 
@@ -554,12 +555,12 @@ public class TypeGeneratorTest extends Assert {
         if (!serverOutDir.exists())
             serverOutDir.mkdir();
         // Generate servers (old or new style)
-        ModuleBuilder.generate(testFile, null, true, null, 
+        RunCompileCommand.generate(testFile, null, true, null, 
                 true, null, true, null, null, "service.psgi", false, true, 
                 null, true, null, null, false, false, null, null, null, false, 
                 null, newStyle, serverOutDir, null, true);
         // Generate clients (always new style)
-        ModuleBuilder.generate(testFile, null, true, null, 
+        RunCompileCommand.generate(testFile, null, true, null, 
                 true, null, false, null, null, null, false, true, 
                 null, false, null, null, false, false, null, null, null, false, 
                 null, true, serverOutDir, null, true);

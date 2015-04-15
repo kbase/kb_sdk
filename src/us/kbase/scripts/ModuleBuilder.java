@@ -78,7 +78,6 @@ public class ModuleBuilder {
 	    }
     }
     
-    
     public static int runCompileCommand(CompileCommandArgs a, JCommander jc) {
     	
     	// Step 1: convert list of args to a  Files (this must be defined because it is required)
@@ -86,7 +85,7 @@ public class ModuleBuilder {
     	try {
     		if(a.specFileNames.size()>1) {
     			// right now we only support compiling one file at a time
-                showError("Compile Error","Too many input KIDL spec files provided",
+                ModuleBuilder.showError("Compile Error","Too many input KIDL spec files provided",
                 		"Currently there is only support for compiling one module at a time, which \n"+
                 		"is required to register data types and KIDL specs with the Workspace.  This \n"+
                 		"code may be extended in the future to allow multiple modules to be compiled \n"+
@@ -122,7 +121,7 @@ public class ModuleBuilder {
         }
         
         try {
-			generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
+			RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
 			        a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
 			        a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
 			        a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
@@ -133,12 +132,10 @@ public class ModuleBuilder {
 			System.err.println(e.getMessage());
 			return 1;
 		}
-        
         return 0;
     }
     
-
-    private static List<File> convertToFiles(List<String> filenames) throws IOException {
+    static List<File> convertToFiles(List<String> filenames) throws IOException {
     	List <File> files = new ArrayList<File>(filenames.size());
     	for(String filename: filenames) {
     		File f = new File(filename);
@@ -150,111 +147,7 @@ public class ModuleBuilder {
 		return files;
     }
     
-    
-    public static void generate(File specFile, String url, boolean jsClientSide, 
-            String jsClientName, boolean perlClientSide, String perlClientName, 
-            boolean perlServerSide, String perlServerName, String perlImplName, 
-            String perlPsgiName, boolean perlEnableRetries, boolean pyClientSide, 
-            String pyClientName, boolean pyServerSide, String pyServerName, 
-            String pyImplName, boolean javaClientSide, boolean javaServerSide, 
-            String javaPackageParent, String javaSrcPath, String javaLibPath, 
-            boolean javaBuildXml, String javaGwtPackage, boolean newStyle, 
-            File outDir, String jsonSchemaPath, boolean createMakeFile) throws Exception {
-        FileSaver javaSrcOut = null;
-        if (javaSrcPath != null)
-            javaSrcOut = new DiskFileSaver(correctRelativePath(javaSrcPath, outDir));
-        FileSaver javaLibOut = null;
-        if (javaLibPath != null) {
-            javaLibOut = new DiskFileSaver(correctRelativePath(javaLibPath, outDir));
-        }
-        IncludeProvider ip = new FileIncludeProvider(specFile.getCanonicalFile().getParentFile());
-        FileSaver output = new DiskFileSaver(outDir);
-        if (javaBuildXml && new File(outDir, "build.xml").exists()) {
-            System.err.println("Warning: build.xml file already exists, generation is skipped for it");
-            javaBuildXml = false;
-        }
-        FileSaver buildXml = javaBuildXml ? new OneFileSaver(output, "build.xml") : null;
-        FileSaver jsonSchemaOut = null;
-        if (jsonSchemaPath != null) {
-            jsonSchemaOut = new DiskFileSaver(correctRelativePath(jsonSchemaPath, outDir));
-        }
-        Reader specReader = new FileReader(specFile);
-        generate(specReader, url, jsClientSide, jsClientName, perlClientSide, 
-                perlClientName, perlServerSide, perlServerName, perlImplName, 
-                perlPsgiName, perlEnableRetries, pyClientSide, pyClientName, pyServerSide, 
-                pyServerName, pyImplName, javaClientSide, javaServerSide, 
-                javaPackageParent, javaSrcOut, javaLibOut, buildXml, javaGwtPackage, 
-                newStyle, ip, output, jsonSchemaOut, createMakeFile);
-    }
-
-    private static File correctRelativePath(String javaSrcPath, File outDir) {
-        File javaSrcDir = new File(javaSrcPath);
-        if (!javaSrcDir.isAbsolute())
-            javaSrcDir = new File(outDir, javaSrcPath);
-        return javaSrcDir;
-    }
-
-    public static void generate(Reader specFile, String url, boolean jsClientSide, 
-            String jsClientName, boolean perlClientSide, String perlClientName, 
-            boolean perlServerSide, String perlServerName, String perlImplName, 
-            String perlPsgiName, boolean perlEnableRetries, boolean pyClientSide, 
-            String pyClientName, boolean pyServerSide, String pyServerName, 
-            String pyImplName, boolean javaClientSide, boolean javaServerSide, 
-            String javaPackageParent, FileSaver javaSrcDir, FileSaver javaLibDir, 
-            FileSaver javaBuildXml, String javaGwtPackage, boolean newStyle, 
-            IncludeProvider ip, FileSaver output, FileSaver jsonSchemas,
-            boolean createMakefile) throws Exception {
-        Map<String, Map<String, String>> modelToTypeJsonSchemaReturn = null;
-        if (jsonSchemas != null)
-            modelToTypeJsonSchemaReturn = new TreeMap<String, Map<String, String>>();
-        List<KbService> services = KidlParser.parseSpec(KidlParser.parseSpecInt(specFile, 
-                modelToTypeJsonSchemaReturn, ip));
-        if (jsonSchemas != null) {
-            for (String module : modelToTypeJsonSchemaReturn.keySet()) {
-                Map<String, String> typeToSchema = modelToTypeJsonSchemaReturn.get(module);
-                for (String type : typeToSchema.keySet()) {
-                    Writer w = jsonSchemas.openWriter(module + "/" + type + ".json");
-                    w.write(typeToSchema.get(type));
-                    w.close();
-                }
-            }
-        }
-        FileSaver perlMakefile = null;
-        FileSaver pyMakefile = null;
-        FileSaver javaMakefile = null;
-        if (createMakefile) {
-            perlServerSide = TemplateBasedGenerator.genPerlServer(perlServerSide, 
-                    perlServerName, perlImplName, perlPsgiName);
-            pyServerSide = TemplateBasedGenerator.genPythonServer(pyServerSide, 
-                    pyServerName, pyImplName);
-            int srvNum = (javaServerSide ? 1 : 0) + (perlServerSide ? 1 : 0) +
-                    (pyServerSide ? 1 : 0);
-            if (perlServerSide)
-                perlMakefile = new OneFileSaver(output, "makefile." + 
-                        (srvNum > 1 ? "perl_" : "") + "template");
-            if (pyServerSide)
-                pyMakefile = new OneFileSaver(output, "makefile." + 
-                        (srvNum > 1 ? "py_" : "") + "template");
-            if (javaServerSide)
-                javaMakefile = new OneFileSaver(output, "makefile." + 
-                        (srvNum > 1 ? "java_" : "") + "template");
-        }
-        if (javaServerSide)
-            javaClientSide = true;
-        if (javaGwtPackage != null)
-            javaClientSide = true;
-        if (javaClientSide)
-            JavaTypeGenerator.processSpec(services, javaSrcDir, javaPackageParent, 
-                    javaServerSide, javaLibDir, javaGwtPackage, 
-                    url == null ? null : new URL(url), javaBuildXml, javaMakefile);
-        TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
-                perlClientSide, perlClientName, perlServerSide, perlServerName, 
-                perlImplName, perlPsgiName, pyClientSide, pyClientName, 
-                pyServerSide, pyServerName, pyImplName, perlEnableRetries, newStyle, 
-                ip, output, perlMakefile, pyMakefile);
-    }
-
-    private static class GlobalArgs {
+    public static class GlobalArgs {
     	@Parameter(names = {"-h","--help"}, help = true, description="Display help and full usage information.")
     	boolean help;
     }
@@ -268,119 +161,114 @@ public class ModuleBuilder {
     }
     
     @Parameters(commandDescription = "Compile a KIDL file into client and server code")
-    private static class CompileCommandArgs {
+    public static class CompileCommandArgs {
      
-    	@Parameter(names="-out",description="Common output folder (instead of default . folder) which " +
-        		"will be used for all relative paths")//, metaVar="<out-dir>")
+    	@Parameter(names="--out",description="Set the output folder name (default is the current directory)")
+    			//, metaVar="<out-dir>")
         String outDir = null;
         
-    	@Parameter(names="-js", description="Defines whether or not java-script code for client side " +
-        		"should be created, default value is false, use -js for true")
+    	@Parameter(names="--js", description="Generate a JavaScript client with a standard default name")
         boolean jsClientSide = false;
 
-    	@Parameter(names="-jsclname", description="JavaScript client name (if defined then -js will be " +
-        		"treated as true automatically)")//, metaVar = "<js-client-name>")
+    	@Parameter(names="--jsclname", description="Generate a JavaScript client with the name provided by this option" +
+    			"(overrides --js option)")//, metaVar = "<js-client-name>")
         String jsClientName = null;
 
-    	@Parameter(names="-perl", description="Defines whether or not perl code for client side should " +
-        		"be created, default value is false, use -perl for true")
+    	@Parameter(names="--pl", description="Generate a Perl client with the default name")
         boolean perlClientSide = false;
 
-    	@Parameter(names="-perlclname", description="Perl client name including prefix with module " +
-        		"subfolders separated by :: if necessary (if defined then -perl will be " +
-        		"treated as true automatically)")//, metaVar = "<perl-client-name>")
+    	@Parameter(names="--plclname", description="Generate a Perl client with the name provided optionally " +
+        		"prefixed by subdirectories separated by :: as in the standard perl module syntax (e.g. "+
+    			"Bio::KBase::MyModule::Client.pm, overrides the --pl option)")//, metaVar = "<perl-client-name>")
         String perlClientName = null;
 
-    	@Parameter(names="-perlsrv", description="Defines whether or not perl code for server side " +
-        		"should be created, default value is false, use -perlsrv for true (if defined " +
-        		"then -perl will be treated as true automatically)")
+    	@Parameter(names="--plsrv", description="Generate a Perl server with a " +
+    			"standard default name.  If set, Perl clients will automatically be generated too.")
         boolean perlServerSide = false;
 
-    	@Parameter(names="-perlsrvname", description="Perl server name including prefix with module " +
-        		"subfolders separated by :: if necessary (if defined then -perlsrv will be " +
-        		"treated as true automatically)")//, metaVar = "<perl-server-name>")
+    	@Parameter(names="--plsrvname", description="Generate a Perl server with with the " +
+    			"name provided, optionally prefixed by subdirectories separated by :: as "+
+    			"in the standard perl module syntax (e.g. Bio::KBase::MyModule::Server.pm, "+
+    			"overrides the --plserv option).  If set, Perl clients will be generated too.")
+    			//, metaVar = "<perl-server-name>")
         String perlServerName = null;
 
-    	@Parameter(names="-perlimplname", description="Perl impl name including prefix with module " +
-        		"subfolders separated by :: if necessary (if defined then -perlsrv will be " +
-        		"treated as true automatically)")//, metaVar = "<perl-impl-name>")
+    	@Parameter(names="--plimplname", description="Generate a Perl server implementation with the " +
+    			"name provided, optionally prefixed by subdirectories separated by :: as "+
+    			"in the standard Perl module syntax (e.g. Bio::KBase::MyModule::Impl.pm). "+
+    			"If set, Perl server and client code will be generated too.")//, metaVar = "<perl-impl-name>")
         String perlImplName = null;
 
-    	@Parameter(names="-perlpsginame", description="Perl PSGI name (if defined then -perlsrv will be " +
-        		"treated as true automatically)")//, metaVar = "<perl-psgi-name>")
+    	@Parameter(names="--plpsginame", description="Generate a perl PSGI file with the name provided.")//, metaVar = "<perl-psgi-name>")
         String perlPsgiName = null;
 
-    	@Parameter(names="-perlenableretries", description="Defines whether or not perl code for client " +
-        		"side should include reconnection retries, default value is false")
+    	@Parameter(names="--plenableretries", description="When set, generated Perl client code will enable "+
+        		"reconnection retries with the server")
         boolean perlEnableRetries = false;
 
-    	@Parameter(names="-py", description="Defines whether or not python code for client side should be " +
-        		"created, default value is false, use -py for true")
+    	@Parameter(names="--py", description="Generate a Python client with a standard default name")
         boolean pyClientSide = false;
 
-    	@Parameter(names="-pyclname", description="Python client name including prefix with module " +
-        		"subfolders separated by '.' if necessary (if defined then -py will be treated " +
-        		"as true automatically)")//, metaVar = "<py-client-name>")
+    	@Parameter(names="--pyclname", description="Generate a Python client with with the " +
+    			"name provided, optionally prefixed by subdirectories separated by '.' as "+
+    			"in the standard Python module syntax (e.g. biokbase.mymodule.client.py,"+
+    			"overrides the --py option).")//, metaVar = "<py-client-name>")
         String pyClientName = null;
 
-    	@Parameter(names="-pysrv", description="Defines whether or not python code for server side should " +
-        		"be created, default value is false, use -pysrv for true (if defined then -py " +
-        		"will be treated as true automatically)")
+    	@Parameter(names="--pysrv", description="Generate a Python server with a " +
+    			"standard default name.  If set, Python clients will automatically be generated too.")
         boolean pyServerSide = false;
 
-    	@Parameter(names="-pysrvname", description="Python server name including prefix with module " +
-        		"subfolders separated by '.' if necessary (if defined then -perlsrv will be " +
-        		"treated as true automatically)")//, metaVar = "<py-server-name>")
+    	@Parameter(names="--pysrvname", description="Generate a Python server with the " +
+    			"name provided, optionally prefixed by subdirectories separated by '.' as "+
+    			"in the standard Python module syntax (e.g. biokbase.mymodule.server.py,"+
+    			"overrides the --pysrv option).")//, metaVar = "<py-server-name>")
         String pyServerName = null;
 
-    	@Parameter(names="-pyimplname", description="Python impl name including prefix with module " +
-        		"subfolders separated by '.' if necessary (if defined then -perlsrv will be " +
-        		"treated as true automatically)")//, metaVar = "<py-impl-name>")
+    	@Parameter(names="--pyimplname", description="Generate a Python server with the " +
+    			"name provided, optionally prefixed by subdirectories separated by '.' as "+
+    			"in the standard Python module syntax (e.g. biokbase.mymodule.server.py)." +
+    			" If set, Python server and client code will be generated too.")//, metaVar = "<py-impl-name>")
         String pyImplName = null;
 
-    	@Parameter(names="-java", description="Defines whether or not java code for client side should " +
-        		"be created, default value is false, use -java for true (if defined then 'src' " +
-        		"default value is used for -javasrc if it's not overwritten explicitly)")
+    	@Parameter(names="--java", description="Generate Java client code in the directory set by --javasrc")
         boolean javaClientSide = false;
 
-    	@Parameter(names="-javasrc",description="Source output folder (if defined then -java will be " +
-        		"treated as true automatically), default value is 'src'")//, metaVar = 
+    	@Parameter(names="--javasrc",description="Set the output folder for generated Java code")//, metaVar = 
         		//"<java-src-dir>")
         String javaSrcDir = "src";
 
-    	@Parameter(names="-javalib",description="Jars output folder (if defined then -java will be " +
-        		"treated as true automatically), is not defined by default")//, metaVar = 
+    	@Parameter(names="--javalib",description="Set the output folder for jar files (if defined then --java will be " +
+        		"treated as true automatically)")//, metaVar = 
         		//"<java-lib-dir>")
         String javaLibDir = null;
 
-    	@Parameter(names="-javabuildxml",description="Will generate build.xml template for Ant")
-        boolean javaBuildXml;
-        
-    	@Parameter(names="-url", description="Default url for service")//, metaVar = "<url>")
+    	@Parameter(names="--url", description="Set the default url for the service in generated client code")//, metaVar = "<url>")
         String url = null;
 
-    	@Parameter(names="-javapackage",description="Java package parent (module subpackages are " +
+    	@Parameter(names="--javapackage",description="Set the Java package for generated code (module subpackages are " +
         		"created in this package), default value is " + defaultParentPackage)//, 
         		//metaVar = "<java-package>")      
         String javaPackageParent = defaultParentPackage;
 
-    	@Parameter(names="-javasrv", description="Defines whether or not java code for server side " +
-        		"should be created, default value is false, use -javasrv for true (if defined " +
-        		"then -java will be treated as true automatically)")
+    	@Parameter(names="--javasrv", description="Generate Java server code in the directory set by --javasrc")
         boolean javaServerSide = false;
 
-    	@Parameter(names="-javagwt",description="Gwt client java package (define it in case you need " +
-        		"copies of generated classes for GWT client)")//, metaVar="<java-gwt-pckg>")     
+    	@Parameter(names="--javagwt",description="Generate a GWT client Java package (useful if you need " +
+        		"copies of generated classes for GWT clients)")//, metaVar="<java-gwt-pckg>")     
         String javaGwtPackage = null;
 
-    	@Parameter(names="-jsonschema",description="JSON schema output folder, is not defined by " +
-        		"default")//, metaVar="<json-schema>")
+    	@Parameter(names="--jsonschema",description="Generate JSON schema documents for the types in the output folder specified.")//, metaVar="<json-schema>")
         String jsonSchema = null;
 
-    	@Parameter(names="-makefile",description="Will generate makefile templates for servers and/or java client")
+    	
+    	@Parameter(names="--javabuildxml",description="Will generate build.xml template for Ant")
+        boolean javaBuildXml;
+    	
+    	@Parameter(names="--makefile",description="Will generate makefile templates for servers and/or java client")
         boolean makefile = false;
 
-        @Parameter(required=true, description="KIDL spec file to compile")
+        @Parameter(required=true, description="<KIDL spec file>")
         List <String> specFileNames;
     }
     
