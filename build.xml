@@ -120,6 +120,7 @@
       <include name="syslog4j/syslog4j-0.9.46.jar"/>
       <include name="apache_commons/commons-lang-2.4.jar"/>
       <include name="apache_commons/velocity-1.7.jar"/>
+      <include name="jcommander/jcommander-1.48.jar"/>
       <!-- include name="${commonjar}"/ -->
     </fileset>
     <fileset dir=".">
@@ -163,7 +164,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.M
     </fail>
     <!-- Copy main shell script into the target bin folder-->
     <copy todir="${BIN_TARGET}" flatten="true" verbose="true">
-      <fileset file="${dist}/${module_builder.sh.file}"/>
+      <fileset file="${bin.local}/${module_builder.sh.file}"/>
     </copy>
     <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
     <echo>Successfully deployed dev bin to: ${BIN_TARGET}/${module_builder.sh.file}</echo>
