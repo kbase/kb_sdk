@@ -20,8 +20,13 @@
 
 
   <property name="test.dir" location="temp_test_files"/>
-  <property name="test.config"  value="test_scripts/test.cfg"/>
+  <property name="test.script.dir" location="test_scripts"/>
+  <property name="test.config"  value="${test.script.dir}/test.cfg"/>
   <property name="test.script"  value="test_module_builder.sh"/>
+
+  <property name="ee.dir"  value="${test.script.dir}/ee_mock_service"/>
+  <property name="ee.start.script"  value="start_service.sh"/>
+  <property name="ee.stop.script"  value="stop_service.sh"/>
 
   <!-- define the output jar and shell script filenames -->
   <property name="kidl.jar.file" value="kbase-kidl-parser.jar"/>
@@ -63,6 +68,7 @@
     <mkdir dir="${dist}"/>
     <mkdir dir="${bin.local}"/>
     <mkdir dir="${test.dir}"/>
+    <mkdir dir="${ee.dir}"/>
   </target>
 	
   <target name="compile" depends="init" description="compile the source">
@@ -136,11 +142,13 @@
   </target>
 
 
-  <target name="compile_and_bin" depends="compile, copy_kidl_jar" description="compile and create shell file in the local bin directory" >
+  
+  <target name="sh_bin" description="create shell file wrappers">
     <!-- Define absolute path to main jar file-->
     <property name="jar.absolute.path" location="${dist}/${module_builder.jar.file}"/>
     <!-- Define classpath string with : delimiter from list of lib-jar files-->
     <pathconvert targetos="unix" property="lib.classpath" refid="compile.classpath"/>
+
     <!-- Create main shell script-->
     <echo file="${bin.local}/${module_builder.sh.file}">#!/bin/sh
 export JAVA_HOME=${env.JAVA_HOME}
@@ -149,7 +157,33 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.M
     </echo>
     <chmod file="${bin.local}/${module_builder.sh.file}" perm="a+x"/>
     <echo>Successfully built: ${bin.local}/${module_builder.sh.file}</echo>
+
+    <!-- Create start/stop scripts for the local mock Execution Engine-->
+    <echo file="${ee.dir}/${ee.start.script}">#!/bin/bash
+export JAVA_HOME=${env.JAVA_HOME}
+export PATH=$JAVA_HOME/bin:$PATH
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" &amp;&amp; pwd )
+PORT=8000
+if [ -z $1 ]; then echo "port is not set, listening on $PORT"; else PORT=$1; fi
+$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.kbasejobservice.KBaseJobServiceServer $PORT &gt; $DIR/out_$1.txt 2&gt; $DIR/err_$1.txt &amp; pid=$!
+echo $pid > $DIR/pid.txt
+    </echo>
+    <chmod file="${ee.dir}/${ee.start.script}" perm="a+x"/>
+    <echo>Successfully built: ${ee.dir}/${ee.start.script}</echo>
+    
+    <echo file="${ee.dir}/${ee.stop.script}">#!/bin/bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" &amp;&amp; pwd )
+kill $(&lt;"$DIR/pid.txt")
+    </echo>
+    <chmod file="${ee.dir}/${ee.stop.script}" perm="a+x"/>
+    <echo>Successfully built: ${ee.dir}/${ee.stop.script}</echo>
   </target>
+
+
+
+  <target name="compile_and_bin" depends="compile, copy_kidl_jar, sh_bin" description="compile and create shell file in the local bin directory" >
+  </target>
+
 
 
   <target name="copy_local_bin" description="copies the module_builder binary to the BIN_TARGET">
@@ -240,6 +274,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.M
     <delete dir="${dist}"/>
     <delete dir="${test.dir}"/>
     <delete dir="${bin.local}"/>
+    <delete dir="${ee.dir}"/>
   </target>
 
 
