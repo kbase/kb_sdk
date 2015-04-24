@@ -115,10 +115,11 @@ is the output response of that server call.  The token is the kbase user
 token generated when a user is authenticated.
 
 Right now, `kb-module-builder` does not wrap the command above as a
-shell script, although it may be able to in the future.  To use this 
-prototype for now, though, you should package necessary environment
-variables needed by your language/script manually into a shell script.
-For instance, see [this example](https://github.com/msneddon/service_test/blob/perl/Makefile#L40)
+shell script, although it may be able to in the future depending on how
+we setup our development environment.  To use this prototype for now, 
+though, you should package necessary environment variables needed by
+your language/script manually into a shell script. For instance, see
+[this example](https://github.com/msneddon/service_test/blob/perl/Makefile#L40)
 
 When a standard KBase server method is called on a running server, it
 is handled identically to the current KBase service architecture.  In fact,
@@ -130,17 +131,43 @@ Engine.  That Execution Engine then is responsible for queuing and executing
 the job, and returning any results.
 
 We have a prototype interface to the Execution Engine that has the information
-necessary to submit a job, for instance, to AWE if there is a running AWE cluster
-with this module installed.  See [KBaseJobService.spec](/KBaseJobService.spec).
+necessary to submit a job in a general way.  See [KBaseJobService.spec](/KBaseJobService.spec).
 The interface is something we can iterate on based on the functionality in KBase
 we need.
 
 For testing, however, the module builder includes a mock Execution Engine that
-is easy to setup and run locally.
+is easy to setup and run locally.  To start/stop the mock Execution Engine, build
+the module_builder using `make`, which will create start/stop scripts in the
+test_scripts/ee_mock_service directory.
 
-- TODO: notes on how to start/stop the mock Execution Engine
-- TODO: notes on how kb-module-builder can generate: Makefile / build.xml
-- TODO: notes on how a client calls an async method, and ways of checking status
+Once the mock Execution Engine is running, you can start your server configured
+to forward requests for the long running async method to the mock Execution Engine
+by setting the `job-service-url` config variable in `deploy.cfg` file of your
+module.  For example, see https://github.com/msneddon/service_test/blob/perl/deploy.cfg
+
+The location of the deployment.cfg config file used by KBase services can be set
+by an environment variable named KB_DEPLOYMENT_CONFIG.
+
+Again, to see all this in action (for a Perl server for now), see: 
+https://travis-ci.org/msneddon/service_test
+
+Finally, a few brief words on the methods generated in the client code for
+async methods.  Instead of generating just one client function per method,
+async methods will generate 3 functions:
+
+    - **[method_name]** - a method that submits the long running job, and checks
+      the state of the method until it completes, finally returning the output.
+      For the client, it appears as a standard synchronous call.
+
+    - **[method_name]_async** - submits a long running job and returns a job
+      id.  The job id can be used later to check the status of the job.
+
+    - **[method_name]_check** - given a job id, checks the status of the job. If
+      the job is complete and has output, this method returns the output
+      data marshalled into the types specified in KIDL.  This marshalling of
+      output data is a key reason why this is not generated as a single method
+      for all jobs, which would force the user of the client to map some generic
+      output into the specific return data types by hand.
 
 
 #### running tests
