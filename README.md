@@ -155,19 +155,19 @@ Finally, a few brief words on the methods generated in the client code for
 async methods.  Instead of generating just one client function per method,
 async methods will generate 3 functions:
 
-    - **[method_name]** - a method that submits the long running job, and checks
-      the state of the method until it completes, finally returning the output.
+- **[method_name]** - a method that submits the long running job, and checks
+  the state of the method until it completes, finally returning the output.
       For the client, it appears as a standard synchronous call.
 
-    - **[method_name]_async** - submits a long running job and returns a job
-      id.  The job id can be used later to check the status of the job.
+- **[method_name]_async** - submits a long running job and returns a job
+  id.  The job id can be used later to check the status of the job.
 
-    - **[method_name]_check** - given a job id, checks the status of the job. If
-      the job is complete and has output, this method returns the output
-      data marshalled into the types specified in KIDL.  This marshalling of
-      output data is a key reason why this is not generated as a single method
-      for all jobs, which would force the user of the client to map some generic
-      output into the specific return data types by hand.
+- **[method_name]_check** - given a job id, checks the status of the job. If
+  the job is complete and has output, this method returns the output
+  data marshalled into the types specified in KIDL.  This marshalling of
+  output data is a key reason why this is not generated as a single method
+  for all jobs, which would force the user of the client to map some generic
+  output into the specific return data types by hand.
 
 
 #### running tests
