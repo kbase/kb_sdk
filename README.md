@@ -18,7 +18,7 @@ Perl.  Clients can be generated in Python, Java, JavaScript and Perl.
 
 #### installation
 
-The tool is accessable as a command-line program named kb-module-builder.
+The tool is accessable as a command-line program named `kb-module-builder`.
 
 To install (either standalone or within a dev_container environment):
 
@@ -28,20 +28,20 @@ To install (either standalone or within a dev_container environment):
     make
 
 If you are building in a KBase dev_container, running make will
-automatically install the kb-module-builder command to dev_container/bin
+automatically install the `kb-module-builder` command to `dev_container/bin`
 which will be on your path.  If you are outside of the dev_container,
-then you can module_builder/bin to your path.  That is, from within
+then you can add `module_builder/bin` to your path.  That is, from within
 the base module_builder directory, run:
 
     export PATH=$(pwd)/bin:$PATH
 
 You will need a java JDK installed in your system either way, with the 
-JAVA_HOME environment variable defined pointing to your java installation.
+`JAVA_HOME` environment variable defined pointing to your java installation.
 
 
 #### getting started
 
-Once the kb-module-builder command is on the path, you can get additional
+Once the `kb-module-builder` command is on the path, you can get additional
 help by running:
 
     kb-module-builder help
