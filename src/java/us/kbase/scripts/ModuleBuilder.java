@@ -24,7 +24,7 @@ import us.kbase.kidl.KidlParser;
 
 public class ModuleBuilder {
     private static final String defaultParentPackage = "us.kbase";
-    private static final String MODULE_BUILDER_SH_NAME = "kb-module-builder";
+    private static final String MODULE_BUILDER_SH_NAME = "kb-mobu";
     
     private static final String COMPILE_COMMAND = "compile";
     private static final String HELP_COMMAND = "help";
@@ -280,7 +280,7 @@ public class ModuleBuilder {
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();
     	out.println("");
-    	out.println(MODULE_BUILDER_SH_NAME + " - tool for building and validating KBase modules and services");
+    	out.println(MODULE_BUILDER_SH_NAME + " - KBase MOdule BUilder - a developer tool for building and validating KBase modules");
     	out.println("");
     	out.println("usage: "+MODULE_BUILDER_SH_NAME+" <command> [options]");
     	out.println("");
