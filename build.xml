@@ -128,6 +128,7 @@
       <include name="apache_commons/velocity-1.7.jar"/>
       <include name="apache_commons/commons-collections-3.2.1.jar"/>
       <include name="jcommander/jcommander-1.48.jar"/>
+      <include name="snakeyaml/snakeyaml-1.11.jar"/>
       <!-- include name="${commonjar}"/ -->
     </fileset>
     <fileset dir=".">

@@ -31,6 +31,7 @@ _SetupMobuCompletion ()
                         COMPREPLY=(
                           $(compgen -W "--out" -- ${cur})
                           $(compgen -f -X "$xpat" -- "${cur}")
+                          $(compgen -d -- "${cur}")
                           )
                         ;;
                     esac
@@ -41,9 +42,9 @@ _SetupMobuCompletion ()
                     ;;
                 ${VALIDATE_CMD})
                     case ${prev} in
-                      # if options are added to the validate command, they should be placed here
-                      #"--opt") COMPREPLY=($(compgen -d -- "${cur}"));;
-                      *) COMPREPLY=($(compgen -d -- "${cur}"));;
+                      # if options are added to the validate command that take parameters, they should be placed here
+                      #"--verbose") COMPREPLY=();
+                      *) COMPREPLY=($(compgen -W "-v --verbose" -- ${cur}) $(compgen -d -- "${cur}"));;
                     esac
                     ;;
                 ${HELP_CMD})

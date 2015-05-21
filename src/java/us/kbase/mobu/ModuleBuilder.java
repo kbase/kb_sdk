@@ -22,6 +22,7 @@ import us.kbase.jkidl.IncludeProvider;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
 import us.kbase.mobu.compiler.RunCompileCommand;
+import us.kbase.mobu.validator.ModuleValidator;
 
 public class ModuleBuilder {
 	
@@ -97,8 +98,15 @@ public class ModuleBuilder {
     }
     
     private static int runValidateCommand(ValidateCommandArgs validateArgs, JCommander jc) {
-    	System.out.println("Validation not yet implemented.");
-		return 0;
+    	// initialize 
+    	if(validateArgs.modules==null) {
+    		validateArgs.modules = new ArrayList<String>();
+    	}
+    	if(validateArgs.modules.size()==0) {
+    		validateArgs.modules.add(".");
+    	}
+    	ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose);
+    	return mv.validateAll();
 	}
 
 	private static int runInitCommand(InitCommandArgs initArgs, JCommander jc) {
@@ -183,6 +191,8 @@ public class ModuleBuilder {
     
     @Parameters(commandDescription = "Validate a module or modules.")
     private static class ValidateCommandArgs {
+    	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
+        boolean verbose = false;
     	@Parameter(description="[path to the module directories]")
         List<String> modules;
     }
