@@ -1,10 +1,11 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import java.util.Collections;
 import java.util.List;
 
 import us.kbase.kidl.KbAuthdef;
 import us.kbase.kidl.KbFuncdef;
+import us.kbase.mobu.util.TextUtils;
 
 public class JavaFunc {
 	private String moduleName;

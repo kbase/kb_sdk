@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import static com.googlecode.jsonschema2pojo.rules.PrimitiveTypes.isPrimitive;
 import static com.googlecode.jsonschema2pojo.rules.PrimitiveTypes.primitiveType;

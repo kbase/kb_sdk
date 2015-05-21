@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +7,7 @@ import java.util.List;
 import us.kbase.kidl.KbBasicType;
 import us.kbase.kidl.KbStruct;
 import us.kbase.kidl.KbTypedef;
+import us.kbase.mobu.util.TextUtils;
 
 public class JavaType implements Comparable<JavaType> {
 	private List<KbTypedef> aliasHistoryOuterToDeep;

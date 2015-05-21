@@ -46,15 +46,15 @@ import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
 import us.kbase.kidl.test.KidlTest;
-import us.kbase.scripts.DiskFileSaver;
-import us.kbase.scripts.JavaData;
-import us.kbase.scripts.JavaFunc;
-import us.kbase.scripts.JavaModule;
-import us.kbase.scripts.JavaTypeGenerator;
-import us.kbase.scripts.ModuleBuilder;
-import us.kbase.scripts.RunCompileCommand;
-import us.kbase.scripts.TextUtils;
-import us.kbase.scripts.util.ProcessHelper;
+import us.kbase.mobu.ModuleBuilder;
+import us.kbase.mobu.compiler.JavaData;
+import us.kbase.mobu.compiler.JavaFunc;
+import us.kbase.mobu.compiler.JavaModule;
+import us.kbase.mobu.compiler.JavaTypeGenerator;
+import us.kbase.mobu.compiler.RunCompileCommand;
+import us.kbase.mobu.util.DiskFileSaver;
+import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 
 /**
  * Main test class for JavaTypeGenerator. It contains 10 tests checking different cases 

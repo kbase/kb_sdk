@@ -16,10 +16,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import us.kbase.kidl.test.KidlTest;
-import us.kbase.scripts.DiskFileSaver;
-import us.kbase.scripts.TemplateBasedGenerator;
-import us.kbase.scripts.TextUtils;
-import us.kbase.scripts.util.ProcessHelper;
+import us.kbase.mobu.compiler.TemplateBasedGenerator;
+import us.kbase.mobu.util.DiskFileSaver;
+import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 
 public class TemplateBasedGeneratorTest {
     public static final String tempDirName = "temp_test";

@@ -1,4 +1,4 @@
-package us.kbase.scripts.util;
+package us.kbase.mobu.util;
 
 import java.io.*;
 import java.util.ArrayList;

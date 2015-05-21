@@ -1,9 +1,10 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import java.util.Collections;
 import java.util.List;
 
 import us.kbase.kidl.KbModule;
+import us.kbase.mobu.util.TextUtils;
 
 public class JavaModule {
 	private String moduleName;

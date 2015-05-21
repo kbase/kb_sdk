@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +11,8 @@ import us.kbase.kidl.KbMapping;
 import us.kbase.kidl.KbScalar;
 import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.mobu.util.FileSaver;
+import us.kbase.mobu.util.TextUtils;
 
 public class GwtGenerator {
 	public static void generate(JavaData data, FileSaver srcOutDir, String gwtPackage) throws Exception {

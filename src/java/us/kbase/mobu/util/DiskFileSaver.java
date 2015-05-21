@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import java.util.ArrayList;
 import java.util.HashMap;

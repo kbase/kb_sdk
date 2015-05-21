@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import static org.apache.commons.lang.StringUtils.stripEnd;
 import static org.apache.commons.lang.StringUtils.substringAfter;

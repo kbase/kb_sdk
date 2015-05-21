@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu;
 
 import java.io.File;
 import java.io.FileReader;
@@ -21,13 +21,18 @@ import us.kbase.jkidl.FileIncludeProvider;
 import us.kbase.jkidl.IncludeProvider;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
+import us.kbase.mobu.compiler.RunCompileCommand;
 
 public class ModuleBuilder {
+	
     private static final String defaultParentPackage = "us.kbase";
     private static final String MODULE_BUILDER_SH_NAME = "kb-mobu";
+
+    private static final String INIT_COMMAND     = "init";
+    private static final String VALIDATE_COMMAND = "validate";
+    private static final String COMPILE_COMMAND  = "compile";
+    private static final String HELP_COMMAND     = "help";
     
-    private static final String COMPILE_COMMAND = "compile";
-    private static final String HELP_COMMAND = "help";
     
     public static void main(String[] args) throws Exception {
     	
@@ -36,6 +41,15 @@ public class ModuleBuilder {
     	JCommander jc = new JCommander(gArgs);
     	jc.setProgramName(MODULE_BUILDER_SH_NAME);
 
+    	
+    	// add the 'init' command
+    	InitCommandArgs initArgs = new InitCommandArgs();
+    	jc.addCommand(INIT_COMMAND, initArgs);
+
+    	// add the 'compile' command
+    	ValidateCommandArgs validateArgs = new ValidateCommandArgs();
+    	jc.addCommand(VALIDATE_COMMAND, validateArgs);
+    	
     	// add the 'compile' command
     	CompileCommandArgs compileArgs = new CompileCommandArgs();
     	jc.addCommand(COMPILE_COMMAND, compileArgs);
@@ -69,16 +83,30 @@ public class ModuleBuilder {
 	    if(jc.getParsedCommand().equals(HELP_COMMAND)) {
 		    showCommandUsage(jc,help,System.out);
 		    
+	    } else if(jc.getParsedCommand().equals(INIT_COMMAND)) {
+	    	returnCode = runInitCommand(initArgs,jc);
+	    } else if(jc.getParsedCommand().equals(VALIDATE_COMMAND)) {
+	    	returnCode = runValidateCommand(validateArgs,jc);
 	    } else if(jc.getParsedCommand().equals(COMPILE_COMMAND)) {
 	    	returnCode = runCompileCommand(compileArgs,jc);
-	    }
+	    } 
 	    
 	    if(returnCode!=0) {
 	    	System.exit(returnCode);
 	    }
     }
     
-    public static int runCompileCommand(CompileCommandArgs a, JCommander jc) {
+    private static int runValidateCommand(ValidateCommandArgs validateArgs, JCommander jc) {
+    	System.out.println("Validation not yet implemented.");
+		return 0;
+	}
+
+	private static int runInitCommand(InitCommandArgs initArgs, JCommander jc) {
+    	System.out.println("Initialization not yet implemented.");
+		return 0;
+	}
+
+	public static int runCompileCommand(CompileCommandArgs a, JCommander jc) {
     	
     	// Step 1: convert list of args to a  Files (this must be defined because it is required)
     	File specFile = null;
@@ -151,6 +179,19 @@ public class ModuleBuilder {
     	@Parameter(names = {"-h","--help"}, help = true, description="Display help and full usage information.")
     	boolean help;
     }
+    
+    
+    @Parameters(commandDescription = "Validate a module or modules.")
+    private static class ValidateCommandArgs {
+    	@Parameter(description="[path to the module directories]")
+        List<String> modules;
+    }
+    
+    @Parameters(commandDescription = "Initialize a module in the current directory.")
+    private static class InitCommandArgs {
+    	
+    }
+    
     
     @Parameters(commandDescription = "Get help and usage information.")
     private static class HelpCommandArgs {

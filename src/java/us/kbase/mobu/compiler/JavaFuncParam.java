@@ -1,4 +1,4 @@
-package us.kbase.scripts;
+package us.kbase.mobu.compiler;
 
 import us.kbase.kidl.KbParameter;
 import us.kbase.kidl.KbType;
