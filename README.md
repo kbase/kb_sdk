@@ -1,10 +1,10 @@
-## module builder
+## KBase SDK
 
 #### overview
 
-A prototype set of tools for building a KBase module that includes a
-standard KBase service interface, which now optionally includes methods
-for submitting long running jobs to a job execution engine.
+A set of tools for developing new modules in KBase.  The main tool
+included is the module builder, which includes tooling to help define
+standard KBase service/function interface.
 
 The module builder tooling is desinged to allow complete local testing
 of long running jobs without any external registration or configuration
@@ -18,11 +18,11 @@ Perl.  Clients can be generated in Python, Java, JavaScript and Perl.
 
 #### installation
 
-The tool is accessable as a command-line program named `kb-module-builder`.
+The tool is accessable as a command-line program named `kb-mobu`.
 
 To install (either standalone or within a dev_container environment):
 
-    git clone https://github.com/kbaseIncubator/module_builder
+    git clone https://github.com/kbaseIncubator/kb_sdk
     git clone https://github.com/kbase/jars
     cd module_builder
     make
@@ -44,7 +44,7 @@ You will need a java JDK installed in your system either way, with the
 Once the `kb-module-builder` command is on the path, you can get additional
 help by running:
 
-    kb-module-builder help
+    kb-mobu help
 
 Additional documentation and tutorials will slowly be added to the 'docs' 
 directory of this repository as it is needed.
