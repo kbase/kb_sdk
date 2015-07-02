@@ -2,11 +2,13 @@
 
 #### overview
 
-A set of tools for developing new modules in KBase.  The main tool
-included is the module builder, which includes tooling to help define
-standard KBase service/function interface.
+A set of tools for developing new modules in KBase.  This software is
+still in beta and should only be used for internal use.
 
-The module builder tooling is desinged to allow complete local testing
+The main tool included is the KBase Module Builder (kb-mobu), which can
+be used to help define, build and validate standard KBase services/functions.
+
+The module builder tooling is being desinged to allow complete local testing
 of long running jobs without any external registration or configuration
 of the deployed job execution engine.  Implmentation of the code for
 long running jobs is handled identically to implementations of server
@@ -16,38 +18,45 @@ Server and long running job stubs can be generated in Python, Java and
 Perl.  Clients can be generated in Python, Java, JavaScript and Perl.
 
 
+
 #### installation
 
-The tool is accessable as a command-line program named `kb-mobu`.
+The module builder tool is accessable as a command-line program named `kb-mobu`.
 
 To install (either standalone or within a dev_container environment):
 
     git clone https://github.com/kbaseIncubator/kb_sdk
     git clone https://github.com/kbase/jars
-    cd module_builder
+    cd kb_sdk
     make
 
 If you are building in a KBase dev_container, running make will
-automatically install the `kb-module-builder` command to `dev_container/bin`
+automatically install the `kb-modbu` command to `dev_container/bin`
 which will be on your path.  If you are outside of the dev_container,
-then you can add `module_builder/bin` to your path.  That is, from within
-the base module_builder directory, run:
+then you can either copy files in `kb_sdk/bin` to a directory on
+your path, or add `kb_sdk/bin` directly to your path.  That is, from within
+the base kb_sdk directory, run:
 
     export PATH=$(pwd)/bin:$PATH
 
 You will need a java JDK installed in your system either way, with the 
 `JAVA_HOME` environment variable defined pointing to your java installation.
 
+Optionally, you can install command completion with:
+
+	source source src/sh/mobu-completion.sh
+
+
 
 #### getting started
 
-Once the `kb-module-builder` command is on the path, you can get additional
+Once the `kb-mobu` command is on the path, you can get additional
 help by running:
 
     kb-mobu help
 
 Additional documentation and tutorials will slowly be added to the 'docs' 
-directory of this repository as it is needed.
+directory of this repository.
 
 For an example KBase service with a Perl backend with an asynchronous, long
 running job, see code and automated tests here:
@@ -58,7 +67,10 @@ running job, see code and automated tests here:
 Examples KBase services written in Python and Java will be available soon.
 
 
+
 #### basic usage
+
+Note: the information below is still experimental and subject to change.
 
 Currently, the key new feature of the module builder that is not available
 in KBase is the ability to generate an executable wrapper for long running
@@ -83,25 +95,25 @@ function definition:
 Note that async methods should always require authentication because we
 assume that compute resources will always have to be tracked per user.
 
-To compile the KIDL file, there is a `compile` subcommand of `kb-module-builder`
+To compile the KIDL file, there is a `compile` subcommand of `kb-mobu`
 which takes as input the KIDL file, and generates the client/server/executable
 wrapper.  Run it as:
 
-    kb-module-builder compile [MyModule.spec]
+    kb-mobu compile [MyModule.spec]
 
 If the KIDL file is valid, you will not see any output.  If there are syntax
 errors, those will be printed.  The command does not actually generate any
-code until the appropriate parameters are set. Run the `kb-module-builder`
+code until the appropriate parameters are set. Run the `kb-mobu`
 help for full parameter options, but for example, we can generate a Python
 server and client created in the 'lib' directory by running this:
 
-    kb-module-builder compile [MyModule.spec] \
+    kb-mobu compile [MyModule.spec] \
         --out lib
         --pysrvname biokbase.mymodule.MyModuleServer
         --pyclname biokbase.mymodule.MyModuleClient
 
 Previously the Server/Implementation stubs that are generated could only be
-run as a Service.  The module_builder allows us to run that code directly
+run as a Service.  The module builder allows us to run that code directly
 as a command line script in Python, Perl or as an executable jar in Java.
 
 For instance, in a Perl example, you could directly invoke a Perl server
@@ -114,7 +126,7 @@ standard KBase JSON RPC call.  The output saved to the output json file
 is the output response of that server call.  The token is the kbase user
 token generated when a user is authenticated.
 
-Right now, `kb-module-builder` does not wrap the command above as a
+Right now, `kb-mobu` does not wrap the command above as a
 shell script, although it may be able to in the future depending on how
 we setup our development environment.  To use this prototype for now, 
 though, you should package necessary environment variables needed by
@@ -123,7 +135,7 @@ your language/script manually into a shell script. For instance, see
 
 When a standard KBase server method is called on a running server, it
 is handled identically to the current KBase service architecture.  In fact,
-clients generated by kb-module-builder on an existing service KIDL will
+clients generated by kb-mobu on an existing service KIDL will
 be completely compatible with that existing and running KBase service.  The
 difference is only when calling an async task.  In this case, the Server
 code automatically forwards the request in a standard way to an Execution
@@ -190,7 +202,7 @@ need to install.
 All that said, starting tests is relatively easy.  First edit the test config
 file with a valid KBase user in [test_scripts/test.cfg](test_scripts/test.cfg),
 which is necessary for testing service authentication.  Then, from the base 
-module_builder directory, simply run:
+kb_sdk directory, simply run:
 
     make test
 
