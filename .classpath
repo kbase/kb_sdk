@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/codemodel/codemodel-2.4.1.jar"/>
@@ -20,6 +20,7 @@
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/velocity-1.7.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/jcommander/jcommander-1.48.jar"/>
-	<classpathentry kind="lib" path="./kbase-common-temp.jar"/>
+	<classpathentry kind="lib" path="kbase-common-temp.jar"/>
+	<classpathentry kind="lib" path="/kb/dev_container/modules/jars/lib/jars/snakeyaml/snakeyaml-1.11.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

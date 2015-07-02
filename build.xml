@@ -13,7 +13,7 @@
 
 
   <!-- set global properties for this build -->
-  <property name="src"	location="src"/>
+  <property name="src"	location="src/java"/>
   <property name="dist" location="dist"/>
   <property name="bin.local" location="bin"/>
   <property name="classes"  location="classes"/>
@@ -31,7 +31,7 @@
   <!-- define the output jar and shell script filenames -->
   <property name="kidl.jar.file" value="kbase-kidl-parser.jar"/>
   <property name="module_builder.jar.file"	value="kbase_module_builder.jar"/>
-  <property name="module_builder.sh.file"	value="kb-module-builder"/>
+  <property name="module_builder.sh.file"	value="kb-mobu"/>
 
 
   <!-- If the BIN_LIB_TARGET is defined, then use the jars from the target destination
@@ -86,7 +86,7 @@
     <!-- Make main jar file-->
     <jar destfile="${dist}/${module_builder.jar.file}" basedir="${classes}">
       <manifest>
-        <attribute name="Main-Class" value="us.kbase.scripts.ModuleBuilder"/>
+        <attribute name="Main-Class" value="us.kbase.mobu.ModuleBuilder"/>
       </manifest>
     </jar>
     <copy todir="${classes}">
@@ -128,6 +128,7 @@
       <include name="apache_commons/velocity-1.7.jar"/>
       <include name="apache_commons/commons-collections-3.2.1.jar"/>
       <include name="jcommander/jcommander-1.48.jar"/>
+      <include name="snakeyaml/snakeyaml-1.11.jar"/>
       <!-- include name="${commonjar}"/ -->
     </fileset>
     <fileset dir=".">
@@ -153,7 +154,7 @@
     <echo file="${bin.local}/${module_builder.sh.file}">#!/bin/sh
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
-$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.ModuleBuilder $@
+$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${bin.local}/${module_builder.sh.file}" perm="a+x"/>
     <echo>Successfully built: ${bin.local}/${module_builder.sh.file}</echo>
@@ -238,7 +239,7 @@ kill $(&lt;"$DIR/pid.txt")
     <echo file="${BIN_TARGET}/${module_builder.sh.file}">#!/bin/sh
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
-$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.scripts.ModuleBuilder $@
+$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
   </target>
