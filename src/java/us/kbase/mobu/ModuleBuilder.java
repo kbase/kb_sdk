@@ -109,9 +109,10 @@ public class ModuleBuilder {
 		}
 		String moduleName = String.join("_", initArgs.moduleNames);
 		try {
-			ModuleInitializer.initialize(moduleName, initArgs.verbose);
+			ModuleInitializer initer = new ModuleInitializer(moduleName, initArgs.verbose);
+			initer.initialize();
 		}
-		catch (RuntimeException e) {
+		catch (IOException | RuntimeException e) {
 			showError("Error while initializing module", e.getMessage());
 			return 1;
 		}
