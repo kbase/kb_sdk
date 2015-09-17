@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import us.kbase.templates.TemplateFormatter;
 
 public class ModuleInitializer {
 	private String moduleName;
@@ -24,7 +30,7 @@ public class ModuleInitializer {
 		if (this.moduleName == null) {
 			throw new RuntimeException("Unable to create a null directory!");
 		}
-		if (verbose) System.out.println("Initializing module \"" + this.moduleName + "\"");
+		if (this.verbose) System.out.println("Initializing module \"" + this.moduleName + "\"");
 		
 		/**
 		 *  Steps:
@@ -43,10 +49,30 @@ public class ModuleInitializer {
 			initDirectory(Paths.get(this.moduleName, dir));
 		}
 		
-		// 3. copy over static files
+		/*
+		 *  3. copy over static files
+		 *  - Intro readmes - UI, docs, service
+		 */
+		
+		
+		/*
+		 *  4. Fill in templated files and write them
+		 *  - Typespec
+		 *  - Dockerfile
+		 *  - Readme.md
+		 *  - method spec
+		 *  - method yaml
+		 *  - Makefile
+		 *  - .travis.yml
+		 */
+		Map<String, Object> typespecContext = new LinkedHashMap<String, Object>();
+		typespecContext.put("module_name", this.moduleName);
+		TemplateFormatter.formatTemplate("typespec", typespecContext, true, Paths.get(this.moduleName, this.moduleName + ".spec").toFile());
+		
 	}
 	
-	public void initDirectory(Path dirPath) throws IOException {
+	private void initDirectory(Path dirPath) throws IOException {
+		if (this.verbose) System.out.println("Making directory \"" + dirPath.toString() + "\"");
 		File newDir = dirPath.toFile();
 		if (!newDir.exists()) {
 			newDir.mkdir();
@@ -54,5 +80,13 @@ public class ModuleInitializer {
 		else {
 			throw new IOException("Error while creating module - " + dirPath + " already exists!");
 		}
+	}
+	
+	private void copyFile(Path source, Path target) throws IOException {
+		
+	}
+	
+	private void fillTemplate(Path template) {
+		
 	}
 }
