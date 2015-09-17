@@ -1,27 +1,20 @@
 package us.kbase.mobu;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-import us.kbase.jkidl.FileIncludeProvider;
-import us.kbase.jkidl.IncludeProvider;
-import us.kbase.kidl.KbService;
-import us.kbase.kidl.KidlParser;
 import us.kbase.mobu.compiler.RunCompileCommand;
+import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.validator.ModuleValidator;
 
 public class ModuleBuilder {
@@ -63,7 +56,7 @@ public class ModuleBuilder {
     	try {
     		jc.parse(args);
     	} catch (RuntimeException e) {
-    		showError("Command Line Arguement Error", e.getMessage());
+    		showError("Command Line Argument Error", e.getMessage());
     		System.exit(1);
     	}
     	
@@ -110,7 +103,18 @@ public class ModuleBuilder {
 	}
 
 	private static int runInitCommand(InitCommandArgs initArgs, JCommander jc) {
-    	System.out.println("Initialization not yet implemented.");
+		if (initArgs.moduleNames==null || initArgs.moduleNames.size()==0) {
+			ModuleBuilder.showError("Init Error", "A module name is required.");
+			return 1;
+		}
+		String moduleName = String.join("_", initArgs.moduleNames);
+		try {
+			ModuleInitializer.initialize(moduleName, initArgs.verbose);
+		}
+		catch (RuntimeException e) {
+			showError("Error while initializing module", e.getMessage());
+			return 1;
+		}
 		return 0;
 	}
 
@@ -199,7 +203,10 @@ public class ModuleBuilder {
     
     @Parameters(commandDescription = "Initialize a module in the current directory.")
     private static class InitCommandArgs {
-    	
+    	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
+    	boolean verbose = false;
+    	@Parameter(required=true, description="<module name>")
+    	List<String> moduleNames;
     }
     
     
