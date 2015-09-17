@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import us.kbase.templates.TemplateFormatter;
@@ -15,7 +13,15 @@ public class ModuleInitializer {
 	private String moduleName;
 	private boolean verbose;
 	
-	private static String[] subdirs = {"data", "docs", "service", "test", "ui"};
+	private static String[] subdirs = {"data", 
+									   "docs", 
+									   "scripts",
+									   "service",
+									   "test", 
+									   "ui", 
+									   "ui/spec", 
+									   "ui/spec/img"};
+	
 	
 	public ModuleInitializer(String moduleName) {
 		this(moduleName, false);
@@ -32,15 +38,6 @@ public class ModuleInitializer {
 		}
 		if (this.verbose) System.out.println("Initializing module \"" + this.moduleName + "\"");
 		
-		/**
-		 *  Steps:
-		 *  1. Build the directory with moduleName.
-		 *  2. Populate with skeleton subdirs - test, src, scripts, etc.
-		 *  3. Copy over static files that are mainly unchanged - .travis.yml, .gitignore, etc.
-		 *  4. Add a bunch of files with name filled in from template - Makefile, spec file, etc.
-		 *  5. Done!
-		 */
-
 		// 1. build dir with moduleName
 		initDirectory(Paths.get(this.moduleName));
 		
@@ -48,27 +45,30 @@ public class ModuleInitializer {
 		for (String dir : subdirs) {
 			initDirectory(Paths.get(this.moduleName, dir));
 		}
-		
+
 		/*
-		 *  3. copy over static files
-		 *  - Intro readmes - UI, docs, service
+		 *  3. Fill in templated files and write them
 		 */
 		
-		
-		/*
-		 *  4. Fill in templated files and write them
-		 *  - Typespec
-		 *  - Dockerfile
-		 *  - Readme.md
-		 *  - method spec
-		 *  - method yaml
-		 *  - Makefile
-		 *  - .travis.yml
+		/* Set up the context - the set of variables used to flesh out the templates */
+		Map<String, Object> moduleContext = new HashMap<String, Object>();
+		moduleContext.put("module_name", this.moduleName);
+
+		/* Set up the templates to be used 
+		 * TODO: move this to some kind of declarative config file
 		 */
-		Map<String, Object> typespecContext = new LinkedHashMap<String, Object>();
-		typespecContext.put("module_name", this.moduleName);
-		TemplateFormatter.formatTemplate("typespec", typespecContext, true, Paths.get(this.moduleName, this.moduleName + ".spec").toFile());
-		
+		Map<String, File> templateFiles = new HashMap<String, File>();
+		templateFiles.put("module_typespec", Paths.get(this.moduleName, "service", this.moduleName + ".spec").toFile());
+		templateFiles.put("module_travis", Paths.get(this.moduleName, ".travis.yml").toFile());
+		templateFiles.put("module_dockerfile", Paths.get(this.moduleName, "scripts", "Dockerfile").toFile());
+		templateFiles.put("module_readme", Paths.get(this.moduleName, "README.md").toFile());
+		templateFiles.put("module_makefile", Paths.get(this.moduleName, "Makefile").toFile());
+		templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "spec", "spec.json").toFile());
+		templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "spec", "display.yaml").toFile());
+
+		for (String templateName : templateFiles.keySet()) {
+			fillTemplate(moduleContext, templateName, templateFiles.get(templateName));
+		}
 	}
 	
 	private void initDirectory(Path dirPath) throws IOException {
@@ -82,11 +82,8 @@ public class ModuleInitializer {
 		}
 	}
 	
-	private void copyFile(Path source, Path target) throws IOException {
-		
-	}
-	
-	private void fillTemplate(Path template) {
-		
+	private void fillTemplate(Map<?,?> context, String templateName, File outfile) throws IOException {
+		if (this.verbose) System.out.println("Building file \"" + outfile.toString() + "\"");
+		TemplateFormatter.formatTemplate(templateName, context, true, outfile);
 	}
 }
