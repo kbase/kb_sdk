@@ -10,7 +10,8 @@ import java.util.Map;
 import us.kbase.templates.TemplateFormatter;
 
 public class ModuleInitializer {
-	private String moduleName;
+	private String moduleName,
+				   userName;
 	private boolean verbose;
 	
 	private static String[] subdirs = {"data", 
@@ -28,8 +29,13 @@ public class ModuleInitializer {
 	}
 	
 	public ModuleInitializer(String moduleName, boolean verbose) {
+		this(moduleName, null, verbose);
+	}
+	
+	public ModuleInitializer(String moduleName, String userName, boolean verbose) {
 		this.moduleName = moduleName;
 		this.verbose = verbose;
+		this.userName = userName;
 	}
 	
 	public void initialize() throws IOException {
@@ -53,6 +59,7 @@ public class ModuleInitializer {
 		/* Set up the context - the set of variables used to flesh out the templates */
 		Map<String, Object> moduleContext = new HashMap<String, Object>();
 		moduleContext.put("module_name", this.moduleName);
+		moduleContext.put("user_name", this.userName);
 
 		/* Set up the templates to be used 
 		 * TODO: move this to some kind of declarative config file

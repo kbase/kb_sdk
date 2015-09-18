@@ -102,14 +102,29 @@ public class ModuleBuilder {
     	return mv.validateAll();
 	}
 
+    /**
+     * Runs the module initialization command - this creates a new module in the relative directory name given.
+     * There's only a couple of possible arguments here in the initArgs:
+     * userName (optional) - the user's Github user name, used to set up some optional fields
+     * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
+     * are replaced with underscores. So if a user runs:
+     *   kb-mobu init my new module
+     * they get a module called "my_new_module" in a directory of the same name.
+     * @param initArgs
+     * @param jc
+     * @return
+     */
 	private static int runInitCommand(InitCommandArgs initArgs, JCommander jc) {
-		if (initArgs.moduleNames==null || initArgs.moduleNames.size()==0) {
+		if (initArgs.moduleNames == null || initArgs.moduleNames.size() == 0) {
 			ModuleBuilder.showError("Init Error", "A module name is required.");
 			return 1;
 		}
 		String moduleName = String.join("_", initArgs.moduleNames);
+		String userName = null;
+		if (initArgs.userName != null)
+			userName = initArgs.userName;
 		try {
-			ModuleInitializer initer = new ModuleInitializer(moduleName, initArgs.verbose);
+			ModuleInitializer initer = new ModuleInitializer(moduleName, userName, initArgs.verbose);
 			initer.initialize();
 		}
 		catch (IOException | RuntimeException e) {
@@ -206,6 +221,10 @@ public class ModuleBuilder {
     private static class InitCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
     	boolean verbose = false;
+    	
+    	@Parameter(names={"-u","--user"}, description="Tailor this module to your github user name")
+    	String userName;
+    	
     	@Parameter(required=true, description="<module name>")
     	List<String> moduleNames;
     }
