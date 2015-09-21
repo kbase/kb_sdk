@@ -115,17 +115,27 @@ public class ModuleBuilder {
      * @return
      */
 	private static int runInitCommand(InitCommandArgs initArgs, JCommander jc) {
+		// Figure out module name.
+		// Join together spaced out names with underscores if necessary.
 		if (initArgs.moduleNames == null || initArgs.moduleNames.size() == 0) {
 			ModuleBuilder.showError("Init Error", "A module name is required.");
 			return 1;
 		}
 		String moduleName = String.join("_", initArgs.moduleNames);
+		
+		// Get username if available
 		String userName = null;
 		if (initArgs.userName != null)
 			userName = initArgs.userName;
+		
+		// Get chosen language
+		String language = ModuleInitializer.DEFAULT_LANGUAGE;
+		if (initArgs.language != null)
+			language = initArgs.language;
+		
 		try {
-			ModuleInitializer initer = new ModuleInitializer(moduleName, userName, initArgs.verbose);
-			initer.initialize();
+			ModuleInitializer initer = new ModuleInitializer(moduleName, userName, language, initArgs.verbose);
+			initer.initialize(initArgs.example);
 		}
 		catch (IOException | RuntimeException e) {
 			showError("Error while initializing module", e.getMessage());
@@ -224,6 +234,12 @@ public class ModuleBuilder {
     	
     	@Parameter(names={"-u","--user"}, description="Tailor this module to your github user name")
     	String userName;
+    	
+    	@Parameter(names={"-e","--example"}, description="Include a fully featured example in your module")
+    	boolean example = false;
+    	
+    	@Parameter(names={"-l","--language"}, description="Choose a language for your module (default=Python)")
+    	String language = ModuleInitializer.DEFAULT_LANGUAGE;
     	
     	@Parameter(required=true, description="<module name>")
     	List<String> moduleNames;

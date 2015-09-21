@@ -21,10 +21,11 @@ public class InitializerTest {
 	   "service",
 	   "test", 
 	   "ui", 
-	   "ui/spec", 
-	   "ui/spec/img",
-	   "ui/spec/spec.json",
-	   "ui/spec/display.yaml",
+	   "ui/narrative", 
+	   "ui/narrative/methods/",
+	   "ui/narrative/methods/example/method/img",
+	   "ui/narrative/methods/example_method/spec.json",
+	   "ui/narrative/methods/example_method/display.yaml",
 	   "README.md",
 	   ".travis.yml",
 	   "scripts/Dockerfile",
@@ -32,7 +33,7 @@ public class InitializerTest {
 	};
 	
 	@After
-	private void tearDownModule() throws IOException {
+	public void tearDownModule() throws IOException {
 		File module = Paths.get(simpleModuleName).toFile();
 		if (module.exists() && module.isDirectory()) {
 			FileUtils.deleteDirectory(module);
@@ -44,7 +45,7 @@ public class InitializerTest {
 	 * @param moduleName
 	 * @return
 	 */
-	private boolean examineModule(String moduleName) {
+	public boolean examineModule(String moduleName) {
 		for (String path : expectedPaths) {
 			File f = Paths.get(moduleName, path).toFile();
 			if (!f.exists())
@@ -59,14 +60,14 @@ public class InitializerTest {
 	@Test
 	public void testSimpleModule() throws Exception {
 		ModuleInitializer initer = new ModuleInitializer(simpleModuleName, false);
-		initer.initialize();
+		initer.initialize(false);
 		Assert.assertTrue(examineModule(simpleModuleName));
 	}
 	
 	@Test
 	public void testModuleWithUser() throws Exception {
-		ModuleInitializer initer = new ModuleInitializer(simpleModuleName, userName, false);
-		initer.initialize();
+		ModuleInitializer initer = new ModuleInitializer(simpleModuleName, userName, "python", false);
+		initer.initialize(false);
 		Assert.assertTrue(examineModule(simpleModuleName));
 	}
 	
@@ -76,6 +77,12 @@ public class InitializerTest {
 		if (!f.exists())
 			f.mkdir();
 		ModuleInitializer initer = new ModuleInitializer(simpleModuleName, false);
-		initer.initialize();
+		initer.initialize(false);
+	}
+	
+	@Test(expected=Exception.class)
+	public void testNoNameModule() throws Exception {
+		ModuleInitializer initer = new ModuleInitializer(null, false);
+		initer.initialize(false);
 	}
 }
