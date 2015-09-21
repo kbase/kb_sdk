@@ -99,7 +99,7 @@ public class ModuleInitializer {
 		 * 3. Fill in templated files and write them
 		 *
 		 * Set up the context - the set of variables used to flesh out the templates */
-		String specFile = Paths.get("service", this.moduleName + ".spec").toString();
+		String specFile = Paths.get(this.moduleName + ".spec").toString();
 		
 		Map<String, Object> moduleContext = new HashMap<String, Object>();
 		moduleContext.put("module_name", this.moduleName);
