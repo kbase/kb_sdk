@@ -30,7 +30,7 @@ Note: this has only been tested in OS X.
 6. Exit terminal
 7. Quit and restart Kitematic
 8. Open Docker CLI
-9. docker pull baseimage (currently dockerhub-ci.kbase.us/rtmin)
+9. docker pull <baseimage>  # (currently dockerhub-ci.kbase.us/rtmin)
 
 ## Deploying development modules
 
