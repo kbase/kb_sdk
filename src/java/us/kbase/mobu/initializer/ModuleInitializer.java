@@ -23,7 +23,7 @@ public class ModuleInitializer {
 	private static String[] subdirs = {"data", 
 									   "docs", 
 									   "scripts",
-									   "service",
+									   "lib",
 									   "test", 
 									   "ui", 
 									   "ui/narrative", 
@@ -120,6 +120,22 @@ public class ModuleInitializer {
 		if (example) {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json").toFile());
 			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml").toFile());
+			switch(this.language) {
+				case "perl":
+					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "bio", "kbase", this.moduleName, this.moduleName + "_impl.pm").toFile());
+					break;
+				case "python":
+					initDirectory(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName));
+					initFile(Paths.get(this.moduleName, "lib", "biokbase", "__init__.py"));
+					initFile(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "__init__.py"));
+					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "Impl.py").toFile());
+					break;
+				case "java":
+					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, this.moduleName + "_impl.java").toFile());
+					break;
+				default:
+					break;
+			}
 		} else {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "example_method", "spec.json").toFile());
 			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "example_method", "display.yaml").toFile());
@@ -144,13 +160,19 @@ public class ModuleInitializer {
 		if (this.verbose) System.out.println("Making directory \"" + dirPath.toString() + "\"");
 		File newDir = dirPath.toFile();
 		if (!newDir.exists()) {
-			newDir.mkdir();
+			newDir.mkdirs();
 		}
 		else {
 			throw new IOException("Error while creating module - " + dirPath + " already exists!");
 		}
 	}
 	
+	private void initFile(Path filePath) throws IOException {
+		if (this.verbose) System.out.println("Building empty file \"" + filePath.toString() + "\"");
+		boolean done = filePath.toFile().createNewFile();
+		if (!done)
+			throw new IOException("Unable to create file \"" + filePath.toString() + "\" - file already exists!");
+	}
 	/**
 	 * 
 	 * @param context
