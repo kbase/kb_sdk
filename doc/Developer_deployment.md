@@ -15,8 +15,9 @@ Note: this has only been tested in OS X.
 1. Install Docker Toolbox: https://www.docker.com/toolbox (it says it includes VirtualBox, but I already had it so I couldn't verify)
 2. Run Kitematic in default configuration (this will start up a VirtualBox machine called "default")
 3. Open the "Docker CLI" (button in lower-left window)
-4. VBoxManage modifyvm "default" --natdnshostresolver1 on
-5. VBoxManage modifyvm "default --natdnsproxy1 on
+4. Run these commands in the terminal (these are to work around an issue with using private docker registries inside a VirtualBox VM):
+        VBoxManage modifyvm "default" --natdnshostresolver1 on
+        VBoxManage modifyvm "default --natdnsproxy1 on
 6. Exit terminal
 7. Quit and restart Kitematic
 8. Open Docker CLI
