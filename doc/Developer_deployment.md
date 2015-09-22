@@ -1,4 +1,6 @@
-# Preparing a new module
+# Deploying a module in a local development environment
+
+## Preparing a new module
 
 Note: most of these steps are still somewhat hand-wavy.
 
@@ -6,7 +8,7 @@ Note: most of these steps are still somewhat hand-wavy.
 2. Push your repository to github
 3. Implement your module
 
-# Building base developer environment
+## Building base developer environment
 
 Note: this has only been tested in OS X.
 
@@ -20,7 +22,7 @@ Note: this has only been tested in OS X.
 8. Open Docker CLI
 9. docker pull baseimage (currently dockerhub-ci.kbase.us/rtmin)
 
-# Deploying development modules
+## Deploying development modules
 
 10. build docker service image
 11. docker run serviceimage
