@@ -1,8 +1,8 @@
 # Deploying a module in a local development environment
 
-## Preparing a new module
-
 Note: most of these steps are still somewhat hand-wavy.
+
+## Preparing a new module
 
 1. Initialize your repository (using kb-mobu)
 2. Push your repository to github
