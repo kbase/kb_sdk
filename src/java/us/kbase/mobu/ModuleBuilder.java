@@ -1,27 +1,20 @@
 package us.kbase.mobu;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Reader;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-import us.kbase.jkidl.FileIncludeProvider;
-import us.kbase.jkidl.IncludeProvider;
-import us.kbase.kidl.KbService;
-import us.kbase.kidl.KidlParser;
 import us.kbase.mobu.compiler.RunCompileCommand;
+import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.validator.ModuleValidator;
 
 public class ModuleBuilder {
@@ -63,7 +56,7 @@ public class ModuleBuilder {
     	try {
     		jc.parse(args);
     	} catch (RuntimeException e) {
-    		showError("Command Line Arguement Error", e.getMessage());
+    		showError("Command Line Argument Error", e.getMessage());
     		System.exit(1);
     	}
     	
@@ -109,8 +102,45 @@ public class ModuleBuilder {
     	return mv.validateAll();
 	}
 
+    /**
+     * Runs the module initialization command - this creates a new module in the relative directory name given.
+     * There's only a couple of possible arguments here in the initArgs:
+     * userName (optional) - the user's Github user name, used to set up some optional fields
+     * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
+     * are replaced with underscores. So if a user runs:
+     *   kb-mobu init my new module
+     * they get a module called "my_new_module" in a directory of the same name.
+     * @param initArgs
+     * @param jc
+     * @return
+     */
 	private static int runInitCommand(InitCommandArgs initArgs, JCommander jc) {
-    	System.out.println("Initialization not yet implemented.");
+		// Figure out module name.
+		// Join together spaced out names with underscores if necessary.
+		if (initArgs.moduleNames == null || initArgs.moduleNames.size() == 0) {
+			ModuleBuilder.showError("Init Error", "A module name is required.");
+			return 1;
+		}
+		String moduleName = String.join("_", initArgs.moduleNames);
+		
+		// Get username if available
+		String userName = null;
+		if (initArgs.userName != null)
+			userName = initArgs.userName;
+		
+		// Get chosen language
+		String language = ModuleInitializer.DEFAULT_LANGUAGE;
+		if (initArgs.language != null)
+			language = initArgs.language;
+		
+		try {
+			ModuleInitializer initer = new ModuleInitializer(moduleName, userName, language, initArgs.verbose);
+			initer.initialize(initArgs.example);
+		}
+		catch (IOException | RuntimeException e) {
+			showError("Error while initializing module", e.getMessage());
+			return 1;
+		}
 		return 0;
 	}
 
@@ -199,7 +229,20 @@ public class ModuleBuilder {
     
     @Parameters(commandDescription = "Initialize a module in the current directory.")
     private static class InitCommandArgs {
+    	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
+    	boolean verbose = false;
     	
+    	@Parameter(names={"-u","--user"}, description="Tailor this module to your github user name")
+    	String userName;
+    	
+    	@Parameter(names={"-e","--example"}, description="Include a fully featured example in your module")
+    	boolean example = false;
+    	
+    	@Parameter(names={"-l","--language"}, description="Choose a language for your module (default=Python)")
+    	String language = ModuleInitializer.DEFAULT_LANGUAGE;
+    	
+    	@Parameter(required=true, description="<module name>")
+    	List<String> moduleNames;
     }
     
     

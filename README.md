@@ -8,9 +8,9 @@ still in beta and should only be used for internal use.
 The main tool included is the KBase Module Builder (kb-mobu), which can
 be used to help define, build and validate standard KBase services/functions.
 
-The module builder tooling is being desinged to allow complete local testing
+The module builder tooling is being designed to allow complete local testing
 of long running jobs without any external registration or configuration
-of the deployed job execution engine.  Implmentation of the code for
+of the deployed job execution engine.  Implementation of the code for
 long running jobs is handled identically to implementations of server
 code in the current standard KBase server generation.
 
@@ -21,7 +21,7 @@ Perl.  Clients can be generated in Python, Java, JavaScript and Perl.
 
 #### installation
 
-The module builder tool is accessable as a command-line program named `kb-mobu`.
+The module builder tool is accessible as a command-line program named `kb-mobu`.
 
 To install (either standalone or within a dev_container environment):
 
@@ -31,7 +31,7 @@ To install (either standalone or within a dev_container environment):
     make
 
 If you are building in a KBase dev_container, running make will
-automatically install the `kb-modbu` command to `dev_container/bin`
+automatically install the `kb-mobu` command to `dev_container/bin`
 which will be on your path.  If you are outside of the dev_container,
 then you can either copy files in `kb_sdk/bin` to a directory on
 your path, or add `kb_sdk/bin` directly to your path.  That is, from within
@@ -39,12 +39,12 @@ the base kb_sdk directory, run:
 
     export PATH=$(pwd)/bin:$PATH
 
-You will need a java JDK installed in your system either way, with the 
-`JAVA_HOME` environment variable defined pointing to your java installation.
+You will need a Java JDK installed in your system either way, with the 
+`JAVA_HOME` environment variable defined pointing to your Java installation.
 
 Optionally, you can install command completion with:
 
-	source source src/sh/mobu-completion.sh
+    source src/sh/mobu-completion.sh
 
 
 
