@@ -88,11 +88,11 @@ public class ModuleInitializer {
 		}
 	
 		// 1. build dir with moduleName
-		initDirectory(Paths.get(this.moduleName));
+		initDirectory(Paths.get(this.moduleName), true);
 		
 		// 2. build skeleton subdirs
 		for (String dir : subdirList) {
-			initDirectory(Paths.get(this.moduleName, dir));
+			initDirectory(Paths.get(this.moduleName, dir), true);
 		}
 
 		/*
@@ -106,6 +106,7 @@ public class ModuleInitializer {
 		moduleContext.put("user_name", this.userName);
 		moduleContext.put("spec_file", specFile);
 		moduleContext.put("language", this.language);
+		moduleContext.put("module_root_path", Paths.get(this.moduleName).toAbsolutePath());
 
 		/* Set up the templates to be used 
 		 * TODO: move this to some kind of declarative config file
@@ -116,20 +117,28 @@ public class ModuleInitializer {
 		templateFiles.put("module_dockerfile", Paths.get(this.moduleName, "scripts", "Dockerfile").toFile());
 		templateFiles.put("module_readme", Paths.get(this.moduleName, "README.md").toFile());
 		templateFiles.put("module_makefile", Paths.get(this.moduleName, "Makefile").toFile());
+		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg").toFile());
 		
 		if (example) {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json").toFile());
 			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml").toFile());
+			templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl").toFile());
+			templateFiles.put("module_test_all_clients", Paths.get(this.moduleName, "test", "test_all_clients.sh").toFile());
+
 			switch(this.language) {
+				// Perl just needs an impl file and a start server script
 				case "perl":
-					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "bio", "kbase", this.moduleName, this.moduleName + "_impl.pm").toFile());
+					templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_perl_server.sh").toFile());
+					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "Bio", "KBase", this.moduleName, "Impl.pm").toFile());
 					break;
+				// Python needs some empty __init__.py files and the impl file
 				case "python":
-					initDirectory(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName));
-					initFile(Paths.get(this.moduleName, "lib", "biokbase", "__init__.py"));
-					initFile(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "__init__.py"));
+					initDirectory(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName), false);
+					initFile(Paths.get(this.moduleName, "lib", "biokbase", "__init__.py"), false);
+					initFile(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "__init__.py"), false);
 					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "Impl.py").toFile());
 					break;
+				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
 					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, this.moduleName + "_impl.java").toFile());
 					break;
@@ -148,6 +157,9 @@ public class ModuleInitializer {
 		System.out.println("Done! Your module is available in the " + this.moduleName + " directory.");
 		if (example) {
 			System.out.println("Compile and run the example methods with the following inputs:");
+			System.out.println("  cd " + this.moduleName);
+			System.out.println("  make");
+			System.out.println();
 		}
 	}
 	
@@ -156,21 +168,21 @@ public class ModuleInitializer {
 	 * @param dirPath
 	 * @throws IOException
 	 */
-	private void initDirectory(Path dirPath) throws IOException {
+	private void initDirectory(Path dirPath, boolean failOnExist) throws IOException {
 		if (this.verbose) System.out.println("Making directory \"" + dirPath.toString() + "\"");
 		File newDir = dirPath.toFile();
 		if (!newDir.exists()) {
 			newDir.mkdirs();
 		}
-		else {
+		else if (failOnExist) {
 			throw new IOException("Error while creating module - " + dirPath + " already exists!");
 		}
 	}
 	
-	private void initFile(Path filePath) throws IOException {
+	private void initFile(Path filePath, boolean failOnExist) throws IOException {
 		if (this.verbose) System.out.println("Building empty file \"" + filePath.toString() + "\"");
 		boolean done = filePath.toFile().createNewFile();
-		if (!done)
+		if (!done && failOnExist)
 			throw new IOException("Unable to create file \"" + filePath.toString() + "\" - file already exists!");
 	}
 	/**
@@ -182,6 +194,7 @@ public class ModuleInitializer {
 	 */
 	private void fillTemplate(Map<?,?> context, String templateName, File outfile, boolean useExample) throws IOException {
 		if (this.verbose) System.out.println("Building file \"" + outfile.toString() + "\"");
+		initDirectory(outfile.getParentFile().toPath(), false);
 		if (useExample)
 			templateName += "_example";
 		TemplateFormatter.formatTemplate(templateName, context, true, outfile);
