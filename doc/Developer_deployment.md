@@ -11,9 +11,12 @@ Note: most of these steps are still somewhat hand-wavy.
 
 ## Preparing a new module
 
-    git clone https://github.com/kbaseIncubator/kb_sdk
+For now, we are using the develop branch.  Very soon we will merge to the master branch.
+
+    git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
     cd kb_sdk
+    git checkout develop
     make
     ./bin/kb-modu init -u <username> <modulename>
 
