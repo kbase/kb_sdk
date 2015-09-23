@@ -11,7 +11,7 @@ Note: most of these steps are still somewhat hand-wavy.
 
 ## Preparing a new module
 
-For now, we are using the develop branch.  Very soon we will merge to the master branch.
+For now, we are using the develop branch.  Very soon we will merge to the master branch.  You need to export your JAVA_HOME environment variable correctly (the location depends on which JDK you're using).
 
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
