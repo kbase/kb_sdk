@@ -107,6 +107,7 @@ public class ModuleInitializer {
 		moduleContext.put("spec_file", specFile);
 		moduleContext.put("language", this.language);
 		moduleContext.put("module_root_path", Paths.get(this.moduleName).toAbsolutePath());
+		moduleContext.put("example", example);
 
 		/* Set up the templates to be used 
 		 * TODO: move this to some kind of declarative config file
@@ -151,7 +152,7 @@ public class ModuleInitializer {
 		}
 
 		for (String templateName : templateFiles.keySet()) {
-			fillTemplate(moduleContext, templateName, templateFiles.get(templateName), example);
+			fillTemplate(moduleContext, templateName, templateFiles.get(templateName));
 		}
 		
 		System.out.println("Done! Your module is available in the " + this.moduleName + " directory.");
@@ -192,11 +193,9 @@ public class ModuleInitializer {
 	 * @param outfile
 	 * @throws IOException
 	 */
-	private void fillTemplate(Map<?,?> context, String templateName, File outfile, boolean useExample) throws IOException {
+	private void fillTemplate(Map<?,?> context, String templateName, File outfile) throws IOException {
 		if (this.verbose) System.out.println("Building file \"" + outfile.toString() + "\"");
 		initDirectory(outfile.getParentFile().toPath(), false);
-		if (useExample)
-			templateName += "_example";
 		TemplateFormatter.formatTemplate(templateName, context, true, outfile);
 	}
 	
