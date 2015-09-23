@@ -18,7 +18,7 @@ For now, we are using the develop branch.  Very soon we will merge to the master
     cd kb_sdk
     git checkout develop
     make
-    ./bin/kb-modu init -u <username> <modulename>
+    ./bin/kb-mobu init -u <username> <modulename>
 
 ## Building base developer environment
 
