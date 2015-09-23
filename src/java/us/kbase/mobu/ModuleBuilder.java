@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -121,7 +123,8 @@ public class ModuleBuilder {
 			ModuleBuilder.showError("Init Error", "A module name is required.");
 			return 1;
 		}
-		String moduleName = String.join("_", initArgs.moduleNames);
+		String moduleName = StringUtils.join(initArgs.moduleNames, "_");
+//		String moduleName = String.join("_", initArgs.moduleNames);
 		
 		// Get username if available
 		String userName = null;
