@@ -107,7 +107,7 @@ public class ModuleBuilder {
     /**
      * Runs the module initialization command - this creates a new module in the relative directory name given.
      * There's only a couple of possible arguments here in the initArgs:
-     * userName (optional) - the user's Github user name, used to set up some optional fields
+     * userName (required) - the user's Github user name, used to set up some optional fields
      * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
      * are replaced with underscores. So if a user runs:
      *   kb-mobu init my new module
@@ -124,7 +124,6 @@ public class ModuleBuilder {
 			return 1;
 		}
 		String moduleName = StringUtils.join(initArgs.moduleNames, "_");
-//		String moduleName = String.join("_", initArgs.moduleNames);
 		
 		// Get username if available
 		String userName = null;
@@ -235,13 +234,19 @@ public class ModuleBuilder {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
     	boolean verbose = false;
     	
-    	@Parameter(names={"-u","--user"}, description="Tailor this module to your github user name")
+    	@Parameter(required=true, names={"-u","--user"}, 
+    			description="(Required) provide a username to serve as the owner of this module")
     	String userName;
     	
-    	@Parameter(names={"-e","--example"}, description="Include a fully featured example in your module")
+    	@Parameter(names={"-e","--example"}, 
+    			description="Include a fully featured example in your module. " +
+    			"This generates an example set of code and configurations that can " +
+    			"be used to demonstrate a very simple example.")
     	boolean example = false;
     	
-    	@Parameter(names={"-l","--language"}, description="Choose a language for your module (default=Python)")
+    	@Parameter(names={"-l","--language"}, description="Choose a language for developing " + 
+    			" code in your module. You can currently choose from Python, Perl, and Java " + 
+    			"(default=Python)")
     	String language = ModuleInitializer.DEFAULT_LANGUAGE;
     	
     	@Parameter(required=true, description="<module name>")
