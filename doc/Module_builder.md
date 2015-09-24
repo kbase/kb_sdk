@@ -16,7 +16,10 @@ The KBase Module Builder is an application that helps developers initialize, com
 
 # Build the SDK
 
+Some newer features are on other branches, such as develop.  If you do not need these features you do not need to check out a different branch.
+
     cd kb_sdk
+    git checkout <branch>
     make
 
 You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
@@ -81,3 +84,6 @@ To build and run the module examples, you'll need to do the following.
 
 The compile option is the primary service compiler, and makes up the bulk of the example Makefile.
 
+## Docker deployments
+
+To build a Docker image and run a service from a Docker container, see [Docker_deployment.md](Docker_deployment.md).
