@@ -27,8 +27,8 @@ public class ModuleInitializer {
 									   "test", 
 									   "ui", 
 									   "ui/narrative", 
-									   "ui/narrative/methods"};
-	
+									   "ui/narrative/methods",
+									   "ui/widgets"};	
 	/**
 	 * 
 	 * @param moduleName
@@ -120,17 +120,25 @@ public class ModuleInitializer {
 		templateFiles.put("module_makefile", Paths.get(this.moduleName, "Makefile"));
 		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg"));
 		templateFiles.put("module_license", Paths.get(this.moduleName, "LICENSE"));
+		templateFiles.put("module_docker_entrypoint", Paths.get(this.moduleName, "scripts", "entrypoint.sh"));
+		templateFiles.put("module_readme_lib", Paths.get(this.moduleName, "lib", "README.md"));
+		templateFiles.put("module_readme_ui", Paths.get(this.moduleName, "ui", "README.md"));
+		templateFiles.put("module_readme_test", Paths.get(this.moduleName, "test", "README.md"));
+		templateFiles.put("module_readme_docs", Paths.get(this.moduleName, "docs", "README.md"));
+		templateFiles.put("module_readme_data", Paths.get(this.moduleName, "data", "README.md"));
 		
 		if (example) {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
 			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
 			templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl"));
+			templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", "test_python_client.py"));
+			templateFiles.put("module_test_java_client", Paths.get(this.moduleName, "test", "test_java_client.java"));
 			templateFiles.put("module_test_all_clients", Paths.get(this.moduleName, "test", "test_all_clients.sh"));
 
 			switch(this.language) {
 				// Perl just needs an impl file and a start server script
 				case "perl":
-					templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_perl_server.sh"));
+					templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
 					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "Bio", "KBase", this.moduleName, "Impl.pm"));
 					break;
 				// Python needs some empty __init__.py files and the impl file
@@ -139,10 +147,12 @@ public class ModuleInitializer {
 					initFile(Paths.get(this.moduleName, "lib", "biokbase", "__init__.py"), false);
 					initFile(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "__init__.py"), false);
 					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "Impl.py"));
+					templateFiles.put("module_start_python_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
 					break;
 				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
-					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, this.moduleName + "_impl.java"));
+					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "src", "us", "kbase", this.moduleName, this.moduleName + "_impl.java"));
+					templateFiles.put("module_start_java_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
 					break;
 				default:
 					break;
