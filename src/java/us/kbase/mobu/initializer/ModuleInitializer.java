@@ -112,43 +112,44 @@ public class ModuleInitializer {
 		/* Set up the templates to be used 
 		 * TODO: move this to some kind of declarative config file
 		 */
-		Map<String, File> templateFiles = new HashMap<String, File>();
-		templateFiles.put("module_typespec", Paths.get(this.moduleName, specFile).toFile());
-		templateFiles.put("module_travis", Paths.get(this.moduleName, ".travis.yml").toFile());
-		templateFiles.put("module_dockerfile", Paths.get(this.moduleName, "scripts", "Dockerfile").toFile());
-		templateFiles.put("module_readme", Paths.get(this.moduleName, "README.md").toFile());
-		templateFiles.put("module_makefile", Paths.get(this.moduleName, "Makefile").toFile());
-		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg").toFile());
+		Map<String, Path> templateFiles = new HashMap<String, Path>();
+		templateFiles.put("module_typespec", Paths.get(this.moduleName, specFile));
+		templateFiles.put("module_travis", Paths.get(this.moduleName, ".travis.yml"));
+		templateFiles.put("module_dockerfile", Paths.get(this.moduleName, "scripts", "Dockerfile"));
+		templateFiles.put("module_readme", Paths.get(this.moduleName, "README.md"));
+		templateFiles.put("module_makefile", Paths.get(this.moduleName, "Makefile"));
+		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg"));
+		templateFiles.put("module_license", Paths.get(this.moduleName, "LICENSE"));
 		
 		if (example) {
-			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json").toFile());
-			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml").toFile());
-			templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl").toFile());
-			templateFiles.put("module_test_all_clients", Paths.get(this.moduleName, "test", "test_all_clients.sh").toFile());
+			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
+			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
+			templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl"));
+			templateFiles.put("module_test_all_clients", Paths.get(this.moduleName, "test", "test_all_clients.sh"));
 
 			switch(this.language) {
 				// Perl just needs an impl file and a start server script
 				case "perl":
-					templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_perl_server.sh").toFile());
-					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "Bio", "KBase", this.moduleName, "Impl.pm").toFile());
+					templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_perl_server.sh"));
+					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "Bio", "KBase", this.moduleName, "Impl.pm"));
 					break;
 				// Python needs some empty __init__.py files and the impl file
 				case "python":
 					initDirectory(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName), false);
 					initFile(Paths.get(this.moduleName, "lib", "biokbase", "__init__.py"), false);
 					initFile(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "__init__.py"), false);
-					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "Impl.py").toFile());
+					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "Impl.py"));
 					break;
 				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
-					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, this.moduleName + "_impl.java").toFile());
+					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, this.moduleName + "_impl.java"));
 					break;
 				default:
 					break;
 			}
 		} else {
-			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "example_method", "spec.json").toFile());
-			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "example_method", "display.yaml").toFile());
+			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "example_method", "spec.json"));
+			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "example_method", "display.yaml"));
 		}
 
 		for (String templateName : templateFiles.keySet()) {
@@ -193,10 +194,10 @@ public class ModuleInitializer {
 	 * @param outfile
 	 * @throws IOException
 	 */
-	private void fillTemplate(Map<?,?> context, String templateName, File outfile) throws IOException {
-		if (this.verbose) System.out.println("Building file \"" + outfile.toString() + "\"");
-		initDirectory(outfile.getParentFile().toPath(), false);
-		TemplateFormatter.formatTemplate(templateName, context, true, outfile);
+	private void fillTemplate(Map<?,?> context, String templateName, Path outfilePath) throws IOException {
+		if (this.verbose) System.out.println("Building file \"" + outfilePath.toString() + "\"");
+		initDirectory(outfilePath.getParent(), false);
+		TemplateFormatter.formatTemplate(templateName, context, true, outfilePath.toFile());
 	}
 	
 	/**
