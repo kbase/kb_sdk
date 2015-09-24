@@ -29,21 +29,14 @@ public class ModuleInitializer {
 									   "ui/narrative", 
 									   "ui/narrative/methods",
 									   "ui/widgets"};	
-	/**
-	 * 
-	 * @param moduleName
-	 */
-	public ModuleInitializer(String moduleName) {
-		this(moduleName, false);
-	}
 	
 	/**
 	 * 
 	 * @param moduleName
 	 * @param verbose
 	 */
-	public ModuleInitializer(String moduleName, boolean verbose) {
-		this(moduleName, null, DEFAULT_LANGUAGE, verbose);
+	public ModuleInitializer(String moduleName, String userName, boolean verbose) {
+		this(moduleName, userName, DEFAULT_LANGUAGE, verbose);
 	}
 	
 	/**
@@ -115,7 +108,7 @@ public class ModuleInitializer {
 		Map<String, Path> templateFiles = new HashMap<String, Path>();
 		templateFiles.put("module_typespec", Paths.get(this.moduleName, specFile));
 		templateFiles.put("module_travis", Paths.get(this.moduleName, ".travis.yml"));
-		templateFiles.put("module_dockerfile", Paths.get(this.moduleName, "scripts", "Dockerfile"));
+		templateFiles.put("module_dockerfile", Paths.get(this.moduleName, "Dockerfile"));
 		templateFiles.put("module_readme", Paths.get(this.moduleName, "README.md"));
 		templateFiles.put("module_makefile", Paths.get(this.moduleName, "Makefile"));
 		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg"));
@@ -126,6 +119,7 @@ public class ModuleInitializer {
 		templateFiles.put("module_readme_test", Paths.get(this.moduleName, "test", "README.md"));
 		templateFiles.put("module_readme_docs", Paths.get(this.moduleName, "docs", "README.md"));
 		templateFiles.put("module_readme_data", Paths.get(this.moduleName, "data", "README.md"));
+		templateFiles.put("module_config_yaml", Paths.get(this.moduleName, "kbase.yml"));
 		
 		if (example) {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
