@@ -1,6 +1,6 @@
 # Deploying a module in a local Docker development environment
 
-## Build your module
+## Build and implement your module
 
 See [Module_builder.md](Module_builder.md).
 
