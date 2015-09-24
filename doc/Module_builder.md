@@ -2,12 +2,18 @@
 
 The KBase Module Builder is an application that helps developers initialize, compile, test, and run KBase modules. This document details how to install and use it.
 
-# Obtain prerequisites
+# Obtain and install prerequisites
 
 1. Java JDK (http://java.oracle.com)
 2. ant (http://ant.apache.org/)
   - Mac OS: Homebrew or MacPorts are the easiest ways to install
   - Linux: Depends on distribution
+
+# Set environment variables
+
+Set JAVA_HOME to the directory where you installed JDK. If you're not sure where that is, the command /usr/libexec/java_home will tell you.
+    setenv JAVA_HOME `/usr/libexec/java_home`
+Also, add to your PATH the directory where you installed ant.
 
 # Get the git repos
 
@@ -20,10 +26,9 @@ The KBase Module Builder is an application that helps developers initialize, com
     make
 
 You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
-
     export PATH=$(pwd)/bin:$PATH
 
-(or some variant for your OS - consider adding this to your .profile or .bashrc)
+(or some variant for your OS -- consider adding this to your .profile or .bashrc)
 
 # kb-mobu init
 
