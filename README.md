@@ -46,8 +46,6 @@ Optionally, you can install command completion with:
 
     source src/sh/mobu-completion.sh
 
-
-
 #### getting started
 
 Once the `kb-mobu` command is on the path, you can get additional
@@ -55,7 +53,7 @@ help by running:
 
     kb-mobu help
 
-Additional documentation and tutorials will slowly be added to the 'docs' 
+Additional documentation and tutorials will slowly be added to the 'doc' 
 directory of this repository.
 
 For an example KBase service with a Perl backend with an asynchronous, long
