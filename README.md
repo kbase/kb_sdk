@@ -44,9 +44,7 @@ You will need a Java JDK installed in your system either way, with the
 
 Optionally, you can install command completion with:
 
-	source src/sh/mobu-completion.sh
-
-
+    source src/sh/mobu-completion.sh
 
 #### getting started
 
