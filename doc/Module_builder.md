@@ -9,8 +9,10 @@ The KBase Module Builder is an application that helps developers initialize, com
   - Mac OS: Homebrew or MacPorts are the easiest ways to install
   - Linux: Depends on distribution
 3. plack:
-   cpanm --sudo Task::Plack
+   sudo cpanm --sudo Task::Plack
    (If you don't have cpanm, install from http://search.cpan.org/~miyagawa/App-cpanminus-1.7039/lib/App/cpanminus.pm#INSTALL)
+4. Bio::KBase
+   sudo cpanm Bio::KBase
 
 # Set environment variables
 
