@@ -8,11 +8,6 @@ The KBase Module Builder is an application that helps developers initialize, com
 2. ant (http://ant.apache.org/)
   - Mac OS: Homebrew or MacPorts are the easiest ways to install
   - Linux: Depends on distribution
-3. plack:
-   sudo cpanm --sudo Task::Plack
-   (If you don't have cpanm, install from http://search.cpan.org/~miyagawa/App-cpanminus-1.7039/lib/App/cpanminus.pm#INSTALL)
-4. Bio::KBase
-   sudo cpanm Bio::KBase
 
 # Set environment variables
 
@@ -90,4 +85,3 @@ To build and run the module examples, you'll need to do the following.
 # kb-mobu compile
 
 The compile option is the primary service compiler, and makes up the bulk of the example Makefile.
-
