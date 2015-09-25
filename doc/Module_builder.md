@@ -2,12 +2,18 @@
 
 The KBase Module Builder is an application that helps developers initialize, compile, test, and run KBase modules. This document details how to install and use it.
 
-# Obtain prerequisites
+# Obtain and install prerequisites
 
 1. Java JDK (http://java.oracle.com)
 2. ant (http://ant.apache.org/)
   - Mac OS: Homebrew or MacPorts are the easiest ways to install
   - Linux: Depends on distribution
+
+# Set environment variables
+
+Set JAVA_HOME to the directory where you installed JDK. If you're not sure where that is, the command /usr/libexec/java_home will tell you.
+    setenv JAVA_HOME `/usr/libexec/java_home`
+Also, add to your PATH the directory where you installed ant.
 
 # Get the git repos
 
@@ -23,10 +29,9 @@ Some newer features are on other branches, such as develop.  If you do not need 
     make
 
 You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
-
     export PATH=$(pwd)/bin:$PATH
 
-(or some variant for your OS - consider adding this to your .profile or .bashrc)
+(or some variant for your OS -- consider adding this to your .profile or .bashrc)
 
 # kb-mobu init
 
@@ -67,13 +72,13 @@ To build and run the module examples, you'll need to do the following.
 
 2. Start the Mockup job service. This is a small web service that is a part of the SDK, and used for testing for now (note - this is under construction).
 
-    cd kb_sdk/test_scripts/ee_mock_service
+    cd ../test_scripts/ee_mock_service
     ./start_service.sh
 
 3. Start your module's server. The Perl example is given below
 
-    cd MyModule/scripts
-    ./start_perl_server.sh > server.log 2>&1 &
+    cd ../../MyModule/scripts
+    sh ./start_perl_server.sh > server.log 2>&1 &
 
 4. Now you can run your tests against your running server. The example test directory contains some basic client tests, but others can be added here.
 
