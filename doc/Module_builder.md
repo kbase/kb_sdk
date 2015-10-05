@@ -8,6 +8,9 @@ The KBase Module Builder is an application that helps developers initialize, com
 2. ant (http://ant.apache.org/)
   - Mac OS: Homebrew or MacPorts are the easiest ways to install
   - Linux: Depends on distribution
+3. git (https://git-scm.com)
+4. create a GitHub account if you do not have one already (https://github.com)
+  - All modules in KBase are pulled and registered from public GitHub repositories
 
 # Set environment variables
 
@@ -61,6 +64,22 @@ Creates a module with an example written in Perl. With the example written, you 
 
 Creates a complete example that also tailors the module to your user name.
 
+# Create a GitHub repository for your module
+
+Since functionality in KBase is pulled into KBase from public GitHub repositories, you will need to track your module as a git repository.  With git installed, this is easy to do.  Enter the repository of your module, add all files created by kb-mobu, and commit with some commit message.  This creates a git repository locally.
+
+    cd MyModule
+    git init
+    git add .
+    git commit -m 'initial commit'
+
+Now you can sync this to a new GitHub repository.  First create a new GitHub repository through github, but do not initialize it! Just go here: https://github.com/new or see more instructions here: https://help.github.com/articles/creating-a-new-repository
+
+Once the repository is setup, you can push your local KBase module to GitHub.  Setup the remote repository URL and push your updates.
+
+    git remote add origin git@github.com:[GITHUB_USER_NAME]/MyModule.git
+    git push -u origin master
+
 # Building and running examples
 
 To build and run the module examples, you'll need to do the following.
@@ -72,12 +91,12 @@ To build and run the module examples, you'll need to do the following.
 
 2. Start the Mockup job service. This is a small web service that is a part of the SDK, and used for testing for now (note - this is under construction).
 
-    cd ../test_scripts/ee_mock_service
+    cd [Path_to_kb_sdk]/test_scripts/ee_mock_service
     ./start_service.sh
 
 3. Start your module's server. The Perl example is given below
 
-    cd ../../MyModule/scripts
+    cd [Path_to_MyModule]/scripts
     sh ./start_perl_server.sh > server.log 2>&1 &
 
 4. Now you can run your tests against your running server. The example test directory contains some basic client tests, but others can be added here.
