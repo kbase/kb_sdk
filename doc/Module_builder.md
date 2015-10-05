@@ -1,6 +1,6 @@
 # KBase Module Builder documentation
 
-The KBase Module Builder is an application that helps developers initialize, compile, test, and run KBase modules. This document details how to install and use it.
+The KBase Module Builder (kb-mobu) is an application that helps developers initialize, compile, test, and run KBase modules. This document details how to install and use it.
 
 # Obtain and install prerequisites
 
@@ -11,8 +11,9 @@ The KBase Module Builder is an application that helps developers initialize, com
 
 # Set environment variables
 
-Set JAVA_HOME to the directory where you installed JDK. If you're not sure where that is, the command /usr/libexec/java_home will tell you.
-    setenv JAVA_HOME `/usr/libexec/java_home`
+Set JAVA_HOME to the directory where you installed JDK. If you're not sure where that is, the command */usr/libexec/java_home* will tell you.  
+
+    setenv JAVA_HOME `/usr/libexec/java_home`  
 Also, add to your PATH the directory where you installed ant.
 
 # Get the git repos
@@ -29,6 +30,7 @@ Some newer features are on other branches, such as develop.  If you do not need 
     make
 
 You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
+
     export PATH=$(pwd)/bin:$PATH
 
 (or some variant for your OS -- consider adding this to your .profile or .bashrc)
@@ -41,11 +43,11 @@ There are a few functions built into the module builder. Let's start with init.
 
 The kb-mobu init function creates a new directory with the given module name (any whitespace is replaced with underscores) and populates it with the basic structure of a KBase module. Optionally, this can also be filled with an executable example module. The module name is expected to be a single 
 
-_Options:_
--v, --verbose    Show verbose output of which files and directories are being created.
--u, --username   Give a username (presumably a github username) that will slightly adjust some files in the module.
--e, --example    Populate your repo with an example module in the language set by -l
--l, --language   Choose a programming language to base your repo on. Currently, we support Perl, Python, and Java. Default is Python
+_Options:_<br/>
+-v, --verbose    Show verbose output of which files and directories are being created.<br/>
+-u, --username   Give a username (presumably a github username) that will slightly adjust some files in the module.<br/>
+-e, --example    Populate your repo with an example module in the language set by -l<br/>
+-l, --language   Choose a programming language to base your repo on. Currently, we support Perl, Python, and Java. Default is Python<br/>
 
 ## Examples:
 
@@ -65,24 +67,24 @@ Creates a complete example that also tailors the module to your user name.
 
 To build and run the module examples, you'll need to do the following.
 
-1. Run `make` in the new module directory
+1. Run `make` in the new module directory  
 
-    cd MyModule
+    cd MyModule  
     make
 
-2. Start the Mockup job service. This is a small web service that is a part of the SDK, and used for testing for now (note - this is under construction).
+2. Start the Mockup job service. This is a small web service that is a part of the SDK, and used for testing for now (note - this is under construction).  
 
-    cd ../test_scripts/ee_mock_service
+    cd ../test_scripts/ee_mock_service  
     ./start_service.sh
 
-3. Start your module's server. The Perl example is given below
+3. Start your module's server. The Perl example is given below.  
 
-    cd ../../MyModule/scripts
+    cd ../../MyModule/scripts  
     sh ./start_perl_server.sh > server.log 2>&1 &
 
-4. Now you can run your tests against your running server. The example test directory contains some basic client tests, but others can be added here.
+4. Now you can run your tests against your running server. The example test directory contains some basic client tests, but others can be added here.  
 
-    cd MyModule/test
+    cd MyModule/test  
     ./test_all_clients.sh
 
 # kb-mobu compile
