@@ -126,7 +126,7 @@ public class RunCompileCommand {
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
                 pyServerSide, pyServerName, pyImplName, perlEnableRetries, newStyle, 
-                ip, output, perlMakefile, pyMakefile);
+                ip, output, perlMakefile, pyMakefile, newStyle);
     }
 	
 	

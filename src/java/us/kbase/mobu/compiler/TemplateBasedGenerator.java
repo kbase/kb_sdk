@@ -32,7 +32,7 @@ public class TemplateBasedGenerator {
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, genPerlServer, 
                 perlServerName, perlImplName, perlPsgiName, genPython, pythonClientName, 
                 genPythonServer, pythonServerName, pythonImplName, enableRetries, newStyle, ip, 
-                output, null, null);
+                output, null, null, false);
     }
     
     public static boolean genPerlServer(boolean genPerlServer, 
@@ -53,7 +53,7 @@ public class TemplateBasedGenerator {
             boolean genPython, String pythonClientName, boolean genPythonServer,
             String pythonServerName, String pythonImplName, boolean enableRetries, 
             boolean newStyle, IncludeProvider ip, FileSaver output,
-            FileSaver perlMakefile, FileSaver pyMakefile) throws Exception {
+            FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault) throws Exception {
         KbService service = srvs.get(0);
         if (genJs && jsClientName == null)
             jsClientName = service.getName() + "Client";
@@ -107,6 +107,26 @@ public class TemplateBasedGenerator {
             pythonClient.close();
             pyMakefileContext.put("client_package_name", pythonClientName);
             pyMakefileContext.put("client_file", pythonClientPath);
+        }
+        //////////////////////////////////////// Servers /////////////////////////////////////////
+        if (asyncByDefault) {
+            // Make all methods async and mark methods being async already as couldn't be sync
+            context.put("any_async", true);
+            List<Map<String, Object>> modules = (List<Map<String, Object>>)context.get("modules");
+            for (int modulePos = 0; modulePos < modules.size(); modulePos++) {
+                Map<String, Object> module = modules.get(modulePos);
+                module.put("any_async", true);
+                List<Map<String, Object>> methods = (List<Map<String, Object>>)module.get("methods");
+                if (methods == null)
+                    continue;
+                for (int methodPos = 0; methodPos < methods.size(); methodPos++) {
+                    Map<String, Object> method = methods.get(methodPos);
+                    Boolean async = (Boolean)method.get("async");
+                    method.put("async", true);
+                    if (async == null || !async)
+                        method.put("could_be_sync", true);
+                }
+            }
         }
         if (perlServerName != null) {
             String perlServerPath = fixPath(perlServerName, "::") + ".pm";
