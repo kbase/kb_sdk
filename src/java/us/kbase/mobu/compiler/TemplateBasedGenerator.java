@@ -102,6 +102,7 @@ public class TemplateBasedGenerator {
         }
         if (pythonClientName != null) {
             String pythonClientPath = fixPath(pythonClientName, ".") + ".py";
+            initPyhtonPackages(pythonClientPath, output);
             Writer pythonClient = output.openWriter(pythonClientPath);
             TemplateFormatter.formatTemplate("python_client", context, newStyle, pythonClient);
             pythonClient.close();
@@ -138,6 +139,7 @@ public class TemplateBasedGenerator {
         }
         if (pythonServerName != null) {
             String pythonServerPath = fixPath(pythonServerName, ".") + ".py";
+            initPyhtonPackages(pythonServerPath, output);
             Writer pythonServer = output.openWriter(pythonServerPath);
             TemplateFormatter.formatTemplate("python_server", context, newStyle, pythonServer);
             pythonServer.close();
@@ -217,6 +219,22 @@ public class TemplateBasedGenerator {
             Writer pyMakefileWr = pyMakefile.openWriter(".");
             TemplateFormatter.formatTemplate("python_makefile", pyMakefileContext, true, pyMakefileWr);
             pyMakefileWr.close();
+        }
+    }
+    
+    private static void initPyhtonPackages(String relativePyPath, FileSaver output) throws Exception {
+        String path = relativePyPath;
+        while (true) {
+            int pos = path.lastIndexOf("/");
+            if (pos < 0)
+                break;
+            path = path.substring(0, pos);
+            if (path.isEmpty())
+                break;
+            String initPath = path + "/__init__.py";
+            File prevFile = output.getAsFileOrNull(initPath);
+            if (prevFile == null || !prevFile.exists())
+                output.openWriter(initPath).close();
         }
     }
 
