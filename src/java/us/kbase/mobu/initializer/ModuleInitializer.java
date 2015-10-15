@@ -114,6 +114,7 @@ public class ModuleInitializer {
 		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg"));
 		templateFiles.put("module_license", Paths.get(this.moduleName, "LICENSE"));
 		templateFiles.put("module_docker_entrypoint", Paths.get(this.moduleName, "scripts", "entrypoint.sh"));
+        templateFiles.put("module_run_async", Paths.get(this.moduleName, "scripts", "run_async.sh"));
 		templateFiles.put("module_readme_lib", Paths.get(this.moduleName, "lib", "README.md"));
 		templateFiles.put("module_readme_ui", Paths.get(this.moduleName, "ui", "README.md"));
 		templateFiles.put("module_readme_test", Paths.get(this.moduleName, "test", "README.md"));
@@ -132,21 +133,23 @@ public class ModuleInitializer {
 			switch(this.language) {
 				// Perl just needs an impl file and a start server script
 				case "perl":
-					templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
-					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", "Bio", "KBase", this.moduleName, "Impl.pm"));
+					//templateFiles.put("module_start_perl_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
+				    // start_server script is now made in Makefile
+					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", this.moduleName, this.moduleName + "Impl.pm"));
 					break;
 				// Python needs some empty __init__.py files and the impl file
 				case "python":
-					initDirectory(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName), false);
-					initFile(Paths.get(this.moduleName, "lib", "biokbase", "__init__.py"), false);
-					initFile(Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "__init__.py"), false);
-					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", "biokbase", this.moduleName, "Impl.py"));
-					templateFiles.put("module_start_python_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
+					initDirectory(Paths.get(this.moduleName, "lib", this.moduleName), false);
+					initFile(Paths.get(this.moduleName, "lib", this.moduleName, "__init__.py"), false);
+					templateFiles.put("module_python_impl", Paths.get(this.moduleName, "lib", this.moduleName, this.moduleName + "Impl.py"));
+					//templateFiles.put("module_start_python_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
+                    // start_server script is now made in Makefile
 					break;
 				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
 					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "src", "us", "kbase", this.moduleName, this.moduleName + "_impl.java"));
-					templateFiles.put("module_start_java_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
+					//templateFiles.put("module_start_java_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
+                    // start_server script is now made in build.xml
 					break;
 				default:
 					break;
