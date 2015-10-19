@@ -30,7 +30,7 @@
 
   <!-- define the output jar and shell script filenames -->
   <property name="kidl.jar.file" value="kbase-kidl-parser.jar"/>
-  <property name="module_builder.jar.file"	value="kbase_module_builder.jar"/>
+  <property name="module_builder.jar.file"	value="kbase_module_builder2.jar"/>
   <property name="module_builder.sh.file"	value="kb-mobu"/>
 
 
@@ -228,7 +228,7 @@ kill $(&lt;"$DIR/pid.txt")
     </fail>
     <!-- copy lib to target -->
     <copy todir="${BIN_LIB_TARGET}" flatten="true">
-      <fileset file="${bin.local}/${module_builder.jar.file}"/>
+      <fileset file="${dist}/${module_builder.jar.file}"/>
     </copy>
     <echo>Successfully deployed lib to: ${BIN_LIB_TARGET}/${module_builder.jar.file}</echo>
     <echo>Linking against jar directory: ${jardir}</echo>
