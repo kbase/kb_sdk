@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -381,6 +382,25 @@ public class TypeGeneratorTest extends Assert {
         startTest(15);
     }
     
+    @Test
+    public void testMissingMethods() throws Exception {
+        int testNum = 16;
+        File workDir = prepareWorkDir(testNum);
+        System.out.println();
+        System.out.println("Test " + testNum + " (testMissingMethods) is starting in directory: " + workDir.getName());
+        String testPackage = rootPackageName + ".test" + testNum;
+        File libDir = new File(workDir, "lib");
+        File binDir = new File(workDir, "bin");
+        JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
+        File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
+        runPerlServerTest(testNum, true, workDir, testPackage,
+                libDir, binDir, parsingData, serverOutDir, true, findFreePort());
+        runPythonServerTest(testNum, true, workDir,
+                testPackage, libDir, binDir, parsingData, serverOutDir, true, findFreePort());
+        //runJavaServerTest(testNum, true, testPackage, libDir,
+        //        binDir, parsingData, serverOutDir, findFreePort());
+    }
+
     private Server startJobService(File binDir, File tempDir) throws Exception {
         Server jettyServer = new Server(findFreePort());
 	    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
