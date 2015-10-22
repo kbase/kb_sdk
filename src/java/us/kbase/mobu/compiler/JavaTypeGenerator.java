@@ -150,7 +150,7 @@ public class JavaTypeGenerator {
 			File buildXml, File makefile) throws Exception {		
         FileSaver libOut = libOutDir == null ? null : new DiskFileSaver(libOutDir);
         FileSaver buildXmlOut = buildXml == null ? null : new OneFileSaver(buildXml);
-        FileSaver makefileOut = buildXml == null ? null : new OneFileSaver(makefile);
+        FileSaver makefileOut = makefile == null ? null : new OneFileSaver(makefile);
 		return processSpec(services, new DiskFileSaver(srcOutDir), packageParent, 
 		        createServer, libOut, gwtPackage, url, buildXmlOut, makefileOut);
 	}
@@ -161,6 +161,11 @@ public class JavaTypeGenerator {
 		JavaData data = prepareDataStructures(services);
 		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, makefile);
 		return data;
+	}
+
+	public static JavaData parseSpec(File specFile) throws Exception {        
+	    List<KbService> services = KidlParser.parseSpec(specFile, null, null, null, true);
+	    return prepareDataStructures(services);
 	}
 
 	private static JavaData prepareDataStructures(List<KbService> services) {
@@ -211,6 +216,8 @@ public class JavaTypeGenerator {
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
 			FileSaver buildXml, FileSaver makefile) throws Exception {
+	    if (packageParent.equals("."))  // Special value meaning top level package.
+	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
 		generateClientClass(data, srcOutDir, packageParent, url);
@@ -389,17 +396,12 @@ public class JavaTypeGenerator {
 		}
 	}
 
-	private static String getParentSourceDir(String packageParent) {
-		return packageParent.replace('.', '/');
-	}
-
 	private static void generateClientClass(JavaData data, FileSaver srcOutDir,
 			String packageParent, URL url) throws Exception {
 		Map<String, JavaType> originalToJavaTypes = getOriginalToJavaTypesMap(data);
-		String parentDir = getParentSourceDir(packageParent);
 		for (JavaModule module : data.getModules()) {
-			String moduleDir = parentDir + "/" + module.getModulePackage();
-			JavaImportHolder model = new JavaImportHolder(packageParent + "." + module.getModulePackage());
+			String moduleDir = sub(packageParent, module.getModulePackage()).replace('.', '/');
+			JavaImportHolder model = new JavaImportHolder(sub(packageParent, module.getModulePackage()));
 			String clientClassName = TextUtils.capitalize(module.getModuleName()) + "Client";
 			String classFile = moduleDir + "/" + clientClassName + ".java";
 			String callerClass = model.ref(utilPackage + ".JsonClientCaller");
@@ -729,7 +731,7 @@ public class JavaTypeGenerator {
 			}
 			classLines.add("}");
 			List<String> headerLines = new ArrayList<String>(Arrays.asList(
-					"package " + packageParent + "." + module.getModulePackage() + ";",
+					"package " + sub(packageParent, module.getModulePackage()) + ";",
 					""
 					));
 			headerLines.addAll(model.generateImports());
@@ -889,10 +891,9 @@ public class JavaTypeGenerator {
 	
 	private static void generateServerClass(JavaData data, FileSaver srcOutDir, String packageParent) throws Exception {
 		Map<String, JavaType> originalToJavaTypes = getOriginalToJavaTypesMap(data);
-		String parentDir = getParentSourceDir(packageParent);
 		for (JavaModule module : data.getModules()) {
-			String moduleDir = parentDir + "/" + module.getModulePackage();
-			JavaImportHolder model = new JavaImportHolder(packageParent + "." + module.getModulePackage());
+			String moduleDir = sub(packageParent, module.getModulePackage()).replace('.', '/');
+			JavaImportHolder model = new JavaImportHolder(sub(packageParent, module.getModulePackage()));
 			String serverClassName = TextUtils.capitalize(module.getModuleName()) + "Server";
 			String classFile = moduleDir + "/" + serverClassName + ".java";
 			HashMap<String, String> originalCode = parsePrevCode(srcOutDir.getAsFileOrNull(classFile), module.getFuncs());
@@ -939,8 +940,8 @@ public class JavaTypeGenerator {
 				classLines.add("    @" + model.ref(utilPackage + ".JsonServerMethod") + "(" +
 						"rpc = \"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\"" +
 						(func.getRetMultyType() == null ? "" : ", tuple = true") + 
-						(func.isAuthOptional() ? ", authOptional=true" : "") + 
-						(func.getOriginal().isAsync() ? ", async=true" : "") + ")");
+						(func.isAuthOptional() ? ", authOptional=true" : "") + ", async=true" +
+						(func.getOriginal().isAsync() ? ", sync=false" : "") + ")");
 				classLines.add("    public " + retTypeName + " " + func.getJavaName() + "(" + funcParams + ") throws Exception {");
 				
 				List<String> funcLines = new LinkedList<String>();
@@ -996,7 +997,7 @@ public class JavaTypeGenerator {
 					"    }",
 					"}"));
 			List<String> headerLines = new ArrayList<String>(Arrays.asList(
-					"package " + packageParent + "." + module.getModulePackage() + ";",
+					"package " + sub(packageParent, module.getModulePackage()) + ";",
 					""
 					));
 			headerLines.addAll(model.generateImports());
@@ -1267,7 +1268,7 @@ public class JavaTypeGenerator {
 		}
 		tree.put("description", descr.toString());
 		tree.put("type", "object");
-		tree.put("javaType", packageParent + "." + type.getModuleName() + "." + type.getJavaClassName());
+		tree.put("javaType", sub(packageParent, type.getModuleName()) + "." + type.getJavaClassName());
 		if (type.getMainType() instanceof KbStruct) {
 			LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
 			for (int itemPos = 0; itemPos < type.getInternalTypes().size(); itemPos++) {
@@ -1287,6 +1288,10 @@ public class JavaTypeGenerator {
 		mapper.writeValue(jsonFile, tree);
 	}
 
+	private static String sub(String packageParent, String moduleName) {
+	    return (packageParent.isEmpty() ? "" : (packageParent + ".")) + moduleName;
+	}
+	
 	private static LinkedHashMap<String, Object> createJsonRefTypeTree(String module, JavaType type, String comment, 
 			boolean insideTypeParam, String packageParent, Set<Integer> tupleTypes) {
 		LinkedHashMap<String, Object> typeTree = new LinkedHashMap<String, Object>();
@@ -1295,7 +1300,7 @@ public class JavaTypeGenerator {
 		if (type.needClassGeneration()) {
 			if (insideTypeParam) {
 				typeTree.put("type", "object");
-				typeTree.put("javaType", packageParent + "." + type.getModuleName() + "." + type.getJavaClassName());
+				typeTree.put("javaType", sub(packageParent, type.getModuleName()) + "." + type.getJavaClassName());
 			} else {
 				String modulePrefix = type.getModuleName().equals(module) ? "" : ("../" + type.getModuleName() + "/");
 				typeTree.put("$ref", modulePrefix + type.getJavaClassName() + ".json");
@@ -1412,7 +1417,7 @@ public class JavaTypeGenerator {
 	}
 
 	private static String getPackagePrefix(String packageParent, JavaType type) {
-		return packageParent + "." + type.getModuleName() + ".";
+		return sub(packageParent, type.getModuleName()) + ".";
 	}
 	
 	public static class Args {

@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import us.kbase.mobu.compiler.JavaData;
+import us.kbase.mobu.compiler.JavaModule;
+import us.kbase.mobu.compiler.JavaTypeGenerator;
 import us.kbase.templates.TemplateFormatter;
 
 public class ModuleInitializer {
@@ -57,7 +60,7 @@ public class ModuleInitializer {
 	 * @param example
 	 * @throws IOException
 	 */
-	public void initialize(boolean example) throws IOException {
+	public void initialize(boolean example) throws Exception {
 		if (this.moduleName == null) {
 			throw new RuntimeException("Unable to create a null directory!");
 		}
@@ -122,6 +125,20 @@ public class ModuleInitializer {
 		templateFiles.put("module_readme_data", Paths.get(this.moduleName, "data", "README.md"));
 		templateFiles.put("module_config_yaml", Paths.get(this.moduleName, "kbase.yml"));
 		
+		if (language.equals("java")) {
+            templateFiles.put("module_build_xml", Paths.get(this.moduleName, "build.xml"));
+		    templateFiles.put("module_web_xml", Paths.get(this.moduleName, "scripts", "web.xml"));
+            templateFiles.put("module_jetty_xml", Paths.get(this.moduleName, "scripts", "jetty.xml"));
+		    fillTemplate(moduleContext, "module_typespec", templateFiles.remove("module_typespec"));
+            String javaPackageParent = ".";  // Special value meaning top level package.
+            moduleContext.put("java_package_parent", javaPackageParent);
+            File moduleDir = new File(this.moduleName);
+            JavaData data = JavaTypeGenerator.parseSpec(new File(moduleDir, specFile));
+            JavaModule module = data.getModules().get(0);
+            moduleContext.put("java_package", module.getModulePackage());
+            moduleContext.put("java_module_name", module.getModuleName());
+		}
+		
 		if (example) {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
 			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
@@ -137,7 +154,7 @@ public class ModuleInitializer {
 				    // start_server script is now made in Makefile
 					templateFiles.put("module_perl_impl", Paths.get(this.moduleName, "lib", this.moduleName, this.moduleName + "Impl.pm"));
 					break;
-				// Python needs some empty __init__.py files and the impl file
+				// Python needs some empty __init__.py files and the impl file (Done, see TemplateBasedGenerator.initPyhtonPackages)
 				case "python":
 					initDirectory(Paths.get(this.moduleName, "lib", this.moduleName), false);
 					initFile(Paths.get(this.moduleName, "lib", this.moduleName, "__init__.py"), false);
@@ -147,9 +164,16 @@ public class ModuleInitializer {
 					break;
 				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
-					templateFiles.put("module_java_impl", Paths.get(this.moduleName, "lib", "src", "us", "kbase", this.moduleName, this.moduleName + "_impl.java"));
+		            File moduleDir = new File(this.moduleName);
+		            File srcDir = new File(moduleDir, "lib/src");
+		            String modulePackage = (String)moduleContext.get("java_package");
+		            String javaModuleName = (String)moduleContext.get("java_module_name");
+		            String javaPackageParent = (String)moduleContext.get("java_package_parent");
+			        File serverJavaFile = new File(srcDir, modulePackage.replace('.', '/') + "/" + javaModuleName + "Server.java");
+			        fillTemplate(moduleContext, "module_java_impl", serverJavaFile.toPath());
+			        JavaTypeGenerator.processSpec(new File(moduleDir, specFile), srcDir, javaPackageParent, true, null, null, null);
 					//templateFiles.put("module_start_java_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
-                    // start_server script is now made in build.xml
+                    // start_server script is now made in Makefile
 					break;
 				default:
 					break;
