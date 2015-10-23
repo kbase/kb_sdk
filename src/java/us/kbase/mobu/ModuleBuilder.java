@@ -139,7 +139,7 @@ public class ModuleBuilder {
 			ModuleInitializer initer = new ModuleInitializer(moduleName, userName, language, initArgs.verbose);
 			initer.initialize(initArgs.example);
 		}
-		catch (IOException | RuntimeException e) {
+		catch (Exception e) {
 			showError("Error while initializing module", e.getMessage());
 			return 1;
 		}

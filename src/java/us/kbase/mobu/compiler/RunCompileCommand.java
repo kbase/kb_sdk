@@ -2,12 +2,9 @@ package us.kbase.mobu.compiler;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,12 +13,9 @@ import us.kbase.jkidl.FileIncludeProvider;
 import us.kbase.jkidl.IncludeProvider;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
-import us.kbase.mobu.ModuleBuilder.CompileCommandArgs;
 import us.kbase.mobu.util.DiskFileSaver;
 import us.kbase.mobu.util.FileSaver;
 import us.kbase.mobu.util.OneFileSaver;
-
-import com.beust.jcommander.JCommander;
 
 public class RunCompileCommand {
 

@@ -51,7 +51,7 @@
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
   <property name="jardir" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
-  <condition property="commonjar" value="kbase/common/kbase-common-0.0.9.jar">
+  <condition property="commonjar" value="kbase/common/kbase-common-0.0.11.jar">
     <or>
       <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
       <not>
@@ -129,11 +129,11 @@
       <include name="apache_commons/commons-collections-3.2.1.jar"/>
       <include name="jcommander/jcommander-1.48.jar"/>
       <include name="snakeyaml/snakeyaml-1.11.jar"/>
-      <!-- include name="${commonjar}"/ -->
+      <include name="${commonjar}"/>
     </fileset>
-    <fileset dir=".">
+    <!--fileset dir=".">
       <include name="kbase-common-temp.jar"/>
-    </fileset>
+    </fileset-->
   </path>
 
   <target name="copy_kidl_jar" if="EXT_KIDL_JAR">

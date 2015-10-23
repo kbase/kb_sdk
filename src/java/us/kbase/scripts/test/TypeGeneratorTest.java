@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
@@ -47,7 +46,6 @@ import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
 import us.kbase.kidl.test.KidlTest;
-import us.kbase.mobu.ModuleBuilder;
 import us.kbase.mobu.compiler.JavaData;
 import us.kbase.mobu.compiler.JavaFunc;
 import us.kbase.mobu.compiler.JavaModule;
@@ -210,7 +208,7 @@ public class TypeGeneratorTest extends Assert {
 		int testNum = 8;
 		File workDir = prepareWorkDir(testNum);
 		System.out.println();
-		System.out.println("Test " + testNum + " is staring in directory: " + workDir.getName());
+		System.out.println("Test " + testNum + " (testServerCodeStoring) is staring in directory: " + workDir.getName());
 		String testFileName = "test" + testNum + ".spec";
 		extractSpecFiles(testNum, workDir, testFileName);
 		File srcDir = new File(workDir, "src");
@@ -397,8 +395,22 @@ public class TypeGeneratorTest extends Assert {
                 libDir, binDir, parsingData, serverOutDir, true, findFreePort());
         runPythonServerTest(testNum, true, workDir,
                 testPackage, libDir, binDir, parsingData, serverOutDir, true, findFreePort());
-        //runJavaServerTest(testNum, true, testPackage, libDir,
-        //        binDir, parsingData, serverOutDir, findFreePort());
+        runJavaServerTest(testNum, true, testPackage, libDir,
+                binDir, parsingData, serverOutDir, findFreePort());
+    }
+
+    @Test
+    public void testEmptyPackageParent() throws Exception {
+        int testNum = 17;
+        File workDir = prepareWorkDir(testNum);
+        System.out.println();
+        System.out.println("Test " + testNum + " (testEmptyPackageParent) is starting in directory: " + workDir.getName());
+        String testPackage = ".";
+        File libDir = new File(workDir, "lib");
+        File binDir = new File(workDir, "bin");
+        JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
+        runJavaServerTest(testNum, true, testPackage, libDir,
+                binDir, parsingData, null, findFreePort());
     }
 
     private Server startJobService(File binDir, File tempDir) throws Exception {
@@ -707,7 +719,7 @@ public class TypeGeneratorTest extends Assert {
 			File libDir, File binDir, String testPackage) throws Exception,
 			MalformedURLException, ClassNotFoundException {
 		URLClassLoader urlcl = prepareUrlClassLoader(libDir, binDir);
-        String serverClassName = testPackage + "." + module.getModulePackage() + "." + getServerClassName(module);
+        String serverClassName = pref(testPackage) + module.getModulePackage() + "." + getServerClassName(module);
         Class<?> serverClass = urlcl.loadClass(serverClassName);
 		return serverClass;
 	}
@@ -765,6 +777,12 @@ public class TypeGeneratorTest extends Assert {
 	    }
 	}
 	
+	private static String pref(String testPackage) {
+	    if (testPackage.equals("."))
+	        testPackage = "";
+	    return testPackage.isEmpty() ? "" : (testPackage + ".");
+	}
+	
     private static void runJavaClientTest(int testNum, String testPackage, JavaData parsingData, 
             File libDir, File binDir, int portNum, boolean needClientServer) throws Exception {
 		//System.out.println("Port: " + portNum);
@@ -775,10 +793,10 @@ public class TypeGeneratorTest extends Assert {
 			Thread.sleep(100);
 			try {
 				for (JavaModule module : parsingData.getModules()) {
-					Class<?> testClass = urlcl.loadClass(testPackage + ".Test" + testNum);
+					Class<?> testClass = urlcl.loadClass(pref(testPackage) + "Test" + testNum);
 					if (needClientServer) {
 						String clientClassName = getClientClassName(module);
-						Class<?> clientClass = urlcl.loadClass(testPackage + "." + module.getModulePackage() + "." + clientClassName);
+						Class<?> clientClass = urlcl.loadClass(pref(testPackage) + module.getModulePackage() + "." + clientClassName);
 						Object client = clientClass.getConstructor(URL.class).newInstance(new URL("http://localhost:" + portNum));
 						try {
 							testClass.getConstructor(clientClass).newInstance(client);
