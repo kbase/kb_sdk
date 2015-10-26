@@ -117,6 +117,7 @@ public class ModuleInitializer {
 		templateFiles.put("module_deploy_cfg", Paths.get(this.moduleName, "deploy.cfg"));
 		templateFiles.put("module_license", Paths.get(this.moduleName, "LICENSE"));
 		templateFiles.put("module_docker_entrypoint", Paths.get(this.moduleName, "scripts", "entrypoint.sh"));
+        templateFiles.put("module_prepare_deploy_cfg", Paths.get(this.moduleName, "scripts", "prepare_deploy_cfg.py"));
         templateFiles.put("module_run_async", Paths.get(this.moduleName, "scripts", "run_async.sh"));
 		templateFiles.put("module_readme_lib", Paths.get(this.moduleName, "lib", "README.md"));
 		templateFiles.put("module_readme_ui", Paths.get(this.moduleName, "ui", "README.md"));
