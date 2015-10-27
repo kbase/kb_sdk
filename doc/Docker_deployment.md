@@ -26,10 +26,9 @@ Note: this has only been tested in OS X.
 
 ## Deploying a service module
 
-1. docker run --name mymodulename -d mymodulename -p 5000:5000
+1. docker run --name mymodulename -d -p 5000:5000 -v work:/kb/module/work mymodulename
 2. curl http://localhost:5000
 
 ## Deploying and testing async methods
 
-1. docker run --name mymodulename -d mymodulename -p 5000:5000
-2. do stuff
+1. docker run --name mymodulename -v work:/kb/module/work mymodulename async <arguments>
