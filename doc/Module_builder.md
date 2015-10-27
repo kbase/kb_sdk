@@ -109,6 +109,15 @@ Once the repository is set up, you can push your local KBase module to GitHub.
     git remote add origin git@github.com:[GITHUB_USER_NAME]/MyModule.git
     git push -u origin master
 
+# What to edit
+
+You will need to modify the following files in your repository in order to be able to run your code.
+
+1. MyModule.spec. Add your funcdef definitions here, then run kb-mobu compile.
+2. The implementation file for your language.  This is where you actually write the code for your defined methods.
+3. The method specs.  This is where you define your narrative widgets.
+3. Dockerfile.  This is used to build a Docker image.  Add any prerequisites here.
+
 # Build and run examples
 
 To build and run the module examples, you'll need to do the following.
