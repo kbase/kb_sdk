@@ -22,8 +22,14 @@ Note: this has only been tested in OS X.
 7. Quit and restart Kitematic
 8. Open Docker CLI
 9. docker pull kbase/deplbase
+10. docker build -t mymodulename .
 
-## Deploying a module
+## Deploying a service module
 
-1. docker build -t mymodulename .
-2. docker run --name mymodulename -d mymodulename
+1. docker run --name mymodulename -d mymodulename -p 5000:5000
+2. curl http://localhost:5000
+
+## Deploying and testing async methods
+
+1. docker run --name mymodulename -d mymodulename -p 5000:5000
+2. do stuff
