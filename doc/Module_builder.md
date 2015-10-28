@@ -49,6 +49,7 @@ Some newer features are on other branches, such as develop.  If you do not need 
 
 You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
 
+    # for bash
     export PATH=$(pwd)/bin:$PATH
 
 (or some variant for your shell -- consider adding this to your .profile or .bashrc)
