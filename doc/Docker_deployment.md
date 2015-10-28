@@ -17,7 +17,7 @@ Note: this has only been tested in OS X.
 4. Run these commands in the terminal (these are to work around an issue with using private docker registries inside a VirtualBox VM):
 
         VBoxManage modifyvm "default" --natdnshostresolver1 on
-        VBoxManage modifyvm "default --natdnsproxy1 on
+        VBoxManage modifyvm "default" --natdnsproxy1 on
 6. Exit terminal
 7. Quit and restart Kitematic
 8. Open Docker CLI
