@@ -18,7 +18,7 @@ An example KBase service written in Java will be available soon.
 2. Java JDK (version 7 or above): http://java.oracle.com/
  - You will also need to set the JAVA_HOME environment variable to point to your Java installation.
 3. Latest version of XCode (includes make and other developer tools)
-4. ant: http://java.oracle.com/
+4. ant: http://ant.apache.org/
 5. git (command-line version): https://git-scm.com/
 6. Create a GitHub account if you do not have one already: https://github.com
  - All modules in KBase are pulled and registered from public GitHub repositories
