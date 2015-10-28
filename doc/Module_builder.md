@@ -109,7 +109,7 @@ Once the repository is set up, you can push your local KBase module to GitHub.
     git remote add origin git@github.com:[GITHUB_USER_NAME]/MyModule.git
     git push -u origin master
 
-# Build and run examples
+# (below here, out of date and probably won't work!) Build and run examples
 
 To build and run the module examples, you'll need to do the following.
 
