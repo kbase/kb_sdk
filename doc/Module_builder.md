@@ -27,7 +27,11 @@ An example KBase service written in Java will be available soon.
 
 Set JAVA_HOME to the directory where you installed JDK. If you're not sure where that is, the command `/usr/libexec/java_home` will tell you.  
 
+    # for tcsh/csh
     setenv JAVA_HOME `/usr/libexec/java_home`  
+    # for bash
+    export JAVA_HOME=`/usr/libexec/java_home`
+
 Also, be sure your PATH includes the directory that has the *ant* executable.
 
 # Get the git repos
