@@ -13,7 +13,7 @@ An example KBase service written in Java will be available soon.
 
 # Obtain and install prerequisites
 
-1. MacOS 8 or higher.
+1. Mac: OS X 10.8 or higher.
  - The SDK should also work on Linux but has not yet been extensively tested. We are not yet supporting Windows.
 2. Java JDK (version 7 or above): http://java.oracle.com/
  - You will also need to set the JAVA_HOME environment variable to point to your Java installation.
