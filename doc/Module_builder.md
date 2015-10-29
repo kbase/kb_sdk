@@ -112,9 +112,10 @@ but do not initialize it! Just go here to set up a new empty repository: https:/
 instructions here: https://help.github.com/articles/creating-a-new-repository .  You may wish to
 use the name of your module as the name for your new repository.
 
-Once the repository is set up, you can push your local KBase module to GitHub.
+Once the repository is set up, you can push your local KBase module to GitHub.  When you create a new
+repository you can copy and paste the URL to your repository.
 
-    git remote add origin git@github.com:[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
+    git remote add origin https://github.com/[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
     git push -u origin master
 
 # What to edit
