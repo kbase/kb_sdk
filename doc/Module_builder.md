@@ -107,12 +107,14 @@ Since functionality in KBase is pulled into KBase from public GitHub repositorie
     git commit -m 'initial commit'
 
 Now you can sync this to a new GitHub repository. First create a new GitHub repository on github.com
-**[in the kbase project or anywhere?]**,
-but do not initialize it! Just go here to set up a new empty repository: https://github.com/new or see more instructions here: https://help.github.com/articles/creating-a-new-repository
+(it can be in your personal GitHub account or in an organization, but it must be public),
+but do not initialize it! Just go here to set up a new empty repository: https://github.com/new or see more
+instructions here: https://help.github.com/articles/creating-a-new-repository .  You may wish to
+use the name of your module as the name for your new repository.
 
 Once the repository is set up, you can push your local KBase module to GitHub.
 
-    git remote add origin git@github.com:[GITHUB_USER_NAME]/MyModule.git
+    git remote add origin git@github.com:[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
     git push -u origin master
 
 # What to edit
