@@ -27,7 +27,9 @@ Note: this has only been tested in OS X.
 ## Deploying a service module
 
 1. docker run --name mymodulename -d -p 5000:5000 -v work:/kb/module/work mymodulename
-2. curl http://localhost:5000
+2. $ docker-machine inspect default |grep IP
+        "IPAddress": "AAA.BBB.CCC.DDD",
+2. curl http://AAA.BBB.CCC.DDD:5000
 
 ## Deploying and testing async methods
 
