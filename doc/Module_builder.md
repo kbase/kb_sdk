@@ -19,8 +19,8 @@ An example KBase service written in Java will be available soon.
  - You will also need to set the JAVA_HOME environment variable to point to your Java installation.
 3. Latest version of XCode (includes make and other developer tools)
 4. ant: http://ant.apache.org/
- - You will also need to add ant to your PATH environment variable.
-5. git (command-line version): https://git-scm.com/ (should come with Xcode)
+ - You will also need to add the directory with the ant binary to your PATH environment variable.
+5. git (command-line version): https://git-scm.com/ (OS X users should install Xcode to get git)
 6. Create a GitHub account if you do not have one already: https://github.com
  - All modules in KBase are pulled and registered from public GitHub repositories
 
