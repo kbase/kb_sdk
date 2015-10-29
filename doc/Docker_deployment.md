@@ -33,4 +33,8 @@ Note: this has only been tested in OS X.
 
 ## Deploying and testing async methods
 
-1. docker run --name mymodulename -v work:/kb/module/work mymodulename async <arguments>
+1. Add any needed runtime configuration to work/config.properties
+2. Add valid token to work/token
+2. Add proper JSON input to work/input.json
+2. docker run --name mymodulename -v work:/kb/module/work mymodulename async
+3. Look in work/output.json for output
