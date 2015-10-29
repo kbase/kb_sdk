@@ -13,13 +13,14 @@ An example KBase service written in Java will be available soon.
 
 # Obtain and install prerequisites
 
-1. MacOS 8 or higher.
+1. Mac: OS X 10.8 or higher.
  - The SDK should also work on Linux but has not yet been extensively tested. We are not yet supporting Windows.
 2. Java JDK (version 7 or above): http://java.oracle.com/
  - You will also need to set the JAVA_HOME environment variable to point to your Java installation.
 3. Latest version of XCode (includes make and other developer tools)
-4. ant: http://java.oracle.com/
-5. git (command-line version): https://git-scm.com/
+4. ant: http://ant.apache.org/
+ - You will also need to add the directory with the ant binary to your PATH environment variable.
+5. git (command-line version): https://git-scm.com/ (OS X users should install Xcode to get git)
 6. Create a GitHub account if you do not have one already: https://github.com
  - All modules in KBase are pulled and registered from public GitHub repositories
 
@@ -27,7 +28,11 @@ An example KBase service written in Java will be available soon.
 
 Set JAVA_HOME to the directory where you installed JDK. If you're not sure where that is, the command `/usr/libexec/java_home` will tell you.  
 
+    # for tcsh/csh
     setenv JAVA_HOME `/usr/libexec/java_home`  
+    # for bash
+    export JAVA_HOME=`/usr/libexec/java_home`
+
 Also, be sure your PATH includes the directory that has the *ant* executable.
 
 # Get the git repos
@@ -45,6 +50,7 @@ Some newer features are on other branches, such as develop.  If you do not need 
 
 You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
 
+    # for bash
     export PATH=$(pwd)/bin:$PATH
 
 (or some variant for your shell -- consider adding this to your .profile or .bashrc)
@@ -101,13 +107,26 @@ Since functionality in KBase is pulled into KBase from public GitHub repositorie
     git commit -m 'initial commit'
 
 Now you can sync this to a new GitHub repository. First create a new GitHub repository on github.com
-**[in the kbase project or anywhere?]**,
-but do not initialize it! Just go here to set up a new empty repository: https://github.com/new or see more instructions here: https://help.github.com/articles/creating-a-new-repository
+(it can be in your personal GitHub account or in an organization, but it must be public),
+but do not initialize it! Just go here to set up a new empty repository: https://github.com/new or see more
+instructions here: https://help.github.com/articles/creating-a-new-repository .  You may wish to
+use the name of your module as the name for your new repository.
 
-Once the repository is set up, you can push your local KBase module to GitHub.
+Once the repository is set up, you can push your local KBase module to GitHub.  When you create a new
+repository you can copy and paste the URL to your repository.
 
-    git remote add origin git@github.com:[GITHUB_USER_NAME]/MyModule.git
+    git remote add origin https://github.com/[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
     git push -u origin master
+
+# What to edit
+
+You will need to modify the following files in your repository in order to be able to run your code.
+
+1. kbase.yaml.  Define metadata about your module here, such as your module name (which will be used to register with KBase), a short description, the implementation language, a version, and the KBase ids of the owners of the module (only these listed ids will also be permitted to register the module).
+2. MyModule.spec. Add your funcdef definitions here, then run kb-mobu compile.
+3. The implementation file for your language.  This is where you actually write the code for your defined methods.
+4. The method specs.  This is where you define your narrative widgets.
+5. Dockerfile.  This is used to build a Docker image.  Add any prerequisites here.
 
 # (below here, out of date and probably won't work!) Build and run examples
 
