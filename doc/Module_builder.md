@@ -124,7 +124,7 @@ You will need to modify the following files in your repository in order to be ab
 4. The method specs.  This is where you define your narrative widgets.
 5. Dockerfile.  This is used to build a Docker image.  Add any prerequisites here.
 
-# Build and run examples
+# (below here, out of date and probably won't work!) Build and run examples
 
 To build and run the module examples, you'll need to do the following.
 
