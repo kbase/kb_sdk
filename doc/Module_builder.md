@@ -222,6 +222,6 @@ All that said, starting tests is relatively easy. First edit the test config fil
 
     make test
 
-## Docker deployments
+## Local Docker deployments
 
-To build a Docker image and run a service from a Docker container, see [Docker_deployment.md](Docker_deployment.md).
+You can optionally build and run a Docker image locally on your own workstation or laptop.  To do this see [Docker_deployment.md](Docker_deployment.md).
