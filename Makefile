@@ -65,7 +65,7 @@ deploy-service:
 	@echo "No service to deploy"
 
 deploy-scripts:
-	if ["$(TARGET)" -eq ""]; \
+	if [ "$(TARGET)" = "" ]; \
 	  then \
 	  	 echo "Error makefile variable TARGET must be defined to deploy-scripts"; \
 	  	 exit 1; \
