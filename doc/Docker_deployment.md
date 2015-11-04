@@ -24,6 +24,17 @@ Note: this has only been tested in OS X.
 9. docker pull kbase/deplbase
 
 ## Deploying a module
-
-1. docker build -t mymodulename .
-2. docker run --name mymodulename -d mymodulename
+1. generate cluster.ini and ssl
+```shell
+     git clone https://github.com/kbaseincubator/deploy_dev
+     cd deploy_dev/
+     cp site.cfg.example site.cfg
+     vi site.cfg
+     ./scripts/generate_config 
+     ./scripts/create_certs 
+     cp cluster.ini [your_module_dir]
+     cp -r ssl [your_module_dir]
+```
+2. change your working directory to [your_module_dir]
+3. docker build -t mymodulename.
+4. docker run --name mymodulename -d mymodulename
