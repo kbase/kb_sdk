@@ -21,7 +21,7 @@ ANT_OPTIONS =
 .PHONY : test sdkbase
 
 
-default: compile sdkbase
+default: compile
 
 ifeq ($(TOP_DIR_NAME), dev_container)
 ##############################
