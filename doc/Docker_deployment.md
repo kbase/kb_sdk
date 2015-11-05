@@ -38,30 +38,3 @@ Note: this has only been tested in OS X.
 2. Add proper JSON input to work/input.json
 2. docker run --name mymodulename -v work:/kb/module/work mymodulename async
 3. Look in work/output.json for output
-
-For docker related development questions and common issues, a great resource is this article: [Docker for Development: Common Problems and Solutions](https://medium.com/@rdsubhas/docker-for-development-common-problems-and-solutions-95b25cae41eb?_tmc=Diy2bNEQqG5t8sSbcMW6T5Us4KCmgsInjBviObh0atg&mkt_tok=3RkMMJWWfF9wsRonuqTMZKXonjHpfsX57u8lXqCzlMI%2F0ER3fOvrPUfGjI4AS8VqI%2BSLDwEYGJlv6SgFQ7LMMaZq1rgMXBk%3D#.pwg4oa1ew)
-
-
-## FAQ
-
-#### During the Docker build, I get this error: IOError: [Errno 13] Permission denied: '/tmp/kbase/[ModuleName]/.git/config.lock'
-
-Add a .dockerignore file to skip .git files.  You should also skip any other OS specific files.  Soon we will try to provide a standard .dockerignore and .gitignore files generated as part of the kb-mobu init.
-
-####  How can I see the tools that are available in the KBase base image?
-
-If you have deplbase pulled down locally, you can do this...
-
-        docker run -it —rm kbsae/deplbase:latest
-        
-Then you can navigate around to see what is present.  You can also look directly at the docker file used to build the runtime here: https://hub.docker.com/r/kbase/runtime/~/dockerfile/
-
-There are some tools also installed by the standard KBase services, but if you have a specific version of a tool you would like to use, then it would probably be best to install it yourself.
-
-#### Are the KBase boostrap repository third party dependency scripts being used in the current Docker base image setup?
-
-Not entirely, so don't use the bootstrap repo as a reference for what is installed.
-
-#### Are there any size constraints for the images that we create?
-
-Not yet, but there will be one soon.  Ideally keep images under 10GB.  If you have large amounts of reference data that will not fit within the 10GB, then please contact us directly.  We are working on alternative ways to handle reference data that are still being tested and documented, so do not add this data directly to your image.
