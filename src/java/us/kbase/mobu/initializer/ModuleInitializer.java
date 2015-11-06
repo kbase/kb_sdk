@@ -122,6 +122,12 @@ public class ModuleInitializer {
 		templateFiles.put("module_readme_docs", Paths.get(this.moduleName, "docs", "README.md"));
 		templateFiles.put("module_readme_data", Paths.get(this.moduleName, "data", "README.md"));
 		templateFiles.put("module_config_yaml", Paths.get(this.moduleName, "kbase.yml"));
+        templateFiles.put("module_gitignore", Paths.get(this.moduleName, ".gitignore"));
+        templateFiles.put("module_dockerignore", Paths.get(this.moduleName, ".dockerignore"));
+        templateFiles.put("module_readme_test_local", Paths.get(this.moduleName, "test_local", "readme.txt"));
+        templateFiles.put("module_test_cfg", Paths.get(this.moduleName, "test_local", "test.cfg"));
+        templateFiles.put("module_build_run_tests", Paths.get(this.moduleName, "test_local", "build_run_tests.sh"));
+        templateFiles.put("module_run_bash", Paths.get(this.moduleName, "test_local", "run_bash.sh"));
 		
 		switch (language) {
 		case "java":
