@@ -1,6 +1,6 @@
 # KBase Module Builder documentation
 
-The KBase Module Builder (kb-mobu) is an application that helps developers initialize, compile, test, and run KBase modules. This document details how to install and use it.
+The KBase Module Builder (kb-sdk) is an application that helps developers initialize, compile, test, and run KBase modules. This document details how to install and use it.
 
 The module builder tooling is being designed to allow complete local testing of long running jobs without any external registration or configuration of the deployed job execution engine. Implementation of the code for long running jobs is handled identically to implementations of server code in the current standard KBase server generation.
 
@@ -48,7 +48,7 @@ Some newer features are on other branches, such as develop.  If you do not need 
     git checkout <branch>
     make
 
-You should now have the kb-mobu program built in kb_sdk/bin. It will be helpful to add this to your execution path:
+You should now have the kb-sdk program built in kb_sdk/bin. It will be helpful to add this to your execution path:
 
     # for bash
     export PATH=$(pwd)/bin:$PATH
@@ -61,21 +61,21 @@ Optionally, you can install command completion with:
     source src/sh/mobu-completion.sh
 
 # Get started
-Once the kb-mobu command is in your PATH, you can get additional help by running:
+Once the kb-sdk command is in your PATH, you can get additional help by running:
 
-    kb-mobu help
+    kb-sdk help
     
 The module builder can generate an executable wrapper for long-running code (i.e., code that runs for more than ~20 seconds and should be queued by some execution engine). This basic usage guide will focus on this feature.
 
-The module builder operates on an interface specification file ("spec file") written in KIDL (KBase Interface Description Language). We assume you have some basic understanding of this format and how to define types and functions. The best way to get started is to create an example module in your language of choice (Perl, Python or Java), look at its structure and contents, and structure your module similarly. The next section describes how to use `kb-mobu init` to set up your module directory, including the option to set up an example.
+The module builder operates on an interface specification file ("spec file") written in KIDL (KBase Interface Description Language). We assume you have some basic understanding of this format and how to define types and functions. The best way to get started is to create an example module in your language of choice (Perl, Python or Java), look at its structure and contents, and structure your module similarly. The next section describes how to use `kb-sdk init` to set up your module directory, including the option to set up an example.
 
-# kb-mobu init
+# kb-sdk init
 
 There are a few functions built into the module builder. Let's start with `init`.
 
-    kb-mobu init [-ev] [-l language] [-u username] module_name
+    kb-sdk init [-ev] [-l language] [-u username] module_name
 
-The kb-mobu init function creates a new directory with the given module name (any whitespace is replaced with underscores) and populates it with the basic structure of a KBase module. Optionally, this can also be filled with an executable example module.
+The kb-sdk init function creates a new directory with the given module name (any whitespace is replaced with underscores) and populates it with the basic structure of a KBase module. Optionally, this can also be filled with an executable example module.
 
 _Options:_<br/>
 -v, --verbose&nbsp;&nbsp;&nbsp;&nbsp;Show verbose output about which files and directories are being created.<br/>
@@ -85,21 +85,21 @@ _Options:_<br/>
 
 ## Examples:
 
-    kb-mobu init MyModule
+    kb-sdk init MyModule
 
 Creates an empty module named MyModule. This has just the bare components needed to build a repo - just the Typespec file and a bare Makefile. You'll need to fill out the Makefile with some options.
 
-    kb-mobu init -e -l Perl MyModule
+    kb-sdk init -e -l Perl MyModule
 
 Creates a module with an example written in Perl. With the example written, you should be able to just enter the module's directory and run 'make' to build the module.
 
-    kb-mobu init -v -e -l Perl -u my_user_name MyModule
+    kb-sdk init -v -e -l Perl -u my_user_name MyModule
 
 Creates a complete example that also tailors the module to your user name.
 
 # Create a GitHub repository for your module
 
-Since functionality in KBase is pulled into KBase from public GitHub repositories, you will need to put your module code into a  GitHub repository. With git installed, this is easy to do. First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-mobu, and commit with some commit message. This creates a git repository locally.
+Since functionality in KBase is pulled into KBase from public GitHub repositories, you will need to put your module code into a  GitHub repository. With git installed, this is easy to do. First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
 
     cd MyModule
     git init
@@ -123,7 +123,7 @@ repository you can copy and paste the URL to your repository.
 You will need to modify the following files in your repository in order to be able to run your code.
 
 1. kbase.yaml.  Define metadata about your module here, such as your module name (which will be used to register with KBase), a short description, the implementation language, a version, and the KBase ids of the owners of the module (only these listed ids will also be permitted to register the module).
-2. MyModule.spec. Add your funcdef definitions here, then run kb-mobu compile.
+2. MyModule.spec. Add your funcdef definitions here, then run kb-sdk compile.
 3. The implementation file for your language.  This is where you actually write the code for your defined methods.
 4. The method specs.  This is where you define your narrative widgets.
 5. Dockerfile.  This is used to build a Docker image.  Add any prerequisites here.
@@ -152,20 +152,20 @@ To build and run the module examples, you'll need to do the following.
     `cd MyModule/test`<br/>
     `./test_all_clients.sh`
 
-# kb-mobu compile
+# kb-sdk compile
 
-To compile a KIDL spec file, there is a `compile` subcommand of `kb-mobu` that takes as an argument the KIDL file, and generates the client/server/executable wrapper. Run it as:
+To compile a KIDL spec file, there is a `compile` subcommand of `kb-sdk` that takes as an argument the KIDL file, and generates the client/server/executable wrapper. Run it as:
 
-    kb-mobu compile [MyModule.spec]
+    kb-sdk compile [MyModule.spec]
 
 If the KIDL file is valid, you will not see any output. If there are syntax errors, those will be printed. The command does not actually generate any code until the appropriate parameters are set. For example, we can generate a Python server and client in the 'lib' directory by running this:
 
-    kb-mobu compile [MyModule.spec] \
+    kb-sdk compile [MyModule.spec] \
         --out lib
         --pysrvname biokbase.mymodule.MyModuleServer
         --pyclname biokbase.mymodule.MyModuleClient
 
-Run `kb-mobu help` for full parameter options.
+Run `kb-sdk help` for full parameter options.
 
 The module builder allows us to run server code directly as a command line script in Python or Perl or as an executable jar in Java. For instance, in a Perl example, you could directly invoke a Perl server function from the command line as:
 
@@ -173,7 +173,7 @@ The module builder allows us to run server code directly as a command line scrip
 
 The input file is exactly the JSON information sent to the server in a standard KBase JSON RPC call. The output saved to the output JSON file is the output response of that server call. The token is the kbase user token generated when a user is authenticated.
 
-Right now, `kb-mobu` does not wrap the command above as a shell script, although it may be able to in the future depending on how we set up our development environment. To use this prototype for now, though, you should package the necessary environment variables needed by your language/script manually into a shell script. You can build the shell script in the Makefile. For instance, see this example from https://github.com/msneddon/service_test/blob/perl/Makefile#L40:
+Right now, `kb-sdk` does not wrap the command above as a shell script, although it may be able to in the future depending on how we set up our development environment. To use this prototype for now, though, you should package the necessary environment variables needed by your language/script manually into a shell script. You can build the shell script in the Makefile. For instance, see this example from https://github.com/msneddon/service_test/blob/perl/Makefile#L40:
 
     build-executable-script-perl:
     	mkdir -p $(LBIN_DIR)
@@ -193,11 +193,11 @@ A new KIDL feature supported by Module Builder is the ability to tag a method as
 
 Note that async methods should always require authentication because we assume that compute resources will always have to be tracked per user.
 
-When a standard KBase server method is called on a running server, it is handled identically to the current KBase service architecture. In fact, clients generated by kb-mobu on an existing service KIDL will be completely compatible with that existing and running KBase service. The difference is only when calling an async task. In this case, the Server code automatically forwards the request in a standard way to an Execution Engine. That Execution Engine then is responsible for queuing and executing the job, and returning any results.
+When a standard KBase server method is called on a running server, it is handled identically to the current KBase service architecture. In fact, clients generated by kb-sdk on an existing service KIDL will be completely compatible with that existing and running KBase service. The difference is only when calling an async task. In this case, the Server code automatically forwards the request in a standard way to an Execution Engine. That Execution Engine then is responsible for queuing and executing the job, and returning any results.
 
 We have a prototype interface to the Execution Engine that has the information necessary to submit a job in a general way--see [KBaseJobService.spec](https://github.com/kbase/kb_sdk/blob/master/KBaseJobService.spec). The interface is something we can iterate on based on the functionality in KBase we need.
 
-For testing, however, the module builder includes a mock Execution Engine that is easy to set up and run locally. To start/stop the mock Execution Engine, build the module_builder using `make`, which will create start/stop scripts in the test_scripts/ee_mock_service directory.
+For testing, however, the module builder includes a mock Execution Engine that is easy to set up and run locally. To start/stop the mock Execution Engine, build the kb-sdk using `make`, which will create start/stop scripts in the test_scripts/ee_mock_service directory.
 
 Once the mock Execution Engine is running, you can start your server configured to forward requests for the long running async method to the mock Execution Engine by setting the job-service-url config variable in the deploy.cfg file of your module--for example,
 

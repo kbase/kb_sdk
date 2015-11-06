@@ -23,7 +23,7 @@ import us.kbase.mobu.validator.ModuleValidator;
 public class ModuleBuilder {
 	
     private static final String defaultParentPackage = "us.kbase";
-    private static final String MODULE_BUILDER_SH_NAME = "kb-mobu";
+    private static final String MODULE_BUILDER_SH_NAME = "kb-sdk";
 
     private static final String INIT_COMMAND     = "init";
     private static final String VALIDATE_COMMAND = "validate";
@@ -118,7 +118,7 @@ public class ModuleBuilder {
      * userName (required) - the user's Github user name, used to set up some optional fields
      * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
      * are replaced with underscores. So if a user runs:
-     *   kb-mobu init my new module
+     *   kb-sdk init my new module
      * they get a module called "my_new_module" in a directory of the same name.
      * @param initArgs
      * @param jc
@@ -234,7 +234,7 @@ public class ModuleBuilder {
      * userName (required) - the user's Github user name, used to set up some optional fields
      * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
      * are replaced with underscores. So if a user runs:
-     *   kb-mobu init my new module
+     *   kb-sdk init my new module
      * they get a module called "my_new_module" in a directory of the same name.
      * @param initArgs
      * @param jc
@@ -426,8 +426,8 @@ public class ModuleBuilder {
     	    out.println("        " + command.getKey() +" - "+jc.getCommandDescription(command.getKey()));
     	}
     	out.println("");
-    	out.println("    For help on a specific command, see \"kb-module-builder help <command>\".");
-    	out.println("    For full usage information, see \"kb-module-builder help -a\".");
+    	out.println("    For help on a specific command, see \"kb-sdk help <command>\".");
+    	out.println("    For full usage information, see \"kb-sdk help -a\".");
     	out.println("");
     };
     

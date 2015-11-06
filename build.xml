@@ -31,7 +31,8 @@
   <!-- define the output jar and shell script filenames -->
   <property name="kidl.jar.file" value="kbase-kidl-parser.jar"/>
   <property name="module_builder.jar.file"	value="kbase_module_builder2.jar"/>
-  <property name="module_builder.sh.file"	value="kb-mobu"/>
+  <property name="module_builder.sh.old.file" value="kb-mobu"/>
+  <property name="module_builder.sh.file"   value="kb-sdk"/>
 
 
   <!-- If the BIN_LIB_TARGET is defined, then use the jars from the target destination
@@ -157,6 +158,13 @@ export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${bin.local}/${module_builder.sh.file}" perm="a+x"/>
+    <!-- Create old main shell script-->
+    <echo file="${bin.local}/${module_builder.sh.old.file}">#!/bin/sh
+export JAVA_HOME=${env.JAVA_HOME}
+export PATH=$JAVA_HOME/bin:$PATH
+$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
+    </echo>
+    <chmod file="${bin.local}/${module_builder.sh.old.file}" perm="a+x"/>
     <echo>Successfully built: ${bin.local}/${module_builder.sh.file}</echo>
 
     <!-- Create start/stop scripts for the local mock Execution Engine-->
@@ -242,6 +250,13 @@ export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
+    <!-- Create old main shell script-->
+    <echo file="${BIN_TARGET}/${module_builder.sh.old.file}">#!/bin/sh
+export JAVA_HOME=${env.JAVA_HOME}
+export PATH=$JAVA_HOME/bin:$PATH
+$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
+    </echo>
+    <chmod file="${BIN_TARGET}/${module_builder.sh.old.file}" perm="a+x"/>
   </target>
 
 

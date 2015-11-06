@@ -46,7 +46,7 @@ For docker related development questions and common issues, a great resource is 
 
 #### During the Docker build, I get this error: IOError: [Errno 13] Permission denied: '/tmp/kbase/[ModuleName]/.git/config.lock'
 
-Add a .dockerignore file to skip .git files.  You should also skip any other OS specific files.  Soon we will try to provide a standard .dockerignore and .gitignore files generated as part of the kb-mobu init.
+Add a .dockerignore file to skip .git files.  You should also skip any other OS specific files.  Soon we will try to provide a standard .dockerignore and .gitignore files generated as part of the kb-sdk init.
 
 ####  How can I see the tools that are available in the KBase base image?
 
