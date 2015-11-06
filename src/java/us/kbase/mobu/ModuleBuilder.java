@@ -17,6 +17,7 @@ import com.beust.jcommander.Parameters;
 
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.validator.ModuleValidator;
 
 public class ModuleBuilder {
@@ -28,6 +29,7 @@ public class ModuleBuilder {
     private static final String VALIDATE_COMMAND = "validate";
     private static final String COMPILE_COMMAND  = "compile";
     private static final String HELP_COMMAND     = "help";
+    private static final String TEST_COMMAND     = "test";
     
     
     public static void main(String[] args) throws Exception {
@@ -53,7 +55,11 @@ public class ModuleBuilder {
     	// add the 'help' command
     	HelpCommandArgs help = new HelpCommandArgs();
     	jc.addCommand(HELP_COMMAND, help);
-    	
+
+        // add the 'test' command
+        TestCommandArgs testArgs = new TestCommandArgs();
+        jc.addCommand(TEST_COMMAND, testArgs);
+
     	// parse the arguments and gracefully catch any errors
     	try {
     		jc.parse(args);
@@ -85,6 +91,8 @@ public class ModuleBuilder {
 	    	returnCode = runValidateCommand(validateArgs,jc);
 	    } else if(jc.getParsedCommand().equals(COMPILE_COMMAND)) {
 	    	returnCode = runCompileCommand(compileArgs,jc);
+        } else if(jc.getParsedCommand().equals(TEST_COMMAND)) {
+            returnCode = runTestCommand(testArgs,jc);
 	    } 
 	    
 	    if(returnCode!=0) {
@@ -220,7 +228,32 @@ public class ModuleBuilder {
     	boolean help;
     }
     
-    
+    /**
+     * Runs the module initialization command - this creates a new module in the relative directory name given.
+     * There's only a couple of possible arguments here in the initArgs:
+     * userName (required) - the user's Github user name, used to set up some optional fields
+     * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
+     * are replaced with underscores. So if a user runs:
+     *   kb-mobu init my new module
+     * they get a module called "my_new_module" in a directory of the same name.
+     * @param initArgs
+     * @param jc
+     * @return
+     */
+    private static int runTestCommand(TestCommandArgs testArgs, JCommander jc) {
+        // Figure out module name.
+        // Join together spaced out names with underscores if necessary.
+        try {
+            ModuleTester tester = new ModuleTester();
+            tester.runTests();
+        }
+        catch (Exception e) {
+            showError("Error while testing module", e.getMessage());
+            return 1;
+        }
+        return 0;
+    }
+
     @Parameters(commandDescription = "Validate a module or modules.")
     private static class ValidateCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
@@ -374,7 +407,9 @@ public class ModuleBuilder {
         List <String> specFileNames;
     }
     
-    
+    @Parameters(commandDescription = "Test a module with local Docker.")
+    private static class TestCommandArgs {
+    }
     
     
     
