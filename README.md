@@ -1,39 +1,71 @@
 # KBase SDK
 
-## Prerequisites
-**Experience:**
- - Understanding of client/server architecture
- - Basic familiarity with the KBase architecture and codebase (https://github.com/kbase)
- - Some familiarity with KIDL (KBase Interface Description Language)
- - Ability to write a client-server module in Python, Java or Perl
- - Able to use Unix/Linux/MacOS shell commands (for example, setting environment variables)
- - Basic understanding of “make” and “ant”
- - GItHub account
- - Basic understanding of the command-line interface to git
+**This software is still in beta and should only be used for internal KBase development.**
 
-**Software you should have installed:**<br/>
-Please see the kb-mobu documentation, [https://github.com/kbase/kb_sdk/blob/develop/doc/Module_builder.md](https://github.com/kbase/kb_sdk/blob/develop/doc/Module_builder.md).
+The KBase SDK is a set of tools for developing new modules that can be dynamically registered and run on the KBase platform.  Modules include all code, specification files, and documentation needed to define and run a set of methods in the KBase Narrative interface.
 
-**Note**: This software is still in beta and should only be used for internal use.
+There are a number of restrictions on module functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current set of restrictions are:
 
-### overview
-
-KBase is designed with a service-oriented architecture, in which functions (modules) are implemented in a client/server fashion and share core functionality such as queuing and dispatch, access to data, and access to scalable computing resources. The KBase SDK is A set of tools for developing new modules (services) in KBase. KBase modules are defined by a spec file written in KIDL (the KBase Interface Description Language).
-
-The main tool in the SDK is the KBase Module Builder (kb-mobu), which can be used to help define, build and validate standard KBase services/functions in Python, Java or Perl. For detailed instructions on installing and running kb-mobu, please see  [https://github.com/kbase/kb_sdk/blob/develop/doc/Module_builder.md](https://github.com/kbase/kb_sdk/blob/develop/doc/Module_builder.md).
-
-For an example KBase service with an asynchronous, long running job, see code and automated tests here:
- - Perl: [https://github.com/kbaseIncubator/contigcount/tree/develop](https://github.com/kbaseIncubator/contigcount/tree/develop)
- - Python: [https://github.com/kbaseIncubator/onerepotest](https://github.com/kbaseIncubator/onerepotest)
-
-Example KBase services written in Java will be available soon.
-
-After using kb-mobu to initialize and compile your module, you will need to test your new service. There are three main ways to do this:
- - Test on your local computer (see [https://github.com/kbase/kb_sdk/blob/develop/doc/Module_builder.md](https://github.com/kbase/kb_sdk/blob/develop/doc/Module_builder.md))
- - Build a Docker image and run your service from a Docker container (see Docker_deployment.md and https://github.com/kbaseIncubator/deploy_dev/blob/develop/docs/README-service.md)
- - Install the complete KBase deployment environment and run your service in that (see ???) 
+- Runs on a standard KBase worker node (at least 2 cores and 22GB memory)
+- Operates only on supported KBase data types
+- Uses existing data visualization widgets
+- Does not require new uploaders/downloaders
+- Wrapper written in Python, Java, or Perl
 
 
-#### need more?
+For more details on developing modules for KBase see:
+
+- KBase Developer Policies
+- [Full Installation Guide](doc/installation.md)
+- Anatomy of a KBase Module
+- Building and Registering Your First Module
+- Wrapping an Existing Command-Line Tool
+- Debugging Your Module
+- Module Testing Framework
+- Managing Your Module Release Cycle
+- Working with KBase Data Types
+- KBase Interface Description Language (KIDL) Guide
+- Narrative Method Specification Guide
+- (Visualization Widget Development Guide)
+- SDK command-line interface quick reference
+- FAQ
+
+
+### Quick Install Guide
+
+Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
+
+System Dependencies:
+
+- Mac OS X 10.8+ or Linux
+- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- JAVA_HOME environment variable set to JDK installation path
+- Apache Ant http://ant.apache.org
+- (Mac only) Xcode https://developer.apple.com/xcode
+- git https://git-scm.com
+- Docker https://www.docker.com
+
+Get the SDK and KBase Jar file dependencies:
+
+    git clone https://github.com/kbase/kb_sdk
+    git clone https://github.com/kbase/jars
+
+Build the SDK tool from source:
+
+    cd kb_sdk
+    make
+
+Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk directory:
+
+    # for bash
+    export PATH=$(pwd)/bin:$PATH
+    source src/sh/kb-sdk-completion.sh
+
+Test installation:
+
+    kb-sdk help
+
+
+#### Need more?
 
 If you have questions or comments, please create a GitHub issue or pull request.
