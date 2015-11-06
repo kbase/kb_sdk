@@ -105,9 +105,6 @@ public class ModuleInitializer {
 		moduleContext.put("module_root_path", Paths.get(this.moduleName).toAbsolutePath());
 		moduleContext.put("example", example);
 
-		/* Set up the templates to be used 
-		 * TODO: move this to some kind of declarative config file
-		 */
 		Map<String, Path> templateFiles = new HashMap<String, Path>();
 		templateFiles.put("module_typespec", Paths.get(this.moduleName, specFile));
 		templateFiles.put("module_travis", Paths.get(this.moduleName, ".travis.yml"));
@@ -125,8 +122,15 @@ public class ModuleInitializer {
 		templateFiles.put("module_readme_docs", Paths.get(this.moduleName, "docs", "README.md"));
 		templateFiles.put("module_readme_data", Paths.get(this.moduleName, "data", "README.md"));
 		templateFiles.put("module_config_yaml", Paths.get(this.moduleName, "kbase.yml"));
+        templateFiles.put("module_gitignore", Paths.get(this.moduleName, ".gitignore"));
+        templateFiles.put("module_dockerignore", Paths.get(this.moduleName, ".dockerignore"));
+        templateFiles.put("module_readme_test_local", Paths.get(this.moduleName, "test_local", "readme.txt"));
+        templateFiles.put("module_test_cfg", Paths.get(this.moduleName, "test_local", "test.cfg"));
+        templateFiles.put("module_build_run_tests", Paths.get(this.moduleName, "test_local", "build_run_tests.sh"));
+        templateFiles.put("module_run_bash", Paths.get(this.moduleName, "test_local", "run_bash.sh"));
 		
-		if (language.equals("java")) {
+		switch (language) {
+		case "java":
             templateFiles.put("module_build_xml", Paths.get(this.moduleName, "build.xml"));
 		    templateFiles.put("module_web_xml", Paths.get(this.moduleName, "scripts", "web.xml"));
             templateFiles.put("module_jetty_xml", Paths.get(this.moduleName, "scripts", "jetty.xml"));
@@ -138,15 +142,27 @@ public class ModuleInitializer {
             JavaModule module = data.getModules().get(0);
             moduleContext.put("java_package", module.getModulePackage());
             moduleContext.put("java_module_name", module.getModuleName());
+            File testSrcDir = new File(moduleDir, "test/src");
+            String modulePackage = (String)moduleContext.get("java_package");
+            String javaModuleName = (String)moduleContext.get("java_module_name");
+            File testJavaFile = new File(testSrcDir, modulePackage.replace('.', '/') + "/test/" + javaModuleName + "ServerTest.java");
+            fillTemplate(moduleContext, "module_test_java_client", testJavaFile.toPath());
+            break;
+		case "python":
+            templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.py"));
+            break;
+        case "perl":
+            templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.py"));
+            break;
 		}
 		
 		if (example) {
 			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
 			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
-			templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl"));
-			templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", "test_python_client.py"));
-			templateFiles.put("module_test_java_client", Paths.get(this.moduleName, "test", "test_java_client.java"));
-			templateFiles.put("module_test_all_clients", Paths.get(this.moduleName, "test", "test_all_clients.sh"));
+			//templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl"));
+			//templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", "test_python_client.py"));
+			//templateFiles.put("module_test_java_client", Paths.get(this.moduleName, "test", "test_java_client.java"));
+			//templateFiles.put("module_test_all_clients", Paths.get(this.moduleName, "test", "test_all_clients.sh"));
 
 			switch(this.language) {
 				// Perl just needs an impl file and a start server script
