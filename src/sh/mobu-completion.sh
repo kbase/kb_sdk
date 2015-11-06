@@ -1,5 +1,5 @@
 # file: mobu-completion
-# Setup parameter completion for kb-mobu
+# Setup parameter completion for kb-sdk
 
 _SetupMobuCompletion ()
 {                 
@@ -67,3 +67,4 @@ _SetupMobuCompletion ()
 }
 
 complete -F _SetupMobuCompletion -o filenames kb-mobu
+complete -F _SetupMobuCompletion -o filenames kb-sdk
