@@ -211,6 +211,11 @@ kill $(&lt;"$DIR/pid.txt")
       <fileset file="${bin.local}/${module_builder.sh.file}"/>
     </copy>
     <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
+    <!-- Copy old main shell script into the target bin folder-->
+    <copy todir="${BIN_TARGET}" flatten="true" verbose="true">
+      <fileset file="${bin.local}/${module_builder.sh.old.file}"/>
+    </copy>
+    <chmod file="${BIN_TARGET}/${module_builder.sh.old.file}" perm="a+x"/>
     <echo>Successfully deployed dev bin to: ${BIN_TARGET}/${module_builder.sh.file}</echo>
   </target>
 
