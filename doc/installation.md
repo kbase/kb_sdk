@@ -54,7 +54,7 @@ http://stackoverflow.com/questions/30498397/how-to-customize-virtualbox-configur
 
 ## Get the KBase SDK code and KBase dependencies
 
-Fetch the code from GitHub so you 
+Fetch the code from GitHub:
 
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
