@@ -18,7 +18,7 @@ ANT ?= ant
 ANT_OPTIONS =
 
 # make sure our make test works
-.PHONY : test
+.PHONY : test sdkbase
 
 
 default: compile
@@ -71,6 +71,10 @@ deploy-scripts:
 	  	 exit 1; \
 	fi;
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib
+
+sdkbase:
+	cd sdkbase && ./makeconfig
+	docker build -t kbase/sdkbase:latest sdkbase
 
 test: submodule-init
 	@# todo: remove perl typecomp tests and add it as a separate target
