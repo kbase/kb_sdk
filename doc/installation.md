@@ -3,11 +3,11 @@
 
 ## Obtain and install system dependencies
 
-** 1. Mac OS X 10.8+ or Linux **
+#### 1. Mac OS X 10.8+ or Linux
 
 Windows development is not currently supported.  If you are running Windows or do not want to develop on your local machine, we recommend using [VirtualBox](https://www.virtualbox.org) and installing Ubuntu 14+.
 
-** 2. Java JDK 7+ **
+#### 2. Java JDK 7+
 
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
@@ -20,26 +20,26 @@ After downloading and installing the JDK, set your `JAVA_HOME` enviornment varia
 
 You should probably add this command to the end of your `~/.bash_profile` or ~/.bashrc file so it is always set when you start a terminal.
 
-** 3. Apache Ant **
+#### 3. Apache Ant
 
 http://ant.apache.org
 http://ant.apache.org/manual/install.html
 
 The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH enviornment variable, which is generally handled for you if you use a package manager like HomeBrew.
 
-** 4. (Mac only) Xcode **
+#### 4. (Mac only) Xcode
 
 https://developer.apple.com/xcode
 
 Xcode or the Xcode Command Line Tools will install some standard terminal commands like `make` and `git` that are necessary for building the KBase SDK and your module code.
 
-** 5. git +**
+#### 5. git
 
 https://git-scm.com
 
 On a Mac this is typically already installed as part of Xcode.
 
-** 6. Docker **
+#### 6. Docker
 
 https://www.docker.com
 
