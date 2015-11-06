@@ -8,6 +8,7 @@ There are a number of restrictions on module functionality that will gradually b
 
 - Runs on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
+- Requires either no or fairly limited amounts of reference data
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, or Perl
@@ -17,10 +18,10 @@ For more details on developing modules for KBase see:
 
 - KBase Developer Policies
 - [Full Installation Guide](doc/installation.md)
-- Anatomy of a KBase Module
-- Building and Registering Your First Module
+- [Anatomy of a KBase Module](doc/module_overview.md)
+- [Building and Registering Your First Module](doc/Module_builder.md)
 - Wrapping an Existing Command-Line Tool
-- Debugging Your Module
+- [Debugging Your Module](doc/Docker_deployment.md)
 - Module Testing Framework
 - Managing Your Module Release Cycle
 - Working with KBase Data Types
@@ -68,4 +69,4 @@ Test installation:
 
 #### Need more?
 
-If you have questions or comments, please create a GitHub issue or pull request.
+If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us
