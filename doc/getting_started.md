@@ -79,13 +79,39 @@ TODO: the rest
 
 ## 4) Generate the Python implementation stub
 
+Run:
+
+    make
+
+This will call `kb-sdk compile` with a set of parameters predefined for you.
+
 ## 5) Implement your method
+
+Look at `lib/ContigCount`
 
 ## 6) Setup and run tests
 
 ## 7) Define a Narrative Method Specification
 
+They are defined in `ui/narrative/methods`
+
 ## 8) Add everything to a public git repo
+
+Since functionality in KBase is pulled into KBase from public git repositories, you will need to put your module code into a public git repository.  Here we'll show a brief example using [GitHub](http://github.com).  First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
+
+    cd MyModule
+    git init
+    git add .
+    git commit -m 'initial commit'
+
+Now you can sync this to a new GitHub repository. First create a new GitHub repository on github.com
+(it can be in your personal GitHub account or in an organization, but it must be public),
+but do not initialize it! Just go here to set up a new empty repository: https://github.com/new or see more
+instructions here: https://help.github.com/articles/creating-a-new-repository .  You may wish to
+use the name of your module as the name for your new repository.
+
+    git remote add origin https://github.com/[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
+    git push -u origin master
 
 ## 9) Register your method thorugh the Narrative
 

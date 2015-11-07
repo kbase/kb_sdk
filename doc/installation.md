@@ -74,6 +74,15 @@ Optionally, you can also install command completion with:
 Like `JAVA_HOME`, you should consider adding these last two commands to your `~/.bash_profile` or `~/.bashrc` file so the SDK is always available in the terminal with command completion.
 
 
+## Download the KBase SDK base Docker image
+
+KBase modules run in Docker containers.  Docker containers are built on top of existing base images.  KBase has a public base image that includes a number of installed runtimes, some basic Bioinformatics tools, and other KBase specific tools.  To run this locally, you will need to download and build the KBase SDK base image.  There is a Makefile target that does most of the work for you:
+
+    make sdkbase
+
+The Image currently is fairly large, so this will take some time to run and build the image.  This step is required for running tests locally.
+
+
 ## Verify the installation
 
 Once the kb-sdk command is in your `PATH`, you can confirm it is running and get additional help by running:
