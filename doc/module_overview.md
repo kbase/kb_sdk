@@ -203,7 +203,7 @@ Your module will include by default a couple generated scripts to aid in deploym
 
 ## Technical Documentation
 
-   MyModule
+    MyModule
     ├── docs
     │   └── README.md
 
@@ -220,7 +220,7 @@ Narrative widgets and other UI components cannot yet be defined as part of your 
 
 ## Data
 
-   MyModule
+    MyModule
     ├── data
     │   └── README.md
 
