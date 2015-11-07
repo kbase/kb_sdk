@@ -7,7 +7,9 @@ KBase modules consist of a set a set of code, configurations, and specifications
 
 To explore the contents of a module yourself, simply use the kb-sdk tool to create an example module.
 
-    kb-mobu init --example -l python --user test_user MyModule
+    kb-sdk init --example -l python --user test_user MyModule
+    cd MyModule
+    make
 
 This command will initialize a new Module named MyModule with a prebuilt implementation of an example method.  You should use your own username instead of test_user.  The generated directory structure will look something like this:
 
@@ -32,13 +34,17 @@ This command will initialize a new Module named MyModule with a prebuilt impleme
     ├── scripts
     │   ├── entrypoint.sh
     │   ├── prepare_deploy_cfg.py
-    │   └── run_async.sh
+    │   ├── run_async.sh
+    │   └── start_server.sh
     ├── test
+    │   ├── MyModule6_server_test.py
     │   ├── README.md
-    │   ├── test_all_clients.sh
-    │   ├── test_java_client.java
-    │   ├── test_perl_client.pl
-    │   └── test_python_client.py
+    │   └── run_tests.sh
+    ├── test_local
+    │   ├── build_run_tests.sh
+    │   ├── readme.txt
+    │   ├── run_bash.sh
+    │   └── test.cfg
     └── ui
         ├── README.md
         ├── narrative
@@ -181,13 +187,16 @@ Right now you have to write the method specifications by hand, but in the future
 
     MyModule
     ├── test
+    │   ├── MyModule6_server_test.py
     │   ├── README.md
-    │   ├── test_all_clients.sh
-    │   ├── test_java_client.java
-    │   ├── test_perl_client.pl
-    │   └── test_python_client.py
+    │   └── run_tests.sh
+    ├── test_local
+    │   ├── build_run_tests.sh
+    │   ├── readme.txt
+    │   ├── run_bash.sh
+    │   └── test.cfg
 
-The test directory contains a basic template for performing unit tests of the code in your module implmentation. This is useful for both debugging and ensuring your module is robust and operates well on a range of input data.  The test directory should be used also for creating any temporary test files.
+The test directory contains a basic template for performing unit tests of the code in your module implmentation. This is useful for both debugging and ensuring your module is robust and operates well on a range of input data.  The test_local directory is created on `make` to create a scratch space for running tests locally.  It is important that you do not check in any test configuration files with passwords to public git repositories.
 
 
 ## Scripts Directory for Utility/Docker Scripts
@@ -196,7 +205,8 @@ The test directory contains a basic template for performing unit tests of the co
     ├── scripts
     │   ├── entrypoint.sh
     │   ├── prepare_deploy_cfg.py
-    │   └── run_async.sh
+    │   ├── run_async.sh
+    │   └── start_server.sh
 
 Your module will include by default a couple generated scripts to aid in deployment and to define how your Docker container is run.  For the most part, you can ignore these files.  If you need additional utility scripts, for instance to aid in system dependency installations, fetch a reference data file that needs to be stored in the Docker image, or other methods for testing or validation, you should place them in the scripts directory.
 
