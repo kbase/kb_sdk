@@ -22,5 +22,13 @@
 	<classpathentry kind="lib" path="../jars/lib/jars/jcommander/jcommander-1.48.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/snakeyaml/snakeyaml-1.11.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/kbase/common/kbase-common-0.0.12.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/workspace/WorkspaceClient-0.2.0.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/shock/shock-client-0.0.8.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/handle/HandleServiceClient-141020-5eda76e.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/http/httpclient-4.3.1.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/http/httpcore-4.3.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/http/httpmime-4.3.1.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>
