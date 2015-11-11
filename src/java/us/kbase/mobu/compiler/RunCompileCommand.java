@@ -26,57 +26,34 @@ public class RunCompileCommand {
             String pyClientName, boolean pyServerSide, String pyServerName, 
             String pyImplName, boolean javaClientSide, boolean javaServerSide, 
             String javaPackageParent, String javaSrcPath, String javaLibPath, 
-            boolean javaBuildXml, String javaGwtPackage, boolean newStyle, 
-            File outDir, String jsonSchemaPath, boolean createMakeFile) throws Exception {
+            boolean withJavaBuildXml, String javaGwtPackage, boolean rClientSide, 
+            String rClientName, boolean rServerSide, String rServerName, 
+            String rImplName, boolean newStyle, File outDir, 
+            String jsonSchemaPath, boolean createMakefile) throws Exception {
     	
-        FileSaver javaSrcOut = null;
+        FileSaver javaSrcDir = null;
         if (javaSrcPath != null)
-            javaSrcOut = new DiskFileSaver(correctRelativePath(javaSrcPath, outDir));
-        FileSaver javaLibOut = null;
+            javaSrcDir = new DiskFileSaver(correctRelativePath(javaSrcPath, outDir));
+        FileSaver javaLibDir = null;
         if (javaLibPath != null) {
-            javaLibOut = new DiskFileSaver(correctRelativePath(javaLibPath, outDir));
+            javaLibDir = new DiskFileSaver(correctRelativePath(javaLibPath, outDir));
         }
         IncludeProvider ip = new FileIncludeProvider(specFile.getCanonicalFile().getParentFile());
         FileSaver output = new DiskFileSaver(outDir);
-        if (javaBuildXml && new File(outDir, "build.xml").exists()) {
+        if (withJavaBuildXml && new File(outDir, "build.xml").exists()) {
             System.err.println("Warning: build.xml file already exists, generation is skipped for it");
-            javaBuildXml = false;
+            withJavaBuildXml = false;
         }
-        FileSaver buildXml = javaBuildXml ? new OneFileSaver(output, "build.xml") : null;
-        FileSaver jsonSchemaOut = null;
+        FileSaver javaBuildXml = withJavaBuildXml ? new OneFileSaver(output, "build.xml") : null;
+        FileSaver jsonSchemas = null;
         if (jsonSchemaPath != null) {
-            jsonSchemaOut = new DiskFileSaver(correctRelativePath(jsonSchemaPath, outDir));
+            jsonSchemas = new DiskFileSaver(correctRelativePath(jsonSchemaPath, outDir));
         }
         Reader specReader = new FileReader(specFile);
-        generate(specReader, url, jsClientSide, jsClientName, perlClientSide, 
-                perlClientName, perlServerSide, perlServerName, perlImplName, 
-                perlPsgiName, perlEnableRetries, pyClientSide, pyClientName, pyServerSide, 
-                pyServerName, pyImplName, javaClientSide, javaServerSide, 
-                javaPackageParent, javaSrcOut, javaLibOut, buildXml, javaGwtPackage, 
-                newStyle, ip, output, jsonSchemaOut, createMakeFile);
-    }
-
-    private static File correctRelativePath(String javaSrcPath, File outDir) {
-        File javaSrcDir = new File(javaSrcPath);
-        if (!javaSrcDir.isAbsolute())
-            javaSrcDir = new File(outDir, javaSrcPath);
-        return javaSrcDir;
-    }
-
-    public static void generate(Reader specFile, String url, boolean jsClientSide, 
-            String jsClientName, boolean perlClientSide, String perlClientName, 
-            boolean perlServerSide, String perlServerName, String perlImplName, 
-            String perlPsgiName, boolean perlEnableRetries, boolean pyClientSide, 
-            String pyClientName, boolean pyServerSide, String pyServerName, 
-            String pyImplName, boolean javaClientSide, boolean javaServerSide, 
-            String javaPackageParent, FileSaver javaSrcDir, FileSaver javaLibDir, 
-            FileSaver javaBuildXml, String javaGwtPackage, boolean newStyle, 
-            IncludeProvider ip, FileSaver output, FileSaver jsonSchemas,
-            boolean createMakefile) throws Exception {
         Map<String, Map<String, String>> modelToTypeJsonSchemaReturn = null;
         if (jsonSchemas != null)
             modelToTypeJsonSchemaReturn = new TreeMap<String, Map<String, String>>();
-        List<KbService> services = KidlParser.parseSpec(KidlParser.parseSpecInt(specFile, 
+        List<KbService> services = KidlParser.parseSpec(KidlParser.parseSpecInt(specReader, 
                 modelToTypeJsonSchemaReturn, ip));
         if (jsonSchemas != null) {
             for (String module : modelToTypeJsonSchemaReturn.keySet()) {
@@ -119,9 +96,15 @@ public class RunCompileCommand {
         TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
-                pyServerSide, pyServerName, pyImplName, perlEnableRetries, newStyle, 
+                pyServerSide, pyServerName, pyImplName, rClientSide, rClientName, 
+                rServerSide, rServerName, rImplName, perlEnableRetries, newStyle, 
                 ip, output, perlMakefile, pyMakefile, newStyle);
     }
 	
-	
+    private static File correctRelativePath(String javaSrcPath, File outDir) {
+        File javaSrcDir = new File(javaSrcPath);
+        if (!javaSrcDir.isAbsolute())
+            javaSrcDir = new File(outDir, javaSrcPath);
+        return javaSrcDir;
+    }	
 }

@@ -31,8 +31,8 @@ public class TemplateBasedGenerator {
         List<KbService> srvs = KidlParser.parseSpec(KidlParser.parseSpecInt(specReader, null, ip));
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, genPerlServer, 
                 perlServerName, perlImplName, perlPsgiName, genPython, pythonClientName, 
-                genPythonServer, pythonServerName, pythonImplName, enableRetries, newStyle, ip, 
-                output, null, null, false);
+                genPythonServer, pythonServerName, pythonImplName, false, null, false, null, null, 
+                enableRetries, newStyle, ip, output, null, null, false);
     }
     
     public static boolean genPerlServer(boolean genPerlServer, 
@@ -44,15 +44,21 @@ public class TemplateBasedGenerator {
             String pythonServerName, String pythonImplName) {
         return genPythonServer || pythonServerName != null || pythonImplName != null;
     }
-    
+
+    public static boolean genRServer(boolean genRServer,
+            String rServerName, String rImplName) {
+        return genRServer || rServerName != null || rImplName != null;
+    }
+
     @SuppressWarnings("unchecked")
     public static void generate(List<KbService> srvs, String defaultUrl, 
             boolean genJs, String jsClientName,
             boolean genPerl, String perlClientName, boolean genPerlServer, 
             String perlServerName, String perlImplName, String perlPsgiName, 
             boolean genPython, String pythonClientName, boolean genPythonServer,
-            String pythonServerName, String pythonImplName, boolean enableRetries, 
-            boolean newStyle, IncludeProvider ip, FileSaver output,
+            String pythonServerName, String pythonImplName, boolean genR, 
+            String rClientName, boolean genRServer, String rServerName, String rImplName, 
+            boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault) throws Exception {
         KbService service = srvs.get(0);
         if (genJs && jsClientName == null)
@@ -76,6 +82,14 @@ public class TemplateBasedGenerator {
         }
         if (genPython && pythonClientName == null)
             pythonClientName = service.getName() + "Client";
+        genRServer = genPythonServer(genRServer, rServerName, rImplName);
+        if (genRServer) {
+            genR = true;
+            if (rServerName == null)
+                rServerName = service.getName() + "Server";
+        }
+        if (genR && rClientName == null)
+            rClientName = service.getName() + "Client";
         Map<String, Object> context = service.forTemplates(perlImplName, pythonImplName);
         if (defaultUrl != null)
             context.put("default_service_url", defaultUrl);
@@ -108,6 +122,12 @@ public class TemplateBasedGenerator {
             pythonClient.close();
             pyMakefileContext.put("client_package_name", pythonClientName);
             pyMakefileContext.put("client_file", pythonClientPath);
+        }
+        if (rClientName != null) {
+            String rClientPath = rClientName + ".r";
+            Writer rClient = output.openWriter(rClientPath);
+            TemplateFormatter.formatTemplate("r_client", context, newStyle, rClient);
+            rClient.close();
         }
         //////////////////////////////////////// Servers /////////////////////////////////////////
         if (asyncByDefault) {
@@ -146,7 +166,13 @@ public class TemplateBasedGenerator {
             pyMakefileContext.put("server_package_name", pythonServerName);
             pyMakefileContext.put("server_file", pythonServerPath);
         }
-        if (genPerlServer || genPythonServer) {
+        if (rServerName != null) {
+            String rServerPath = rServerName + ".r";
+            Writer rServer = output.openWriter(rServerPath);
+            TemplateFormatter.formatTemplate("r_server", context, newStyle, rServer);
+            rServer.close();
+        }
+        if (genPerlServer || genPythonServer || genRServer) {
             List<Map<String, Object>> modules = (List<Map<String, Object>>)context.get("modules");
             for (int modulePos = 0; modulePos < modules.size(); modulePos++) {
                 Map<String, Object> module = new LinkedHashMap<String, Object>(modules.get(modulePos));
@@ -187,6 +213,18 @@ public class TemplateBasedGenerator {
                     pyMakefileContext.put("impl_package_name", pythonModuleImplName);
                     pyMakefileContext.put("impl_file", pythonImplPath);
                 }
+                String rImplPath = null;
+                if (genRServer) {
+                    rImplPath = rImplName + ".r";
+                    Map<String, String> prevCode = PrevCodeParser.parsePrevCode(
+                            output.getAsFileOrNull(rImplPath), "#", methodNames, false);
+                    module.put("r_module_header", prevCode.get(PrevCodeParser.HEADER));
+                    module.put("r_module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
+                    for (Map<String, Object> method : methods) {
+                        String code = prevCode.get(PrevCodeParser.METHOD + method.get("name"));
+                        method.put("r_user_code", code == null ? "" : code);
+                    }
+                }
                 Map<String, Object> moduleContext = new LinkedHashMap<String, Object>();
                 moduleContext.put("module", module);
                 moduleContext.put("server_package_name", perlServerName);
@@ -201,6 +239,11 @@ public class TemplateBasedGenerator {
                     Writer pythonImpl = output.openWriter(pythonImplPath);
                     TemplateFormatter.formatTemplate("python_impl", moduleContext, newStyle, pythonImpl);
                     pythonImpl.close();
+                }
+                if (genRServer) {
+                    Writer rImpl = output.openWriter(rImplPath);
+                    TemplateFormatter.formatTemplate("r_impl", moduleContext, newStyle, rImpl);
+                    rImpl.close();
                 }
             }
         }
