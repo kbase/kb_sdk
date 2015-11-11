@@ -152,7 +152,11 @@ public class ModuleInitializer {
             templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.py"));
             break;
         case "perl":
-            templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.py"));
+            templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.pl"));
+            break;
+        case "r":
+            //templateFiles.put("module_test_r_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.r"));
+            templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.py"));
             break;
 		}
 		
@@ -179,6 +183,9 @@ public class ModuleInitializer {
 					//templateFiles.put("module_start_python_server", Paths.get(this.moduleName, "scripts", "start_server.sh"));
                     // start_server script is now made in Makefile
 					break;
+				case "r":
+                    templateFiles.put("module_r_impl", Paths.get(this.moduleName, "lib", this.moduleName, this.moduleName + "Impl.r"));
+                    break;
 				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
 		            File moduleDir = new File(this.moduleName);
@@ -252,7 +259,7 @@ public class ModuleInitializer {
 	 * Takes a language string and returns a "qualified" form. E.g. "perl", "Perl", "pl", ".pl", should all 
 	 * return "perl", "Python", "python", ".py", and "py" should all return Python, etc.
 	 * 
-	 * Right now, we support Perl, Python, and Java for implementation languages (nodejs next?)
+	 * Right now, we support Perl, Python, R and Java for implementation languages (nodejs next? Nope, R is first...)
 	 * @param language
 	 * @return
 	 */
@@ -271,7 +278,11 @@ public class ModuleInitializer {
 		if (Arrays.asList(javaNames).contains(lang))
 			return "java";
 		
+        String[] rNames = {"r", ".r"};
+        if (Arrays.asList(rNames).contains(lang))
+            return "r";
+		
 		// If we get here, then we don't recognize it! throw a runtime exception
-		throw new RuntimeException("Unrecognized language: " + language + "\n\tWe currently only support Python, Perl, and Java.");
+		throw new RuntimeException("Unrecognized language: " + language + "\n\tWe currently only support Python, Perl, R and Java.");
 	}
 }
