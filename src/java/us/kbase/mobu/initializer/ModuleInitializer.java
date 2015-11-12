@@ -155,8 +155,7 @@ public class ModuleInitializer {
             templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.pl"));
             break;
         case "r":
-            //templateFiles.put("module_test_r_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.r"));
-            templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.py"));
+            templateFiles.put("module_test_r_client", Paths.get(this.moduleName, "test", this.moduleName + "_server_test.r"));
             break;
 		}
 		
