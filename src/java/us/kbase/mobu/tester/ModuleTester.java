@@ -23,14 +23,14 @@ import us.kbase.templates.TemplateFormatter;
 
 public class ModuleTester {
     private File moduleDir;
-    private Map<String,Object> kbaseYmlConfig;
+    protected Map<String,Object> kbaseYmlConfig;
     private Map<String, Object> moduleContext;
 
     public ModuleTester() throws Exception {
         File dir = new File(".").getCanonicalFile();
-        if (!isModuleDir(dir)) {
+        while (!isModuleDir(dir)) {
             dir = dir.getParentFile();
-            if (!isModuleDir(dir))
+            if (dir == null)
                 throw new IllegalStateException("You're currently not in module folder");
         }
         moduleDir = dir;
