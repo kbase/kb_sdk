@@ -24,9 +24,14 @@ public class TemplateFormatter {
         }
     }
     
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static boolean formatTemplate(String templateName, Map<?,?> context, 
             boolean newStyle, Writer output) {
         try {
+            if (!context.containsKey("esc")) {
+                Map untyped = (Map)context;
+                untyped.put("esc", new VelocityEscaper());
+            }
             Reader input = new InputStreamReader(TemplateFormatter.class.getResourceAsStream(
                     templateName + "." + (newStyle ? "vm" : "old") + ".properties"), Charset.forName("utf-8"));
             VelocityContext cntx = new VelocityContext(context);
@@ -36,6 +41,12 @@ public class TemplateFormatter {
             return ret;
         } catch (Exception ex) {
             throw new IllegalStateException("Problems with template evaluation (" + templateName + ")", ex);
+        }
+    }
+    
+    public static class VelocityEscaper {
+        public String print(String text) {
+            return text;
         }
     }
 }
