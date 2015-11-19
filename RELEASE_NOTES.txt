@@ -1,0 +1,20 @@
+OVERVIEW
+-----------------------------------------
+The KBase SDK is a set of tools for developing new modules 
+that can be dynamically registered and run on the KBase 
+platform.  Modules include all code, specification files, and 
+documentation needed to define and run a set of methods 
+in the KBase Narrative interface.
+
+
+
+VERSION: 0.1.0 (Released 11/19/2015)
+------------------------------------------
+NEW FEATURES:
+- R language is now supported for generation of clients and server stubs.
+- Test sub-command is fully implemented for all 4 languages (perl, 
+   python, java and R).
+- Version sub-command was added
+
+UPDATED FEATURES / MAJOR BUG FIXES:
+- none
