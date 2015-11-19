@@ -2,12 +2,14 @@ package us.kbase.mobu;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -30,6 +32,9 @@ public class ModuleBuilder {
     private static final String COMPILE_COMMAND  = "compile";
     private static final String HELP_COMMAND     = "help";
     private static final String TEST_COMMAND     = "test";
+    private static final String VERSION_COMMAND     = "version";
+    
+    public static final String VERSION = "0.1.0";
     
     
     public static void main(String[] args) throws Exception {
@@ -59,6 +64,10 @@ public class ModuleBuilder {
         // add the 'test' command
         TestCommandArgs testArgs = new TestCommandArgs();
         jc.addCommand(TEST_COMMAND, testArgs);
+
+        // add the 'version' command
+        VersionCommandArgs versionArgs = new VersionCommandArgs();
+        jc.addCommand(VERSION_COMMAND, versionArgs);
 
     	// parse the arguments and gracefully catch any errors
     	try {
@@ -93,7 +102,9 @@ public class ModuleBuilder {
 	    	returnCode = runCompileCommand(compileArgs,jc);
         } else if(jc.getParsedCommand().equals(TEST_COMMAND)) {
             returnCode = runTestCommand(testArgs,jc);
-	    } 
+	    } else if (jc.getParsedCommand().equals(VERSION_COMMAND)) {
+	        returnCode = runVersionCommand(versionArgs, jc);
+	    }
 	    
 	    if(returnCode!=0) {
 	    	System.exit(returnCode);
@@ -155,7 +166,7 @@ public class ModuleBuilder {
 	}
 
 	public static int runCompileCommand(CompileCommandArgs a, JCommander jc) {
-    	
+    	printVersion();
     	// Step 1: convert list of args to a  Files (this must be defined because it is required)
     	File specFile = null;
     	try {
@@ -230,14 +241,8 @@ public class ModuleBuilder {
     }
     
     /**
-     * Runs the module initialization command - this creates a new module in the relative directory name given.
-     * There's only a couple of possible arguments here in the initArgs:
-     * userName (required) - the user's Github user name, used to set up some optional fields
-     * moduleNames (required) - this catchall represents the module's name. Any whitespace (e.g. token breaks) 
-     * are replaced with underscores. So if a user runs:
-     *   kb-sdk init my new module
-     * they get a module called "my_new_module" in a directory of the same name.
-     * @param initArgs
+     * Runs the module test command - this runs tests in local docker container.
+     * @param testArgs
      * @param jc
      * @return
      */
@@ -255,6 +260,23 @@ public class ModuleBuilder {
         return 0;
     }
 
+    private static void printVersion() {
+        String gitCommit = null;
+        try {
+            Properties gitProps = new Properties();
+            InputStream is = ModuleBuilder.class.getResourceAsStream("git.properties");
+            gitProps.load(is);
+            is.close();
+            gitCommit = gitProps.getProperty("commit");
+        } catch (Exception ignore) {}
+        System.out.println("KBase SDK version " + VERSION + (gitCommit == null ? "" : (" (commit " + gitCommit + ")")));
+    }
+    
+    private static int runVersionCommand(VersionCommandArgs testArgs, JCommander jc) {
+        printVersion();
+        return 0;
+    }
+    
     @Parameters(commandDescription = "Validate a module or modules.")
     private static class ValidateCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
@@ -437,6 +459,9 @@ public class ModuleBuilder {
     private static class TestCommandArgs {
     }
     
+    @Parameters(commandDescription = "Print current version of kb-sdk.")
+    private static class VersionCommandArgs {
+    }
     
     
     

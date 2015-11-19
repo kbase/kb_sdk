@@ -75,6 +75,13 @@
 	
   <target name="compile" depends="init" description="compile the source">
     <!-- Compile class files-->
+    <exec executable="git" outputproperty="git.url"><arg line="config --get remote.origin.url"/></exec>
+    <exec executable="git" outputproperty="git.branch"><arg line="rev-parse --abbrev-ref HEAD"/></exec>
+    <exec executable="git" outputproperty="git.commit"><arg line="rev-parse HEAD"/></exec>
+    <echo file="${src}/us/kbase/mobu/git.properties">### PLEASE DO NOT CHANGE THIS FILE MANUALLY! ###
+giturl=${git.url}
+branch=${git.branch}
+commit=${git.commit}</echo>
     <echo>Compiling with jar directory: ${jardir}</echo>
     <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" />
     <!-- Copy resource files-->
