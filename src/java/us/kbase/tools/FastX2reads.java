@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import us.kbase.abstracthandle.AbstractHandleClient;
 import us.kbase.abstracthandle.Handle;
@@ -18,12 +19,14 @@ import us.kbase.common.service.UObject;
 import us.kbase.shock.client.BasicShockClient;
 import us.kbase.shock.client.ShockNode;
 import us.kbase.workspace.ObjectSaveData;
+import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SaveObjectsParams;
 import us.kbase.workspace.WorkspaceClient;
 
 public class FastX2reads {
     
     public FastX2reads() {
+        // Nothing to init.
     }
     
     public void transform(CommandArgs args) throws Exception {
@@ -45,7 +48,8 @@ public class FastX2reads {
         String strainSpecies = args.strainSpecies; 
         String strain = args.strain;
         String outputWsName = args.outputWsName;
-        String outputObjName = args.outputObjName; 
+        String outputObjName = args.outputObjName;
+        File provFile = args.provFile;
         //String provService;
         //String provServiceVer; 
         //String provMethod;
@@ -99,8 +103,15 @@ public class FastX2reads {
         }
         String objType = pairedEnd ? "KBaseFile.PairedEndLibrary" : "KBaseFile.SingleEndLibrary";
         WorkspaceClient wsCl = new WorkspaceClient(new URL(wsUrl), auth);
-        wsCl.saveObjects(new SaveObjectsParams().withWorkspace(outputWsName).withObjects(Arrays.asList(
-                new ObjectSaveData().withData(new UObject(obj)).withType(objType).withName(outputObjName))));
+        ObjectSaveData osd = new ObjectSaveData().withData(new UObject(obj)).withType(objType)
+                .withName(outputObjName);
+        if (provFile != null) {
+            List<ProvenanceAction> provenance = UObject.getMapper().readValue(provFile, 
+                    new TypeReference<List<ProvenanceAction>>() {});
+            osd.withProvenance(provenance);
+        }
+        wsCl.saveObjects(new SaveObjectsParams().withWorkspace(outputWsName).withObjects(
+                Arrays.asList(osd)));
     }
     
     private static void prepareLib(File inputFile, String fileType, AbstractHandleClient handleCl,
@@ -148,15 +159,6 @@ public class FastX2reads {
         file.put("hid", hid);
     }
 
-    /* String token, String wsUrl, String shockUrl, String handleUrl,
-            File inputFile, File inputFile2, Boolean singleEnd, String fileType, 
-            Integer readCount, Integer readSize, String sequencingTech, 
-            String sourceProjectId, String source, String sourceId,
-            String strainGenus, String strainSpecies, String strain,
-            String outputWsName, String outputObjName, String provService,
-            String provServiceVer, String provMethod, String provMethodParams
-    */
-    
     @Parameters(commandDescription = "Transforms fasta/fastq files into Reads object in workspace")
     public static class CommandArgs {
      
@@ -216,5 +218,8 @@ public class FastX2reads {
         
         @Parameter(names="--outobj", required=true, description="Output object name")
         String outputObjName; 
+        
+        @Parameter(names="--prov", description="Provenance JSON file with outer array block listing provenance actions")
+        File provFile = null;
     }
 }
