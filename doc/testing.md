@@ -15,7 +15,8 @@ Then:
 
 When code is run, for any temporary files, you should write them to the directory indicated by the `scratch` configuration variable.  (This is the same configuration that, for instance, is used to give you the Workspace URL).  In tests, this scratch area is automatically mounted on your local system to the `test_local/workdir` directory, so you can easily access any files created by your method.  This is useful in debugging your module.
 
-To add additional tests, edit the code/files in the `test` directory.  For Python, for instance
+To add additional tests, edit the code/files in the `test` directory.  For Python, for instance, you can add additional tests the the ModuleName_server_test.py script using Python's standard unittest module.  The test runner (run_tests.sh) is configured to pick up and run any test files in the test directory that end in `test.py`.  Of course, you can modify the test runner script or any other test files to suit your particular module needs.
+
 
 
 
