@@ -32,7 +32,7 @@ We'll write our implementation in Python, but most steps should apply for all th
 
     kb-sdk init -u [user_name] -l python ContigCount
 
-Module names in KBase need to be unique accross the system.  Since you're not the first one trying out this tutorial, the name ContigCount is probably already taken so you should name it something like MikeContigCount, replacing your name with Mike of course.  Don't worry if your favorite name is taken- there will be ways to provide nicer display names for your module soon.
+Module names in KBase need to be unique accross the system (for now- they will likely be namespaced by a user or organization name soon).  Since you're not the first one trying out this tutorial, the name ContigCount is probably already taken so you should name it something like MikeContigCount, replacing your name with Mike of course.
 
 
 ## 2) Update kbase.yml

@@ -1,5 +1,8 @@
 # Deploying a module in a local Docker development environment
 
+
+NOTE: this document is likely out of date, but the general docker instructions and FAQ are still mostly valid
+
 ## Build and implement your module
 
 See [Module_builder.md](Module_builder.md).
@@ -65,3 +68,10 @@ Not entirely, so don't use the bootstrap repo as a reference for what is install
 #### Are there any size constraints for the images that we create?
 
 Not yet, but there will be one soon.  Ideally keep images under 10GB.  If you have large amounts of reference data that will not fit within the 10GB, then please contact us directly.  We are working on alternative ways to handle reference data that are still being tested and documented, so do not add this data directly to your image.
+
+#### Help- tests were working, and I didn't change anything, but now I'm getting strange network errors.  What do I do?
+
+Assuming you're running on a mac, try rebooting your virtual box instance running docker (https://docs.docker.com/machine/reference/restart/).  If Docker and VirtualBox have been running for a while or you have connected to different networks, VirtualBox will sometimes lose it's connection to the outside world.
+
+
+

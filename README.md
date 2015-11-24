@@ -22,8 +22,9 @@ For more details on developing modules for KBase see:
 - [Building and Registering Your First Module](doc/getting_started.md)
 - [Old Module Builder CLI docs](doc/Module_builder.md) - still has good information, but getting merged into the Building your first module guide above
 - Wrapping an Existing Command-Line Tool
+- [Module Testing Framework](doc/testing.md)
 - [Debugging Your Module](doc/Docker_deployment.md)
-- Module Testing Framework
+- KBase SDK Coding Style Guide and Best Practices
 - Managing Your Module Release Cycle
 - Working with KBase Data Types
 - KBase Interface Description Language (KIDL) Guide
@@ -120,6 +121,16 @@ Explore the other SDK methods in the Narrative method panel.  For finer-grain co
     catalog.version()
 
 The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
+
+
+#### Example Modules
+
+There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
+
+ - [MegaHit](https://github.com/msneddon/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
+ - [Trimmomatic](https://github.com/psdehal/Trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
+ - [OrthoMCL](https://github.com/rsutormin/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
+
 
 
 #### Need more?
