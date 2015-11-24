@@ -1,5 +1,8 @@
 # Deploying a module in a local Docker development environment
 
+
+NOTE: this document is likely out of date, but the general docker instructions and FAQ are still mostly valid
+
 ## Build and implement your module
 
 See [Module_builder.md](Module_builder.md).
