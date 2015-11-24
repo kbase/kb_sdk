@@ -1,15 +1,19 @@
 package us.kbase.mobu.validator;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
+import java.net.URL;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import us.kbase.mobu.util.TextUtils;
+import us.kbase.narrativemethodstore.NarrativeMethodStoreClient;
+import us.kbase.narrativemethodstore.ValidateMethodParams;
+import us.kbase.narrativemethodstore.ValidationResults;
 
 
 public class ModuleValidator {
@@ -20,11 +24,23 @@ public class ModuleValidator {
 	
 	protected List<String> modulePaths;
 	protected boolean verbose;
+	protected String methodStoreUrl;
 	
-	public ModuleValidator(List<String> modulePaths, boolean verbose) {
+	public ModuleValidator(List<String> modulePaths, boolean verbose, String methodStoreUrl) {
 		this.modulePaths = modulePaths;
 		this.verbose = verbose;
+		this.methodStoreUrl = methodStoreUrl;
 	}
+	
+    private static boolean isModuleDir(File dir) {
+        return  new File(dir, "Dockerfile").exists() &&
+                new File(dir, "Makefile").exists() &&
+                new File(dir, "kbase.yml").exists() &&
+                new File(dir, "lib").exists() &&
+                new File(dir, "scripts").exists() &&
+                new File(dir, "test").exists() &&
+                new File(dir, "ui").exists();
+    }
 	
 	public int validateAll() {
 		
@@ -45,11 +61,19 @@ public class ModuleValidator {
 			
 			try {
 				if(verbose) System.out.println("  - canonical path = "+module.getCanonicalPath()+"");
+	            File dir = module.getCanonicalFile();
+	            while (!isModuleDir(dir)) {
+	                dir = dir.getParentFile();
+	                if (dir == null)
+	                    throw new IllegalStateException("  **ERROR** - cannot find folder with module structure");
+	            }
+	            module = dir;
 			} catch (IOException e) {
 				System.err.println("  **ERROR** - unable to extract module canonical path:");
 				System.err.println("                "+e.getMessage());
 			}
-			
+
+
 			// 1) Validate the configuration file
 			try {
 				int status = validateKBaseYmlConfig(module);
@@ -67,8 +91,25 @@ public class ModuleValidator {
 			
 			//     2a) Validate Narrative Methods
 			
-			
-			
+			File uiNarrativeMethodsDir = new File(new File(new File(module, "ui"), "narrative"), "methods");
+			if (uiNarrativeMethodsDir.exists()) {
+			    for (File methodDir : uiNarrativeMethodsDir.listFiles()) {
+			        if (methodDir.isDirectory()) {
+			            System.out.println("\nValidating method in ("+methodDir+")");
+			            try {
+			                int status = validateMethodSpec(methodDir);
+			                if (status != 0) {
+			                    errors++; 
+			                    continue;
+			                }
+			            } catch (Exception e) {
+			                System.err.println("  **ERROR** - method-spec validation failed:");
+			                System.err.println("                "+e.getMessage());
+			                errors++; continue;
+			            }
+			        }
+			    }
+			}
 			
 		}
 		
@@ -125,6 +166,42 @@ public class ModuleValidator {
 	}
 	
 	
-	
+	protected int validateMethodSpec(File methodDir) throws IOException {
+	    NarrativeMethodStoreClient nms = new NarrativeMethodStoreClient(new URL(methodStoreUrl));
+	    nms.setAllSSLCertificatesTrusted(true);
+	    nms.setIsInsecureHttpConnectionAllowed(true);
+	    String spec = FileUtils.readFileToString(new File(methodDir, "spec.json"));
+        String display = FileUtils.readFileToString(new File(methodDir, "display.yaml"));
+        Map<String, String> extraFiles = new LinkedHashMap<String, String>();
+        for (File f : methodDir.listFiles()) {
+            if (f.isFile() && f.getName().endsWith(".html"))
+                extraFiles.put(f.getName(), FileUtils.readFileToString(f));
+        }
+        try {
+            ValidationResults vr = nms.validateMethod(new ValidateMethodParams().withId(
+                    methodDir.getName()).withSpecJson(spec).withDisplayYaml(display)
+                    .withExtraFiles(extraFiles));
+            if (vr.getIsValid() == 1L) {
+                if (vr.getWarnings().size() > 0) {
+                    System.err.println("  **WARNINGS** - method-spec validation:");
+                    for (int num = 0; num < vr.getWarnings().size(); num++) {
+                        String warn = vr.getWarnings().get(num);
+                        System.err.println("                (" + (num + 1) + ") " + warn);
+                    }
+                }
+                return 0;
+            }
+            System.err.println("  **ERROR** - method-spec validation failed:");
+            for (int num = 0; num < vr.getErrors().size(); num++) {
+                String error = vr.getErrors().get(num);
+                System.err.println("                (" + (num + 1) + ") " + error);
+            }
+            return  1;
+        } catch (Exception e) {
+            System.err.println("  **ERROR** - method-spec validation failed:");
+            System.err.println("                "+e.getMessage());
+            return 1;
+        }
+	}
 	
 }
