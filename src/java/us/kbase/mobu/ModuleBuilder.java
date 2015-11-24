@@ -119,7 +119,8 @@ public class ModuleBuilder {
     	if(validateArgs.modules.size()==0) {
     		validateArgs.modules.add(".");
     	}
-    	ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose);
+    	ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose,
+    	        validateArgs.methodStoreUrl);
     	return mv.validateAll();
 	}
 
@@ -281,6 +282,11 @@ public class ModuleBuilder {
     private static class ValidateCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
         boolean verbose = false;
+    	
+    	@Parameter(names={"-m", "--method_store"}, description="Narrative Method Store URL " +
+    			"(default is https://ci.kbase.us/services/narrative_method_store/rpc)")
+    	String methodStoreUrl = "https://ci.kbase.us/services/narrative_method_store/rpc";
+    	
     	@Parameter(description="[path to the module directories]")
         List<String> modules;
     }
