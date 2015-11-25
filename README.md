@@ -66,7 +66,7 @@ Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk
 
     # for bash
     export PATH=$(pwd)/bin:$PATH
-    source src/sh/kb-sdk-completion.sh
+    source src/sh/sdk-completion.sh
 
 Test installation:
 
