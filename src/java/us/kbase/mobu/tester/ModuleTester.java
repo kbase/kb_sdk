@@ -109,6 +109,7 @@ public class ModuleTester {
             pw.println("job_service_url = " + props.getProperty("job_service_url"));
             pw.println("workspace_url = " + props.getProperty("workspace_url"));
             pw.println("shock_url = " + props.getProperty("shock_url"));
+            pw.println("kbase_endpoint = " + props.getProperty("kbase_endpoint"));
         } finally {
             pw.close();
         }
