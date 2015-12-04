@@ -121,10 +121,21 @@ public class RunCompileCommand {
         if (reportFile == null || reportFile.isEmpty())
             reportFile = System.getProperty("KB_SDK_COMPILE_REPORT_FILE");
         if (reportFile != null && !reportFile.isEmpty()) {
-            prepareCompileReport(outDir, services, perlServerSide, perlImplName, 
-                    pyServerSide, pyImplName, rServerSide, rImplName, 
-                    javaServerSide, javaPackageParent, javaSrcPath, 
-                    javaParsingData, new File(reportFile));
+            perlServerSide = TemplateBasedGenerator.genPerlServer(perlServerSide, 
+                    perlServerName, perlImplName, perlPsgiName);
+            pyServerSide = TemplateBasedGenerator.genPythonServer(pyServerSide, 
+                    pyServerName, pyImplName);
+            rServerSide = TemplateBasedGenerator.genPythonServer(rServerSide, 
+                    rServerName, rImplName);
+            try {
+                prepareCompileReport(outDir, services, perlServerSide, perlImplName, 
+                        pyServerSide, pyImplName, rServerSide, rImplName, 
+                        javaServerSide, javaPackageParent, javaSrcPath, 
+                        javaParsingData, new File(reportFile));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                throw ex;
+            }
         }
     }
 	
@@ -205,7 +216,7 @@ public class RunCompileCommand {
         if (implPath.startsWith(rootPath + "/"))
             rootPath += "/";
         if (implPath.startsWith(rootPath))
-            implPath.substring(rootPath.length());
+            implPath = implPath.substring(rootPath.length());
         report.put("impl_file_path", implPath);
         report.put("function_places", funcPositions);
         UObject.getMapper().writeValue(reportFile, report);
