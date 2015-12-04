@@ -15,6 +15,9 @@ elif [ "${1}" = "init" ] ; then
   echo "Initialize module"
 elif [ "${1}" = "bash" ] ; then
   bash
+elif [ "${1}" = "report" ] ; then
+  export KB_SDK_COMPILE_REPORT_FILE=./work/compile_report.json
+  make compile
 else
   echo Unknown
 fi

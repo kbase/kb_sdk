@@ -262,6 +262,11 @@ public class ModuleBuilder {
     }
 
     private static void printVersion() {
+        String gitCommit = getGitCommit();
+        System.out.println("KBase SDK version " + VERSION + (gitCommit == null ? "" : (" (commit " + gitCommit + ")")));
+    }
+
+    public static String getGitCommit() {
         String gitCommit = null;
         try {
             Properties gitProps = new Properties();
@@ -270,7 +275,7 @@ public class ModuleBuilder {
             is.close();
             gitCommit = gitProps.getProperty("commit");
         } catch (Exception ignore) {}
-        System.out.println("KBase SDK version " + VERSION + (gitCommit == null ? "" : (" (commit " + gitCommit + ")")));
+        return gitCommit;
     }
     
     private static int runVersionCommand(VersionCommandArgs testArgs, JCommander jc) {

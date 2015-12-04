@@ -1288,7 +1288,7 @@ public class JavaTypeGenerator {
 		mapper.writeValue(jsonFile, tree);
 	}
 
-	private static String sub(String packageParent, String moduleName) {
+	public static String sub(String packageParent, String moduleName) {
 	    return (packageParent.isEmpty() ? "" : (packageParent + ".")) + moduleName;
 	}
 	
