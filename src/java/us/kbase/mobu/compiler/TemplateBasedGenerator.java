@@ -281,7 +281,7 @@ public class TemplateBasedGenerator {
         }
     }
 
-    private static String fixPath(String path, String div) {
+    public static String fixPath(String path, String div) {
         return path.replace(div, "/");
     }
 }
