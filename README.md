@@ -109,13 +109,13 @@ Run tests:
 
 This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.
 
-When you make changes to the Narrative method specifications, you can valide them for syntax locally.  From the base directory of your module:
-
-    kb-sdk validate
-
 Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
     
     ./run_bash.sh
+
+When you make changes to the Narrative method specifications, you can valide them for syntax locally.  From the base directory of your module:
+
+    kb-sdk validate
 
 Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
