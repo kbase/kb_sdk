@@ -44,14 +44,25 @@ else
 #### OUTSIDE DEV CONTAINER ####
 ###############################
 
-compile:
-	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR)
+compile: jars-submodule-init
+	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -Djardir=submodules/jars/lib/jars/
 
 endif
+
+bin: jars-submodule-init
+	mkdir -p bin
+	echo '#!/bin/sh' > bin/kb-sdk
+	echo 'DIR=$(DIR)' >> bin/kb-sdk
+	echo 'JARS_DIR=$$DIR/submodules/jars/lib/jars' >> bin/kb-sdk
+	echo 'java -cp $$JARS_DIR/apache_commons/commons-collections-3.2.1.jar:$$JARS_DIR/apache_commons/commons-io-2.4.jar:$$JARS_DIR/apache_commons/commons-lang-2.4.jar:$$JARS_DIR/apache_commons/commons-logging-1.1.1.jar:$$JARS_DIR/apache_commons/http/httpclient-4.3.1.jar:$$JARS_DIR/apache_commons/http/httpcore-4.3.jar:$$JARS_DIR/apache_commons/http/httpmime-4.3.1.jar:$$JARS_DIR/apache_commons/velocity-1.7.jar:$$JARS_DIR/codemodel/codemodel-2.4.1.jar:$$JARS_DIR/google/guava-14.0.1.jar:$$JARS_DIR/google/jsonschema2pojo-core-0.3.6.jar:$$JARS_DIR/ini4j/ini4j-0.5.2.jar:$$JARS_DIR/jackson/jackson-annotations-2.2.3.jar:$$JARS_DIR/jackson/jackson-core-2.2.3.jar:$$JARS_DIR/jackson/jackson-databind-2.2.3.jar:$$JARS_DIR/jcommander/jcommander-1.48.jar:$$JARS_DIR/jetty/jetty-all-7.0.0.jar:$$JARS_DIR/jna/jna-3.4.0.jar:$$JARS_DIR/junit/junit-4.9.jar:$$JARS_DIR/kbase/auth/kbase-auth-1380919426-d35c17d.jar:$$JARS_DIR/kbase/common/kbase-common-0.0.12.jar:$$JARS_DIR/kbase/handle/HandleManagerClient-141020-ff26a5d.jar:$$JARS_DIR/kbase/handle/HandleServiceClient-141020-5eda76e.jar:$$JARS_DIR/kbase/shock/shock-client-0.0.8.jar:$$JARS_DIR/kbase/workspace/WorkspaceClient-0.2.0.jar:$$JARS_DIR/kohsuke/args4j-2.0.21.jar:$$JARS_DIR/servlet/servlet-api-2.5.jar:$$JARS_DIR/snakeyaml/snakeyaml-1.11.jar:$$JARS_DIR/syslog4j/syslog4j-0.9.46.jar:$$DIR/lib/kbase_module_builder2.jar us.kbase.mobu.ModuleBuilder $$@' >> bin/kb-sdk
+	chmod +x bin/kb-sdk
 
 submodule-init:
 	git submodule init
 	git submodule update
+
+jars-submodule-init:
+	git submodule update --init submodules/jars
 
 deploy: deploy-client deploy-service deploy-scripts
 

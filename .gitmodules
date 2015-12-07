@@ -1,3 +1,6 @@
 [submodule "typecomp"]
 	path = typecomp
 	url = https://github.com/msneddon/typecomp
+[submodule "submodules/jars"]
+	path = submodules/jars
+	url = https://github.com/kbase/jars
