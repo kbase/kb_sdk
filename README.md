@@ -38,25 +38,24 @@ For more details on developing modules for KBase see:
 
 Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
 
+#### Installation Only
+
 System Dependencies:
 
 - Mac OS X 10.8+ or Linux
-- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
-- JAVA_HOME environment variable set to JDK installation path
-- Apache Ant http://ant.apache.org
+- Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
-- Docker https://www.docker.com
+- Docker https://www.docker.com (for local testing)
 
-Get the SDK and KBase Jar file dependencies:
+Get the SDK:
 
     git clone https://github.com/kbase/kb_sdk
-    git clone https://github.com/kbase/jars
 
-Build the SDK tool from source:
+Pull dependencies and configure the SDK:
 
     cd kb_sdk
-    make
+    make bin
 
 Download the local KBase SDK base Docker image:
 
@@ -71,6 +70,20 @@ Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk
 Test installation:
 
     kb-sdk help
+
+
+#### Build from source
+
+Additional System Dependencies:
+
+- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- JAVA_HOME environment variable set to JDK installation path
+- Apache Ant http://ant.apache.org
+
+Follow basic instructions above.  Instead of running `make bin` you can run `make` to compile the SDK:
+
+    cd kb_sdk
+    make
 
 
 ### Quick Start Guide
@@ -99,6 +112,10 @@ This will build your Docker container, run the method implementation running in 
 Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
     
     ./run_bash.sh
+
+When you make changes to the Narrative method specifications, you can valide them for syntax locally.  From the base directory of your module:
+
+    kb-sdk validate
 
 Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
@@ -130,6 +147,7 @@ There are a number of modules that we continually update and modify to demonstra
  - [MegaHit](https://github.com/msneddon/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
  - [Trimmomatic](https://github.com/psdehal/Trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
  - [OrthoMCL](https://github.com/rsutormin/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
+ - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
 
 
 
