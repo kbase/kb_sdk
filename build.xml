@@ -53,7 +53,7 @@
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
   <property name="jardir" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
-  <condition property="commonjar" value="kbase/common/kbase-common-0.0.12.jar">
+  <condition property="commonjar" value="kbase/common/kbase-common-0.0.13.jar">
     <or>
       <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
       <not>

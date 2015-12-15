@@ -933,7 +933,7 @@ public class JavaTypeGenerator {
 				    appendWithComma(funcParams, getJType(param.getType(), packageParent, model)).append(" ").append(param.getJavaName());
 				if (func.isAuthCouldBeUsed())
 				    appendWithComma(funcParams, model.ref("us.kbase.auth.AuthToken")).append(" authPart");
-                appendWithComma(funcParams, model.ref(utilPackage + ".RpcContext")).append("... ").append("jsonRpcContext");
+                appendWithComma(funcParams, model.ref(utilPackage + ".RpcContext")).append(" ").append("jsonRpcContext");
 				String retTypeName = retType == null ? "void" : getJType(retType, packageParent, model);
 				classLines.add("");
 				printFuncComment(func, originalToJavaTypes, packageParent, classLines, false);
