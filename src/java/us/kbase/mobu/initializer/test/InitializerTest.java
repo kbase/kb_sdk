@@ -114,20 +114,21 @@ public class InitializerTest {
 		
 		allExpectedExamplePaths = new ArrayList<String>(Arrays.asList(EXPECTED_PATHS));
 		allExpectedExamplePaths.add(SIMPLE_MODULE_NAME + ".spec");
-		allExpectedExamplePaths.add("scripts/start_server.sh");
+		allExpectedExamplePaths.add("scripts/entrypoint.sh");
+        allExpectedExamplePaths.add("scripts/run_async.sh");
 		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME);
 		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/img");
 		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/spec.json");
 		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/display.yaml");
 		
 		perlPaths = new ArrayList<String>();
-		perlPaths.add("lib/Bio/KBase/" + SIMPLE_MODULE_NAME + "/Impl.pm");
+		perlPaths.add("lib/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "Impl.pm");
 
 		pythonPaths = new ArrayList<String>();
-		pythonPaths.add("lib/biokbase/" + SIMPLE_MODULE_NAME + "/Impl.py");
+		pythonPaths.add("lib/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "Impl.py");
 
 		javaPaths = new ArrayList<String>();
-		javaPaths.add("lib/src/us/kbase/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "_impl.java");
+		javaPaths.add("lib/src/asimplemoduleforunittesting/ASimpleModuleForUnitTestingServer.java");
 		
 	}
 	

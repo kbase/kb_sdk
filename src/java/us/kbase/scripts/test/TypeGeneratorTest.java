@@ -30,6 +30,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -127,6 +128,11 @@ public class TypeGeneratorTest extends Assert {
             @Override
             public void debug(String arg0) {}
         });
+	}
+	
+	@Before
+	public void beforeCleanup() {
+	    System.clearProperty("KB_JOB_CHECK_WAIT_TIME");
 	}
 	
 	@Test
@@ -328,7 +334,7 @@ public class TypeGeneratorTest extends Assert {
                     ));
             TextUtils.writeFileLines(lines, new File(workDir, "run_" + moduleName + "_async_job.sh"));
             runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, 
-                    parsingData, serverOutDir, true, findFreePort(), jobServiceUrl);
+                    parsingData, serverOutDir, true, findFreePort(), jobServiceUrl, null);
             //////////////////////////////////////// Python server ///////////////////////////////////////////
             lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
@@ -337,7 +343,7 @@ public class TypeGeneratorTest extends Assert {
                     ));
             TextUtils.writeFileLines(lines, new File(workDir, "run_" + moduleName + "_async_job.sh"));
 	        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, 
-	                parsingData, serverOutDir, true, findFreePort(), jobServiceUrl);
+	                parsingData, serverOutDir, true, findFreePort(), jobServiceUrl, null);
             //////////////////////////////////////// Java server ///////////////////////////////////////////
             lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
@@ -368,8 +374,8 @@ public class TypeGeneratorTest extends Assert {
         int portNum = findFreePort();
         Map<String, String> serverManualCorrections = new HashMap<String, String>();
         serverManualCorrections.put("send_context", "returnVal = arg1; " +
-        		"returnVal.getMethods().add(jsonRpcContext[0].getCallStack().get(0).getMethod()); " +
-        		"returnVal.getMethods().add(jsonRpcContext[0].getCallStack().get(1).getMethod())");
+        		"returnVal.getMethods().add(jsonRpcContext.getCallStack().get(0).getMethod()); " +
+        		"returnVal.getMethods().add(jsonRpcContext.getCallStack().get(1).getMethod())");
         JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, portNum, true,
                 serverManualCorrections);
         runJavaServerTest(testNum, true, testPackage, libDir, binDir, parsingData, null, portNum);
@@ -391,10 +397,10 @@ public class TypeGeneratorTest extends Assert {
         File binDir = new File(workDir, "bin");
         JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
         File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
-        runPerlServerTest(testNum, true, workDir, testPackage,
-                libDir, binDir, parsingData, serverOutDir, true, findFreePort());
-        runPythonServerTest(testNum, true, workDir,
-                testPackage, libDir, binDir, parsingData, serverOutDir, true, findFreePort());
+        runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort());
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort());
         runJavaServerTest(testNum, true, testPackage, libDir,
                 binDir, parsingData, serverOutDir, findFreePort());
     }
@@ -411,6 +417,39 @@ public class TypeGeneratorTest extends Assert {
         JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
         runJavaServerTest(testNum, true, testPackage, libDir,
                 binDir, parsingData, null, findFreePort());
+    }
+
+    @Test
+    public void testProvenance() throws Exception {
+        ////////////////////////////////////// Java ///////////////////////////////////////
+        int testNum = 18;
+        File workDir = prepareWorkDir(testNum);
+        System.out.println();
+        System.out.println("Test " + testNum + " (testProvenance) is staring in directory: " + workDir.getName());
+        String testPackage = rootPackageName + ".test" + testNum;
+        File libDir = new File(workDir, "lib");
+        File binDir = new File(workDir, "bin");
+        int portNum = findFreePort();
+        Map<String, String> javaSrvManualCorr = new HashMap<String, String>();
+        javaSrvManualCorr.put("get_prov", "us.kbase.workspace.ProvenanceAction pa = " +
+        		"((java.util.List<us.kbase.workspace.ProvenanceAction>)jsonRpcContext.getProvenance()).get(0); " +
+        		"returnVal = new UObject(new java.util.ArrayList<us.kbase.workspace.ProvenanceAction>(" +
+        		"java.util.Arrays.asList(new us.kbase.workspace.ProvenanceAction().withService(pa.getService()).withMethod(pa.getMethod()))))");
+        Map<String, String> pySrvManualCorr = new HashMap<String, String>();
+        pySrvManualCorr.put("get_prov", "returnVal = [{'service':ctx['provenance'][0]['service'],'method':ctx['provenance'][0]['method']}]");
+        Map<String, String> perlSrvManualCorr = new HashMap<String, String>();
+        perlSrvManualCorr.put("get_prov", "$return = [{'service'=>$ctx->provenance->[0]->{'service'},'method'=>$ctx->provenance->[0]->{'method'}}]");
+        if (!libDir.exists())
+            libDir.mkdirs();
+        JavaTypeGenerator.checkLib(new DiskFileSaver(libDir), "WorkspaceClient");
+        JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, portNum, true,
+                javaSrvManualCorr);
+        File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
+        runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort(), null, perlSrvManualCorr);
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort(), null, pySrvManualCorr);
+        runJavaServerTest(testNum, true, testPackage, libDir, binDir, parsingData, serverOutDir, portNum);
     }
 
     private Server startJobService(File binDir, File tempDir) throws Exception {
@@ -456,15 +495,19 @@ public class TypeGeneratorTest extends Assert {
             File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
 		    if (needPerlServer) {
 		        runPerlServerTest(testNum, needClientServer, workDir, testPackage,
-		                libDir, binDir, parsingData, serverOldDir, false, findFreePort());
+		                libDir, binDir, parsingData, serverOldDir, false, 
+		                findFreePort());
 		        runPerlServerTest(testNum, needClientServer, workDir, testPackage,
-		                libDir, binDir, parsingData, serverOutDir, true, findFreePort());
+		                libDir, binDir, parsingData, serverOutDir, true, 
+		                findFreePort());
 		    }
             if (needPythonServer) {
 		        runPythonServerTest(testNum, needClientServer, workDir,
-		                testPackage, libDir, binDir, parsingData, serverOldDir, false, findFreePort());
+		                testPackage, libDir, binDir, parsingData, serverOldDir, 
+		                false, findFreePort());
 		        runPythonServerTest(testNum, needClientServer, workDir,
-		                testPackage, libDir, binDir, parsingData, serverOutDir, true, findFreePort());
+		                testPackage, libDir, binDir, parsingData, serverOutDir, 
+		                true, findFreePort());
 		    }
 		    if (needJavaServer)
 		        runJavaServerTest(testNum, needClientServer, testPackage, libDir,
@@ -475,18 +518,27 @@ public class TypeGeneratorTest extends Assert {
 	}
 
 	protected static void runPythonServerTest(int testNum,
+	        boolean needClientServer, File workDir, String testPackage,
+	        File libDir, File binDir, JavaData parsingData, File serverOutDir,
+	        boolean newStyle, int portNum) throws IOException, Exception {
+	    runPythonServerTest(testNum, needClientServer, workDir, testPackage, libDir, 
+	            binDir, parsingData, serverOutDir, newStyle, portNum, null, null);
+	}
+
+	protected static void runPythonServerTest(int testNum,
 			boolean needClientServer, File workDir, String testPackage,
 			File libDir, File binDir, JavaData parsingData, File serverOutDir,
-			boolean newStyle, int portNum, String... jobServiceUrl) throws IOException, Exception {
+			boolean newStyle, int portNum, String jobServiceUrl,
+			Map<String, String> serverManualCorrections) throws IOException, Exception {
 		String serverType = (newStyle ? "New" : "Old") + " python";
 		File pidFile = new File(serverOutDir, "pid.txt");
-		pythonServerCorrection(serverOutDir, parsingData);
+		pythonServerCorrection(serverOutDir, parsingData, serverManualCorrections);
 		try {
 			File serverFile = findPythonServerScript(serverOutDir);
 			File uwsgiFile = new File(serverOutDir, "start_py_server.sh");
 			List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-			if (jobServiceUrl != null && jobServiceUrl.length == 1)
-			    lines.add("export KB_JOB_SERVICE_URL=" + jobServiceUrl[0]);
+			if (jobServiceUrl != null)
+			    lines.add("export KB_JOB_SERVICE_URL=" + jobServiceUrl);
 			//JavaTypeGenerator.checkEnvVars(lines, "PYTHONPATH");
 			lines.addAll(Arrays.asList(
 			        "cd \"" + serverOutDir.getAbsolutePath() + "\"",
@@ -543,19 +595,28 @@ public class TypeGeneratorTest extends Assert {
 	    } catch (IOException e) {}
 	    throw new IllegalStateException("Can not find available port in system");
 	}
-	
+
+	protected static void runPerlServerTest(int testNum,
+	        boolean needClientServer, File workDir, String testPackage,
+	        File libDir, File binDir, JavaData parsingData, File serverOutDir,
+	        boolean newStyle, int portNum) throws IOException, Exception {
+	    runPerlServerTest(testNum, needClientServer, workDir, testPackage, libDir, 
+	            binDir, parsingData, serverOutDir, newStyle, portNum, null, null);
+	}
+
 	protected static void runPerlServerTest(int testNum,
 			boolean needClientServer, File workDir, String testPackage,
 			File libDir, File binDir, JavaData parsingData, File serverOutDir,
-			boolean newStyle, int portNum, String... jobServiceUrl) throws IOException, Exception {
+			boolean newStyle, int portNum, String jobServiceUrl,
+			Map<String, String> serverManualCorrections) throws IOException, Exception {
 	    String serverType = (newStyle ? "New" : "Old") + " perl";
-		perlServerCorrection(serverOutDir, parsingData);
+		perlServerCorrection(serverOutDir, parsingData, serverManualCorrections);
 		File pidFile = new File(serverOutDir, "pid.txt");
 		try {
 			File plackupFile = new File(serverOutDir, "start_perl_server.sh");
 			List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-			if (jobServiceUrl != null && jobServiceUrl.length == 1)
-			    lines.add("export KB_JOB_SERVICE_URL=" + jobServiceUrl[0]);
+			if (jobServiceUrl != null)
+			    lines.add("export KB_JOB_SERVICE_URL=" + jobServiceUrl);
 			//JavaTypeGenerator.checkEnvVars(lines, "PERL5LIB");
 			lines.addAll(Arrays.asList(
                     "cd \"" + serverOutDir.getAbsolutePath() + "\"",
@@ -1006,8 +1067,8 @@ public class TypeGeneratorTest extends Assert {
 		}
 	}
 
-	private static void perlServerCorrection(File serverOutDir,
-			JavaData parsingData) throws IOException {
+	private static void perlServerCorrection(File serverOutDir, JavaData parsingData, 
+	        Map<String, String> serverManualCorrections) throws IOException {
 		for (JavaModule module : parsingData.getModules()) {
             Map<String, JavaFunc> origNameToFunc = new HashMap<String, JavaFunc>();
             for (JavaFunc func : module.getFuncs()) {
@@ -1019,7 +1080,10 @@ public class TypeGeneratorTest extends Assert {
             	String line = perlServerLines.get(pos);
             	if (line.startsWith("    #BEGIN ")) {
             		String origFuncName = line.substring(line.lastIndexOf(' ') + 1);
-            		if (origNameToFunc.containsKey(origFuncName)) {
+            		if (serverManualCorrections != null && serverManualCorrections.containsKey(origFuncName)) {
+                        pos++;
+                        perlServerLines.add(pos, "    " + serverManualCorrections.get(origFuncName) + ";");                     
+                    } else if (origNameToFunc.containsKey(origFuncName)) {
                         KbFuncdef origFunc = origNameToFunc.get(origFuncName).getOriginal();
                         int paramCount = origFunc.getParameters().size();
             		    if (origFuncName.equals("throw_error_on_server_side")) {
@@ -1064,37 +1128,38 @@ public class TypeGeneratorTest extends Assert {
             	origNameToFunc.put(func.getOriginal().getName(), func);
             }
             File moduleDir = new File(srcDir.getAbsolutePath() + "/" + packageParent.replace('.', '/') + "/" + module.getModulePackage());
-            File perlServerImpl = new File(moduleDir, getServerClassName(module) + ".java");
-            List<String> perlServerLines = TextUtils.readFileLines(perlServerImpl);
-            for (int pos = 0; pos < perlServerLines.size(); pos++) {
-            	String line = perlServerLines.get(pos);
+            File serverImpl = new File(moduleDir, getServerClassName(module) + ".java");
+            List<String> serverLines = TextUtils.readFileLines(serverImpl);
+            for (int pos = 0; pos < serverLines.size(); pos++) {
+            	String line = serverLines.get(pos);
             	if (line.startsWith("        //BEGIN ")) {
             		String origFuncName = line.substring(line.lastIndexOf(' ') + 1);
             		if (serverManualCorrections != null && serverManualCorrections.containsKey(origFuncName)) {
                         pos++;
-                        perlServerLines.add(pos, "        " + serverManualCorrections.get(origFuncName) + ";");            		    
+                        serverLines.add(pos, "        " + serverManualCorrections.get(origFuncName) + ";");            		    
             		} else if (origNameToFunc.containsKey(origFuncName)) {
             			JavaFunc func = origNameToFunc.get(origFuncName);
             			if (origFuncName.equals("throw_error_on_server_side")) {
                             String message = func.getParams().size() > 0 ? ("\"\" + " + func.getParams().get(0).getJavaName()) : "";
                             pos++;
-                            perlServerLines.add(pos, "        if (true) throw new Exception(" + message + ");");                     
+                            serverLines.add(pos, "        if (true) throw new Exception(" + message + ");");                     
             			} else {
             			    int paramCount = func.getParams().size();
             			    for (int paramPos = 0; paramPos < paramCount; paramPos++) {
             			        pos++;
-            			        perlServerLines.add(pos, "        return" + (paramCount > 1 ? ("" + (paramPos + 1)) : "Val") + " = " + 
+            			        serverLines.add(pos, "        return" + (paramCount > 1 ? ("" + (paramPos + 1)) : "Val") + " = " + 
             			                func.getParams().get(paramPos).getJavaName() + ";");
             			    }
             			}
             		}
             	}
             }
-            TextUtils.writeFileLines(perlServerLines, perlServerImpl);
+            TextUtils.writeFileLines(serverLines, serverImpl);
         }
 	}
 
-	private static void pythonServerCorrection(File serverOutDir, JavaData parsingData) throws IOException {
+	private static void pythonServerCorrection(File serverOutDir, JavaData parsingData,
+	        Map<String, String> serverManualCorrections) throws IOException {
 		for (JavaModule module : parsingData.getModules()) {
             Map<String, JavaFunc> origNameToFunc = new HashMap<String, JavaFunc>();
             for (JavaFunc func : module.getFuncs()) {
@@ -1106,7 +1171,10 @@ public class TypeGeneratorTest extends Assert {
             	String line = pyServerLines.get(pos);
             	if (line.startsWith("        #BEGIN ")) {
             		String origFuncName = line.substring(line.lastIndexOf(' ') + 1);
-            		if (origNameToFunc.containsKey(origFuncName)) {
+                    if (serverManualCorrections != null && serverManualCorrections.containsKey(origFuncName)) {
+                        pos++;
+                        pyServerLines.add(pos, "        " + serverManualCorrections.get(origFuncName));                     
+                    } else if (origNameToFunc.containsKey(origFuncName)) {
             			KbFuncdef origFunc = origNameToFunc.get(origFuncName).getOriginal();
             			int paramCount = origFunc.getParameters().size();
                         if (origFuncName.equals("throw_error_on_server_side")) {
