@@ -85,7 +85,7 @@ deploy-scripts:
 
 sdkbase:
 	cd sdkbase && ./makeconfig
-	docker build -t kbase/sdkbase:latest sdkbase
+	docker build -t kbase/kbase:sdkbase.latest sdkbase
 
 test: submodule-init
 	@# todo: remove perl typecomp tests and add it as a separate target
