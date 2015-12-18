@@ -113,8 +113,6 @@ use the name of your module as the name for your new repository.
     git remote add origin https://github.com/[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
     git push -u origin master
 
-## 9) Register your method through the Narrative
-
-Documentation for this is available in the Quick Start section of toplevel SDK documentation.
+## 9) Register your method thorugh the Narrative
 
 ## 10) Run the new Narrative Method
