@@ -5,7 +5,7 @@ KBase modules consist of a set of code, configurations, and specifications that 
 
 ## Overview
 
-To explore the contents of a module yourself, you can use the kb-sdk tool to create an example module.
+To explore the contents of a module yourself, you can use the kb-sdk tool to create an example module. (Please see [these instructions](https://github.com/kbase/kb_sdk/blob/master/doc/installation.md) on how to install kb-sdk.)
 
     kb-sdk init --example -l python --user YOURUSERNAME MyModule
     cd MyModule
