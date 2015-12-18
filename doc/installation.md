@@ -9,7 +9,7 @@ Windows development is not currently supported.  If you are running Windows or d
 #### 2. Java JDK 7+ 
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-After downloading and installing the JDK, set your `JAVA_HOME` enviornment variable to point to your JDK installation.  If you're not sure where that is, on a Mac the command `/usr/libexec/java_home` should tell you and on Linux `readlink -f $(which javac)` will provide the installed location of the javac, which you can use to find the base directory of the installation.  On a Mac you can set the variable like so:
+After downloading and installing the JDK, set your `JAVA_HOME` environment variable to point to your JDK installation.  If you're not sure where that is, on a Mac the command `/usr/libexec/java_home` should tell you and on Linux `readlink -f $(which javac)` will provide the installed location of the javac, which you can use to find the base directory of the installation.  On a Mac you can set the variable like so:
 
     # for tcsh/csh
     setenv JAVA_HOME `/usr/libexec/java_home`  
