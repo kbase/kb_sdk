@@ -23,7 +23,7 @@ http://ant.apache.org
 
 http://ant.apache.org/manual/install.html
 
-The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH enviornment variable, which is generally handled for you if you use a package manager like HomeBrew.
+The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH environment variable, which is generally handled for you if you use a package manager like HomeBrew.
 
 #### 4. (Mac only) Xcode
 https://developer.apple.com/xcode
