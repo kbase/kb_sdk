@@ -29,7 +29,7 @@ If running on a mac, you may get this error:
 
 This occurs because the linux/mac readlink methods are different.  There are several ways to solve this problem, see this [stackoverflow thread](http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac).  A simple way is to install greadlink in coreutils, for instance with brew:
 
-    brew install coreuitls
+    brew install coreutils
 
 And edit the `test_local/build_run_tests.sh` script by adding a 'g' before 'readlink' in the second line.
 
