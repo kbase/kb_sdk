@@ -117,4 +117,6 @@ use the name of your module as the name for your new repository.
 
 Documentation for this is available in the Quick Start section of toplevel SDK documentation.
 
+Documentation for this is available in the "Quick Start" section of the top level SDK documentation (README.md).
+
 ## 10) Run the new Narrative Method
