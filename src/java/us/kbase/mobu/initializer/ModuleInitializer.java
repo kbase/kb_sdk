@@ -75,8 +75,13 @@ public class ModuleInitializer {
 
 		List<String> subdirList = new ArrayList<String>(Arrays.asList(subdirs));
 		if (example) {
-			subdirList.add("ui/narrative/methods/count_contigs_in_set");
-			subdirList.add("ui/narrative/methods/count_contigs_in_set/img");
+		    if (this.language.equals("python") || this.language.equals("perl")) {
+	            subdirList.add("ui/narrative/methods/filter_contigs");
+	            subdirList.add("ui/narrative/methods/filter_contigs/img");
+		    } else {
+		        subdirList.add("ui/narrative/methods/count_contigs_in_set");
+		        subdirList.add("ui/narrative/methods/count_contigs_in_set/img");
+		    }
 		}
 		else {
 			subdirList.add("ui/narrative/methods/example_method");
@@ -160,8 +165,13 @@ public class ModuleInitializer {
 		}
 		
 		if (example) {
-			templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
-			templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
+            if (this.language.equals("python") || this.language.equals("perl")) {
+                templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "filter_contigs", "spec.json"));
+                templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "filter_contigs", "display.yaml"));
+            } else {
+                templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
+                templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
+            }
 			//templateFiles.put("module_test_perl_client", Paths.get(this.moduleName, "test", "test_perl_client.pl"));
 			//templateFiles.put("module_test_python_client", Paths.get(this.moduleName, "test", "test_python_client.py"));
 			//templateFiles.put("module_test_java_client", Paths.get(this.moduleName, "test", "test_java_client.java"));
