@@ -75,7 +75,7 @@ public class ModuleInitializer {
 
 		List<String> subdirList = new ArrayList<String>(Arrays.asList(subdirs));
 		if (example) {
-		    if (this.language.equals("python") || this.language.equals("perl")) {
+		    if (this.language.equals("python") || this.language.equals("perl") || this.language.equals("java")) {
 	            subdirList.add("ui/narrative/methods/filter_contigs");
 	            subdirList.add("ui/narrative/methods/filter_contigs/img");
 		    } else {
@@ -165,7 +165,7 @@ public class ModuleInitializer {
 		}
 		
 		if (example) {
-            if (this.language.equals("python") || this.language.equals("perl")) {
+            if (this.language.equals("python") || this.language.equals("perl") || this.language.equals("java")) {
                 templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "filter_contigs", "spec.json"));
                 templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "filter_contigs", "display.yaml"));
             } else {

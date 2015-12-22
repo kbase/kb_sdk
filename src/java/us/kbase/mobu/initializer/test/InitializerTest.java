@@ -137,10 +137,10 @@ public class InitializerTest {
 
 		javaPaths = new ArrayList<String>();
 		javaPaths.add("lib/src/asimplemoduleforunittesting/ASimpleModuleForUnitTestingServer.java");
-		javaPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME);
-		javaPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/img");
-		javaPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/spec.json");
-		javaPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/display.yaml");
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME);
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/img");
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/spec.json");
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/display.yaml");
 
 		rPaths = new ArrayList<String>();
 		rPaths.add("lib/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "Impl.r");
