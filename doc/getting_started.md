@@ -115,4 +115,6 @@ use the name of your module as the name for your new repository.
 
 ## 9) Register your method thorugh the Narrative
 
+Documentation for this is available in the "Quick Start" section of the top level SDK documentation (README.md).
+
 ## 10) Run the new Narrative Method

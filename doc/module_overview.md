@@ -183,7 +183,7 @@ These method specifications indicate what parameters are exposed to the user, ho
 Right now you have to write the method specifications by hand, but in the future templates for each method defined in the KIDL specification will be generated.
 
 
-## Test Framwork
+## Test Framework
 
     MyModule
     ├── test
