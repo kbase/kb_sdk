@@ -34,7 +34,9 @@ public class ModuleBuilder {
     private static final String TEST_COMMAND     = "test";
     private static final String VERSION_COMMAND     = "version";
     
-    public static final String VERSION = "0.1.0";
+    public static final String DEFAULT_METHOD_STORE_URL = "https://ci.kbase.us/services/narrative_method_store/rpc";
+    
+    public static final String VERSION = "0.1.1";
     
     
     public static void main(String[] args) throws Exception {
@@ -120,7 +122,7 @@ public class ModuleBuilder {
     		validateArgs.modules.add(".");
     	}
     	ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose,
-    	        validateArgs.methodStoreUrl);
+    	        validateArgs.methodStoreUrl, validateArgs.allowSyncMethods);
     	return mv.validateAll();
 	}
 
@@ -252,7 +254,7 @@ public class ModuleBuilder {
         // Join together spaced out names with underscores if necessary.
         try {
             ModuleTester tester = new ModuleTester();
-            tester.runTests();
+            tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
         }
         catch (Exception e) {
             showError("Error while testing module", e.getMessage());
@@ -289,8 +291,12 @@ public class ModuleBuilder {
         boolean verbose = false;
     	
     	@Parameter(names={"-m", "--method_store"}, description="Narrative Method Store URL " +
-    			"(default is https://ci.kbase.us/services/narrative_method_store/rpc)")
-    	String methodStoreUrl = "https://ci.kbase.us/services/narrative_method_store/rpc";
+    			"(default is " + DEFAULT_METHOD_STORE_URL + ")")
+    	String methodStoreUrl = DEFAULT_METHOD_STORE_URL;
+    	
+    	@Parameter(names={"-a","--allow_sync_method"}, description="Allow synchonous methods " +
+    			"(advanced option, default is false)")
+        boolean allowSyncMethods = false;
     	
     	@Parameter(description="[path to the module directories]")
         List<String> modules;
@@ -468,6 +474,16 @@ public class ModuleBuilder {
     
     @Parameters(commandDescription = "Test a module with local Docker.")
     private static class TestCommandArgs {
+        @Parameter(names={"-m", "--method_store"}, description="Narrative Method Store URL used in validation " +
+                "(default is " + DEFAULT_METHOD_STORE_URL + ")")
+        String methodStoreUrl = DEFAULT_METHOD_STORE_URL;
+        
+        @Parameter(names={"-s", "--skip_validation"}, description="Will skip validation step (default is false)")
+        boolean skipValidation = false;
+        
+        @Parameter(names={"-a","--allow_sync_method"}, description="Allow synchonous methods " +
+                "(advanced option, part of validation settings, default value is false)")
+        boolean allowSyncMethods = false;
     }
     
     @Parameters(commandDescription = "Print current version of kb-sdk.")

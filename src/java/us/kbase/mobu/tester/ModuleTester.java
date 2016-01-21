@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.yaml.snakeyaml.Yaml;
 import us.kbase.auth.AuthService;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
+import us.kbase.mobu.validator.ModuleValidator;
 import us.kbase.templates.TemplateFormatter;
 
 public class ModuleTester {
@@ -64,7 +66,18 @@ public class ModuleTester {
         }
     }
     
-    public void runTests() throws Exception {
+    public void runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods) throws Exception {
+        if (skipValidation) {
+            System.out.println("Validation step is skipped");
+        } else {
+            ModuleValidator mv = new ModuleValidator(Arrays.asList(moduleDir.getCanonicalPath()), 
+                    false, methodStoreUrl, allowSyncMethods);
+            int returnCode = mv.validateAll();
+            if (returnCode!=0) {
+                System.out.println("You can skip validation step using -s (or --skip_validation) flag");
+                System.exit(returnCode);
+            }
+        }
         String testLocal = "test_local";
         checkIgnoreLine(new File(moduleDir, ".gitignore"), testLocal);
         checkIgnoreLine(new File(moduleDir, ".dockerignore"), testLocal);
