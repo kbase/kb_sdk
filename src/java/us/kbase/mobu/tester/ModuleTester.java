@@ -1,15 +1,20 @@
 package us.kbase.mobu.tester;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -88,7 +93,7 @@ public class ModuleTester {
             tlDir.mkdir();
             TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, new File(tlDir, "readme.txt"));
             TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, new File(tlDir, "test.cfg"));
-            TemplateFormatter.formatTemplate("module_build_run_tests", moduleContext, true, runTestsSh);
+            //TemplateFormatter.formatTemplate("module_build_run_tests", moduleContext, true, runTestsSh);
             TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
             System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
             return;
@@ -126,8 +131,146 @@ public class ModuleTester {
         } finally {
             pw.close();
         }
-        ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
         ProcessHelper.cmd("chmod", "+x", runBashSh.getCanonicalPath()).exec(tlDir);
+        String moduleName = (String)kbaseYmlConfig.get("module-name");
+        String imageName = "test/" + moduleName.toLowerCase() + ":latest";
+        System.out.println();
+        System.out.println("Delete old Docker containers");
+        List<String> lines = exec(tlDir, "docker", "ps", "-a");
+        for (String line : lines) {
+            String[] parts = splitByWhiteSpaces(line);
+            if (parts[1].equals(imageName)) {
+                String cntId = parts[0];
+                ProcessHelper.cmd("docker", "rm", "-v", "-f", cntId).exec(tlDir);
+            }
+        }
+        String oldImageId = findImageIdByName(tlDir, imageName);    
+        System.out.println();
+        System.out.println("Build Docker image");
+        boolean ok = buildImage(moduleDir, imageName);
+        if (!ok)
+            return;
+        if (oldImageId != null) {
+            String newImageId = findImageIdByName(tlDir, imageName);
+            if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
+                System.out.println("Delete old Docker image");
+                ProcessHelper.cmd("docker", "rmi", oldImageId).exec(tlDir);
+            }
+        }
+        String dockerRunCmd = "docker run -v " + tlDir.getCanonicalPath() + "/workdir:" +
+        		"/kb/module/work " + imageName + " test";
+        pw = new PrintWriter(runTestsSh);
+        try {
+            pw.println(dockerRunCmd);
+        } finally {
+            pw.close();
+        }
+        System.out.println();
+        ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
         ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath()).exec(tlDir);
     }
+
+    public String findImageIdByName(File tlDir, String imageName)
+            throws Exception {
+        List<String> lines;
+        String ret = null;
+        lines = exec(tlDir, "docker", "images");
+        for (String line : lines) {
+            String[] parts = splitByWhiteSpaces(line);
+            String name = parts[0] + ":" + parts[1];
+            if (name.equals(imageName)) {
+                ret = parts[2];
+                break;
+            }
+        }
+        return ret;
+    }
+
+    public String[] splitByWhiteSpaces(String line) {
+        String[] parts = line.split("\\s+");
+        return parts;
+    }
+    
+    private static List<String> exec(File workDir, String... cmd) throws Exception {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ProcessHelper.cmd(cmd).exec(workDir, null, pw, pw);
+        pw.close();
+        List<String> ret = new ArrayList<String>();
+        BufferedReader br = new BufferedReader(new StringReader(sw.toString()));
+        while (true) {
+            String l = br.readLine();
+            if (l == null)
+                break;
+            ret.add(l);
+        }
+        br.close();
+        return ret;
+    }
+    
+    private boolean buildImage(File repoDir, String targetImageName) throws Exception {
+        Process p = Runtime.getRuntime().exec(new String[] {"docker", "build", "--rm", "-t", 
+                targetImageName, repoDir.getCanonicalPath()});
+        List<Thread> workers = new ArrayList<Thread>();
+        InputStream[] inputStreams = new InputStream[] {p.getInputStream(), p.getErrorStream()};
+        final String[] cntIdToDelete = {null};
+        final String[] imageIdToDelete = {null};
+        for (int i = 0; i < inputStreams.length; i++) {
+            final InputStream is = inputStreams[i];
+            final boolean isError = i == 1;
+            Thread ret = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                        while (true) {
+                            String line = br.readLine();
+                            if (line == null)
+                                break;
+                            if (isError) {
+                                System.err.println(line);
+                            } else {
+                                System.out.println(line);
+                                if (line.startsWith(" ---> Running in ")) {
+                                    String[] parts = splitByWhiteSpaces(line.trim());
+                                    if (parts.length > 3) {
+                                        String cntId = parts[parts.length - 1];
+                                        cntIdToDelete[0] = cntId;
+                                    }
+                                } else if (line.startsWith(" ---> ")) {
+                                    String[] parts = splitByWhiteSpaces(line.trim());
+                                    if (parts.length > 1) {
+                                        String imageId = parts[parts.length - 1];
+                                        imageIdToDelete[0] = imageId;
+                                    }
+                                }
+                            }
+                        }
+                        br.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new IllegalStateException("Error reading data from executed container", e);
+                    }
+                }
+            });
+            ret.start();
+            workers.add(ret);
+        }
+        for (Thread t : workers)
+            t.join();
+        p.waitFor();
+        int exitCode = p.exitValue();
+        if (exitCode != 0) {
+            try {
+                if (cntIdToDelete[0] != null) {
+                    System.out.println("Cleaning up building container: " + cntIdToDelete[0]);
+                    Thread.sleep(1000);
+                    ProcessHelper.cmd("docker", "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
+                }
+            } catch (Exception ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+        return exitCode == 0;
+    }
+
 }
