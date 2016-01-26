@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -46,8 +45,11 @@ public class ModuleTester {
         Map<String,Object> config = (Map<String, Object>)new Yaml().load(kbaseYml);
         kbaseYmlConfig = config;
         moduleContext = new HashMap<String, Object>();
-        moduleContext.put("module_name", config.get("module-name"));
+        moduleContext.put("module_name", kbaseYmlConfig.get("module-name"));
         moduleContext.put("module_root_path", moduleDir.getAbsolutePath());
+        if (kbaseYmlConfig.get("data-version") != null) {
+            moduleContext.put("data_version", kbaseYmlConfig.get("data-version"));
+        }
     }
     
     private static boolean isModuleDir(File dir) {
@@ -87,16 +89,25 @@ public class ModuleTester {
         checkIgnoreLine(new File(moduleDir, ".gitignore"), testLocal);
         checkIgnoreLine(new File(moduleDir, ".dockerignore"), testLocal);
         File tlDir = new File(moduleDir, testLocal);
-        File runTestsSh = new File(tlDir, "build_run_tests.sh");
+        File runTestsSh = new File(tlDir, "run_tests.sh");
         File runBashSh = new File(tlDir, "run_bash.sh");
         if (!tlDir.exists()) {
             tlDir.mkdir();
             TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, new File(tlDir, "readme.txt"));
             TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, new File(tlDir, "test.cfg"));
-            //TemplateFormatter.formatTemplate("module_build_run_tests", moduleContext, true, runTestsSh);
+            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
             TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
             System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
             return;
+        } if (kbaseYmlConfig.get("data-version") != null) {
+            File refDataDir = new File(tlDir, "refdata");
+            if (!refDataDir.exists()) {
+                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
+                refDataDir.mkdir();
+            }
+        }
+        if (!runTestsSh.exists()) {
+            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
         }
         Properties props = new Properties();
         InputStream is = new FileInputStream(new File(tlDir, "test.cfg"));
@@ -157,13 +168,15 @@ public class ModuleTester {
                 ProcessHelper.cmd("docker", "rmi", oldImageId).exec(tlDir);
             }
         }
-        String dockerRunCmd = "docker run -v " + tlDir.getCanonicalPath() + "/workdir:" +
-        		"/kb/module/work " + imageName + " test";
-        pw = new PrintWriter(runTestsSh);
-        try {
-            pw.println(dockerRunCmd);
-        } finally {
-            pw.close();
+        if (!runTestsSh.exists()) {
+            pw = new PrintWriter(runTestsSh);
+            try {
+                String dockerRunCmd = "docker run -v " + tlDir.getCanonicalPath() + "/workdir:" +
+                        "/kb/module/work " + imageName + " test";
+                pw.println(dockerRunCmd);
+            } finally {
+                pw.close();
+            }
         }
         System.out.println();
         ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
