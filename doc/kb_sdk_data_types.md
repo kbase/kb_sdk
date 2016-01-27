@@ -121,7 +121,7 @@ The GenomeSet is a data object for grouping Genomes.
 
 ##### data structure
 
-Note: either ref or data is defined for an element, but not both.
+Note: either *ref* or *data* is defined for an element, but not both.
 - optional metadata
 - optional ref
 - optional data
