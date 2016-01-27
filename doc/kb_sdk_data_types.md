@@ -95,14 +95,37 @@ A ContigSet object contains contiguous regions of DNA sequences (e.g. a set of g
 
 ##### data structure
 
-
+```
+    { id: 'ContigSet_id',
+      name: '',
+      md5: '',
+      source_id: '',
+      source: '',
+      type: '',
+      reads_ref: '',
+      fasta_ref: '',
+      contigs: [ { id: '',
+                   length: <seq_bp_len>,
+                    md5: '',
+                    sequence: '',
+                    genetic_code: <genetic_code (def: 11)>,
+                    cell_compartment: '',
+                    replicon_type: '',
+                    replicon_geometry: '',
+                    name: '',
+                    description: '',
+                    complete: <T/F> },
+                  ...
+               ]
+    }
+```
 
 ##### setup
 The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
 
 ```
-from biokbase.workspace.client import Workspace as workspaceService
-from Bio import SeqIO
+    from biokbase.workspace.client import Workspace as workspaceService
+    from Bio import SeqIO
 
     def __init__(self, config):
         self.workspaceURL = config['workspace-url']
