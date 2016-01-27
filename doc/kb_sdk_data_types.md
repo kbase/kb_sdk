@@ -124,7 +124,7 @@ Note: either ref or data is defined for an element, but not both.
 - optional ref
 - optional data
 
-
+```
     { description: ‘genome_set_name’,
       elements : { ‘genome_name1_1’: { metadata: {‘f1’: ‘v1’,
                                                    ‘f2’: ‘v2’,
@@ -136,7 +136,7 @@ Note: either ref or data is defined for an element, but not both.
                     ‘genome_name_2’: ...
                   }
     }
-
+```
 
 ##### obtaining
 ##### using
