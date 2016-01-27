@@ -46,7 +46,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 
 ## KBase Data Objects
 
-- [SingleEndLibrary](#SingleEndLibrary)
+- [SingleEndLibrary](#single-end-library)
 - PairedEndLibrary
 - ContigSet
 - ReferenceAssembly
@@ -65,7 +65,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 - PhenotypeSet
 
 
-#### SingleEndLibrary
+#### [SingleEndLibrary](#single-end-library)
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary-2.1
 
 ##### data structure
