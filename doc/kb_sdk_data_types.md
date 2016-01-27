@@ -27,7 +27,7 @@ Supported types include:
 - n | dna     => dna sequence object or CDS data, often given as the MD5 of the sequence
 - f | feature => feature object or CDS data
 
-*NOTE: THERE ARE MORE THAT SHOULD BE LISTED HERE*
+**NOTE: THERE ARE MORE THAT SHOULD BE LISTED HERE**
 
 
 #### ws_obj_id
@@ -63,6 +63,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 - ProbAnno
 - ExpressionSeries
 - PhenotypeSet
+- Network
 
 
 #### [SingleEndLibrary](#single-end-library)
@@ -115,9 +116,9 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet-2.1
 ##### data structure
 
 Note: either ref or data is defined for an element, but not both.
-@optional metadata
-@optional ref
-@optional data
+- optional metadata
+- optional ref
+- optional data
 
 
     { description: ‘genome_set_name’,
@@ -233,3 +234,10 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### using
 ##### storing
 
+
+#### Network
+
+##### data structure
+##### obtaining
+##### using
+##### storing
