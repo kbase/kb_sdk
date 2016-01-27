@@ -102,6 +102,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 ```
 from biokbase.workspace.client import Workspace as workspaceService
+from Bio import SeqIO
 
     def __init__(self, config):
         self.workspaceURL = config['workspace-url']
