@@ -4,7 +4,7 @@
 
 Some, but not all, of the KBase data type definitions are available at
 
-    https://github.com/kbase/data_api/tree/develop/experiments/workspace_typespecs.
+    https://github.com/kbase/data_api/tree/develop/experiments/workspace_typespecs
 
 Others may be examined by selecting an object of that type in a Narrative and clicking on the type to open the Landing Page for that type (make sure you click on the object type on the right, not the grouping on the left).
 Then click on the 'Spec-file' tab.
@@ -63,6 +63,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 - ProbAnno
 - ExpressionSeries
 - PhenotypeSet
+- PhenotypeSimulationSet
 - Network
 
 
@@ -228,6 +229,14 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 
 
 #### PhenotypeSet
+
+##### data structure
+##### obtaining
+##### using
+##### storing
+
+
+#### PhenotypeSimulationSet
 
 ##### data structure
 ##### obtaining
