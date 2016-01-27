@@ -97,9 +97,10 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet-2.1
 ##### data structure
 
 Note: either ref or data is defined for an element, but not both.
-- @optional metadata
-- @optional ref
-- @optional data
+@optional metadata
+@optional ref
+@optional data
+
 
     { description: ‘genome_set_name’,
       elements : { ‘genome_name1_1’: { metadata: {‘f1’: ‘v1’,
