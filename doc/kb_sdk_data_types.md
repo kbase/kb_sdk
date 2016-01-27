@@ -47,30 +47,30 @@ The fully qualified name of a workspace object that includes the workspace name.
 ## KBase Data Objects
 
 - [SingleEndLibrary](#single-end-library)
-- PairedEndLibrary
-- ContigSet
-- ReferenceAssembly
-- FeatureSet
-- GenomeSet
-- Genome
-- DomainAnnotation
-- Pangenome
-- ProteomeComparison
-- FBAModel
-- FBA
-- Media
-- RxnProbs
-- ProbAnno
-- ExpressionSeries
-- FloatDataTable
-- RNASeqSample
-- RNASeqSampleAlignment
-- PhenotypeSet
-- PhenotypeSimulationSet
-- Network
+- [PairedEndLibrary](#paired-end-library)
+- [ContigSet](#contig-set)
+- [ReferenceAssembly](#reference-assembly)
+- [FeatureSet](#feature-set)
+- [GenomeSet](#genome-set)
+- [Genome](#genome)
+- [DomainAnnotation](#domain-annotation)
+- [Pangenome](#pangenome)
+- [ProteomeComparison](#proteome-comparison)
+- [FBAModel](#fba-model)
+- [FBA](#fba)
+- [Media](#media)
+- [RxnProbs](#rxn-probs)
+- [ProbAnno](#prob-anno)
+- [ExpressionSeries](#expression-series)
+- [FloatDataTable](#float-data-table)
+- [RNASeqSample](#rna-seq-sample)
+- [RNASeqSampleAlignment](#rna-seq-sample-alignment)
+- [PhenotypeSet](#phenotype-set)
+- [PhenotypeSimulationSet](#phenotype-simulation-set)
+- [Network](#network)
 
 
-#### <A NAME="single-end-library"></a>SingleEndLibrary
+#### <A NAME="single-end-library"></A> SingleEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary-2.1
 
 ##### data structure
@@ -79,7 +79,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLi
 ##### storing
 
 
-#### PairedEndLibrary
+#### <A NAME="paired-end-library"></A> PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary-2.1
 
 ##### data structure
