@@ -10,12 +10,12 @@ Then click on the 'Spec-file' tab.
 
 ## Base KBase and Workspace IDs and references
 
-### kbase_id
+#### kbase_id
 
 A KBase ID is a string starting with the characters "kb|".  KBase IDs are typed. The types are designated using a short string. For instance," g" denotes a genome, "tree" denotes a Tree, and "aln" denotes a sequence alignment. KBase IDs may be hierarchical.  For example, if a KBase genome identifier is "kb|g.1234", a protein encoding gene within that genome may be represented as "kb|g.1234.peg.771".
 
 
-### ref_type
+#### ref_type
 
 An enumeration of reference types for a node.  Either the one letter abbreviation or full name can be given.
 
@@ -28,17 +28,17 @@ Supported types include:
 *NOTE: THERE ARE MORE THAT SHOULD BE LISTED HERE*
 
 
-### ws_obj_id
+#### ws_obj_id
 
 The fully qualified name of a workspace object that includes the workspace name.  For example:
 
     dylan:1424477476805/Carsonella_10.genome_set
 
 
-### workspace_id / workspace?
+#### workspace_id / workspace?
 
 
-### workspace_name / workspace?
+#### workspace_name / workspace?
 
 
 
@@ -54,39 +54,45 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLi
 ##### storing
 
 
-### PairedEndLibrary
+#### PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary-2.1
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### ContigSet
+#### ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### ReferenceAssembly
+#### ReferenceAssembly
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly-2.1
 
-### FeatureSet
-
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### GenomeSet
+#### FeatureSet
+
+##### data structure
+##### obtaining
+##### using
+##### storing
+
+
+#### GenomeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet-2.1
 
-#### data structure
+##### data structure
 
 Note: either ref or data is defined for an element, but not both.
 - @optional metadata
@@ -107,86 +113,86 @@ Note: either ref or data is defined for an element, but not both.
     }
 
 
-#### obtaining
-#### using
-#### storing
+##### obtaining
+##### using
+##### storing
 
 
-### Genome
+#### Genome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome-8.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### DomainAnnotation
+#### DomainAnnotation
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation-2.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### Pangenome
+#### Pangenome
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### ProteomeComparison
+#### ProteomeComparison
 https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison-2.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### FBAModel
+#### FBAModel
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel-7.1
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### FBA
+#### FBA
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA-12.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### Media
+#### Media
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media-1.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### RxnProbs
+#### RxnProbs
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.RxnProbs-1.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
 
 
-### ProbAnno
+#### ProbAnno
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.ProbAnno-1.0
 
-#### data structure
-#### obtaining
-#### using
-#### storing
+##### data structure
+##### obtaining
+##### using
+##### storing
