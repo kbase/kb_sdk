@@ -91,10 +91,94 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLi
 #### <A NAME="contig-set"></A>ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.0
 
+A ContigSet object contains contiguous regions of DNA sequences (e.g. a set of genome fragments)
+
 ##### data structure
+
+
+
+##### setup
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+
+```
+from biokbase.workspace.client import Workspace as workspaceService
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
 ##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+
+```
+    def method_name(self, ctx, input):
+        token = ctx['token']
+        wsClient = workspaceService(self.workspaceURL, token=token)
+        contigSet = wsClient.get_objects([{'ref': input['input_ws']+'/'+input['contigset_id']}])[0]['data']
+```
+
 ##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+
+```
+        for contig in contigSet['contigs']:
+            contig_count += 1
+            if len(contig['sequence']) >= int(input['min_length']):
+                passing_contigs.append(contig)
+```
+
 ##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+        # parse the output and save back to KBase
+        output_contigs = os.path.join(output_dir, 'final.contigs.fa')
+
+        # Warning: this reads everything into memory!  Will not work if 
+        # the contigset is very large!
+        contigset_data = {
+            'id':'megahit.contigset',
+            'source':'User assembled contigs from reads in KBase',
+            'source_id':'none',
+            'md5': 'md5 of what? concat seq? concat md5s?',
+            'contigs':[]
+        }
+
+        lengths = []
+        for seq_record in SeqIO.parse(output_contigs, 'fasta'):
+            contig = {
+                'id':seq_record.id,
+                'name':seq_record.name,
+                'description':seq_record.description,
+                'length':len(seq_record.seq),
+                'sequence':str(seq_record.seq),
+                'md5':hashlib.md5(str(seq_record.seq)).hexdigest()
+            }
+            lengths.append(contig['length'])
+            contigset_data['contigs'].append(contig)
+
+
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
+
+        # save the contigset output
+        new_obj_info = ws.save_objects({
+                'id':info[6], # set the output workspace ID
+                'objects':[
+                    {
+                        'type':'KBaseGenomes.ContigSet',
+                        'data':contigset_data,
+                        'name':params['output_contigset_name'],
+                        'meta':{},
+                        'provenance':provenance
+                    }
+                ]
+            })
+```
 
 
 #### <A NAME="reference-assembly"></A>ReferenceAssembly
@@ -141,13 +225,13 @@ Note: either *ref* or *data* is defined for an element, but not both.
 ```
 
 ##### obtaining
-The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving a data object of this type.
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
 
 ##### using
-The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating a data object of this type.
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
 
 ##### storing
-The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing a data object of this type.
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
 
 
 #### <A NAME="genome"></A>Genome
