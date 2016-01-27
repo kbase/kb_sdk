@@ -91,30 +91,43 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLi
 #### <A NAME="contig-set"></A>ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.0
 
-A ContigSet object contains contiguous regions of DNA sequences (e.g. a set of genome fragments)
+A ContigSet object contains contiguous regions of DNA/RNA sequences (e.g. a set of genome fragments)
 
 ##### data structure
+- optional: name
+- optional: type 
+- optional: reads_ref
+- optional: fasta_ref
+- optional: length
+- optional: md5
+- optional: genetic_code
+- optional: cell_compartment
+- optional: replicon_geometry
+- optional: replicon_type
+- optional: description
+- optional: complete
 
 ```
-    { id: 'ContigSet_id',
-      name: '',
-      md5: '',
-      source_id: '',
-      source: '',
-      type: '',
-      reads_ref: '',
-      fasta_ref: '',
-      contigs: [ { id: '',
-                   length: <seq_bp_len>,
-                    md5: '',
-                    sequence: '',
-                    genetic_code: <genetic_code (def: 11)>,
-                    cell_compartment: '',
-                    replicon_type: '',
-                    replicon_geometry: '',
-                    name: '',
-                    description: '',
-                    complete: <T/F> },
+    { id: 'ContigSet_kbase_id',
+      name: 'ContigSet_name',                    # user defined
+      md5: 'md5_chksum',                         # md5 checksum of the contigs sequences
+      source_id: 'source_kbase_id',              # source kbase_id of the ContigSet
+      source: 'source',                          # source name of the ContigSet
+      type: 'ContigSet_type',                    # values are Genome,Transcripts,Environment,Collection
+      reads_ref: 'reads_kbase_ref ',             # ref to shock node with the raw reads from which contigs were assembled
+      fasta_ref: 'fasta_kbase_ref',              # ref to fasta file source
+      contigs: [ { id: 'contig_id',              # id (not kbase_id) of the contig in the set
+                   length: <seq_bp_len>,         # length in bases of the contig sequence
+                   md5: 'md5_chksum',            # md5 checksum of the individual contig sequence
+                   sequence: 'ACGTACGT...',      # the contig sequence itself
+                   genetic_code: <genetic_code>  # def: 11
+                   cell_compartment: 'compart',  # e.g. "nucleus"
+                   replicon_type: 'rep_type',    # e.g. plasmid
+                   replicon_geometry: 'geom',    # e.g. "linear", "circular"
+                   name: 'contig_name',          # name
+                   description: 'desc',          # contig description
+                   complete: <0/1>               # is contig a complete chromosome/plasmid?  0=FALSE, 1=TRUE
+                 },
                   ...
                ]
     }
