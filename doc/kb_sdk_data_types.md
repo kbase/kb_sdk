@@ -70,7 +70,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 - [Network](#network)
 
 
-#### <A NAME="single-end-library"></A> SingleEndLibrary
+#### <A NAME="single-end-library"></A>SingleEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary-2.1
 
 ##### data structure
@@ -79,7 +79,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLi
 ##### storing
 
 
-#### <A NAME="paired-end-library"></A> PairedEndLibrary
+#### <A NAME="paired-end-library"></A>PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary-2.1
 
 ##### data structure
@@ -88,7 +88,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLi
 ##### storing
 
 
-#### ContigSet
+#### <A NAME="contig-set"></A>ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.0
 
 ##### data structure
@@ -97,7 +97,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.
 ##### storing
 
 
-#### ReferenceAssembly
+#### <A NAME="reference-assembly"></A>ReferenceAssembly
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly-2.1
 
 ##### data structure
@@ -106,7 +106,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAs
 ##### storing
 
 
-#### FeatureSet
+#### <A NAME="feature-set"></A>FeatureSet
 
 ##### data structure
 ##### obtaining
@@ -114,7 +114,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAs
 ##### storing
 
 
-#### GenomeSet
+#### <A NAME="genome-set"></A>GenomeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet-2.1
 
 ##### data structure
@@ -143,7 +143,7 @@ Note: either ref or data is defined for an element, but not both.
 ##### storing
 
 
-#### Genome
+#### <A NAME="genome"></A>Genome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome-8.0
 
 ##### data structure
@@ -152,7 +152,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome-8.0
 ##### storing
 
 
-#### DomainAnnotation
+#### <A NAME="domain-annotation"></A>DomainAnnotation
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation-2.0
 
 ##### data structure
@@ -161,7 +161,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainA
 ##### storing
 
 
-#### Pangenome
+#### <A NAME="pangenome"></A>Pangenome
 
 ##### data structure
 ##### obtaining
@@ -169,7 +169,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainA
 ##### storing
 
 
-#### ProteomeComparison
+#### <A NAME="proteome-comparison"></A>ProteomeComparison
 https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison-2.0
 
 ##### data structure
@@ -178,7 +178,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.Proteome
 ##### storing
 
 
-#### FBAModel
+#### <A NAME="fba-model"></A>FBAModel
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel-7.1
 
 ##### data structure
@@ -187,7 +187,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel-7.1
 ##### storing
 
 
-#### FBA
+#### <A NAME="fba"></A>FBA
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA-12.0
 
 ##### data structure
@@ -196,7 +196,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA-12.0
 ##### storing
 
 
-#### Media
+#### <A NAME="media"></A>Media
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media-1.0
 
 ##### data structure
@@ -205,7 +205,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media-1.0
 ##### storing
 
 
-#### RxnProbs
+#### <A NAME="rxn-probs"></A>RxnProbs
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.RxnProbs-1.0
 
 ##### data structure
@@ -214,7 +214,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.R
 ##### storing
 
 
-#### ProbAnno
+#### <A NAME="prob-anno"></A>ProbAnno
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.ProbAnno-1.0
 
 ##### data structure
@@ -223,7 +223,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### ExpressionSeries
+#### <A NAME="expression-series"></A>ExpressionSeries
 
 ##### data structure
 ##### obtaining
@@ -231,7 +231,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### FloatDataTable
+#### <A NAME="float-data-table"></A>FloatDataTable
 
 ##### data structure
 ##### obtaining
@@ -239,7 +239,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### RNASeqSample
+#### <A NAME="rna-seq-sample"></A>RNASeqSample
 
 ##### data structure
 ##### obtaining
@@ -247,7 +247,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### RNASeqSampleAlignment
+#### <A NAME="rna-seq-sample-alignment"></A>RNASeqSampleAlignment
 
 ##### data structure
 ##### obtaining
@@ -255,7 +255,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### PhenotypeSet
+#### <A NAME="phenotype-set"></A>PhenotypeSet
 
 ##### data structure
 ##### obtaining
@@ -263,7 +263,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### PhenotypeSimulationSet
+#### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
 
 ##### data structure
 ##### obtaining
@@ -271,7 +271,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 ##### storing
 
 
-#### Network
+#### <A NAME="network"></A>Network
 
 ##### data structure
 ##### obtaining
