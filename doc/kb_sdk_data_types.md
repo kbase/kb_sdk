@@ -141,8 +141,13 @@ Note: either *ref* or *data* is defined for an element, but not both.
 ```
 
 ##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving a data object of this type.
+
 ##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating a data object of this type.
+
 ##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing a data object of this type.
 
 
 #### <A NAME="genome"></A>Genome
