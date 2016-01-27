@@ -46,7 +46,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 
 ## KBase Data Objects
 
-- [SingleEndLibrary]
+- [SingleEndLibrary](#SingleEndLibrary)
 - PairedEndLibrary
 - ContigSet
 - ReferenceAssembly
