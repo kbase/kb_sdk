@@ -117,6 +117,8 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAs
 #### <A NAME="genome-set"></A>GenomeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet-2.1
 
+The GenomeSet is a data object for grouping Genomes.
+
 ##### data structure
 
 Note: either ref or data is defined for an element, but not both.
@@ -127,7 +129,7 @@ Note: either ref or data is defined for an element, but not both.
 ```
     { description: ‘genome_set_name’,
       elements : { ‘genome_name1_1’: { metadata: {‘f1’: ‘v1’,
-                                                   ‘f2’: ‘v2’,
+                                                  ‘f2’: ‘v2’,
                                                    ...
                                                  }
                                        ref: ‘genome_ws_ref’,
