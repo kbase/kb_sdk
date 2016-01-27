@@ -62,6 +62,8 @@ The fully qualified name of a workspace object that includes the workspace name.
 - RxnProbs
 - ProbAnno
 - ExpressionSeries
+- RNASeqSample
+- RNASeqSampleAlignment
 - PhenotypeSet
 - PhenotypeSimulationSet
 - Network
@@ -221,6 +223,22 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 
 
 #### ExpressionSeries
+
+##### data structure
+##### obtaining
+##### using
+##### storing
+
+
+#### RNASeqSample
+
+##### data structure
+##### obtaining
+##### using
+##### storing
+
+
+#### RNASeqSampleAlignment
 
 ##### data structure
 ##### obtaining
