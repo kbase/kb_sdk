@@ -94,18 +94,19 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.
 A ContigSet object contains contiguous regions of DNA/RNA sequences (e.g. a set of genome fragments)
 
 ##### data structure
-- optional: name
-- optional: type 
-- optional: reads_ref
-- optional: fasta_ref
-- optional: length
-- optional: md5
-- optional: genetic_code
-- optional: cell_compartment
-- optional: replicon_geometry
-- optional: replicon_type
-- optional: description
-- optional: complete
+optional:
+- name
+- type 
+- reads_ref
+- fasta_ref
+- length
+- md5
+- genetic_code
+- cell_compartment
+- replicon_geometry
+- replicon_type
+- description
+- complete
 
 ```
     { id: 'ContigSet_kbase_id',
