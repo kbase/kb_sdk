@@ -80,7 +80,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 - [Network](#network) (MISSING)
 
 
-#### <A NAME="single-end-library"></A>SingleEndLibrary
+### <A NAME="single-end-library"></A>SingleEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary
 
 ##### data structure
@@ -198,7 +198,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 ```
 
-#### <A NAME="paired-end-library"></A>PairedEndLibrary
+### <A NAME="paired-end-library"></A>PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary
 
 ##### data structure
@@ -394,7 +394,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 
-#### <A NAME="contig-set"></A>ContigSet
+### <A NAME="contig-set"></A>ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet
 
 A ContigSet object contains contiguous regions of DNA/RNA sequences (e.g. a set of genome fragments)
@@ -525,7 +525,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 
-#### <A NAME="feature-set"></A>FeatureSet
+### <A NAME="feature-set"></A>FeatureSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseCollections.FeatureSet
 
 ##### data structure
@@ -615,7 +615,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 
-#### <A NAME="genome"></A>Genome
+### <A NAME="genome"></A>Genome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 
 ##### data structure
@@ -683,7 +683,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 
 
-#### <A NAME="tree"></A>Tree
+### <A NAME="tree"></A>Tree
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.Tree
 
 Phylogenetic trees may represent the evolutionary relationships of either species/genomes or genes.
@@ -753,92 +753,89 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 
-#### <A NAME="pangenome"></A>Pangenome
+### <A NAME="pangenome"></A>Pangenome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Pangenome
 
 
 
-#### <A NAME="proteome-comparison"></A>GenomeComparison
+### <A NAME="proteome-comparison"></A>GenomeComparison
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.GenomeComparison
 
 
 
-#### <A NAME="proteome-comparison"></A>ProteomeComparison
+### <A NAME="proteome-comparison"></A>ProteomeComparison
 https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison
 
 
 
-#### <A NAME="reference-assembly"></A>ReferenceAssembly
+### <A NAME="reference-assembly"></A>ReferenceAssembly
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly
 
 
 
-#### <A NAME="fba-model"></A>FBAModel
+### <A NAME="fba-model"></A>FBAModel
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel
 
 
 
-#### <A NAME="fba"></A>FBA
+### <A NAME="fba"></A>FBA
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA
 
 
 
-#### <A NAME="media"></A>Media
+### <A NAME="media"></A>Media
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media
 
 
 
-#### <A NAME="rxn-probs"></A>RxnProbs
+### <A NAME="rxn-probs"></A>RxnProbs
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.RxnProbs
 
 
 
-#### <A NAME="prob-anno"></A>ProbAnno
+### <A NAME="prob-anno"></A>ProbAnno
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.ProbAnno
 
 
 
-#### <A NAME="expression-matrix"></A>ExpressionMatrix
+### <A NAME="expression-matrix"></A>ExpressionMatrix
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFeatureValues.ExpressionMatrix
 
 
 
-#### <A NAME="feature-clusters"></A>FeatureClusters
+### <A NAME="feature-clusters"></A>FeatureClusters
 
 
 
-#### <A NAME="estimate-k-result"></A>EstimateKResult
+### <A NAME="estimate-k-result"></A>EstimateKResult
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFeatureValues.EstimateKResult
 
 
 
+### <A NAME="expression-series"></A>ExpressionSeries
 
 
 
-#### <A NAME="expression-series"></A>ExpressionSeries
+### <A NAME="float-data-table"></A>FloatDataTable
 
 
 
-#### <A NAME="float-data-table"></A>FloatDataTable
+### <A NAME="rna-seq-sample"></A>RNASeqSample
 
 
 
-#### <A NAME="rna-seq-sample"></A>RNASeqSample
+### <A NAME="rna-seq-sample-alignment"></A>RNASeqSampleAlignment
 
 
 
-#### <A NAME="rna-seq-sample-alignment"></A>RNASeqSampleAlignment
-
-
-
-#### <A NAME="phenotype-set"></A>PhenotypeSet
+### <A NAME="phenotype-set"></A>PhenotypeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBasePhenotypes.PhenotypeSet
 
 
 
-#### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
+### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
 
 
 
-#### <A NAME="network"></A>Network
+### <A NAME="network"></A>Network
 
