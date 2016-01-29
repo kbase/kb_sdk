@@ -49,11 +49,12 @@ The fully qualified name of a workspace object that includes the workspace name.
 - [SingleEndLibrary](#single-end-library)
 - [PairedEndLibrary](#paired-end-library)
 - [ContigSet](#contig-set)
-- [ReferenceAssembly](#reference-assembly)
 - [FeatureSet](#feature-set)
 - [GenomeSet](#genome-set)
 - [Genome](#genome)
 - [DomainAnnotation](#domain-annotation)
+
+- [ReferenceAssembly](#reference-assembly)
 - [Pangenome](#pangenome)
 - [ProteomeComparison](#proteome-comparison)
 - [FBAModel](#fba-model)
@@ -268,15 +269,6 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 ```
 
 
-#### <A NAME="reference-assembly"></A>ReferenceAssembly
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly-2.1
-
-##### data structure
-##### obtaining
-##### using
-##### storing
-
-
 #### <A NAME="feature-set"></A>FeatureSet
 
 ##### data structure
@@ -390,6 +382,39 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation-2.0
+##### data structure
+
+##### setup
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+
+```
+    from biokbase.workspace.client import Workspace as workspaceService
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
+##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+
+```
+```
+
+##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+
+```
+```
+
+##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+```
+
+
+#### <A NAME="reference-assembly"></A>ReferenceAssembly
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly-2.1
 
 
 
