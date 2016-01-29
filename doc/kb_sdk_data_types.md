@@ -62,6 +62,9 @@ The fully qualified name of a workspace object that includes the workspace name.
 - [Media](#media) (MISSING)
 - [RxnProbs](#rxn-probs) (MISSING)
 - [ProbAnno](#prob-anno) (MISSING)
+- [ExpressionMatrix](#expression-matrix) (MISSING)
+- [FeatureClusters](#feature-clusters) (MISSING)
+- [EstimateKResult](#estimate-k-result) (MISSING)
 - [ExpressionSeries](#expression-series) (MISSING)
 - [FloatDataTable](#float-data-table) (MISSING)
 - [RNASeqSample](#rna-seq-sample) (MISSING)
@@ -749,6 +752,11 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Pangenome
 
 
 
+#### <A NAME="proteome-comparison"></A>GenomeComparison
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.GenomeComparison
+
+
+
 #### <A NAME="proteome-comparison"></A>ProteomeComparison
 https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison
 
@@ -784,6 +792,23 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 
 
 
+#### <A NAME="expression-matrix"></A>ExpressionMatrix
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseFeatureValues.ExpressionMatrix
+
+
+
+#### <A NAME="feature-clusters"></A>FeatureClusters
+
+
+
+#### <A NAME="estimate-k-result"></A>EstimateKResult
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseFeatureValues.EstimateKResult
+
+
+
+
+
+
 #### <A NAME="expression-series"></A>ExpressionSeries
 
 
@@ -802,6 +827,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 
 #### <A NAME="phenotype-set"></A>PhenotypeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBasePhenotypes.PhenotypeSet
+
 
 
 #### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
