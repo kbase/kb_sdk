@@ -42,12 +42,15 @@ The fully qualified name of a workspace object that includes the workspace name.
 
     dylan:1424477476805/Carsonella_10.genome_set
 
+**NEED CLARIFICATION BETWEEN THESE**
 
 #### workspace_id / workspace?
 
+**NEED CLARIFICATION BETWEEN THESE**
 
 #### workspace_name / workspace?
 
+**NEED CLARIFICATION BETWEEN THESE**
 
 
 ## KBase Data Objects
