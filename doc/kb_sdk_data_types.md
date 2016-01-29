@@ -93,7 +93,8 @@ SingleEndLibrary objects are often quite large and the bulky sequence data is th
 
 ##### data structure
 
-KBaseFile SingleEndLibrary definition
+**KBaseFile SingleEndLibrary definition**
+
 optional:
 - file_name
 - remote_md5
@@ -154,7 +155,8 @@ optional:
     }
 ```
 
-KBaseAssembly SingleEndLibrary definition
+**KBaseAssembly SingleEndLibrary definition**
+
 optional:
 - hid
 - file_name
