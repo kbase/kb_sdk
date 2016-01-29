@@ -72,7 +72,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 
 
 #### <A NAME="single-end-library"></A>SingleEndLibrary
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary-2.1
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary
 
 ##### data structure
 
@@ -90,7 +90,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 ##### obtaining
-The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```
         #### Get the read library
@@ -190,7 +190,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 ```
 
 #### <A NAME="paired-end-library"></A>PairedEndLibrary
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary-2.1
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary
 
 ##### data structure
 
@@ -386,7 +386,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 
 #### <A NAME="contig-set"></A>ContigSet
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet-3.0
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet
 
 A ContigSet object contains contiguous regions of DNA/RNA sequences (e.g. a set of genome fragments)
 
@@ -517,8 +517,21 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 
 #### <A NAME="feature-set"></A>FeatureSet
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseCollections.FeatureSet
 
 ##### data structure
+optional:
+- description
+- element_ordering
+
+```
+    { description: 'user_defined_name_or_desc_for_set',
+      element_ordering: ['feature_1_kbase_id', 'feature_2_kbase_id', ...],
+      elements: { 'feature_1_kbase_id': ['source_A_genome_ref', 'source_B_genome_ref', ...]
+    }
+      
+```
+
 ##### setup
 The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
 
@@ -549,7 +562,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 
 #### <A NAME="genome-set"></A>GenomeSet
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet-2.1
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet
 
 The GenomeSet is a data object for grouping Genomes.
 
@@ -594,7 +607,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 
 #### <A NAME="genome"></A>Genome
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome-8.0
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 
 ##### data structure
 
@@ -628,7 +641,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation-2.0
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation
 ##### data structure
 
 ##### setup
@@ -661,7 +674,7 @@ The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py 
 
 
 #### <A NAME="reference-assembly"></A>ReferenceAssembly
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly-2.1
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAssembly
 
 
 
@@ -670,32 +683,32 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAs
 
 
 #### <A NAME="proteome-comparison"></A>ProteomeComparison
-https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison-2.0
+https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison
 
 
 
 #### <A NAME="fba-model"></A>FBAModel
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel-7.1
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel
 
 
 
 #### <A NAME="fba"></A>FBA
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA-12.0
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA
 
 
 
 #### <A NAME="media"></A>Media
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media-1.0
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media
 
 
 
 #### <A NAME="rxn-probs"></A>RxnProbs
-https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.RxnProbs-1.0
+https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.RxnProbs
 
 
 
 #### <A NAME="prob-anno"></A>ProbAnno
-https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.ProbAnno-1.0
+https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.ProbAnno
 
 
 
@@ -716,7 +729,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.P
 
 
 #### <A NAME="phenotype-set"></A>PhenotypeSet
-
+https://narrative.kbase.us/functional-site/#/spec/type/KBasePhenotypes.PhenotypeSet
 
 
 #### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
