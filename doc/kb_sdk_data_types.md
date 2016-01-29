@@ -74,18 +74,67 @@ The fully qualified name of a workspace object that includes the workspace name.
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary-2.1
 
 ##### data structure
-##### obtaining
-##### using
-##### storing
 
+##### setup
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+
+```
+    from biokbase.workspace.client import Workspace as workspaceService
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
+##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+
+```
+```
+
+##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+
+```
+```
+
+##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+```
 
 #### <A NAME="paired-end-library"></A>PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary-2.1
 
 ##### data structure
+
+##### setup
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+
+```
+    from biokbase.workspace.client import Workspace as workspaceService
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
 ##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+
+```
+```
+
 ##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+
+```
+```
+
 ##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+```
 
 
 #### <A NAME="contig-set"></A>ContigSet
@@ -231,9 +280,33 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.ReferenceAs
 #### <A NAME="feature-set"></A>FeatureSet
 
 ##### data structure
+##### setup
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+
+```
+    from biokbase.workspace.client import Workspace as workspaceService
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
 ##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+
+```
+```
+
 ##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+
+```
+```
+
 ##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+```
 
 
 #### <A NAME="genome-set"></A>GenomeSet
@@ -265,144 +338,118 @@ Note: either *ref* or *data* is defined for an element, but not both.
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
 
+```
+```
+
 ##### using
 The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
 
+```
+```
+
 ##### storing
 The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+```
 
 
 #### <A NAME="genome"></A>Genome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome-8.0
 
 ##### data structure
+
+##### setup
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+
+```
+    from biokbase.workspace.client import Workspace as workspaceService
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
 ##### obtaining
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for retrieving the data object.
+
+```
+```
+
 ##### using
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+
+```
+```
+
 ##### storing
+The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for storing the data object.
+
+```
+```
 
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation-2.0
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="pangenome"></A>Pangenome
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="proteome-comparison"></A>ProteomeComparison
 https://narrative.kbase.us/functional-site/#/spec/type/GenomeComparison.ProteomeComparison-2.0
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="fba-model"></A>FBAModel
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBAModel-7.1
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="fba"></A>FBA
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFBA.FBA-12.0
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="media"></A>Media
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseBiochem.Media-1.0
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="rxn-probs"></A>RxnProbs
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.RxnProbs-1.0
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="prob-anno"></A>ProbAnno
 https://narrative.kbase.us/functional-site/#/spec/type/ProbabilisticAnnotation.ProbAnno-1.0
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="expression-series"></A>ExpressionSeries
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="float-data-table"></A>FloatDataTable
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="rna-seq-sample"></A>RNASeqSample
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="rna-seq-sample-alignment"></A>RNASeqSampleAlignment
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="phenotype-set"></A>PhenotypeSet
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
 
-##### data structure
-##### obtaining
-##### using
-##### storing
 
 
 #### <A NAME="network"></A>Network
 
-##### data structure
-##### obtaining
-##### using
-##### storing
