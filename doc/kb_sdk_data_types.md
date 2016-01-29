@@ -297,7 +297,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 ##### using
-The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for manipulating the data object.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```
         # construct the command
