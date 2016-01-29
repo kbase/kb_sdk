@@ -54,21 +54,21 @@ The fully qualified name of a workspace object that includes the workspace name.
 - [Genome](#genome)
 - [DomainAnnotation](#domain-annotation)
 - [Tree](#tree)
-- *[Pangenome](#pangenome)
-- *[ProteomeComparison](#proteome-comparison)
-- *[ReferenceAssembly](#reference-assembly)
-- *[FBAModel](#fba-model)
-- *[FBA](#fba)
-- *[Media](#media)
-- *[RxnProbs](#rxn-probs)
-- *[ProbAnno](#prob-anno)
-- *[ExpressionSeries](#expression-series)
-- *[FloatDataTable](#float-data-table)
-- *[RNASeqSample](#rna-seq-sample)
-- *[RNASeqSampleAlignment](#rna-seq-sample-alignment)
-- *[PhenotypeSet](#phenotype-set)
-- *[PhenotypeSimulationSet](#phenotype-simulation-set)
-- *[Network](#network)
+- [Pangenome](#pangenome) (MISSING)
+- [ProteomeComparison](#proteome-comparison) (MISSING)
+- [ReferenceAssembly](#reference-assembly) (MISSING)
+- [FBAModel](#fba-model) (MISSING)
+- [FBA](#fba) (MISSING)
+- [Media](#media) (MISSING)
+- [RxnProbs](#rxn-probs) (MISSING)
+- [ProbAnno](#prob-anno) (MISSING)
+- [ExpressionSeries](#expression-series) (MISSING)
+- [FloatDataTable](#float-data-table) (MISSING)
+- [RNASeqSample](#rna-seq-sample) (MISSING)
+- [RNASeqSampleAlignment](#rna-seq-sample-alignment) (MISSING)
+- [PhenotypeSet](#phenotype-set) (MISSING)
+- [PhenotypeSimulationSet](#phenotype-simulation-set) (MISSING)
+- [Network](#network) (MISSING)
 
 
 #### <A NAME="single-end-library"></A>SingleEndLibrary
@@ -675,7 +675,45 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 
 #### <A NAME="tree"></A>Tree
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.Tree
+
+Phylogenetic trees may represent the evolutionary relationships of either species/genomes or genes.
+
 ##### data structure
+optional:
+- name
+- description
+- type
+- tree_attributes
+- default_node_labels
+- ws_refs
+- kb_refs
+- leaf_list
+
+```
+{ name: ‘tree_name’,
+  description: ‘tree_desc’,
+  type: ‘tree_type’,
+  tree: ‘newick_string’,
+  tree_attributes: { 'attr_1': 'val_1',
+                     'attr_2': 'val_2',
+                     ...
+                   },
+  default_node_labels: { ‘node_id_1’: ‘label_1’,
+                         'node_id_2', 'label_2',
+		                ...
+                       }
+  ws_refs: { ‘node_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...]
+			              }
+	         ‘node_id_2’: ...
+ 		    }
+  kb_refs: { ‘node_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...]
+                          }
+	         ‘node_id_2’: ...
+	       }
+  leaf_list: [‘node_id_1’, ‘node_id_2’, ...]
+}
+```
 
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
