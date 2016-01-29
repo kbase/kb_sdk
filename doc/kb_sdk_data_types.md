@@ -117,19 +117,19 @@ optional:
     		     remote_md5: 'md5_hash_of_contents',
     		     remote_sha1: 'sha1_hash_of_contents'
     		   },
-    	      encoding: 'file_encoding',                     # e.g. UTF8
-    	      type: 'file_type',                             # e.g. FASTA, FASTQ
+    	      encoding: 'file_encoding',				# e.g. UTF8
+    	      type: 'file_type',					# e.g. FASTA, FASTQ
     	      size: <file_byte_size>,
     	      description: 'user_defined_description'
     	    }
-       strain: { genetic_code: <genetic_code>,                           # typically 11
+       strain: { genetic_code: <genetic_code>,				# typically 11
        		 genus: 'genus_name',
        		 species: 'species_name',
        		 strain: 'strain_name',
        		 organelle: 'organelle_name',
-       		 source: { source: 'name_of_strain_source',              # e.g. NCBI, JGI, Swiss-Prot
-       		 	   source_id: 'id_of_strain_data_at_source',
-       		 	   project_id: 'id_of_strain_project_at_source'
+       		 source: { source: 'name_of_strain_source',		# e.g. NCBI, JGI, Swiss-Prot
+			   source_id: 'id_of_strain_data_at_source',
+			   project_id: 'id_of_strain_project_at_source'
        		         },
        		 ncbi_taxid: <tax_id>,
        		 location: { lat: <float_lat>,
@@ -139,11 +139,11 @@ optional:
        		 	     description: 'location_description'
        		 	   },
        		},
-       source: { source: 'name_of_sequence_source',                      # e.g. NCBI, JGI, Swiss-Prot
-       		 source_id: 'id_of_sequence_data_at_source',
-       		 project_id: 'id_of_sequence_project_at_source'
+       source: { source: 'name_of_sequence_source',			# e.g. NCBI, JGI, Swiss-Prot
+		 source_id: 'id_of_sequence_data_at_source',
+		 project_id: 'id_of_sequence_project_at_source'
        	       },
-       single_genome: <0/1>,                                             # flag to indicate single organism, 0=FALSE, 1=TRUE
+       single_genome: <0/1>,						# flag to indicate single organism, 0=FALSE, 1=TRUE
        sequencing_tech: 'tech_used_for_sequencing',
        read_count: <number_of_sequences>,
        read_size: <total_sum_of_readlengths_in_bases',
