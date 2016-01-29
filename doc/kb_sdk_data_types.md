@@ -77,7 +77,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLi
 ##### data structure
 
 ##### setup
-The following is a python snippet (e.g. for use in the SDK <module_name>Impl.py file) for preparing to work with the data object.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```
     from biokbase.workspace.client import Workspace as workspaceService
