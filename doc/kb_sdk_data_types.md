@@ -1,5 +1,8 @@
 # ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Data Types
 
+KBase is currently working on a Data API that will replace direct access of KBase Data Objects.  Access to Genome Types will be the first class of data supported.  The API is not yet available.  In the meantime, Community Developers should access the Data Objects directly, following the guidance below.
+
+
 ## Data Type Definitions
 
 Some, but not all, of the KBase data type definitions are available at
@@ -8,6 +11,9 @@ https://github.com/kbase/data_api/tree/develop/experiments/workspace_typespecs
 
 Others may be examined by selecting an object of that type in a Narrative and clicking on the type to open the Landing Page for that type (make sure you click on the object type on the right, not the grouping on the left).
 Then click on the 'Spec-file' tab.
+
+e.g.
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 
 
 ## Base KBase and Workspace IDs and references
