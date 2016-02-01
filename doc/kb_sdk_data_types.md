@@ -87,13 +87,13 @@ The fully qualified name of a workspace object that includes the workspace name.
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.SingleEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary
 
-SingleEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  It may be compressed with GZIP compression.  There are two types of SingleEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of SingleEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
+SingleEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  It may be compressed with GZIP compression.  There are two types of SingleEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of SingleEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  The KBaseAssembly version is essentially just the 'file' portion of the 'lib' structure in the KBaseFile SingleEndLibrary definition, but uses the field name 'handle' instead of 'file' (see below).  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
 
 SingleEndLibrary objects are often quite large and the bulky sequence data is therefore typically stored in the SHOCK filesystem.
 
 ##### data structure
 
-**KBaseFile SingleEndLibrary definition**
+*KBaseFile SingleEndLibrary* definition
 
 optional:
 - file_name
@@ -155,7 +155,7 @@ optional:
     }
 ```
 
-**KBaseAssembly SingleEndLibrary definition**
+*KBaseAssembly SingleEndLibrary* definition
 
 optional:
 - hid
@@ -212,13 +212,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary
 
-PairedEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  Typically there are two files, one for 'forward' reads and one for 'reverse' reads.  They may be compressed with GZIP compression.  There are two types of PairedEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of PariedEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
+PairedEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  Typically there are two files, one for 'forward' reads and one for 'reverse' reads.  They may be compressed with GZIP compression.  There are two types of PairedEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of PariedEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  The KBaseAssembly version is essentially just the 'file' portion of the 'lib' substructure in the KBaseFile PairedEndLibrary definition, but uses the field name 'handle' instead of 'file' (see below).  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
 
 PairedEndLibrary objects are often quite large and the bulky sequence data is therefore typically stored in the SHOCK filesystem.
 
 ##### data structure
 
-KBaseFile definition
+*KBaseFile PairedEndLibrary* definition
+
 optional:
 - lib2
 - file_name
@@ -296,6 +297,40 @@ optional:
        read_count: <number_of_sequences>,
        read_size: <total_sum_of_readlengths_in_bases>,
        gc_content: <float_average_gc>
+    }
+```
+
+*KBaseAssembly PariedEndLibrary* definition
+
+optional:
+- hid
+- file_name
+- type
+- url
+- remote_md5
+- remote_sha1
+
+```
+    { handle_1: { hid: 'ws_handle_id',
+    	  	  file_name: 'user_defined_file_name',
+    		  id: 'shock_node_id',
+    		  url: 'url_of_shock_server',
+    		  type: 'shock',
+    		  remote_md5: 'md5_hash_of_contents',
+    		  remote_sha1: 'sha1_hash_of_contents'
+    	        },
+      handle_2: { hid: 'ws_handle_id',
+    	  	  file_name: 'user_defined_file_name',
+    		  id: 'shock_node_id',
+    		  url: 'url_of_shock_server',
+    		  type: 'shock',
+    		  remote_md5: 'md5_hash_of_contents',
+    		  remote_sha1: 'sha1_hash_of_contents'
+    	        },
+       insert_size_mean: <average_insert_size>,
+       insert_size_std_dev: <std_dev_of_insert_size_distribution>,
+       interleaved: <0/1>,						# flag to indicate mate pairs interleaved in lib1, 0=FALSE, 1=TRUE
+       read_orientation_outward: <0/1>,					# flag to indicate read orientation, 0=FALSE, 1=TRUE
     }
 ```
 
