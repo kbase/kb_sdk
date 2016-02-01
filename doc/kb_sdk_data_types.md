@@ -62,6 +62,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 - [GenomeSet](#genome-set)
 - [Genome](#genome)
 - [DomainAnnotation](#domain-annotation)
+- [MSA](#msa)
 - [Tree](#tree)
 - [Pangenome](#pangenome) (MISSING)
 - [ProteomeComparison](#proteome-comparison) (MISSING)
@@ -400,7 +401,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         self.__class__.singleEndLibInfo = new_obj_info[0]
         return new_obj_info[0]
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
  
 
 ### <A NAME="paired-end-library"></A>PairedEndLibrary
@@ -814,7 +815,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         self.__class__.pairedEndLibInfo = new_obj_info[0]
         return new_obj_info[0]
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
 
 
 ### <A NAME="contig-set"></A>ContigSet
@@ -946,7 +947,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                 ]
             })
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
 
 
 ### <A NAME="feature-set"></A>FeatureSet
@@ -999,6 +1000,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
+    def exportFasta(self, ws, workspace_name, featureset_id):
         # Process each genome one by one
         records = []
         for genomeRef in genome2Features:
@@ -1016,8 +1018,26 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
+    def createMSA(self, ws, workspace_name, featureset_id, msa_id):
+        alignment_length = 0
+        msa = {
+            'name' : 'multiple alignmemnt for FeatureSet: ' + featureset_id,
+            'sequence_type': 'protein',
+            'alignment_length': 0,
+            'alignment': {},
+            'row_order': []
+        }
+        for record in SeqIO.parse( self.fileOutputName, "fasta"):
+            msa['row_order'].append(record.id)
+            sequence = str(record.seq)
+            msa['alignment'][record.id] = sequence
+            alignment_length = len(sequence)
+        msa['alignment_length'] = alignment_length
+        
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':msa_id, 'type':'KBaseTrees.MSA', 'data': msa}]})
+        return str(msa)
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
 
 
 #### <A NAME="genome-set"></A>GenomeSet
@@ -1063,7 +1083,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
 
 
 ### <A NAME="genome"></A>Genome
@@ -1098,7 +1118,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
 
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
@@ -1132,7 +1152,100 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
+
+
+
+### <A NAME="msa"></A>MSA
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.MSA
+
+Multiple Sequence Alignments (MSA) are used for examining sequence variation across homologous sequences and as inputs to phylogenetic reconstructions, such as Trees.
+
+##### data structure
+optional:
+- description
+- element_ordering
+
+```
+    { description: 'user_defined_name_or_desc_for_set',
+      element_ordering: ['feature_1_kbase_id', 'feature_2_kbase_id', ...],
+      elements: { 'feature_1_kbase_id': ['source_A_genome_ref', 'source_B_genome_ref', ...]
+    }
+      
+```
+
+##### setup
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
+
+```python
+    from biokbase.workspace.client import Workspace as workspaceService
+    from Bio import SeqIO
+    from Bio.Seq import Seq
+    from Bio.SeqRecord import SeqRecord
+    from Bio.Alphabet import generic_protein
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
+##### obtaining
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
+
+```python
+    def buildGenome2Features(self, ws, workspace_name, featureset_id):
+        genome2Features = {}
+        featureSet = ws.get_objects([{'ref':workspace_name+'/'+featureset_id}])[0]['data']
+        features = featureSet['elements']
+        for fId in features:
+            genomeRef = features[fId][0]
+            if genomeRef not in genome2Features:
+                genome2Features[genomeRef] = []
+            genome2Features[genomeRef].append(fId)
+        return genome2Features
+```
+
+##### using
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
+
+```python
+    def exportFasta(self, ws, workspace_name, featureset_id):
+        # Process each genome one by one
+        records = []
+        for genomeRef in genome2Features:
+            genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+            featureIds = genome2Features[genomeRef]
+            for feature in genome['features']:
+                for fId in featureIds:
+                    if fId == feature['id']:
+                        record = SeqRecord(Seq(feature['protein_translation']), id=fId, description=genomeRef)
+                        records.append(record)
+        SeqIO.write(records, self.fileFastaName, "fasta")
+```
+
+##### storing
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
+
+```python
+    def createMSA(self, ws, workspace_name, featureset_id, msa_id):
+        alignment_length = 0
+        msa = {
+            'name' : 'multiple alignmemnt for FeatureSet: ' + featureset_id,
+            'sequence_type': 'protein',
+            'alignment_length': 0,
+            'alignment': {},
+            'row_order': []
+        }
+        for record in SeqIO.parse( self.fileOutputName, "fasta"):
+            msa['row_order'].append(record.id)
+            sequence = str(record.seq)
+            msa['alignment'][record.id] = sequence
+            alignment_length = len(sequence)
+        msa['alignment_length'] = alignment_length
+        
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':msa_id, 'type':'KBaseTrees.MSA', 'data': msa}]})
+        return str(msa)
+```
+[\[back to data type list\]](#data-type-list)
 
 
 
@@ -1204,7 +1317,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
-[\[up to data type list\]](#data-type-list)
+[\[back to data type list\]](#data-type-list)
 
 
 ### <A NAME="pangenome"></A>Pangenome
