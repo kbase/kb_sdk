@@ -188,12 +188,22 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
 ```python
+	console = []
+
         #### Get the read library
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
@@ -218,22 +228,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             raise ValueError('Unable to fetch read library object from workspace: ' + str(e))
             #to get the full stack trace: traceback.format_exc()
 
-
-        #### Download the paired end library
-        if type_name == 'PairedEndLibrary':
+        #### Download the single end library
+        if type_name == 'SingleEndLibrary':
             try:
-                if 'lib1' in data:
+                if 'lib' in data:
                     forward_reads = data['lib1']['file']
-                elif 'handle_1' in data:
+                elif 'handle' in data:
                     forward_reads = data['handle_1']
-                if 'lib2' in data:
-                    reverse_reads = data['lib2']['file']
-                elif 'handle_2' in data:
-                    reverse_reads = data['handle_2']
-                else:
-                    reverse_reads={}
 
-                ### NOTE: this section is what could be replaced by the transform services
                 forward_reads_file_location = os.path.join(self.scratch,forward_reads['file_name'])
                 forward_reads_file = open(forward_reads_file_location, 'w', 0)
                 self.log(console, 'downloading reads file: '+str(forward_reads_file_location))
@@ -243,34 +245,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                     forward_reads_file.write(chunk)
                 forward_reads_file.close();
                 self.log(console, 'done')
-                ### END NOTE
-
-                if 'interleaved' in data and data['interleaved']:
-                    self.log(console, 'extracting forward/reverse reads into separate files')
-                    if re.search('gz', forward_reads['file_name'], re.I):
-                        bcmdstring = 'gunzip -c ' + forward_reads_file_location
-                    else:    
-                        bcmdstring = 'cat ' + forward_reads_file_location 
-
-                    cmdstring = bcmdstring + '| (paste - - - - - - - -  | tee >(cut -f 1-4 | tr "\t" "\n" > '+self.scratch+'/forward.fastq) | cut -f 5-8 | tr "\t" "\n" > '+self.scratch+'/reverse.fastq )'
-                    cmdProcess = subprocess.Popen(cmdstring, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable='/bin/bash')
-                    stdout, stderr = cmdProcess.communicate()
-
-                    self.log(console, "cmdstring: " + cmdstring + " stdout: " + stdout + " stderr: " + stderr)
-                    
-                    forward_reads['file_name']='forward.fastq'
-                    reverse_reads['file_name']='reverse.fastq'
-                else:
-                    ### NOTE: this section is what could also be replaced by the transform services
-                    reverse_reads_file_location = os.path.join(self.scratch,reverse_reads['file_name'])
-                    reverse_reads_file = open(reverse_reads_file_location, 'w', 0)
-                    self.log(console, 'downloading reverse reads file: '+str(reverse_reads_file_location))
-                    r = requests.get(reverse_reads['url']+'/node/'+reverse_reads['id']+'?download', stream=True, headers=headers)
-                    for chunk in r.iter_content(1024):
-                        reverse_reads_file.write(chunk)
-                    reverse_reads_file.close()
-                    self.log(console, 'done')
-                    ### END NOTE
             except Exception as e:
                 print(traceback.format_exc())
                 raise ValueError('Unable to download paired-end read library files: ' + str(e))
@@ -288,8 +262,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         # we only support PE reads, so add that
         megahit_cmd.append('-1')
         megahit_cmd.append(forward_reads['file_name'])
-        megahit_cmd.append('-2')
-        megahit_cmd.append(reverse_reads['file_name'])
 
         for arg in params['args'].keys():
             megahit_cmd.append('--'+arg)
@@ -326,13 +298,107 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.
 
 ```python
-    #upload reads
-    cmdstring = " ".join( ('ws-tools fastX2reads --inputfile', output_fastX_file_path, 
-                            '--wsurl', self.workspaceURL, '--shockurl', self.shockURL, '--outws', input_params['output_ws'],
-                            '--outobj', input_params['output_read_library'], '--readcount', readcount ) )
+    def getContext(self):
+        return self.__class__.ctx
 
-    cmdProcess = subprocess.Popen(cmdstring, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=env)
-    stdout, stderr = cmdProcess.communicate()
+    def upload_file_to_shock(self,
+                             shock_service_url = None,
+                             filePath = None,
+                             ssl_verify = True,
+                             token = None):
+        """
+        Use HTTP multi-part POST to save a file to a SHOCK instance.
+        """
+
+        if token is None:
+            raise Exception("Authentication token required!")
+
+        #build the header
+        header = dict()
+        header["Authorization"] = "Oauth {0}".format(token)
+
+        if filePath is None:
+            raise Exception("No file given for upload to SHOCK!")
+
+        dataFile = open(os.path.abspath(filePath), 'rb')
+        m = MultipartEncoder(fields={'upload': (os.path.split(filePath)[-1], dataFile)})
+        header['Content-Type'] = m.content_type
+
+        #logger.info("Sending {0} to {1}".format(filePath,shock_service_url))
+        try:
+            response = requests.post(shock_service_url + "/node", headers=header, data=m, allow_redirects=True, verify=ssl_verify)
+            dataFile.close()
+        except:
+            dataFile.close()
+            raise
+
+        if not response.ok:
+            response.raise_for_status()
+
+        result = response.json()
+
+        if result['error']:
+            raise Exception(result['error'][0])
+        else:
+            return result["data"]
+
+    def getSingleEndLibInfo(self):
+        if hasattr(self.__class__, 'singleEndLibInfo'):
+            return self.__class__.singleEndLibInfo
+        # 1) upload files to shock
+        token = self.ctx['token']
+        forward_shock_file = self.upload_file_to_shock(
+            shock_service_url = self.shockURL,
+            filePath = 'data/small.forward.fq',
+            token = token
+            )
+        #pprint(forward_shock_file)
+
+        # 2) create handle
+        hs = HandleService(url=self.handleURL, token=token)
+        forward_handle = hs.persist_handle({
+                                        'id' : forward_shock_file['id'], 
+                                        'type' : 'shock',
+                                        'url' : self.shockURL,
+                                        'file_name': forward_shock_file['file']['name'],
+                                        'remote_md5': forward_shock_file['file']['checksum']['md5']})
+
+        # 3) save to WS
+        single_end_library = {
+            'lib': {
+                'file': {
+                    'hid':forward_handle,
+                    'file_name': forward_shock_file['file']['name'],
+                    'id': forward_shock_file['id'],
+                    'url': self.shockURL,
+                    'type':'shock',
+                    'remote_md5':forward_shock_file['file']['checksum']['md5']
+                },
+                'encoding':'UTF8',
+                'type':'fastq',
+                'size':forward_shock_file['file']['size']
+            },
+            'sequencing_tech':'artificial reads'
+        }
+
+        new_obj_info = self.ws.save_objects({
+                        'workspace':self.getWsName(),
+                        'objects':[
+                            {
+                                'type':'KBaseFile.SingleEndLibrary',
+                                'data':single_end_library,
+                                'name':'test.pe.reads',
+                                'meta':{},
+                                'provenance':[
+                                    {
+                                        'service':'MegaHit',
+                                        'method':'test_megahit'
+                                    }
+                                ]
+                            }]
+                        })
+        self.__class__.singleEndLibInfo = new_obj_info[0]
+        return new_obj_info[0]
 ```
 [\[up to data type list\]](#data-type-list)
  
@@ -474,12 +540,22 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
 ```python
+	console = []
+
         #### Get the read library
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
@@ -519,7 +595,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                 else:
                     reverse_reads={}
 
-                ### NOTE: this section is what could be replaced by the transform services
                 forward_reads_file_location = os.path.join(self.scratch,forward_reads['file_name'])
                 forward_reads_file = open(forward_reads_file_location, 'w', 0)
                 self.log(console, 'downloading reads file: '+str(forward_reads_file_location))
@@ -529,7 +604,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                     forward_reads_file.write(chunk)
                 forward_reads_file.close();
                 self.log(console, 'done')
-                ### END NOTE
 
                 if 'interleaved' in data and data['interleaved']:
                     self.log(console, 'extracting forward/reverse reads into separate files')
@@ -547,7 +621,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                     forward_reads['file_name']='forward.fastq'
                     reverse_reads['file_name']='reverse.fastq'
                 else:
-                    ### NOTE: this section is what could also be replaced by the transform services
                     reverse_reads_file_location = os.path.join(self.scratch,reverse_reads['file_name'])
                     reverse_reads_file = open(reverse_reads_file_location, 'w', 0)
                     self.log(console, 'downloading reverse reads file: '+str(reverse_reads_file_location))
@@ -556,7 +629,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                         reverse_reads_file.write(chunk)
                     reverse_reads_file.close()
                     self.log(console, 'done')
-                    ### END NOTE
             except Exception as e:
                 print(traceback.format_exc())
                 raise ValueError('Unable to download paired-end read library files: ' + str(e))
