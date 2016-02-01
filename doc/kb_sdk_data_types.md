@@ -180,7 +180,7 @@ optional:
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
 
     def __init__(self, config):
@@ -193,19 +193,146 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
-```
+```python
+        #### Get the read library
+        try:
+            ws = workspaceService(self.workspaceURL, token=ctx['token'])
+            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['read_library_name']}])
+            data = objects[0]['data']
+            info = objects[0]['info']
+            # Object Info Contents
+            # absolute ref = info[6] + '/' + info[0] + '/' + info[4]
+            # 0 - obj_id objid
+            # 1 - obj_name name
+            # 2 - type_string type
+            # 3 - timestamp save_date
+            # 4 - int version
+            # 5 - username saved_by
+            # 6 - ws_id wsid
+            # 7 - ws_name workspace
+            # 8 - string chsum
+            # 9 - int size 
+            # 10 - usermeta meta
+            type_name = info[2].split('.')[1].split('-')[0]
+        except Exception as e:
+            raise ValueError('Unable to fetch read library object from workspace: ' + str(e))
+            #to get the full stack trace: traceback.format_exc()
+
+
+        #### Download the paired end library
+        if type_name == 'PairedEndLibrary':
+            try:
+                if 'lib1' in data:
+                    forward_reads = data['lib1']['file']
+                elif 'handle_1' in data:
+                    forward_reads = data['handle_1']
+                if 'lib2' in data:
+                    reverse_reads = data['lib2']['file']
+                elif 'handle_2' in data:
+                    reverse_reads = data['handle_2']
+                else:
+                    reverse_reads={}
+
+                ### NOTE: this section is what could be replaced by the transform services
+                forward_reads_file_location = os.path.join(self.scratch,forward_reads['file_name'])
+                forward_reads_file = open(forward_reads_file_location, 'w', 0)
+                self.log(console, 'downloading reads file: '+str(forward_reads_file_location))
+                headers = {'Authorization': 'OAuth '+ctx['token']}
+                r = requests.get(forward_reads['url']+'/node/'+forward_reads['id']+'?download', stream=True, headers=headers)
+                for chunk in r.iter_content(1024):
+                    forward_reads_file.write(chunk)
+                forward_reads_file.close();
+                self.log(console, 'done')
+                ### END NOTE
+
+                if 'interleaved' in data and data['interleaved']:
+                    self.log(console, 'extracting forward/reverse reads into separate files')
+                    if re.search('gz', forward_reads['file_name'], re.I):
+                        bcmdstring = 'gunzip -c ' + forward_reads_file_location
+                    else:    
+                        bcmdstring = 'cat ' + forward_reads_file_location 
+
+                    cmdstring = bcmdstring + '| (paste - - - - - - - -  | tee >(cut -f 1-4 | tr "\t" "\n" > '+self.scratch+'/forward.fastq) | cut -f 5-8 | tr "\t" "\n" > '+self.scratch+'/reverse.fastq )'
+                    cmdProcess = subprocess.Popen(cmdstring, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, executable='/bin/bash')
+                    stdout, stderr = cmdProcess.communicate()
+
+                    self.log(console, "cmdstring: " + cmdstring + " stdout: " + stdout + " stderr: " + stderr)
+                    
+                    forward_reads['file_name']='forward.fastq'
+                    reverse_reads['file_name']='reverse.fastq'
+                else:
+                    ### NOTE: this section is what could also be replaced by the transform services
+                    reverse_reads_file_location = os.path.join(self.scratch,reverse_reads['file_name'])
+                    reverse_reads_file = open(reverse_reads_file_location, 'w', 0)
+                    self.log(console, 'downloading reverse reads file: '+str(reverse_reads_file_location))
+                    r = requests.get(reverse_reads['url']+'/node/'+reverse_reads['id']+'?download', stream=True, headers=headers)
+                    for chunk in r.iter_content(1024):
+                        reverse_reads_file.write(chunk)
+                    reverse_reads_file.close()
+                    self.log(console, 'done')
+                    ### END NOTE
+            except Exception as e:
+                print(traceback.format_exc())
+                raise ValueError('Unable to download paired-end read library files: ' + str(e))
+        else:
+            raise ValueError('Cannot yet handle library type of: '+type_name)
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
-```
+```python
+        # construct the command
+        megahit_cmd = [self.MEGAHIT]
+
+        # we only support PE reads, so add that
+        megahit_cmd.append('-1')
+        megahit_cmd.append(forward_reads['file_name'])
+        megahit_cmd.append('-2')
+        megahit_cmd.append(reverse_reads['file_name'])
+
+        for arg in params['args'].keys():
+            megahit_cmd.append('--'+arg)
+            megahit_cmd.append(params['args'][arg])
+
+        # set the output location
+        timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
+        output_dir = os.path.join(self.scratch,'output.'+str(timestamp))
+        megahit_cmd.append('-o')
+        megahit_cmd.append(output_dir)
+
+        # run megahit, capture output as it happens
+        self.log(console, 'running megahit:')
+        self.log(console, '    '+' '.join(megahit_cmd))
+        p = subprocess.Popen(megahit_cmd,
+                    cwd = self.scratch,
+                    stdout = subprocess.PIPE, 
+                    stderr = subprocess.STDOUT, shell = False)
+
+        while True:
+            line = p.stdout.readline()
+            if not line: break
+            self.log(console, line.replace('\n', ''))
+
+        p.stdout.close()
+        p.wait()
+        self.log(console, 'return code: ' + str(p.returncode))
+        if p.returncode != 0:
+            raise ValueError('Error running megahit, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
 ```
 
 ##### storing
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.
 
-```
+```python
+    #upload reads
+    cmdstring = " ".join( ('ws-tools fastX2reads --inputfile', output_fastX_file_path, 
+                            '--wsurl', self.workspaceURL, '--shockurl', self.shockURL, '--outws', input_params['output_ws'],
+                            '--outobj', input_params['output_read_library'], '--readcount', readcount ) )
+
+    cmdProcess = subprocess.Popen(cmdstring, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=env)
+    stdout, stderr = cmdProcess.communicate()
 ```
 [\[up to data type list\]](#data-type-list)
  
@@ -337,9 +464,9 @@ optional:
 ```
 
 ##### setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
 
     def __init__(self, config):
@@ -350,9 +477,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 ##### obtaining
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
-```
+```python
         #### Get the read library
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
@@ -438,9 +565,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 ##### using
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
-```
+```python
         # construct the command
         megahit_cmd = [self.MEGAHIT]
 
@@ -450,9 +577,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         megahit_cmd.append('-2')
         megahit_cmd.append(reverse_reads['file_name'])
 
-	for arg in params['args'].keys():
-	    megahit_cmd.append('--'+arg)
-	    megahit_cmd.append(params['args'][arg])
+        for arg in params['args'].keys():
+            megahit_cmd.append('--'+arg)
+            megahit_cmd.append(params['args'][arg])
 
         # set the output location
         timestamp = int((datetime.utcnow() - datetime.utcfromtimestamp(0)).total_seconds()*1000)
@@ -482,11 +609,11 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 ##### storing
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.  **(HOW DO WE STORE A PAIREDENDLIBRARY OBJECT?)**
 
-```
+```python
     #upload reads
-    cmdstring = " ".join( ('ws-tools fastX2reads --inputfile', 'trimmed_' + readLibrary['data']['handle']['file_name'], 
+    cmdstring = " ".join( ('ws-tools fastX2reads --inputfile', output_fastX_file_path, 
                             '--wsurl', self.workspaceURL, '--shockurl', self.shockURL, '--outws', input_params['output_ws'],
                             '--outobj', input_params['output_read_library'], '--readcount', readcount ) )
 
@@ -545,7 +672,7 @@ optional:
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
     from Bio import SeqIO
 
@@ -556,7 +683,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
-```
+```python
     def method_name(self, ctx, input):
         token = ctx['token']
         wsClient = workspaceService(self.workspaceURL, token=token)
@@ -566,7 +693,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
-```
+```python
         for contig in contigSet['contigs']:
             contig_count += 1
             if len(contig['sequence']) >= int(input['min_length']):
@@ -576,7 +703,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
-```
+```python
         # parse the output and save back to KBase
         output_contigs = os.path.join(output_dir, 'final.contigs.fa')
 
@@ -647,7 +774,7 @@ optional:
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
 
     def __init__(self, config):
@@ -728,7 +855,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
 
     def __init__(self, config):
@@ -762,7 +889,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainA
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
 
     def __init__(self, config):
@@ -834,7 +961,7 @@ optional:
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
-```
+```python
     from biokbase.workspace.client import Workspace as workspaceService
 
     def __init__(self, config):
