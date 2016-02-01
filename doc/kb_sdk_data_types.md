@@ -53,7 +53,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 **NEED CLARIFICATION BETWEEN THESE**
 
 
-## KBase Data Objects
+## <A NAME="data-type-list"></A>KBase Data Types
 
 - [SingleEndLibrary ](#single-end-library)
 - [PairedEndLibrary](#paired-end-library)
@@ -207,6 +207,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
+[\[up to data type list\]](#data-type-list)
+ 
 
 ### <A NAME="paired-end-library"></A>PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.PairedEndLibrary
@@ -491,6 +493,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     cmdProcess = subprocess.Popen(cmdstring, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=env)
     stdout, stderr = cmdProcess.communicate()
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 ### <A NAME="contig-set"></A>ContigSet
@@ -622,6 +625,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                 ]
             })
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 ### <A NAME="feature-set"></A>FeatureSet
@@ -667,6 +671,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 #### <A NAME="genome-set"></A>GenomeSet
@@ -712,6 +717,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 ### <A NAME="genome"></A>Genome
@@ -746,6 +752,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
@@ -779,6 +786,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 
@@ -850,6 +858,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```
 ```
+[\[up to data type list\]](#data-type-list)
 
 
 ### <A NAME="pangenome"></A>Pangenome
