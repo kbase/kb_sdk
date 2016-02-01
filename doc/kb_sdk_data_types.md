@@ -112,7 +112,7 @@ optional:
 - read_size
 - single_genome
 
-```
+```json
     { lib: { file: { hid: 'ws_handle_id',
     		     file_name: 'user_defined_file_name',
     		     id: 'shock_node_id',
