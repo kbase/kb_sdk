@@ -970,6 +970,10 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
+    from Bio import SeqIO
+    from Bio.Seq import Seq
+    from Bio.SeqRecord import SeqRecord
+    from Bio.Alphabet import generic_protein
 
     def __init__(self, config):
         self.workspaceURL = config['workspace-url']
@@ -978,19 +982,40 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
-```
+```python
+    def buildGenome2Features(self, ws, workspace_name, featureset_id):
+        genome2Features = {}
+        featureSet = ws.get_objects([{'ref':workspace_name+'/'+featureset_id}])[0]['data']
+        features = featureSet['elements']
+        for fId in features:
+            genomeRef = features[fId][0]
+            if genomeRef not in genome2Features:
+                genome2Features[genomeRef] = []
+            genome2Features[genomeRef].append(fId)
+        return genome2Features
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
-```
+```python
+        # Process each genome one by one
+        records = []
+        for genomeRef in genome2Features:
+            genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+            featureIds = genome2Features[genomeRef]
+            for feature in genome['features']:
+                for fId in featureIds:
+                    if fId == feature['id']:
+                        record = SeqRecord(Seq(feature['protein_translation']), id=fId, description=genomeRef)
+                        records.append(record)
+        SeqIO.write(records, self.fileFastaName, "fasta")
 ```
 
 ##### storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
-```
+```python
 ```
 [\[up to data type list\]](#data-type-list)
 
