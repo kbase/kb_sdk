@@ -682,7 +682,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 
 ##### storing
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.  **(HOW DO WE STORE A PAIREDENDLIBRARY OBJECT?)**
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  Note that two read files must be present, one for forward reads and one for reverse reads.
 
 ```python
     def getContext(self):
@@ -1018,26 +1018,24 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def createMSA(self, ws, workspace_name, featureset_id, msa_id):
-        alignment_length = 0
-        msa = {
-            'name' : 'multiple alignmemnt for FeatureSet: ' + featureset_id,
-            'sequence_type': 'protein',
-            'alignment_length': 0,
-            'alignment': {},
-            'row_order': []
+    def storeFeatureSet(self, ws, workspace_name, featureset_id, featureset_name, feature_list):
+        featureset = {
+            'description' : featureset_name,
+            'element_ordering': [],
+            'elements': {}
         }
-        for record in SeqIO.parse( self.fileOutputName, "fasta"):
-            msa['row_order'].append(record.id)
-            sequence = str(record.seq)
-            msa['alignment'][record.id] = sequence
-            alignment_length = len(sequence)
-        msa['alignment_length'] = alignment_length
+        for feature in feature_list:
+	    feature_id = feature['feature_id']
+            featureset['element_ordering'].append(feature_id);
+            featureset['elements'][feature_id] = []
+            for genome_id in feature['genomes']:
+                featureset['elements'][feature_id].append(genome_id)
         
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':msa_id, 'type':'KBaseTrees.MSA', 'data': msa}]})
-        return str(msa)
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':featureset_id, 'type':'KBaseCollections.FeatureSet', 'data': featureset}]})
+        return str(featureset)
 ```
 [\[back to data type list\]](#data-type-list)
+
 
 
 #### <A NAME="genome-set"></A>GenomeSet
@@ -1163,15 +1161,49 @@ Multiple Sequence Alignments (MSA) are used for examining sequence variation acr
 
 ##### data structure
 optional:
+- name
 - description
-- element_ordering
+- sequence_type
+- trim_info
+- alignment_attributes
+- row_order
+- default_row_labels
+- ws_refs
+- kb_refs
+- parent_msa_ref
 
 ```
-    { description: 'user_defined_name_or_desc_for_set',
-      element_ordering: ['feature_1_kbase_id', 'feature_2_kbase_id', ...],
-      elements: { 'feature_1_kbase_id': ['source_A_genome_ref', 'source_B_genome_ref', ...]
-    }
-      
+{ name: ‘MSA_name’,
+  description: ‘tree_desc’,
+  sequence_type: ‘sequence_type’,            # 'protein' or 'dna'
+  alignment_length: <aln_len>,               # number of columns in alignment, including gaps
+  alignment: { 'row_id_1': 'aligned_seq_1',
+               'row_id_2': 'aligned_seq_2',
+               ...
+             },
+  trim_info: { 'row_id_1': tuple(<start_pos_in_parent>,<end_pos_in_parent>,<parent_len>,<parent_md5>),
+  	       'row_id_2': ...
+  	     },
+  alignment_attributes: { 'attr_1': 'val_1',
+                          'attr_2': 'val_2',
+                          ...
+                        },
+  row_order: ['row_id_1', row_id_2', ...],
+  default_row_labels: { 'row_id_1': 'label_1',
+                        'row_id_2', 'label_2',
+		        ...
+                       },
+  ws_refs: { ‘row_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...]
+			 },
+	     ‘row_id_2’: ...
+ 	   },
+  kb_refs: { ‘row_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...]
+                         },
+	     ‘row_id_2’: ...
+	   },
+  parent_msa_ref: ws_msa_ref                  # reference to parental alignment object to which 
+                                              # this object adds some new aligned sequences 
+}
 ```
 
 ##### setup
@@ -1274,18 +1306,18 @@ optional:
                      'attr_2': 'val_2',
                      ...
                    },
-  default_node_labels: { ‘node_id_1’: ‘label_1’,
+  default_node_labels: { 'node_id_1': 'label_1',
                          'node_id_2', 'label_2',
-		                ...
-                       }
+		         ...
+                       },
   ws_refs: { ‘node_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...]
-			              }
-	         ‘node_id_2’: ...
- 		    }
+			  },
+	      ‘node_id_2’: ...
+ 	   },
   kb_refs: { ‘node_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...]
-                          }
-	         ‘node_id_2’: ...
-	       }
+                          },
+	     ‘node_id_2’: ...
+	   },
   leaf_list: [‘node_id_1’, ‘node_id_2’, ...]
 }
 ```
