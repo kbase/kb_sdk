@@ -42,15 +42,15 @@ The fully qualified name of a workspace object that includes the workspace name.
 
     dylan:1424477476805/Carsonella_10.genome_set
 
-**NEED CLARIFICATION BETWEEN THESE**
+*NEED CLARIFICATION BETWEEN THESE*
 
 #### workspace_id / workspace?
 
-**NEED CLARIFICATION BETWEEN THESE**
+*NEED CLARIFICATION BETWEEN THESE*
 
 #### workspace_name / workspace?
 
-**NEED CLARIFICATION BETWEEN THESE**
+*NEED CLARIFICATION BETWEEN THESE*
 
 
 ## <A NAME="data-type-list"></A>KBase Data Types
@@ -496,7 +496,7 @@ optional:
     }
 ```
 
-*KBaseAssembly PariedEndLibrary* definition
+*KBaseAssembly PairedEndLibrary* definition
 
 optional:
 - hid
@@ -1057,7 +1057,7 @@ Note: either *ref* or *data* is defined for an element, but not both.
                                                    ...
                                                  }
                                        ref: ‘genome_ws_ref’,
-                                       data: KBaseGenomes.Genome instance
+                                       data: { KBaseGenomes.Genome instance }   # (see below)
                                      },
                     ‘genome_name_2’: ...
                   }
@@ -1088,6 +1088,67 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 
 ##### data structure
+
+optional:
+- quality
+- close_genomes
+- analysis_events
+- features
+- source_id
+- source
+- contigs
+- contig_ids
+- publications
+- md5
+- taxonomy
+- gc_content
+- complete
+- dna_size
+- num_contigs
+- contig_lengths
+- contigset_ref
+
+```
+    {
+        id: 'genome_kbase_id',
+        scientific_name: 'Genus_species_STRAIN',
+        domain: 'domain_of_life',                     # bacteria, archaea, or eukaryote, perhaps?
+        genetic_code: <code>,                         # typically 11
+        dna_size: <sum_of_contig_lens>,
+        num_contigs: <num_contigs>,
+        contigs: [ { id: 'contig_1_kbase_id>,
+        	     length: <len>,
+        	     md5: 'md5_chksum',
+        	     sequence: 'sequence_of_contig',
+        	     genetic_code: <code>,            # typically 11
+	 	     cell_compartment: '',
+	 	     replicon_type: '',
+	 	     replicon_geometry: '',
+	 	     name: '',
+	 	     description: '',
+	 	     complete: <0/1>
+        	   },
+        	   { id: 'contig_2_kbase_id',
+        	     ...
+        	   },
+        	   ...
+        	 ],
+        contig_lengths: [ <contig_1_len>, <contig_2_len>, ...],
+        contig_ids: [ <contig_1_kbase_id>, <contig_2_kbase_id>, ...],
+        source: 'source_of_genome',                  # e.g. NCBI, JGI, etc.
+        source_id: 'id_of_genome_at_source',
+        md5: 'md5_chksum_of_concat_contigs',
+        taxonomy: 'taxonomic string',
+        gc_content: <float_avg_gc>,
+        complete: <0/1>,                              # 0=FALSE, 1=TRUE
+        publications: [],
+        features: [],
+        contigset_ref:
+        quality:
+        close_genomes: [],
+        analysis_events: []
+    }
+```
 
 ##### setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
