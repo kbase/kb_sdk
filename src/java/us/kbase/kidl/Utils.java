@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import us.kbase.common.service.test.Tuple2;
+import us.kbase.common.service.Tuple2;
 
 public class Utils {
 
