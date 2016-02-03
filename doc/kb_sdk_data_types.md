@@ -114,7 +114,7 @@ optional:
 - single_genome
 
 ```
-    {
+    { ## KBaseFile.SingleEndLibrary
       lib: { file: { hid: 'ws_handle_id',
     		     file_name: 'user_defined_file_name',
     		     id: 'shock_node_id',
@@ -168,7 +168,7 @@ optional:
 - remote_sha1
 
 ```
-    {
+    { ## KBaseAssembly.SingleEndLibrary
       handle: { hid: 'ws_handle_id',
     		file_name: 'user_defined_file_name',
     		id: 'shock_node_id',
@@ -439,7 +439,7 @@ optional:
 - single_genome
 
 ```
-    {
+    { ## KBaseFile.PairedEndLibrary
       lib1: { file: { hid: 'ws_handle_id',                              # e.g. for 'forward' reads
     		      file_name: 'user_defined_file_name',
     		      id: 'shock_node_id',
@@ -510,7 +510,7 @@ optional:
 - remote_sha1
 
 ```
-    {
+    { ## KBaseAssembly.PairedEndLibrary
       handle_1: { hid: 'ws_handle_id',
     	  	  file_name: 'user_defined_file_name',
     		  id: 'shock_node_id',
@@ -843,7 +843,7 @@ optional:
 - complete
 
 ```
-    {
+    { ## KBaseGenomes.ContigSet
       id: 'ContigSet_kbase_id',
       name: 'ContigSet_name',                    # user defined
       md5: 'md5_chksum',                         # md5 checksum of the contigs sequences
@@ -964,7 +964,7 @@ optional:
 - element_ordering
 
 ```
-    {
+    { ## KBaseCollections.FeatureSet
       description: 'user_defined_name_or_desc_for_set',
       element_ordering: ['feature_1_kbase_id', 'feature_2_kbase_id', ...],
       elements: { 'feature_1_kbase_id': ['source_A_genome_ref', 'source_B_genome_ref', ...]
@@ -1057,7 +1057,7 @@ Note: either *ref* or *data* is defined for an element, but not both.
 - optional data
 
 ```
-    {
+    { ## KBaseSearch.GenomeSet
       description: ‘genome_set_name’,
       elements : { ‘genome_name1_1’: { metadata: {‘f1’: ‘v1’,
                                                   ‘f2’: ‘v2’,
@@ -1164,7 +1164,7 @@ optional:
 - contigset_ref
 
 ```
-    {
+    { ## KBaseGenomes.Genome
         id: 'genome_kbase_id',
         scientific_name: 'Genus_species_STRAIN',
         domain: 'domain_of_life',                    # bacteria, archaea, or eukaryote, perhaps?
@@ -1368,7 +1368,8 @@ optional:
 - parent_msa_ref
 
 ```
-{ name: ‘MSA_name’,
+{ ## KBaseTrees.MSA
+  name: ‘MSA_name’,
   description: ‘tree_desc’,
   sequence_type: ‘sequence_type’,            # 'protein' or 'dna'
   alignment_length: <aln_len>,               # number of columns in alignment, including gaps
@@ -1471,7 +1472,8 @@ optional:
 - leaf_list
 
 ```
-{ name: ‘tree_name’,
+{ ## KBaseTrees.Tree
+  name: ‘tree_name’,
   description: ‘tree_desc’,
   type: ‘tree_type’,
   tree: ‘newick_string’,
