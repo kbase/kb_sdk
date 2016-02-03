@@ -1099,12 +1099,12 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         for genome_name in genomeSet['elements'].keys():
             genomeRef = genomeSet['elements'][genome_name]['ref']
             genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-	    contigSetRef = genome['contigset_ref']
-	    contigSet = ws.get_objects([{'ref':contigSetRef}])[0]['data']
-	    for contig_id in contigSet['contigs'].keys():
-	    	contig_sequence = contigSet['contigs'][contig_id]['sequence']
-	    	record = SeqRecord(Seq(contig_sequence), id=genome_name+contig_id, description=genome_name+" "+contig_id)
-	    	records.append(record)
+            contigSetRef = genome['contigset_ref']
+            contigSet = ws.get_objects([{'ref':contigSetRef}])[0]['data']
+            for contig_id in contigSet['contigs'].keys():
+                contig_sequence = contigSet['contigs'][contig_id]['sequence']
+            	record = SeqRecord(Seq(contig_sequence), id=genome_name+contig_id, description=genome_name+" "+contig_id)
+            	records.append(record)
             SeqIO.write(records, self.fileFastaName+"_"+genome_name, "fasta")
 ```
 
@@ -1226,6 +1226,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 ```
 [\[back to data type list\]](#data-type-list)
+
 
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
