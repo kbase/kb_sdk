@@ -1103,8 +1103,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 	    contigSet = ws.get_objects([{'ref':contigSetRef}])[0]['data']
 	    for contig_id in contigSet['contigs'].keys():
 	    	contig_sequence = contigSet['contigs'][contig_id]['sequence']
-                record = SeqRecord(Seq(contig_sequence), id=genome_name+contig_id, description=genome_name+" "+contig_id)
-                records.append(record)
+	    	record = SeqRecord(Seq(contig_sequence), id=genome_name+contig_id, description=genome_name+" "+contig_id)
+	    	records.append(record)
             SeqIO.write(records, self.fileFastaName+"_"+genome_name, "fasta")
 ```
 
@@ -1123,8 +1123,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         for genome in genomes_list:
             genomeSet[genome['name']] = { 'ref': genome['ref'] }
 
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':genomeSet_id,
-        						         'type':'KBaseSearch.GenomeSet',
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':genomeSet_id, \
+        						         'type':'KBaseSearch.GenomeSet', \
         						         'data': genomeSet}]})
         return str(genomeSet)
 ```
