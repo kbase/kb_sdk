@@ -1297,12 +1297,12 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
     def exportFasta(self, genome):
     	records = []
-	for feature in genome['features']:
-	    record = SeqRecord(Seq(feature['protein_translation']), \
-	    	               id=feature['id'], \
-	    		       description=feature['type']+"."+feature['function'])
-	    records.append(record)
-	SeqIO.write(records, self.fileFastaName, "fasta")
+    	for feature in genome['features']:
+    	    record = SeqRecord(Seq(feature['protein_translation']), \
+    	    	               id=feature['id'], \
+    	    		       description=feature['type']+"."+feature['function'])
+    	    records.append(record)
+    	SeqIO.write(records, self.fileFastaName, "fasta")
 ```
 
 ##### storing
