@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import us.kbase.common.service.test.Tuple2;
+import us.kbase.common.service.Tuple2;
 
 /**
  * Class represents type definition (or named type) in spec-file.
