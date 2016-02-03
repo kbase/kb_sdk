@@ -10,7 +10,7 @@ KBase is currently working on a Data API that will replace direct access of KBas
 A KBase ID is a string starting with the characters "kb|".  KBase IDs are typed. The types are designated using a short string. For instance," g" denotes a genome, "tree" denotes a Tree, and "aln" denotes a sequence alignment. KBase IDs may be hierarchical.  For example, if a KBase genome identifier is "kb|g.1234", a protein encoding gene within that genome may be represented as "kb|g.1234.peg.771".
 
 
-#### Data object names and IDs
+#### Data object names, IDs, and references
 
 Data objects are stored in an object database.  Individual Narratives have "workspaces" associated with them where all data is stored for a given Narrative analysis.  Methods should interact with the data objects within a single workspace.
 
