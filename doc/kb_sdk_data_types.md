@@ -22,7 +22,7 @@ Workspaces have names and numerical IDs that are used to access them.  Workspace
 Data object reference syntax is described here:<br>
 https://www.kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
 
-A data object reference, used in retrieving and storing data objects, has the workspace name/ID, the data object name/ID, and possible a trailing version, delimted by slashes.
+A data object reference, used in retrieving and storing data objects, has the workspace name/ID, the data object name/ID, and possible a trailing version, delimited by slashes.
   
 e.g. The following are equivalent objects
 
@@ -32,10 +32,10 @@ KBasePublicGenomesV5/kb|g.26833    # wsName/objName
 KBasePublicGenomesV5/kb|g.26833/1  # wsName/objName/objVer
 2907/15741/1                       # wsId/objId/objVer
 ```
-Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods by configuring behavior in ui/<narrative_method>/spec.json file (see SDK doc).
+Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods by configuring behavior in ui/\<narrative_method\>/spec.json file (see SDK doc).
 
 ```
-    {
+{
 	"behavior": {
 		"service-mapping": {
 			"input_mapping": [
@@ -46,7 +46,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 			]
 		}
 	}
-    }
+}
 ```
 
 
