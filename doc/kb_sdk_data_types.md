@@ -189,6 +189,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     def getContext(self):
         return self.__class__.ctx
         
+    def getWsName(self):
+        if hasattr(self.__class__, 'wsName'):
+            return self.__class__.wsName
+        suffix = int(time.time() * 1000)
+        wsName = "temp_test_ws_" + str(suffix)
+        ret = self.ws.create_workspace({'workspace': wsName})
+        self.__class__.wsName = wsName
+        return wsName
+        
     def __init__(self, config):
         ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
@@ -311,20 +320,17 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                              filePath = None,
                              ssl_verify = True,
                              token = None):
-        """
+	"""
         Use HTTP multi-part POST to save a file to a SHOCK instance.
-        """
-
+	"""
         if token is None:
             raise Exception("Authentication token required!")
 
         #build the header
         header = dict()
         header["Authorization"] = "Oauth {0}".format(token)
-
         if filePath is None:
             raise Exception("No file given for upload to SHOCK!")
-
         dataFile = open(os.path.abspath(filePath), 'rb')
         m = MultipartEncoder(fields={'upload': (os.path.split(filePath)[-1], dataFile)})
         header['Content-Type'] = m.content_type
@@ -339,19 +345,17 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
         if not response.ok:
             response.raise_for_status()
-
         result = response.json()
-
         if result['error']:
             raise Exception(result['error'][0])
         else:
             return result["data"]
 
-    def getSingleEndLibInfo(self):
-        if hasattr(self.__class__, 'singleEndLibInfo'):
-            return self.__class__.singleEndLibInfo
+    def storeSingleEndLibInfo(self):
+        ctx = self.getContext()
+
         # 1) upload files to shock
-        token = self.ctx['token']
+        token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
             shock_service_url = self.shockURL,
             filePath = 'data/small.forward.fq',
@@ -702,9 +706,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  Note that two read files must be present, one for forward reads and one for reverse reads.
 
 ```python
-    def getContext(self):
-        return self.__class__.ctx
-
     def upload_file_to_shock(self,
                              shock_service_url = None,
                              filePath = None,
@@ -713,17 +714,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         """
         Use HTTP multi-part POST to save a file to a SHOCK instance.
         """
-
         if token is None:
             raise Exception("Authentication token required!")
 
         #build the header
         header = dict()
         header["Authorization"] = "Oauth {0}".format(token)
-
         if filePath is None:
             raise Exception("No file given for upload to SHOCK!")
-
         dataFile = open(os.path.abspath(filePath), 'rb')
         m = MultipartEncoder(fields={'upload': (os.path.split(filePath)[-1], dataFile)})
         header['Content-Type'] = m.content_type
@@ -738,20 +736,17 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
         if not response.ok:
             response.raise_for_status()
-
         result = response.json()
-
         if result['error']:
             raise Exception(result['error'][0])
         else:
             return result["data"]
 
-    def getPairedEndLibInfo(self):
-        if hasattr(self.__class__, 'pairedEndLibInfo'):
-            return self.__class__.pairedEndLibInfo
+    def storePairedEndLibInfo(self):
+       ctx = self.getContext()
             
         # 1) upload files to shock
-        token = self.ctx['token']
+        token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
             shock_service_url = self.shockURL,
             filePath = 'data/small.forward.fq',
@@ -919,7 +914,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-    def method_name(self, ctx, input):
+    def getContigSet(self, ctx, input):
         token = ctx['token']
         wsClient = workspaceService(self.workspaceURL, token=token)
         contigSet = wsClient.get_objects([{'ref': input['input_ws']+'/'+input['contigset_id']}])[0]['data']
@@ -939,6 +934,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
+    def storeContigSet(self):
+    	ctx = self.getContext()
+
         # parse the output and save back to KBase
         output_contigs = os.path.join(output_dir, 'final.contigs.fa')
 
@@ -1077,21 +1075,43 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def storeFeatureSet(self, ws, workspace_name, featureset_id, featureset_name, feature_list):
-        featureset = {
-            'description' : featureset_name,
+    def storeFeatureSet(self, ws, featureset_id, featureset_name, feature_list):
+        ctx = self.getContext()
+    
+        featureset_data = {
+            'description': featureset_name,
             'element_ordering': [],
             'elements': {}
         }
         for feature in feature_list:
             feature_id = feature['feature_id']
-            featureset['element_ordering'].append(feature_id);
-            featureset['elements'][feature_id] = []
+            featureset_data['element_ordering'].append(feature_id);
+            featureset_data['elements'][feature_id] = []
             for genome_id in feature['genomes']:
-                featureset['elements'][feature_id].append(genome_id)
+                featureset_data['elements'][feature_id].append(genome_id)
+
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
+        provenance[0]['service']='MegaHit'
+        provenance[0]['method']='test_megahit'
         
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':featureset_id, 'type':'KBaseCollections.FeatureSet', 'data': featureset}]})
-        return str(featureset)
+        # save object in workspace
+        new_obj_info = self.ws.save_objects({
+					      'workspace':self.getWsName(),
+					      'objects':[{
+							   'type':'KBaseCollections.FeatureSet',
+							   'data':featureset_data,
+							   'name':'myfeatures.featureset',
+							   'meta':{},
+							   'provenance':provenance
+							 }]
+                        })
+                        
+        return new_obj_info[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1189,7 +1209,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def createGenomeSet(self, ws, workspace_name, genomeset_id, genomes_list):
+    def storeGenomeSet(self, ws, workspace_name, genomeset_id, genomes_list):
         genome_names = []
         for genome in genomes_list:
             genome_names.append(genome['name'])
