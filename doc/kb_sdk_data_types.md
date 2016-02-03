@@ -1130,8 +1130,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         for genome in genomes_list:
             genomeSet[genome['name']] = { 'ref': genome['ref'] }
 
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':genomeset_id, \
-        						         'type':'KBaseSearch.GenomeSet', \
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name': genomeset_id, \
+        						         'type': 'KBaseSearch.GenomeSet', \
         						         'data': genomeSet}]})
         return str(genomeSet)
 ```
@@ -1165,14 +1165,14 @@ optional:
 
 ```
     { ## KBaseGenomes.Genome
-        id: 'genome_kbase_id',
-        scientific_name: 'Genus_species_STRAIN',
-        domain: 'domain_of_life',                    # bacteria, archaea, or eukaryote, perhaps?
+        id: 'genome_kbase_id',                       # e.g. "kb|g.26833"
+        scientific_name: 'Genus_species_STRAIN',     # e.g. "Escherichia coli str. K-12 substr. MG1655"
+        domain: 'domain_of_life',                    # Bacteria OR Archaea OR Eukaryote
         genetic_code: <code>,                        # typically 11
         dna_size: <sum_of_contig_lens>,              # in bases
         num_contigs: <num_contigs>,                  # contig count
         contigs: [                                   # preferably not used.  Use separate ContigSet object instead
-                   { id: 'contig_id',                # kbase_id of the contig in the set
+                   { id: 'contig_id',                # e.g. "kb|g.26833.c.0"
                      length: <seq_bp_len>,           # length in bases of the contig sequence
                      md5: 'md5_chksum',              # md5 checksum of the individual contig sequence
                      sequence: 'ACGTACGT...',        # the contig sequence itself
@@ -1187,22 +1187,22 @@ optional:
                    ...
                  ],
         contig_lengths: [ <contig_1_len>, <contig_2_len>, ...],
-        contig_ids: [ <contig_1_kbase_id>, <contig_2_kbase_id>, ...],
-        source: 'source_of_genome',                  # e.g. NCBI, JGI, etc.
-        source_id: 'id_of_genome_at_source',         # e.g. NCBI id
-        md5: 'md5_chksum_of_concat_contigs',        
-        taxonomy: 'taxonomic string',
-        gc_content: <float_avg_gc>,
-        complete: <0/1>,                              # 0=FALSE, 1=TRUE
+        contig_ids: [ <contig_1_kbase_id>, <contig_2_kbase_id>, ...],  # e.g. ["kb|g.26833.c.0"]
+        source: 'source_of_genome',                   # e.g. NCBI, JGI, etc.
+        source_id: 'id_of_genome_at_source',          # e.g. NCBI id
+        md5: 'md5_chksum_of_concat_contigs',          
+        taxonomy: 'taxonomic string',                 # e.g. "Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales; Enterobacteriaceae; Escherichia; Escherichia coli str. K-12 substr. MG1655"
+        gc_content: <float_avg_gc>,                   # 0.0-100.0
+        complete: <0/1>,                              # is genome complete?  0=FALSE, 1=TRUE
         publications: [tuple<int, string, string, string, string, string, string>],
         features: [ {
-		      id: 'feature_kbase_id',
-		      location: [tuple<Contig_id, int, string, int>],
-		      type: 'feature_type',           # e.g. CDS
+		      id: 'feature_kbase_id',         # e.g. "kb|g.26833.CDS.3983"
+		      location: [tuple<'Contig_id', <int_beg_pos>, 'strand', <len>>], # e.g. [["kb|g.26833.c.0",3820423,"+",2109]]
+		      type: 'feature_type',           # e.g. 'CDS'
 		      function: 'func',               # usually assigned from SEED
 		      md5: 'md5_chksum',              # of DNA sequence?
-		      protein_translation: 'aa_seq',  # used many places
-		      dna_sequence: 'dna_seq',        # in gene direction
+		      protein_translation: 'aa_seq',  # IN CAPS
+		      dna_sequence: 'dna_seq',        # in lower case.  Following gene direction
 		      protein_translation_length: <aa_len>,  # int
 		      dna_sequence_length: <dna_len>,        # int
 		      publications: [tuple<int, string, string, string, string, string, string>],
@@ -1220,7 +1220,7 @@ optional:
 		      			  },
 		      			  ...
 		      	                ],
-		      aliases: ['alias_1', 'alias_2', ...],
+		      aliases: ['alias_1', 'alias_2', ...],      # e.g. ["P0AG24","spoT","EG10966","NP_418107.1","P0AG24","ABE-0011935","b3650","2.7.6.5","3.1.7.2","SPOT_ECOLI","GO:0005515"]
 		      orthologs: [tuple<string, float>],
 		      annotations: [tuple<string, string, float>],
 		      subsystem_data: [tuple<string, string, string>],
@@ -1308,7 +1308,44 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
-```
+```python
+    def createGenome(self, ws, workspace_name, genome_id, contigset_ref):
+        genome = {      "complete":1,
+			"id":"kb|g.26833",
+			"scientific_name":"Escherichia coli str. K-12 substr. MG1655",
+			"domain":"Bacteria","
+			"taxonomy":"Bacteria; Proteobacteria; Gammaproteobacteria; Enterobacteriales; Enterobacteriaceae; Escherichia; Escherichia coli str. K-12 substr. MG1655"
+			"contig_ids":["kb|g.26833.c.0"],
+			"num_contigs":1,
+			"contig_lengths":[4639675],
+			"contigset_ref":"2907/15736/1",
+			"dna_size":4639675,
+			"gc_content":50.7896997095702,
+			"genetic_code":11,
+			"md5":"86e17907fb68a0a0447aa495085bff13",
+			"source":"KBase Central Store",
+			"source_id":"511145.6",
+			"features":[  { "aliases":["P0AG24","spoT","EG10966","NP_418107.1","P0AG24","ABE-0011935"],
+					"dna_sequence":"ttg...taa",
+					"dna_sequence_length":2109,
+					"function":"GTP pyrophosphokinase (EC 2.7.6.5), (p)ppGpp synthetase II / Guanosine-3',5'-bis(diphosphate) 3'-pyrophosphohydrolase (EC 3.1.7.2)",
+					"id":"kb|g.26833.CDS.3983",
+					"location":[["kb|g.26833.c.0",3820423,"+",2109]],
+					"md5":"f94417311ccd06512cc8ecfa521bbbe6",
+					"protein_translation":"MYL...NRN",
+					"protein_translation_length":702,
+					"subsystem_data":[["Stringent Response, (p)ppGpp metabolism","1","GTP pyrophosphokinase (EC 2.7.6.5), (p)ppGpp synthetase II"],["Stringent Response, (p)ppGpp metabolism","1","Guanosine-3',5'-bis(diphosphate) 3'-pyrophosphohydrolase (EC 3.1.7.2)"]],
+					"subsystems":["Stringent Response, (p)ppGpp metabolism"],
+					"type":"CDS"
+				      },
+				      ...
+				   ],
+		 }
+        
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name': genome_id, \
+        						         'type': 'KBaseGenomes.Genome', \
+        						         'data': genome}]})
+        return str(genome)
 ```
 [\[back to data type list\]](#data-type-list)
 
