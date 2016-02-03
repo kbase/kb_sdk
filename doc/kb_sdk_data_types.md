@@ -1064,24 +1064,72 @@ Note: either *ref* or *data* is defined for an element, but not both.
     }
 ```
 
+##### setup
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
+
+```python
+    from biokbase.workspace.client import Workspace as workspaceService
+    from Bio import SeqIO
+    from Bio.Seq import Seq
+    from Bio.SeqRecord import SeqRecord
+    from Bio.Alphabet import generic_protein
+
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+```
+
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
-```
+```python
+    def getGenomeSet(self, ws, workspace_name, genomeset_id):
+        genomeSet = ws.get_objects([{'ref':workspace_name+'/'+genomeset_id}])[0]['data']
+        return genomeSet
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
-```
+```python
+    def exportContigFasta(self, ws, workspace_name, genomeset_id):
+    	genomeSet = self.getGenomeSet(ws, workspace_name, genomeset_id)
+    	
+        # Process each genome one by one
+        records = []
+        for genome_name in genomeSet['elements'].keys():
+            genomeRef = genomeSet['elements'][genome_name]['ref']
+            genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+	    contigSetRef = genome['contigset_ref']
+	    contigSet = ws.get_objects([{'ref':contigSetRef}])[0]['data']
+	    for contig_id in contigSet['contigs'].keys():
+	    	contig_sequence = contigSet['contigs'][contig_id]['sequence']
+                record = SeqRecord(Seq(contig_sequence), id=genome_name+contig_id, description=genome_name+" "+contig_id)
+                records.append(record)
+            SeqIO.write(records, self.fileFastaName+"_"+genome_name, "fasta")
 ```
 
 ##### storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
-```
+```python
+    def createGenomeSet(self, ws, workspace_name, genomeSet_id, genomes_list):
+        genome_names = []
+	for genome in genomes_list:
+	    genome_names.append(genome['name'])
+        genomeSet = {
+            'description': 'genome set: ' + ",".join(genome_names)
+            'elements': {}
+        }
+        for genome in genomes_list:
+            genomeSet[genome['name']] = { 'ref': genome['ref'] }
+
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':genomeSet_id,
+        						         'type':'KBaseSearch.GenomeSet',
+        						         'data': genomeSet}]})
+        return str(genomeSet)
 ```
 [\[back to data type list\]](#data-type-list)
+
 
 
 ### <A NAME="genome"></A>Genome
@@ -1116,7 +1164,7 @@ optional:
         genetic_code: <code>,                         # typically 11
         dna_size: <sum_of_contig_lens>,
         num_contigs: <num_contigs>,
-        contigs: [ { id: 'contig_1_kbase_id>,
+        contigs: [ { id: 'contig_1_kbase_id>,         # preferably is not used.  Use a separate ContigSet object instead
         	     length: <len>,
         	     md5: 'md5_chksum',
         	     sequence: 'sequence_of_contig',
