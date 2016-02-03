@@ -384,22 +384,26 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             'sequencing_tech':'artificial reads'
         }
 
-        new_obj_info = self.ws.save_objects({
-                        'workspace':self.getWsName(),
-                        'objects':[
-                            {
-                                'type':'KBaseFile.SingleEndLibrary',
-                                'data':single_end_library,
-                                'name':'test.pe.reads',
-                                'meta':{},
-                                'provenance':[
-                                    {
-                                        'service':'MegaHit',
-                                        'method':'test_megahit'
-                                    }
-                                ]
-                            }]
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
+        provenance[0]['service']='MegaHit'
+        provenance[0]['method']='test_megahit'
+        
+	# save object in workspace
+        new_obj_info = self.ws.save_objects({ 'workspace':self.getWsName(),
+					      'objects':[{
+							   'type':'KBaseFile.SingleEndLibrary',
+							   'data':single_end_library,
+							   'name':'test.se.reads',
+							   'meta':{},
+							   'provenance':provenance
+							 }]
                         })
+                        
         self.__class__.singleEndLibInfo = new_obj_info[0]
         return new_obj_info[0]
 ```
@@ -736,6 +740,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     def getPairedEndLibInfo(self):
         if hasattr(self.__class__, 'pairedEndLibInfo'):
             return self.__class__.pairedEndLibInfo
+            
         # 1) upload files to shock
         token = self.ctx['token']
         forward_shock_file = self.upload_file_to_shock(
@@ -799,23 +804,27 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             'interleaved':0,
             'sequencing_tech':'artificial reads'
         }
-
-        new_obj_info = self.ws.save_objects({
-                        'workspace':self.getWsName(),
-                        'objects':[
-                            {
-                                'type':'KBaseFile.PairedEndLibrary',
-                                'data':paired_end_library,
-                                'name':'test.pe.reads',
-                                'meta':{},
-                                'provenance':[
-                                    {
-                                        'service':'MegaHit',
-                                        'method':'test_megahit'
-                                    }
-                                ]
-                            }]
+        
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
+        provenance[0]['service']='MegaHit'
+        provenance[0]['method']='test_megahit'
+        
+	# save object in workspace
+        new_obj_info = self.ws.save_objects({ 'workspace':self.getWsName(),
+					      'objects':[{
+							   'type':'KBaseFile.PairedEndLibrary',
+							   'data':paired_end_library,
+							   'name':'test.pe.reads',
+							   'meta':{},
+							   'provenance':provenance
+							 }]
                         })
+                        
         self.__class__.pairedEndLibInfo = new_obj_info[0]
         return new_obj_info[0]
 ```
@@ -930,27 +939,27 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             lengths.append(contig['length'])
             contigset_data['contigs'].append(contig)
 
-
         # load the method provenance from the context object
         provenance = [{}]
         if 'provenance' in ctx:
             provenance = ctx['provenance']
-        # add additional info to provenance here, in this case the input data object reference
+        # add additional info to provenance here, in this case the input data object reference, service, and method
         provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
-
-        # save the contigset output
-        new_obj_info = ws.save_objects({
-                'id':info[6], # set the output workspace ID
-                'objects':[
-                    {
-                        'type':'KBaseGenomes.ContigSet',
-                        'data':contigset_data,
-                        'name':params['output_contigset_name'],
-                        'meta':{},
-                        'provenance':provenance
-                    }
-                ]
-            })
+        provenance[0]['service']='MegaHit'
+        provenance[0]['method']='test_megahit'
+        
+	# save object in workspace
+        new_obj_info = self.ws.save_objects({ 'workspace':self.getWsName(),
+					      'objects':[{
+							   'type':'KBaseGenomes.ContigSet',
+							   'data':contigset_data,
+							   'name':'megahit.contigs',
+							   'meta':{},
+							   'provenance':provenance
+							 }]
+                        })
+                        
+        return new_obj_info[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1310,7 +1319,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
     def createGenome(self, ws, workspace_name, genome_id, contigset_ref):
-        genome = {      "complete":1,
+        genome = {
+			"complete":1,
 			"id":"kb|g.26833",
 			"scientific_name":"Escherichia coli str. K-12 substr. MG1655",
 			"domain":"Bacteria","
@@ -1339,7 +1349,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 					"type":"CDS"
 				      },
 				      ...
-				   ],
+				   ]
 		 }
         
         ws.save_objects({'workspace':workspace_name, 'objects':[{'name': genome_id, \
