@@ -186,8 +186,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
@@ -209,8 +215,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
         #### Get the read library
         try:
-            ws = workspaceService(self.workspaceURL, token=ctx['token'])
-            objects = ws.get_objects([{'ref': params['workspace_name']+'/'+params['read_library_name']}])
+            objects = self.ws.get_objects([{'ref': params['workspace_name']+'/'+params['read_library_name']}])
             data = objects[0]['data']
             info = objects[0]['info']
             # Object Info Contents
@@ -301,9 +306,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.
 
 ```python
-    def getContext(self):
-        return self.__class__.ctx
-
     def upload_file_to_shock(self,
                              shock_service_url = None,
                              filePath = None,
@@ -545,8 +547,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
@@ -885,10 +893,26 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
-    from Bio import SeqIO
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
@@ -994,8 +1018,25 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     from Bio.SeqRecord import SeqRecord
     from Bio.Alphabet import generic_protein
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
@@ -1093,8 +1134,25 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     from Bio.SeqRecord import SeqRecord
     from Bio.Alphabet import generic_protein
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
@@ -1290,8 +1348,25 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     from Bio.SeqRecord import SeqRecord
     from Bio.Alphabet import generic_protein
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
@@ -1374,8 +1449,25 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
@@ -1462,8 +1554,25 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     from Bio.SeqRecord import SeqRecord
     from Bio.Alphabet import generic_protein
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
@@ -1553,8 +1662,25 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
 
+    def getContext(self):
+        return self.__class__.ctx
+        
     def __init__(self, config):
+        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
+        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
 ```
 
 ##### obtaining
