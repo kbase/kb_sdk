@@ -1273,6 +1273,10 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
     from biokbase.workspace.client import Workspace as workspaceService
+    from Bio import SeqIO
+    from Bio.Seq import Seq
+    from Bio.SeqRecord import SeqRecord
+    from Bio.Alphabet import generic_protein
 
     def __init__(self, config):
         self.workspaceURL = config['workspace-url']
@@ -1281,13 +1285,24 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
-```
+```python
+    def getGenome(self, ws, workspace_name, genome_id):
+        genome = ws.get_objects([{'ref':workspace_name+'/'+genome_id}])[0]['data']
+        return genome
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
-```
+```python
+    def exportFasta(self, genome):
+    	records = []
+	for feature in genome['features']:
+	    record = SeqRecord(Seq(feature['protein_translation']), \
+	    	               id=feature['id'], \
+	    		       description=feature['type']+"."+feature['function'])
+	    records.append(record)
+        SeqIO.write(records, self.fileFastaName, "fasta")
 ```
 
 ##### storing
