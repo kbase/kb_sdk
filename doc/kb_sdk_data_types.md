@@ -3,54 +3,51 @@
 KBase is currently working on a Data API that will replace direct access of KBase Data Objects.  Access to Genome Types will be the first class of data supported.  The API is not yet available.  In the meantime, Community Developers should access the Data Objects directly, following the guidance below.
 
 
-## Data Type Definitions
-
-Some, but not all, of the KBase data type definitions are available at
-
-https://github.com/kbase/data_api/tree/develop/experiments/workspace_typespecs
-
-Others may be examined by selecting an object of that type in a Narrative and clicking on the type to open the Landing Page for that type (make sure you click on the object type on the right, not the grouping on the left).
-Then click on the 'Spec-file' tab.
-
-e.g.
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
-
-
-## Base KBase and Workspace IDs and references
+## KBase and Workspace IDs and references
 
 #### kbase_id
 
 A KBase ID is a string starting with the characters "kb|".  KBase IDs are typed. The types are designated using a short string. For instance," g" denotes a genome, "tree" denotes a Tree, and "aln" denotes a sequence alignment. KBase IDs may be hierarchical.  For example, if a KBase genome identifier is "kb|g.1234", a protein encoding gene within that genome may be represented as "kb|g.1234.peg.771".
 
 
-#### ref_type
+#### Data object names and IDs
 
-An enumeration of reference types for a node.  Either the one letter abbreviation or full name can be given.
+Data objects are stored in an object database.  Individual Narratives have "workspaces" associated with them where all data is stored for a given Narrative analysis.  Methods should interact with the data objects within a single workspace.
 
-Supported types include:
-- g | genome  => genome typed object or CDS data
-- p | protein => protein sequence object or CDS data, often given as the MD5 of the sequence
-- n | dna     => dna sequence object or CDS data, often given as the MD5 of the sequence
-- f | feature => feature object or CDS data
+The KBase workspace is documented here:<br>
+https://www.kbase.us/services/ws/docs/
 
-**NOTE: THERE ARE MORE THAT SHOULD BE LISTED HERE**
+Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and not guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
 
+Data object reference syntax is described here:<br>
+https://www.kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
 
-#### ws_obj_id
+A data object reference, used in retrieving and storing data objects, has the workspace name/ID, the data object name/ID, and possible a trailing version, delimted by slashes.
+  
+e.g. The following are equivalent objects
 
-The fully qualified name of a workspace object that includes the workspace name.  For example:
+```
+KBasePublicGenomesV5/kb|g.26833    # wsName/objName 
+2907/15741                         # wsId/objId
+KBasePublicGenomesV5/kb|g.26833/1  # wsName/objName/objVer
+2907/15741/1                       # wsId/objId/objVer
+```
+Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods by configuring behavior in ui/<narrative_method>/spec.json file (see SDK doc).
 
-    dylan:1424477476805/Carsonella_10.genome_set
-
-*NEED CLARIFICATION BETWEEN THESE*
-
-#### workspace_id / workspace?
-
-*NEED CLARIFICATION BETWEEN THESE*
-
-#### workspace_name / workspace?
-
-*NEED CLARIFICATION BETWEEN THESE*
+```
+    {
+	"behavior": {
+		"service-mapping": {
+			"input_mapping": [
+				{
+					"narrative_system_variable": "workspace",
+					"target_property": "workspace_name"
+				}
+			]
+		}
+	}
+    }
+```
 
 
 ## <A NAME="data-type-list"></A>KBase Data Types
@@ -1640,6 +1637,14 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.Tree
 Phylogenetic trees may represent the evolutionary relationships of either species/genomes or genes.
 
 ##### data structure
+ref_type:
+An enumeration of reference types for a node.  Either the one letter abbreviation or full name can be given.<br>
+Supported types include:<br>
+- g | genome  => genome typed object or CDS data
+- p | protein => protein sequence object or CDS data, often given as the MD5 of the sequence
+- n | dna     => dna sequence object or CDS data, often given as the MD5 of the sequence
+- f | feature => feature object or CDS data
+
 optional:
 - name
 - description
