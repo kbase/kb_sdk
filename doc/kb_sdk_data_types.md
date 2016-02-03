@@ -1121,8 +1121,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
     def createGenomeSet(self, ws, workspace_name, genomeset_id, genomes_list):
         genome_names = []
-	for genome in genomes_list:
-	    genome_names.append(genome['name'])
+        for genome in genomes_list:
+            genome_names.append(genome['name'])
         genomeSet = {
             'description': 'genome set: ' + ",".join(genome_names)
             'elements': {}
