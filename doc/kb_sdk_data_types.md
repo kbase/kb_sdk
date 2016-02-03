@@ -85,7 +85,7 @@ The fully qualified name of a workspace object that includes the workspace name.
 
 
 ### <A NAME="single-end-library"></A>SingleEndLibrary
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.SingleEndLibrary
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.SingleEndLibrary<br>
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary
 
 SingleEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  It may be compressed with GZIP compression.  There are two types of SingleEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of SingleEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  The KBaseAssembly version is essentially just the 'file' portion of the 'lib' structure in the KBaseFile SingleEndLibrary definition, but uses the field name 'handle' instead of 'file' (see below).  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
@@ -393,8 +393,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         provenance[0]['service']='MegaHit'
         provenance[0]['method']='test_megahit'
         
-	# save object in workspace
-        new_obj_info = self.ws.save_objects({ 'workspace':self.getWsName(),
+        # save object in workspace
+        new_obj_info = self.ws.save_objects({
+					      'workspace':self.getWsName(),
 					      'objects':[{
 							   'type':'KBaseFile.SingleEndLibrary',
 							   'data':single_end_library,
@@ -411,7 +412,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
  
 
 ### <A NAME="paired-end-library"></A>PairedEndLibrary
-https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.PairedEndLibrary
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.PairedEndLibrary<br>
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary
 
 PairedEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  Typically there are two files, one for 'forward' reads and one for 'reverse' reads.  They may be compressed with GZIP compression.  There are two types of PairedEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of PariedEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  The KBaseAssembly version is essentially just the 'file' portion of the 'lib' substructure in the KBaseFile PairedEndLibrary definition, but uses the field name 'handle' instead of 'file' (see below).  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
@@ -814,8 +815,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         provenance[0]['service']='MegaHit'
         provenance[0]['method']='test_megahit'
         
-	# save object in workspace
-        new_obj_info = self.ws.save_objects({ 'workspace':self.getWsName(),
+        # save object in workspace
+        new_obj_info = self.ws.save_objects({
+					      'workspace':self.getWsName(),
 					      'objects':[{
 							   'type':'KBaseFile.PairedEndLibrary',
 							   'data':paired_end_library,
@@ -948,8 +950,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         provenance[0]['service']='MegaHit'
         provenance[0]['method']='test_megahit'
         
-	# save object in workspace
-        new_obj_info = self.ws.save_objects({ 'workspace':self.getWsName(),
+        # save object in workspace
+        new_obj_info = self.ws.save_objects({
+					      'workspace':self.getWsName(),
 					      'objects':[{
 							   'type':'KBaseGenomes.ContigSet',
 							   'data':contigset_data,
