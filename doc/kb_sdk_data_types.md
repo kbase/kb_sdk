@@ -114,7 +114,8 @@ optional:
 - single_genome
 
 ```
-    { lib: { file: { hid: 'ws_handle_id',
+    {
+      lib: { file: { hid: 'ws_handle_id',
     		     file_name: 'user_defined_file_name',
     		     id: 'shock_node_id',
     		     url: 'url_of_shock_server',
@@ -167,7 +168,8 @@ optional:
 - remote_sha1
 
 ```
-    { handle: { hid: 'ws_handle_id',
+    {
+      handle: { hid: 'ws_handle_id',
     		file_name: 'user_defined_file_name',
     		id: 'shock_node_id',
     		url: 'url_of_shock_server',
@@ -437,7 +439,8 @@ optional:
 - single_genome
 
 ```
-    { lib1: { file: { hid: 'ws_handle_id',                              # e.g. for 'forward' reads
+    {
+      lib1: { file: { hid: 'ws_handle_id',                              # e.g. for 'forward' reads
     		      file_name: 'user_defined_file_name',
     		      id: 'shock_node_id',
     		      url: 'url_of_shock_server',
@@ -507,7 +510,8 @@ optional:
 - remote_sha1
 
 ```
-    { handle_1: { hid: 'ws_handle_id',
+    {
+      handle_1: { hid: 'ws_handle_id',
     	  	  file_name: 'user_defined_file_name',
     		  id: 'shock_node_id',
     		  url: 'url_of_shock_server',
@@ -839,7 +843,8 @@ optional:
 - complete
 
 ```
-    { id: 'ContigSet_kbase_id',
+    {
+      id: 'ContigSet_kbase_id',
       name: 'ContigSet_name',                    # user defined
       md5: 'md5_chksum',                         # md5 checksum of the contigs sequences
       source_id: 'source_kbase_id',              # source kbase_id of the ContigSet
@@ -847,7 +852,7 @@ optional:
       type: 'ContigSet_type',                    # values are Genome,Transcripts,Environment,Collection
       reads_ref: 'reads_kbase_ref ',             # ref to shock node with the raw reads from which contigs were assembled
       fasta_ref: 'fasta_kbase_ref',              # ref to fasta file source
-      contigs: [ { id: 'contig_id',              # id (not kbase_id) of the contig in the set
+      contigs: [ { id: 'contig_id',              # kbase_id of the contig in the set
                    length: <seq_bp_len>,         # length in bases of the contig sequence
                    md5: 'md5_chksum',            # md5 checksum of the individual contig sequence
                    sequence: 'ACGTACGT...',      # the contig sequence itself
@@ -959,7 +964,8 @@ optional:
 - element_ordering
 
 ```
-    { description: 'user_defined_name_or_desc_for_set',
+    {
+      description: 'user_defined_name_or_desc_for_set',
       element_ordering: ['feature_1_kbase_id', 'feature_2_kbase_id', ...],
       elements: { 'feature_1_kbase_id': ['source_A_genome_ref', 'source_B_genome_ref', ...]
     }
@@ -1025,7 +1031,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             'elements': {}
         }
         for feature in feature_list:
-	    feature_id = feature['feature_id']
+            feature_id = feature['feature_id']
             featureset['element_ordering'].append(feature_id);
             featureset['elements'][feature_id] = []
             for genome_id in feature['genomes']:
@@ -1051,7 +1057,8 @@ Note: either *ref* or *data* is defined for an element, but not both.
 - optional data
 
 ```
-    { description: ‘genome_set_name’,
+    {
+      description: ‘genome_set_name’,
       elements : { ‘genome_name1_1’: { metadata: {‘f1’: ‘v1’,
                                                   ‘f2’: ‘v2’,
                                                    ...
@@ -1112,7 +1119,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def createGenomeSet(self, ws, workspace_name, genomeSet_id, genomes_list):
+    def createGenomeSet(self, ws, workspace_name, genomeset_id, genomes_list):
         genome_names = []
 	for genome in genomes_list:
 	    genome_names.append(genome['name'])
@@ -1123,7 +1130,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         for genome in genomes_list:
             genomeSet[genome['name']] = { 'ref': genome['ref'] }
 
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':genomeSet_id, \
+        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':genomeset_id, \
         						         'type':'KBaseSearch.GenomeSet', \
         						         'data': genomeSet}]})
         return str(genomeSet)
@@ -1158,43 +1165,106 @@ optional:
 
 ```
     {
-        id: 'genome_kbase_id',
+	id: 'genome_kbase_id',
         scientific_name: 'Genus_species_STRAIN',
-        domain: 'domain_of_life',                     # bacteria, archaea, or eukaryote, perhaps?
-        genetic_code: <code>,                         # typically 11
-        dna_size: <sum_of_contig_lens>,
-        num_contigs: <num_contigs>,
-        contigs: [ { id: 'contig_1_kbase_id>,         # preferably is not used.  Use a separate ContigSet object instead
-        	     length: <len>,
-        	     md5: 'md5_chksum',
-        	     sequence: 'sequence_of_contig',
-        	     genetic_code: <code>,            # typically 11
-	 	     cell_compartment: '',
-	 	     replicon_type: '',
-	 	     replicon_geometry: '',
-	 	     name: '',
-	 	     description: '',
-	 	     complete: <0/1>
-        	   },
-        	   { id: 'contig_2_kbase_id',
-        	     ...
-        	   },
-        	   ...
-        	 ],
-        contig_lengths: [ <contig_1_len>, <contig_2_len>, ...],
+        domain: 'domain_of_life',                    # bacteria, archaea, or eukaryote, perhaps?
+        genetic_code: <code>,                        # typically 11
+        dna_size: <sum_of_contig_lens>,              # in bases
+        num_contigs: <num_contigs>,                  # contig count
+	contigs: [                                   # preferably not used.  Use separate ContigSet object instead
+                   { id: 'contig_id',                # kbase_id of the contig in the set
+                     length: <seq_bp_len>,           # length in bases of the contig sequence
+                     md5: 'md5_chksum',              # md5 checksum of the individual contig sequence
+                     sequence: 'ACGTACGT...',        # the contig sequence itself
+                     genetic_code: <genetic_code>    # def: 11
+                     cell_compartment: 'compart',    # e.g. "nucleus"
+                     replicon_type: 'rep_type',      # e.g. plasmid
+                     replicon_geometry: 'geom',      # e.g. "linear", "circular"
+                     name: 'contig_name',            # name
+                     description: 'desc',            # contig description
+                     complete: <0/1>                 # is contig a complete chromosome/plasmid?  0=FALSE, 1=TRUE
+                   },
+                   ...
+                 ],
+	contig_lengths: [ <contig_1_len>, <contig_2_len>, ...],
         contig_ids: [ <contig_1_kbase_id>, <contig_2_kbase_id>, ...],
         source: 'source_of_genome',                  # e.g. NCBI, JGI, etc.
-        source_id: 'id_of_genome_at_source',
-        md5: 'md5_chksum_of_concat_contigs',
+        source_id: 'id_of_genome_at_source',         # e.g. NCBI id
+        md5: 'md5_chksum_of_concat_contigs',        
         taxonomy: 'taxonomic string',
         gc_content: <float_avg_gc>,
         complete: <0/1>,                              # 0=FALSE, 1=TRUE
-        publications: [],
-        features: [],
-        contigset_ref:
-        quality:
-        close_genomes: [],
-        analysis_events: []
+        publications: [tuple<int, string, string, string, string, string, string>],
+        features: [ {
+		      id: 'feature_kbase_id',
+		      location: [tuple<Contig_id, int, string, int>],
+		      type: 'feature_type',           # e.g. CDS
+		      function: 'func',               # usually assigned from SEED
+		      md5: 'md5_chksum',              # of DNA sequence?
+		      protein_translation: 'aa_seq',  # used many places
+		      dna_sequence: 'dna_seq',        # in gene direction
+		      protein_translation_length: <aa_len>,  # int
+		      dna_sequence_length: <dna_len>,        # int
+		      publications: [tuple<int, string, string, string, string, string, string>],
+		      subsystems: ['SEED_subsystem_1', ...],
+		      protein_families: [ { id: 'prot_family_id',
+		      			    subject_db: 'prot_family_db',
+		      			    release_version: 'prot_family_db_version',
+		      			    subject_description: 'prot_family_desc',
+		      			    query_begin: <feature_match_beg>,
+		      			    query_end: <feature_match_end>,
+		      			    subject_begin: <prot_family_match_beg>,
+		      			    subject_end: <prot_family_match_end>,
+		      			    score: <float_score>,
+		      			    evalue: <float_evalue>
+		      			  },
+		      			  ...
+		      	                ],
+		      aliases: ['alias_1', 'alias_2', ...],
+		      orthologs: [tuple<string, float>],
+		      annotations: [tuple<string, string, float>],
+		      subsystem_data: [tuple<string, string, string>],
+		      regulon_data: [tuple<string, list<Feature_id>, list<Feature_id>],
+		      atomic_regulons: [tuple<string, int>],
+		      coexpressed_fids: [tuple<Feature_id, float>],
+		      co_occuring_fids: [tuple<Feature_id, float>],
+		      quality: { truncated_begin: <0/1>,     # 0=FALSE, 1=TRUE
+		      		 truncated_end: <0/1>,       # 0=FALSE, 1=TRUE
+		      		 existence_confidence: <float_conf>,
+		      		 frameshifted: <0/1>,
+		      		 selenoprotein: <0/1>,
+		      		 pyrrolysylprotein: <0/1>,
+		      		 overlap_rules: ['overlap_rule_1', ...],
+		      		 existence_priority: <float_priority>,
+		      		 hit_count: <float_hit_count>,
+		      		 weighted_hit_count: <weighted_hits>
+		      	       },
+		      feature_creation_event: { id: 'analysis_event_id',
+						tool_name: 'analysis_tool_name',
+						execution_time: <float_time>,
+						parameters: [ 'param1', 'param2', ... ],
+						hostname: 'exec_host'
+					      },
+        	    },
+        	    ...
+        	  ],
+        contigset_ref: <contigset_kbase_ws_ref>,
+        quality: { frameshift_error_rate: <float_err_rate>,
+        	   sequence_error_rate: <seq_err_rate>
+        	 },
+        close_genomes: [ { genome: 'genome_kbase_id',
+        		   closeness_measure: <float_measure>    # usually identity
+        		 },
+        		 ...
+        	       ],
+        analysis_events: [ { id: 'analysis_event_id',
+        		     tool_name: 'analysis_tool_name',
+        		     execution_time: <float_time>,
+        		     parameters: [ 'param1', 'param2', ... ],
+        		     hostname: 'exec_host'
+        		   },
+        		   ...
+        	         ],
     }
 ```
 
@@ -1334,34 +1404,12 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-    def buildGenome2Features(self, ws, workspace_name, featureset_id):
-        genome2Features = {}
-        featureSet = ws.get_objects([{'ref':workspace_name+'/'+featureset_id}])[0]['data']
-        features = featureSet['elements']
-        for fId in features:
-            genomeRef = features[fId][0]
-            if genomeRef not in genome2Features:
-                genome2Features[genomeRef] = []
-            genome2Features[genomeRef].append(fId)
-        return genome2Features
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
-    def exportFasta(self, ws, workspace_name, featureset_id):
-        # Process each genome one by one
-        records = []
-        for genomeRef in genome2Features:
-            genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-            featureIds = genome2Features[genomeRef]
-            for feature in genome['features']:
-                for fId in featureIds:
-                    if fId == feature['id']:
-                        record = SeqRecord(Seq(feature['protein_translation']), id=fId, description=genomeRef)
-                        records.append(record)
-        SeqIO.write(records, self.fileFastaName, "fasta")
 ```
 
 ##### storing
@@ -1382,7 +1430,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             sequence = str(record.seq)
             msa['alignment'][record.id] = sequence
             alignment_length = len(sequence)
-        msa['alignment_length'] = alignment_length
+            msa['alignment_length'] = alignment_length
         
         ws.save_objects({'workspace':workspace_name, 'objects':[{'name':msa_id, 'type':'KBaseTrees.MSA', 'data': msa}]})
         return str(msa)
