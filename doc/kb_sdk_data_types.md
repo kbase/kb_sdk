@@ -1165,13 +1165,13 @@ optional:
 
 ```
     {
-	id: 'genome_kbase_id',
+        id: 'genome_kbase_id',
         scientific_name: 'Genus_species_STRAIN',
         domain: 'domain_of_life',                    # bacteria, archaea, or eukaryote, perhaps?
         genetic_code: <code>,                        # typically 11
         dna_size: <sum_of_contig_lens>,              # in bases
         num_contigs: <num_contigs>,                  # contig count
-	contigs: [                                   # preferably not used.  Use separate ContigSet object instead
+        contigs: [                                   # preferably not used.  Use separate ContigSet object instead
                    { id: 'contig_id',                # kbase_id of the contig in the set
                      length: <seq_bp_len>,           # length in bases of the contig sequence
                      md5: 'md5_chksum',              # md5 checksum of the individual contig sequence
@@ -1186,7 +1186,7 @@ optional:
                    },
                    ...
                  ],
-	contig_lengths: [ <contig_1_len>, <contig_2_len>, ...],
+        contig_lengths: [ <contig_1_len>, <contig_2_len>, ...],
         contig_ids: [ <contig_1_kbase_id>, <contig_2_kbase_id>, ...],
         source: 'source_of_genome',                  # e.g. NCBI, JGI, etc.
         source_id: 'id_of_genome_at_source',         # e.g. NCBI id
