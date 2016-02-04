@@ -314,7 +314,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         p = subprocess.Popen(megahit_cmd,
                     cwd = self.scratch,
                     stdout = subprocess.PIPE, 
-                    stderr = subprocess.STDOUT, shell = False)
+                    stderr = subprocess.STDOUT,
+                    shell = False)
         while True:
             line = p.stdout.readline()
             if not line: break
@@ -612,8 +613,6 @@ class <ModuleName>:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
 ```python
-	console = []
-
         #### Get the read library
         try:
             ws = workspaceService(self.workspaceURL, token=ctx['token'])
@@ -723,7 +722,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         p = subprocess.Popen(megahit_cmd,
                     cwd = self.scratch,
                     stdout = subprocess.PIPE, 
-                    stderr = subprocess.STDOUT, shell = False)
+                    stderr = subprocess.STDOUT,
+                    shell = False)
 
         while True:
             line = p.stdout.readline()
@@ -970,19 +970,25 @@ class <ModuleName>:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-	self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_id'])
-        contigSet = wsClient.get_objects([{'ref': params['workspace_name']+'/'+params['contigset_id']}])[0]['data']
+	self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_name'])
+	contigSetRef = params['workspace_name']+'/'+params['contigset_name']
+        contigSet = wsClient.get_objects([{'ref':contigSetRef}])[0]['data']
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
-	self.log(console, 'writing contigset object: '+params['workspace_name']+'/'+params['contigset_id'])
-        for contig in contigSet['contigs']:
-            contig_count += 1
-            if len(contig['sequence']) >= int(params['min_length']):
-                passing_contigs.append(contig)
+	# export contig sequences to FASTA file
+        fasta_file_location = os.path.join(self.scratch, params['contigset_name']+".fasta")
+        self.log(console, 'writing '+contigSetRef+' to fasta file: '+fasta_file_location)
+
+        records = []
+        for contig_id in contigSet['contigs'].keys():
+            contig_sequence = contigSet['contigs'][contig_id]['sequence']
+            record = SeqRecord(Seq(contig_sequence), id=contig_id, description=contig_id)
+            records.append(record)
+        SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
 ##### storing
@@ -996,7 +1002,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
         # Warning: this reads everything into memory!  Will not work if the contigset is very large!
         contigset_data = {
-            'id': 'megahit.contigset',
+            'id': 'MyMethod.ContigSet',
             'source': 'User assembled contigs from reads in KBase',
             'source_id': 'none',
             'md5': 'md5 of what? concat seq? concat md5s?',
@@ -1020,8 +1026,10 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
         provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['read_library_name']]
-        provenance[0]['service'] = 'MegaHit'
-        provenance[0]['method'] = 'test_megahit'
+        # OR e.g.
+        # provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['contigset_name']]
+        provenance[0]['service'] = 'MyModule'
+        provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = self.ws.save_objects({
