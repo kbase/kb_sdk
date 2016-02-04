@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import us.kbase.common.service.test.Tuple2;
+import us.kbase.common.service.Tuple2;
 
 /**
  * Class represents function definition in spec-file.
