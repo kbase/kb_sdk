@@ -230,12 +230,12 @@ class <ModuleName>:
         sys.stdout.flush()
         
     def run_\<method_name\> (self, ctx, params):
-	console = []
-        self.log(console,'Running run_\<method_name\> with params=')
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
         self.log(console, pformat(params))
 
         token = ctx['token']
-	ws = workspaceService(self.workspaceURL, token=token)
+        ws = workspaceService(self.workspaceURL, token=token)
     	...
 ```
 
