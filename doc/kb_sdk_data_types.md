@@ -970,8 +970,8 @@ class <ModuleName>:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-	self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_name'])
-	contigSetRef = params['workspace_name']+'/'+params['contigset_name']
+        self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_name'])
+        contigSetRef = params['workspace_name']+'/'+params['contigset_name']
         contigSet = wsClient.get_objects([{'ref':contigSetRef}])[0]['data']
 ```
 
