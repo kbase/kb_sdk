@@ -24,7 +24,7 @@ https://www.kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-an
 
 A data object reference, used in retrieving and storing data objects, has the workspace name/ID, the data object name/ID, and possible a trailing version, delimited by slashes.
   
-e.g. The following are equivalent objects
+e.g. the following are equivalent objects
 
 ```
 KBasePublicGenomesV5/kb|g.26833    # wsName/objName 
@@ -32,9 +32,17 @@ KBasePublicGenomesV5/kb|g.26833    # wsName/objName
 KBasePublicGenomesV5/kb|g.26833/1  # wsName/objName/objVer
 2907/15741/1                       # wsId/objId/objVer
 ```
-Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods by configuring 'behavior' in
+Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods using the following code.
 
-ui/\<method\>/spec.json file (see SDK doc):
+1. In the input parameter structure in the KIDL *\<module\>.spec* (see SDK doc):
+
+```
+    typedef structure {
+    	string workspace_name;
+    } <Module>Params;
+```
+
+2. Configure 'behavior' in *ui/\<method\>/spec.json* file (see SDK doc):
 
 ```
 	"behavior": {
@@ -47,14 +55,6 @@ ui/\<method\>/spec.json file (see SDK doc):
 			]
 		}
 	}
-```
-
-and in the input parameter structure in the KIDL \<module\>.spec (see SDK doc):
-
-```
-    typedef structure {
-    	string workspace_name;
-    } <Module>Params;
 ```
 
 
