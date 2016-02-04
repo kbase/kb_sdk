@@ -920,15 +920,31 @@ optional:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
-    from biokbase.workspace.client import Workspace as workspaceService
-
-    def getContext(self):
-        return self.__class__.ctx
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from biokbase.workspace.client import Workspace as workspaceService
         
+class <ModuleName>:
+
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
     def __init__(self, config):
-        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
 
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
@@ -941,16 +957,23 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             target.append(message)
         print(message)
         sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
 ```
 
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-    def getContigSet(self, ctx, input):
-        token = ctx['token']
-        wsClient = workspaceService(self.workspaceURL, token=token)
-        contigSet = wsClient.get_objects([{'ref': input['input_ws']+'/'+input['contigset_id']}])[0]['data']
+        contigSet = wsClient.get_objects([{'ref': params['workspace_name']+'/'+params['contigset_id']}])[0]['data']
 ```
 
 ##### using
@@ -967,33 +990,27 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def storeContigSet(self):
-    	ctx = self.getContext()
-
         # parse the output and save back to KBase
         output_contigs = os.path.join(output_dir, 'final.contigs.fa')
 
-        # Warning: this reads everything into memory!  Will not work if 
-        # the contigset is very large!
+        # Warning: this reads everything into memory!  Will not work if the contigset is very large!
         contigset_data = {
-            'id':'megahit.contigset',
-            'source':'User assembled contigs from reads in KBase',
-            'source_id':'none',
+            'id': 'megahit.contigset',
+            'source': 'User assembled contigs from reads in KBase',
+            'source_id': 'none',
             'md5': 'md5 of what? concat seq? concat md5s?',
-            'contigs':[]
+            'contigs': []
         }
 
-        lengths = []
         for seq_record in SeqIO.parse(output_contigs, 'fasta'):
             contig = {
-                'id':seq_record.id,
-                'name':seq_record.name,
-                'description':seq_record.description,
-                'length':len(seq_record.seq),
-                'sequence':str(seq_record.seq),
-                'md5':hashlib.md5(str(seq_record.seq)).hexdigest()
+                'id': seq_record.id,
+                'name': seq_record.name,
+                'description': seq_record.description,
+                'length': len(seq_record.seq),
+                'sequence': str(seq_record.seq),
+                'md5': hashlib.md5(str(seq_record.seq)).hexdigest()
             }
-            lengths.append(contig['length'])
             contigset_data['contigs'].append(contig)
 
         # load the method provenance from the context object
@@ -1001,19 +1018,19 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
-        provenance[0]['service']='MegaHit'
-        provenance[0]['method']='test_megahit'
+        provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['read_library_name']]
+        provenance[0]['service'] = 'MegaHit'
+        provenance[0]['method'] = 'test_megahit'
         
         # save object in workspace
         new_obj_info = self.ws.save_objects({
-					      'workspace':self.getWsName(),
+					      'workspace': params['workspace_name'],
 					      'objects':[{
-							   'type':'KBaseGenomes.ContigSet',
-							   'data':contigset_data,
-							   'name':'megahit.contigs',
-							   'meta':{},
-							   'provenance':provenance
+							   'type': 'KBaseGenomes.ContigSet',
+							   'data': contigset_data,
+							   'name': 'megahit.contigs',
+							   'meta': {},
+							   'provenance': provenance
 							 }]
                         })
                         
