@@ -335,37 +335,37 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         # 1) upload files to shock
         token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
-							shock_service_url = self.shockURL,
-							filePath = 'data/small.forward.fq',
-							token = token
-						      )
+	    shock_service_url = self.shockURL,
+	    filePath = 'data/small.forward.fq',
+	    token = token
+	)
         #pprint(forward_shock_file)
 
         # 2) create handle
         hs = HandleService(url=self.handleURL, token=token)
         forward_handle = hs.persist_handle({
-                                        'id' : forward_shock_file['id'], 
-                                        'type' : 'shock',
-                                        'url' : self.shockURL,
-                                        'file_name': forward_shock_file['file']['name'],
-                                        'remote_md5': forward_shock_file['file']['checksum']['md5']})
+	    'id': forward_shock_file['id'], 
+	    'type': 'shock',
+	    'url': self.shockURL,
+	    'file_name': forward_shock_file['file']['name'],
+	    'remote_md5': forward_shock_file['file']['checksum']['md5']})
 
         # 3) save to WS
         single_end_library = {
             'lib': {
                 'file': {
-                    'hid':forward_handle,
+                    'hid': forward_handle,
                     'file_name': forward_shock_file['file']['name'],
                     'id': forward_shock_file['id'],
                     'url': self.shockURL,
                     'type':'shock',
-                    'remote_md5':forward_shock_file['file']['checksum']['md5']
+                    'remote_md5': forward_shock_file['file']['checksum']['md5']
                 },
-                'encoding':'UTF8',
-                'type':'fastq',
-                'size':forward_shock_file['file']['size']
+                'encoding': 'UTF8',
+                'type': 'fastq',
+                'size': forward_shock_file['file']['size']
             },
-            'sequencing_tech':'artificial reads'
+            'sequencing_tech': 'artificial reads'
         }
 
         # load the method provenance from the context object
@@ -373,20 +373,20 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
-        provenance[0]['service']='MegaHit'
-        provenance[0]['method']='test_megahit'
+        provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['read_library_name']]
+        provenance[0]['service'] = 'MegaHit'
+        provenance[0]['method'] = 'test_megahit'
         
         # save object in workspace
         new_obj_info = ws.save_objects({
-					      'workspace':params['workspace_name'],
-					      'objects':[{
-							   'type':'KBaseFile.SingleEndLibrary',
-							   'data':single_end_library,
-							   'name':'test.se.reads',
-							   'meta':{},
-							   'provenance':provenance
-							 }]
+			    'workspace': params['workspace_name'],
+			    'objects':[{
+			    'type': 'KBaseFile.SingleEndLibrary',
+			    'data': single_end_library,
+			    'name': 'test.se.reads',
+			    'meta': {},
+			    'provenance': provenance
+			    }]
                         })
         return new_obj_info[0]
 
@@ -395,9 +395,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                              filePath = None,
                              ssl_verify = True,
                              token = None):
-	#
+        #
         # Use HTTP multi-part POST to save a file to a SHOCK instance.
-	#
+        #
         if token is None:
             raise Exception("Authentication token required!")
             
@@ -762,50 +762,50 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         # 2) create handle
         hs = HandleService(url=self.handleURL, token=token)
         forward_handle = hs.persist_handle({
-                                        'id' : forward_shock_file['id'], 
-                                        'type' : 'shock',
-                                        'url' : self.shockURL,
-                                        'file_name': forward_shock_file['file']['name'],
-                                        'remote_md5': forward_shock_file['file']['checksum']['md5']})
+	    'id': forward_shock_file['id'], 
+	    'type': 'shock',
+	    'url': self.shockURL,
+	    'file_name': forward_shock_file['file']['name'],
+	    'remote_md5': forward_shock_file['file']['checksum']['md5']})
 
         reverse_handle = hs.persist_handle({
-                                        'id' : reverse_shock_file['id'], 
-                                        'type' : 'shock',
-                                        'url' : self.shockURL,
-                                        'file_name': reverse_shock_file['file']['name'],
-                                        'remote_md5': reverse_shock_file['file']['checksum']['md5']})
+	    'id' : reverse_shock_file['id'], 
+	    'type' : 'shock',
+	    'url' : self.shockURL,
+	    'file_name': reverse_shock_file['file']['name'],
+	    'remote_md5': reverse_shock_file['file']['checksum']['md5']})
 
         # 3) save to WS
         paired_end_library = {
             'lib1': {
                 'file': {
-                    'hid':forward_handle,
+                    'hid': forward_handle,
                     'file_name': forward_shock_file['file']['name'],
                     'id': forward_shock_file['id'],
                     'url': self.shockURL,
-                    'type':'shock',
-                    'remote_md5':forward_shock_file['file']['checksum']['md5']
+                    'type': 'shock',
+                    'remote_md5': forward_shock_file['file']['checksum']['md5']
                 },
-                'encoding':'UTF8',
-                'type':'fastq',
-                'size':forward_shock_file['file']['size']
+                'encoding': 'UTF8',
+                'type': 'fastq',
+                'size': forward_shock_file['file']['size']
             },
             'lib2': {
                 'file': {
-                    'hid':reverse_handle,
+                    'hid': reverse_handle,
                     'file_name': reverse_shock_file['file']['name'],
                     'id': reverse_shock_file['id'],
                     'url': self.shockURL,
-                    'type':'shock',
-                    'remote_md5':reverse_shock_file['file']['checksum']['md5']
+                    'type': 'shock',
+                    'remote_md5': reverse_shock_file['file']['checksum']['md5']
                 },
-                'encoding':'UTF8',
-                'type':'fastq',
-                'size':reverse_shock_file['file']['size']
+                'encoding': 'UTF8',
+                'type': 'fastq',
+                'size': reverse_shock_file['file']['size']
 
             },
-            'interleaved':0,
-            'sequencing_tech':'artificial reads'
+            'interleaved': 0,
+            'sequencing_tech': 'artificial reads'
         }
         
         # load the method provenance from the context object
@@ -813,19 +813,19 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects']=[params['workspace_name']+'/'+params['read_library_name']]
-        provenance[0]['service']='MegaHit'
-        provenance[0]['method']='test_megahit'
+        provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['read_library_name']]
+        provenance[0]['service'] = 'MegaHit'
+        provenance[0]['method'] = 'test_megahit'
         
         # save object in workspace
         new_obj_info = self.ws.save_objects({
-					      'workspace':params['workspace_name'],
+					      'workspace': params['workspace_name'],
 					      'objects':[{
-							   'type':'KBaseFile.PairedEndLibrary',
-							   'data':paired_end_library,
-							   'name':'test.pe.reads',
-							   'meta':{},
-							   'provenance':provenance
+							   'type': 'KBaseFile.PairedEndLibrary',
+							   'data': paired_end_library,
+							   'name': 'test.pe.reads',
+							   'meta': {},
+							   'provenance': provenance
 							 }]
                         })
         return new_obj_info[0]
@@ -835,7 +835,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                              filePath = None,
                              ssl_verify = True,
                              token = None):
-	#
+        #
         # Use HTTP multi-part POST to save a file to a SHOCK instance.
         #
         if token is None:
