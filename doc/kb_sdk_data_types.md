@@ -979,7 +979,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
-	# export contig sequences to FASTA file
+        # export contig sequences to FASTA file
         fasta_file_location = os.path.join(self.scratch, params['contigset_name']+".fasta")
         self.log(console, 'writing '+contigSetRef+' to fasta file: '+fasta_file_location)
 
@@ -995,7 +995,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-	self.log(console, 'storing contigset object: '+params['workspace_name']+'/'+params['output_contigset_name'])
+        self.log(console, 'storing contigset object: '+params['workspace_name']+'/'+params['output_contigset_name'])
 
         # parse the output and save back to KBase
         output_contigs = os.path.join(output_dir, 'final.contigs.fa')
