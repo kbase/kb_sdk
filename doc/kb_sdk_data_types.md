@@ -338,7 +338,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				shock_service_url = self.shockURL,
 				filePath = 'data/small.forward.fq',
 				token = token
-	)
+				)
         #pprint(forward_shock_file)
 
         # 2) create handle
