@@ -37,7 +37,6 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 ui/\<method\>/spec.json file (see SDK doc):
 
 ```
-{
 	"behavior": {
 		"service-mapping": {
 			"input_mapping": [
@@ -48,7 +47,6 @@ ui/\<method\>/spec.json file (see SDK doc):
 			]
 		}
 	}
-}
 ```
 
 and in the input parameter structure in the KIDL \<module\>.spec (see SDK doc):
