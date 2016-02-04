@@ -32,7 +32,9 @@ KBasePublicGenomesV5/kb|g.26833    # wsName/objName
 KBasePublicGenomesV5/kb|g.26833/1  # wsName/objName/objVer
 2907/15741/1                       # wsId/objId/objVer
 ```
-Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods by configuring behavior in ui/\<narrative_method\>/spec.json file (see SDK doc).
+Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods by configuring 'behavior' in
+
+ui/\<method\>/spec.json file (see SDK doc):
 
 ```
 {
@@ -48,6 +50,15 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 	}
 }
 ```
+
+and in the input parameter structure in the KIDL \<module\>.spec (see SDK doc):
+
+```
+    typedef structure {
+    	string workspace_name;
+    } <Module>Params;
+```
+
 
 
 ## <A NAME="data-type-list"></A>KBase Data Types
