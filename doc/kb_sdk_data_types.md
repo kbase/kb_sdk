@@ -229,7 +229,7 @@ class <ModuleName>:
         print(message)
         sys.stdout.flush()
         
-    def run_\<method_name\> (self, ctx, params):
+    def run_<method_name> (self, ctx, params):
         console = []
         self.log(console,'Running run_<method_name> with params=')
         self.log(console, pformat(params))
