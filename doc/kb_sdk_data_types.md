@@ -332,6 +332,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.
 
 ```python
+        self.log(console, 'storing SingleEndLibrary object: '+params['workspace_name']+'/'+params['output_read_library_name'])
+
         # 1) upload files to shock
         token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
@@ -373,9 +375,10 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['read_library_name']]
-        provenance[0]['service'] = 'MegaHit'
-        provenance[0]['method'] = 'test_megahit'
+        provenance[0]['input_ws_objects'] = []
+        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['read_library_name'])
+        provenance[0]['service'] = 'MyModule'
+        provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = ws.save_objects({
@@ -383,7 +386,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 			    'objects':[{
 			    'type': 'KBaseFile.SingleEndLibrary',
 			    'data': single_end_library,
-			    'name': 'test.se.reads',
+			    'name': params['output_read_library_name'],
 			    'meta': {},
 			    'provenance': provenance
 			    }]
@@ -742,6 +745,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  Note that two read files must be present, one for forward reads and one for reverse reads.
 
 ```python
+        self.log(console, 'storing PairedEndLibrary object: '+params['workspace_name']+'/'+params['output_read_library_name'])
+
         # 1) upload files to shock
         token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
@@ -811,9 +816,10 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects'] = [params['workspace_name']+'/'+params['read_library_name']]
-        provenance[0]['service'] = 'MegaHit'
-        provenance[0]['method'] = 'test_megahit'
+        provenance[0]['input_ws_objects'] = []
+        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['read_library_name'])
+        provenance[0]['service'] = 'MyModule'
+        provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = self.ws.save_objects({
@@ -821,7 +827,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 					      'objects':[{
 							   'type': 'KBaseFile.PairedEndLibrary',
 							   'data': paired_end_library,
-							   'name': 'test.pe.reads',
+							   'name': params['output_read_library_name'],
 							   'meta': {},
 							   'provenance': provenance
 							 }]
