@@ -335,9 +335,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         # 1) upload files to shock
         token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
-	    shock_service_url = self.shockURL,
-	    filePath = 'data/small.forward.fq',
-	    token = token
+				shock_service_url = self.shockURL,
+				filePath = 'data/small.forward.fq',
+				token = token
 	)
         #pprint(forward_shock_file)
 
@@ -387,7 +387,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 			    'meta': {},
 			    'provenance': provenance
 			    }]
-                        })
+			})
         return new_obj_info[0]
 
     def upload_file_to_shock(self,
@@ -747,15 +747,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         # 1) upload files to shock
         token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
-            shock_service_url = self.shockURL,
-            filePath = 'data/small.forward.fq',
-            token = token
-            )
+				shock_service_url = self.shockURL,
+				filePath = 'data/small.forward.fq',
+				token = token
+				)
         reverse_shock_file = self.upload_file_to_shock(
-            shock_service_url = self.shockURL,
-            filePath = 'data/small.reverse.fq',
-            token = token
-            )
+				shock_service_url = self.shockURL,
+				filePath = 'data/small.reverse.fq',
+				token = token
+				)
         #pprint(forward_shock_file)
         #pprint(reverse_shock_file)
 
@@ -827,7 +827,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 							   'meta': {},
 							   'provenance': provenance
 							 }]
-                        })
+					    })
         return new_obj_info[0]
         
     def upload_file_to_shock(self,
