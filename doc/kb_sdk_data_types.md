@@ -236,6 +236,7 @@ class <ModuleName>:
 
         token = ctx['token']
         ws = workspaceService(self.workspaceURL, token=token)
+        
     	...
 ```
 
@@ -332,6 +333,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
         # 1) upload files to shock
+        token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
 							shock_service_url = self.shockURL,
 							filePath = 'data/small.forward.fq',
@@ -393,13 +395,13 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                              filePath = None,
                              ssl_verify = True,
                              token = None):
-        """
-        Use HTTP multi-part POST to save a file to a SHOCK instance.
-        """
+	#
+        # Use HTTP multi-part POST to save a file to a SHOCK instance.
+	#
         if token is None:
             raise Exception("Authentication token required!")
-
-        #build the header
+            
+        # build the header
         header = dict()
         header["Authorization"] = "Oauth {0}".format(token)
         if filePath is None:
@@ -559,15 +561,31 @@ optional:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
 ```python
-    from biokbase.workspace.client import Workspace as workspaceService
-
-    def getContext(self):
-        return self.__class__.ctx
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from biokbase.workspace.client import Workspace as workspaceService
         
+class <ModuleName>:
+
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
     def __init__(self, config):
-        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
 
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
@@ -580,6 +598,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             target.append(message)
         print(message)
         sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
 ```
 
 ##### obtaining
@@ -716,45 +744,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  Note that two read files must be present, one for forward reads and one for reverse reads.
 
 ```python
-    def upload_file_to_shock(self,
-                             shock_service_url = None,
-                             filePath = None,
-                             ssl_verify = True,
-                             token = None):
-        """
-        Use HTTP multi-part POST to save a file to a SHOCK instance.
-        """
-        if token is None:
-            raise Exception("Authentication token required!")
-
-        #build the header
-        header = dict()
-        header["Authorization"] = "Oauth {0}".format(token)
-        if filePath is None:
-            raise Exception("No file given for upload to SHOCK!")
-        dataFile = open(os.path.abspath(filePath), 'rb')
-        m = MultipartEncoder(fields={'upload': (os.path.split(filePath)[-1], dataFile)})
-        header['Content-Type'] = m.content_type
-
-        #logger.info("Sending {0} to {1}".format(filePath,shock_service_url))
-        try:
-            response = requests.post(shock_service_url + "/node", headers=header, data=m, allow_redirects=True, verify=ssl_verify)
-            dataFile.close()
-        except:
-            dataFile.close()
-            raise
-
-        if not response.ok:
-            response.raise_for_status()
-        result = response.json()
-        if result['error']:
-            raise Exception(result['error'][0])
-        else:
-            return result["data"]
-
-    def storePairedEndLibInfo(self):
-       ctx = self.getContext()
-            
         # 1) upload files to shock
         token = ctx['token']
         forward_shock_file = self.upload_file_to_shock(
@@ -830,7 +819,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         
         # save object in workspace
         new_obj_info = self.ws.save_objects({
-					      'workspace':self.getWsName(),
+					      'workspace':params['workspace_name'],
 					      'objects':[{
 							   'type':'KBaseFile.PairedEndLibrary',
 							   'data':paired_end_library,
@@ -839,9 +828,43 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 							   'provenance':provenance
 							 }]
                         })
-                        
-        self.__class__.pairedEndLibInfo = new_obj_info[0]
         return new_obj_info[0]
+        
+    def upload_file_to_shock(self,
+                             shock_service_url = None,
+                             filePath = None,
+                             ssl_verify = True,
+                             token = None):
+	#
+        # Use HTTP multi-part POST to save a file to a SHOCK instance.
+        #
+        if token is None:
+            raise Exception("Authentication token required!")
+
+        # build the header
+        header = dict()
+        header["Authorization"] = "Oauth {0}".format(token)
+        if filePath is None:
+            raise Exception("No file given for upload to SHOCK!")
+        dataFile = open(os.path.abspath(filePath), 'rb')
+        m = MultipartEncoder(fields={'upload': (os.path.split(filePath)[-1], dataFile)})
+        header['Content-Type'] = m.content_type
+
+        #logger.info("Sending {0} to {1}".format(filePath,shock_service_url))
+        try:
+            response = requests.post(shock_service_url + "/node", headers=header, data=m, allow_redirects=True, verify=ssl_verify)
+            dataFile.close()
+        except:
+            dataFile.close()
+            raise
+
+        if not response.ok:
+            response.raise_for_status()
+        result = response.json()
+        if result['error']:
+            raise Exception(result['error'][0])
+        else:
+            return result["data"]        
 ```
 [\[back to data type list\]](#data-type-list)
 
