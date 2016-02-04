@@ -39,6 +39,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 ```
     typedef structure {
     	string workspace_name;
+    	...
     } <Module>Params;
 ```
 
@@ -46,14 +47,18 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 
 ```
 	"behavior": {
+		...
 		"service-mapping": {
+			...
 			"input_mapping": [
 				{
 					"narrative_system_variable": "workspace",
 					"target_property": "workspace_name"
-				}
-			]
-		}
+				},
+				...
+			],
+			...
+		},
 	}
 ```
 
