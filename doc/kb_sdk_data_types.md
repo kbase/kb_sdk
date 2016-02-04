@@ -393,9 +393,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                              filePath = None,
                              ssl_verify = True,
                              token = None):
-	"""
+        """
         Use HTTP multi-part POST to save a file to a SHOCK instance.
-	"""
+        """
         if token is None:
             raise Exception("Authentication token required!")
 
