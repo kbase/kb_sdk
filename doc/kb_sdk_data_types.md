@@ -223,7 +223,6 @@ class <ModuleName>:
            
     # target is a list for collecting log messages
     def log(self, target, message):
-        # we should do something better here...
         if target is not None:
             target.append(message)
         print(message)
@@ -593,7 +592,6 @@ class <ModuleName>:
            
     # target is a list for collecting log messages
     def log(self, target, message):
-        # we should do something better here...
         if target is not None:
             target.append(message)
         print(message)
@@ -952,7 +950,6 @@ class <ModuleName>:
            
     # target is a list for collecting log messages
     def log(self, target, message):
-        # we should do something better here...
         if target is not None:
             target.append(message)
         print(message)
@@ -1122,7 +1119,7 @@ class <ModuleName>:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-	self.log(console, 'getting featureset object: '+params['workspace_name']+'/'+params['featureset_id'])
+        self.log(console, 'getting featureset object: '+params['workspace_name']+'/'+params['featureset_id'])
         featureSet = ws.get_objects([{'ref':params['workspace_name']+'/'+params['featureset_id']}])[0]['data']
 
         genome2Features = {}
@@ -1140,9 +1137,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
 	# export features to FASTA file
-	fasta_file_location = os.path.join(self.scratch, params['featureset_id']+".fasta")
-	self.log(console, 'writing fasta file: '+fasta_file_location)
-	records = []
+        fasta_file_location = os.path.join(self.scratch, params['featureset_id']+".fasta")
+        self.log(console, 'writing fasta file: '+fasta_file_location)
+        records = []
         for genomeRef in genome2Features:
             genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
             these_genomeFeatureIds = genome2Features[genomeRef]
@@ -1157,7 +1154,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-	self.log(console, 'storing featureset object: '+params['workspace_name']+'/'+params['output_featureset_name'])
+        self.log(console, 'storing featureset object: '+params['workspace_name']+'/'+params['output_featureset_name'])
 
         featureset_data = {
             'description': params['featureset_name'],
