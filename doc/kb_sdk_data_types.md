@@ -980,7 +980,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
         self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_name'])
         contigSetRef = params['workspace_name']+'/'+params['contigset_name']
-	contigSet = ws.get_objects([{'ref': contigSetRef}])[0]['data']
+        contigSet = ws.get_objects([{'ref': contigSetRef}])[0]['data']
 ```
 
 ##### using
@@ -1040,15 +1040,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
-        new_obj_info = self.ws.save_objects({
-					      'workspace': params['workspace_name'],
-					      'objects':[{
-							   'type': 'KBaseGenomes.ContigSet',
-							   'data': contigset_data,
-							   'name': params['output_contigset_name'],
-							   'meta': {},
-							   'provenance': provenance
-							 }]
+        new_obj_info = ws.save_objects({
+				      'workspace': params['workspace_name'],
+				      'objects':[{
+						   'type': 'KBaseGenomes.ContigSet',
+						   'data': contigset_data,
+						   'name': params['output_contigset_name'],
+						   'meta': {},
+						   'provenance': provenance
+						 }]
                         })
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
