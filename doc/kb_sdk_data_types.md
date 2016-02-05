@@ -15,12 +15,12 @@ A KBase ID is a string starting with the characters "kb|".  KBase IDs are typed.
 Data objects are stored in an object database.  Individual Narratives have "workspaces" associated with them where all data is stored for a given Narrative analysis.  Methods should interact with the data objects within a single workspace.
 
 The KBase workspace is documented here:<br>
-https://www.kbase.us/services/ws/docs/
+https://ci.kbase.us/services/ws/docs/
 
 Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and not guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
 
 Data object reference syntax is described here:<br>
-https://www.kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
+https://ci.kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
 
 A data object reference, used in retrieving and storing data objects, has the workspace name/ID, the data object name/ID, and possible a trailing version, delimited by slashes.
   
@@ -391,8 +391,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 			    'provenance': provenance
 			    }]
 			})
-        return new_obj_info[0]
-
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
+        
     def upload_file_to_shock(self,
                              shock_service_url = None,
                              filePath = None,
@@ -832,7 +833,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 							   'provenance': provenance
 							 }]
 					    })
-        return new_obj_info[0]
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
         
     def upload_file_to_shock(self,
                              shock_service_url = None,
@@ -978,7 +980,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
         self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_name'])
         contigSetRef = params['workspace_name']+'/'+params['contigset_name']
-        contigSet = wsClient.get_objects([{'ref':contigSetRef}])[0]['data']
+	contigSet = ws.get_objects([{'ref': contigSetRef}])[0]['data']
 ```
 
 ##### using
@@ -1048,8 +1050,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 							   'provenance': provenance
 							 }]
                         })
-                        
-        return new_obj_info[0]
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1134,7 +1136,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
         self.log(console, 'getting featureset object: '+params['workspace_name']+'/'+params['featureset_name'])
-        featureSet = ws.get_objects([{'ref':params['workspace_name']+'/'+params['featureset_name']}])[0]['data']
+        featureSetRef = params['workspace_name']+'/'+params['featureset_name']
+        featureSet = ws.get_objects([{'ref':featureSetRef}])[0]['data']
 
         genome2Features = {}
         features = featureSet['elements']
@@ -1197,18 +1200,18 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
-        new_obj_info = self.ws.save_objects({
-					      'workspace': params['workspace_name'],
-					      'objects':[{
-							   'type': 'KBaseCollections.FeatureSet',
-							   'data': featureset_data,
-							   'name': params['output_featureset_name'],
-							   'meta': {},
-							   'provenance': provenance
-							 }]
+        new_obj_info = ws.save_objects({
+				      'workspace': params['workspace_name'],
+				      'objects':[{
+						   'type': 'KBaseCollections.FeatureSet',
+						   'data': featureset_data,
+						   'name': params['output_featureset_name'],
+						   'meta': {},
+						   'provenance': provenance
+						 }]
                         })
-                        
-        return new_obj_info[0]
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1245,19 +1248,34 @@ Note: either *ref* or *data* is defined for an element, but not both.
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
-    from biokbase.workspace.client import Workspace as workspaceService
-    from Bio import SeqIO
-    from Bio.Seq import Seq
-    from Bio.SeqRecord import SeqRecord
-    from Bio.Alphabet import generic_protein
-
-    def getContext(self):
-        return self.__class__.ctx
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import generic_protein
+from biokbase.workspace.client import Workspace as workspaceService
         
+class <ModuleName>:
+
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
     def __init__(self, config):
-        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
 
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
@@ -1265,48 +1283,61 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
            
     # target is a list for collecting log messages
     def log(self, target, message):
-        # we should do something better here...
         if target is not None:
             target.append(message)
         print(message)
         sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
 ```
 
 ##### obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-    def getGenomeSet(self, ws, workspace_name, genomeset_id):
-        genomeSet = ws.get_objects([{'ref':workspace_name+'/'+genomeset_id}])[0]['data']
-        return genomeSet
+	# get genomeSet
+        self.log(console, 'getting genomeset object: '+params['workspace_name']+'/'+params['genomeset_name'])
+	genomeSetRef = params['workspace_name']+'/'+params['genomeset_name']
+        genomeSet = ws.get_objects([{'ref':genomeSetRef}])[0]['data']
 ```
 
 ##### using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
-    def exportContigFasta(self, ws, workspace_name, genomeset_id):
-    	genomeSet = self.getGenomeSet(ws, workspace_name, genomeset_id)
-    	
-        # Process each genome one by one
-        records = []
+	# Write sequences of genomeset contigs to fasta files, one per genome
+	#   (an example of writing translated features to file is in Genome Data Type below) 
+
         for genome_name in genomeSet['elements'].keys():
+            fasta_file_location = os.path.join(self.scratch, params['genomeset_name']+'-'+genome_name+".fasta")
+            self.log(console, 'writing fasta file: '+fasta_file_location)
             genomeRef = genomeSet['elements'][genome_name]['ref']
             genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+
+            records = []
             contigSetRef = genome['contigset_ref']
             contigSet = ws.get_objects([{'ref':contigSetRef}])[0]['data']
             for contig_id in contigSet['contigs'].keys():
                 contig_sequence = contigSet['contigs'][contig_id]['sequence']
             	record = SeqRecord(Seq(contig_sequence), id=genome_name+contig_id, description=genome_name+" "+contig_id)
             	records.append(record)
-            SeqIO.write(records, self.fileFastaName+"_"+genome_name, "fasta")
+            SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
 ##### storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def storeGenomeSet(self, ws, workspace_name, genomeset_id, genomes_list):
+        self.log(console, 'storing featureset object: '+params['workspace_name']+'/'+params['output_genomeset_name'])
+
         genome_names = []
         for genome in genomes_list:
             genome_names.append(genome['name'])
@@ -1317,10 +1348,30 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         for genome in genomes_list:
             genomeSet[genome['name']] = { 'ref': genome['ref'] }
 
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name': genomeset_id, \
-        						         'type': 'KBaseSearch.GenomeSet', \
-        						         'data': genomeSet}]})
-        return str(genomeSet)
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+        provenance[0]['input_ws_objects'] = []
+        for genome in genomes_list:
+	    provenance[0]['input_ws_objects'].append(genome['ref'])
+        provenance[0]['service'] = 'MyModule'
+        provenance[0]['method'] = 'MyMethod'
+        
+        # save object in workspace
+        new_obj_info = ws.save_objects({
+				      'workspace': params['workspace_name'],
+				      'objects':[{
+						   'type': 'KBaseSearch.GenomeSet',
+						   'data': genomeset_data,
+						   'name': params['output_genomeset_name'],
+						   'meta': {},
+						   'provenance': provenance
+						 }]
+                        })
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
