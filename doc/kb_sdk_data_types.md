@@ -1995,12 +1995,10 @@ optional:
                          'node_id_2', 'label_2',
 		         ...
                        },
-  ws_refs: { ‘node_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...]
-			  },
-	      ‘node_id_2’: ...
+  ws_refs: { ‘node_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...] },
+	     ‘node_id_2’: ...
  	   },
-  kb_refs: { ‘node_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...]
-                          },
+  kb_refs: { ‘node_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...] },
 	     ‘node_id_2’: ...
 	   },
   leaf_list: [‘node_id_1’, ‘node_id_2’, ...]
@@ -2011,15 +2009,35 @@ optional:
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
-    from biokbase.workspace.client import Workspace as workspaceService
-
-    def getContext(self):
-        return self.__class__.ctx
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import generic_protein
+from Bio import Phylo
+from biokbase.workspace.client import Workspace as workspaceService
         
+class <ModuleName>:
+
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
     def __init__(self, config):
-        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
 
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
@@ -2027,29 +2045,124 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
            
     # target is a list for collecting log messages
     def log(self, target, message):
-        # we should do something better here...
         if target is not None:
             target.append(message)
         print(message)
         sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
 ```
 
 ##### <A NAME="tree-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
-```
+```python
+        treeRef = params['workspace_name']+'/'+params['tree_name']
+        self.log(console, 'getting featureset object: '+treeRef)
+        tree = ws.get_objects([{'ref':treeRef}])[0]['data']
 ```
 
 ##### <A NAME="tree-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
-```
+```python
+        # export tree to NEWICK file
+        newick_file_location = os.path.join(self.scratch, params['tree_name']+".newick")
+        self.log(console, 'writing fasta file: '+fasta_file_location)
+        newick_file_handle = open(newick_file_location,'w')
+	newick_file_handle.write(tree['tree'])
+	newick_file_handle.close()
+
+        # export 16S features from Genome to FASTA file
+        fasta_file_location = os.path.join(self.scratch, params['tree_name']+"-16S"+".fasta")
+        self.log(console, 'writing fasta file: '+fasta_file_location)
+        records = []
+        if tree['tree_type'] == 'species':
+            for leaf_id in tree['leaf_list']:
+                genomeRef = tree['ws_refs'][node_id]['genome'][0]
+                self.log(console, 'getting genome object: '+genomeRef)
+                genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
+		longest_feature = None
+		longest_feature_len = 0
+                for feature in genome['features']:
+                    if feature['type'] == 'rna' and ('SSU rRNA' in feature['function']) or 'ssuRNA' in feature['function']:
+        		if feature['dna_sequence_length'] > longest_feature_len:
+        		    longest_feature_len = feature['dna_sequence_length']
+        		    longest_feature = feature
+                record = SeqRecord(Seq(longest_feature['dna_sequence']), id=longest_feature['id'], description=genomeRef+"."+longest_feature['id'])
+                records.append(record)
+        SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
 ##### <A NAME="tree-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
-```
+```python
+        self.log(console, 'storing tree object: '+params['workspace_name']+'/'+params['output_tree_name'])
+
+	output_tree_file_location = os.path.join(self.scratch, params['output_tree_name']+".newick")
+	output_tree_data_format = 'newick'
+	output_tree = Phylo.read(output_tree_file_location, output_tree_data_format)
+
+
+        tree_data = { ## KBaseTrees.Tree
+			name: params['output_tree_name'],
+			description: params['output_tree_desc'],
+			type: 'species',   # or 'gene'
+			tree: output_newick_buf,
+			tree_attributes: {},
+			default_node_labels: { 'node_id_1': 'label_1',
+					       'node_id_2', 'label_2',
+			},
+			ws_refs: { ‘node_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...] },
+					‘node_id_2’: ...
+			},
+			kb_refs: { ‘node_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...] },
+					‘node_id_2’: ...
+			},
+			leaf_list: [‘node_id_1’, ‘node_id_2’, ...]
+	}
+        genomes = []
+        for feature in feature_list:
+            feature_id = feature['feature_id']
+            featureset_data['element_ordering'].append(feature_id);
+            featureset_data['elements'][feature_id] = []
+            for genome_ref in feature['genomes']:
+                featureset_data['elements'][feature_id].append(genome_ref)
+		if not genome_ref in genomes:
+		    genomes.append(genome_ref)
+
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+        provenance[0]['input_ws_objects'] = []
+        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['MSA_name'])
+        provenance[0]['service'] = 'MyModule'
+        provenance[0]['method'] = 'MyMethod'
+        
+        # save object in workspace
+        new_obj_info = ws.save_objects({
+							'workspace': params['workspace_name'],
+							'objects':[{
+									'type': 'KBaseTrees.Tree',
+									'data': tree_data,
+									'name': params['output_tree_name'],
+									'meta': {},
+									'provenance': provenance
+								}]
+                        })
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
