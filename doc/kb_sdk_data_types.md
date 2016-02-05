@@ -1237,7 +1237,7 @@ Note: either *ref* or *data* is defined for an element, but not both.
                                                    ...
                                                  }
                                        ref: ‘genome_ws_ref’,
-                                       data: { KBaseGenomes.Genome instance }   # (see below)
+                                       data: { KBaseGenomes.Genome instance_1 }   # (see below)
                                      },
                     ‘genome_name_2’: ...
                   }
@@ -1566,7 +1566,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 ```python
         genomeRef = params['workspace_name']+'/'+params['genome_name']
-        self.log(console, 'getting genomeset object: '+genomeRef)
+        self.log(console, 'getting genome object: '+genomeRef)
         genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
 ```
 
@@ -1593,7 +1593,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-        self.log(console, 'storing featureset object: '+params['workspace_name']+'/'+params['output_genome_name'])
+        self.log(console, 'storing genome object: '+params['workspace_name']+'/'+params['output_genome_name'])
 
         genome_data = {
 			"complete":1,
