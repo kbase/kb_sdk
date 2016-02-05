@@ -2114,31 +2114,31 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         output_tree_data_format = 'newick'
         output_tree_phylo = Phylo.read(output_tree_file_location, output_tree_data_format)
 
-	tree_type = 'SpeciesTree'  # or 'GeneTree'
-	ref_type = 'genome'   # if ids parsed from output are genome ids
-	#ref_type = 'protein'  # if ids parsed from output are protein ids
-	#ref_type = 'dna'      # if ids parsed from output are any dna ids
-	#ref_type = 'feature'  # if ids parsed from output are feature ids
+        tree_type = 'SpeciesTree'  # or 'GeneTree'
+        ref_type = 'genome'   # if ids parsed from output are genome ids
+        #ref_type = 'protein'  # if ids parsed from output are protein ids
+        #ref_type = 'dna'      # if ids parsed from output are any dna ids
+        #ref_type = 'feature'  # if ids parsed from output are feature ids
 	
         tree_data = { ## KBaseTrees.Tree
-			name: params['output_tree_name'],
-			description: params['output_tree_desc'],
-			type: tree_type,   
-			tree: output_newick_buf,
-			tree_attributes: {},
-			default_node_labels: {},
-			ws_refs: {},
-			kb_refs: {},
-			leaf_list: []
-	}
-	for leaf in output_tree_phylo.get_terminals():  # for just leaf nodes
-	    tree_data['leaf_list'].append(leaf.name)
-	#for node in output_tree_phylo.get_nonterminals():  # for just non-leaf nodes
-	#    print node.name
-	for node in output_tree_phylo.find_clades():  # for all internal and leaf nodes
-	    tree_data['default_node_labels'][node.name] = node.name  # don't have an alternate label
-	    tree_data['ws_refs'][node.name] = { ref_type: [node.name] }  # if names in newick file are ws_refs
-	    #tree_data['kb_refs'][node.name] = { ref_type: [node.name] }  # if names in newick file are kbase_ids
+        		name: params['output_tree_name'],
+        		description: params['output_tree_desc'],
+        		type: tree_type,   
+        		tree: output_newick_buf,
+        		tree_attributes: {},
+        		default_node_labels: {},
+        		ws_refs: {},
+        		kb_refs: {},
+        		leaf_list: []
+        }
+        for leaf in output_tree_phylo.get_terminals():  # for just leaf nodes
+            tree_data['leaf_list'].append(leaf.name)
+        #for node in output_tree_phylo.get_nonterminals():  # for just non-leaf nodes
+        #    print node.name
+        for node in output_tree_phylo.find_clades():  # for all internal and leaf nodes
+            tree_data['default_node_labels'][node.name] = node.name  # don't have an alternate label
+            tree_data['ws_refs'][node.name] = { ref_type: [node.name] }  # if names in newick file are ws_refs
+            #tree_data['kb_refs'][node.name] = { ref_type: [node.name] }  # if names in newick file are kbase_ids
 
         # load the method provenance from the context object
         provenance = [{}]
