@@ -2090,13 +2090,13 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                 genomeRef = tree['ws_refs'][node_id]['genome'][0]
                 self.log(console, 'getting genome object: '+genomeRef)
                 genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
-		longest_feature = None
-		longest_feature_len = 0
+                longest_feature = None
+                longest_feature_len = 0
                 for feature in genome['features']:
                     if feature['type'] == 'rna' and ('SSU rRNA' in feature['function']) or 'ssuRNA' in feature['function']:
-        		if feature['dna_sequence_length'] > longest_feature_len:
-        		    longest_feature_len = feature['dna_sequence_length']
-        		    longest_feature = feature
+                        if feature['dna_sequence_length'] > longest_feature_len:
+                            longest_feature_len = feature['dna_sequence_length']
+                            longest_feature = feature
                 record = SeqRecord(Seq(longest_feature['dna_sequence']), id=longest_feature['id'], description=genomeRef+"."+longest_feature['id'])
                 records.append(record)
         SeqIO.write(records, fasta_file_location, "fasta")
