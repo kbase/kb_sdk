@@ -2078,8 +2078,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         newick_file_location = os.path.join(self.scratch, params['tree_name']+".newick")
         self.log(console, 'writing fasta file: '+fasta_file_location)
         newick_file_handle = open(newick_file_location,'w')
-	newick_file_handle.write(tree['tree'])
-	newick_file_handle.close()
+        newick_file_handle.write(tree['tree'])
+        newick_file_handle.close()
 
         # export 16S features from Genome to FASTA file
         fasta_file_location = os.path.join(self.scratch, params['tree_name']+"-16S"+".fasta")
