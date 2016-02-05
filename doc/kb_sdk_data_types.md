@@ -27,7 +27,7 @@ A data object reference, used in retrieving and storing data objects, has the wo
 e.g. the following are equivalent objects
 
 ```
-KBasePublicGenomesV5/kb|g.26833    # wsName/objName 
+KBasePublicGenomesV5/kb|g.26833    # wsName/objName (PREFERRED FORM)
 2907/15741                         # wsId/objId
 KBasePublicGenomesV5/kb|g.26833/1  # wsName/objName/objVer
 2907/15741/1                       # wsId/objId/objVer
@@ -95,11 +95,17 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.SingleEndLibrary<br>
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary
 
+- [data structure](#single-end-library-ds)
+- [setup](#single-end-library-setup)
+- [obtaining](#single-end-library-obtaining)
+- [using](#single-end-library-using)
+- [storing](#single-end-library-storing)
+
 SingleEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  It may be compressed with GZIP compression.  There are two types of SingleEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of SingleEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  The KBaseAssembly version is essentially just the 'file' portion of the 'lib' structure in the KBaseFile SingleEndLibrary definition, but uses the field name 'handle' instead of 'file' (see below).  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
 
 SingleEndLibrary objects are often quite large and the bulky sequence data is therefore typically stored in the SHOCK filesystem.
 
-##### data structure
+##### <A NAME="single-end-library-ds"></A>data structure
 
 *KBaseFile SingleEndLibrary* definition
 
@@ -187,7 +193,7 @@ optional:
     }
 ```
 
-##### setup
+##### <A NAME="single-end-library-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
 ```python
@@ -239,7 +245,7 @@ class <ModuleName>:
     	...
 ```
 
-##### obtaining
+##### <A NAME="single-end-library-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
 ```python
@@ -290,7 +296,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             raise ValueError('Cannot yet handle library type of: '+type_name)
 ```
 
-##### using
+##### <A NAME="single-end-library-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
 
 ```python
@@ -328,7 +334,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                 '\n\n'+ '\n'.join(console))
 ```
 
-##### storing
+##### <A NAME="single-end-library-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  It will only store a single read file at a time.
 
 ```python
@@ -437,11 +443,17 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.PairedEndLibrary<br>
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary
 
+- [data structure](#paired-end-library-ds)
+- [setup](#paired-end-library-setup)
+- [obtaining](#paired-end-library-obtaining)
+- [using](#paired-end-library-using)
+- [storing](#paired-end-library-storing)
+
 PairedEndLibrary objects contain FASTA or FASTQ formatted read (or longer sequence) data.  Typically there are two files, one for 'forward' reads and one for 'reverse' reads.  They may be compressed with GZIP compression.  There are two types of PairedEndLibrary type definitions that bear large similarity with one another.  The KBaseFile definition of PariedEndReads contains fields that are consistent with the transfer of larger files (e.g. from JGI) and captures more information, whereas the KBaseAssembly definition is used by Assembly methods.  The KBaseAssembly version is essentially just the 'file' portion of the 'lib' substructure in the KBaseFile PairedEndLibrary definition, but uses the field name 'handle' instead of 'file' (see below).  Which you choose to use is up to you (and may depend on which existing data objects you wish to interact with) but our intention is for the KBaseFile definition to become the solitary definition and is therefore more likely to persist.
 
 PairedEndLibrary objects are often quite large and the bulky sequence data is therefore typically stored in the SHOCK filesystem.
 
-##### data structure
+##### <A NAME="paired-end-library-ds"></A>data structure
 
 *KBaseFile PairedEndLibrary* definition
 
@@ -561,7 +573,7 @@ optional:
     }
 ```
 
-##### setup
+##### <A NAME="paired-end-library-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
 ```python
@@ -613,7 +625,7 @@ class <ModuleName>:
     	...
 ```
 
-##### obtaining
+##### <A NAME="paired-end-library-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
 ```python
@@ -697,7 +709,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             raise ValueError('Cannot yet handle library type of: '+type_name)
 ```
 
-##### using
+##### <A NAME="paired-end-library-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
 
 ```python
@@ -742,7 +754,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
                 '\n\n'+ '\n'.join(console))
 ```
 
-##### storing
+##### <A NAME="paired-end-library-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.  Note that two read files must be present, one for forward reads and one for reverse reads.
 
 ```python
@@ -878,9 +890,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ### <A NAME="contig-set"></A>ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet
 
+- [data structure](#contig-set-ds)
+- [setup](#contig-set-setup)
+- [obtaining](#contig-set-obtaining)
+- [using](#contig-set-using)
+- [storing](#contig-set-storing)
+
 A ContigSet object contains contiguous regions of DNA/RNA sequences (e.g. a set of genome fragments)
 
-##### data structure
+##### <A NAME="contig-set-ds"></A>data structure
 optional:
 - name
 - type 
@@ -922,7 +940,7 @@ optional:
     }
 ```
 
-##### setup
+##### <A NAME="contig-set-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
@@ -974,16 +992,16 @@ class <ModuleName>:
     	...
 ```
 
-##### obtaining
+##### <A NAME="contig-set-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-        self.log(console, 'getting contigset object: '+params['workspace_name']+'/'+params['contigset_name'])
         contigSetRef = params['workspace_name']+'/'+params['contigset_name']
+        self.log(console, 'getting contigset object: '+contigSetRef)
         contigSet = ws.get_objects([{'ref': contigSetRef}])[0]['data']
 ```
 
-##### using
+##### <A NAME="contig-set-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
@@ -999,7 +1017,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
-##### storing
+##### <A NAME="contig-set-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
@@ -1059,7 +1077,13 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ### <A NAME="feature-set"></A>FeatureSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseCollections.FeatureSet
 
-##### data structure
+- [data structure](#feature-set-ds)
+- [setup](#feature-set-setup)
+- [obtaining](#feature-set-obtaining)
+- [using](#feature-set-using)
+- [storing](#feature-set-storing)
+
+##### <A NAME="feature-set-ds"></A>data structure
 optional:
 - description
 - element_ordering
@@ -1076,7 +1100,7 @@ optional:
       
 ```
 
-##### setup
+##### <A NAME="feature-set-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
@@ -1131,12 +1155,12 @@ class <ModuleName>:
     	...
 ```
 
-##### obtaining
+##### <A NAME="feature-set-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
-        self.log(console, 'getting featureset object: '+params['workspace_name']+'/'+params['featureset_name'])
         featureSetRef = params['workspace_name']+'/'+params['featureset_name']
+        self.log(console, 'getting featureset object: '+featureSetRef)
         featureSet = ws.get_objects([{'ref':featureSetRef}])[0]['data']
 
         genome2Features = {}
@@ -1149,7 +1173,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         return genome2Features
 ```
 
-##### using
+##### <A NAME="feature-set-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
@@ -1167,7 +1191,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
-##### storing
+##### <A NAME="feature-set-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
@@ -1220,9 +1244,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 #### <A NAME="genome-set"></A>GenomeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet
 
+- [data structure](#genome-set-ds)
+- [setup](#genome-set-setup)
+- [obtaining](#genome-set-obtaining)
+- [using](#genome-set-using)
+- [storing](#genome-set-storing)
+
 The GenomeSet is a data object for grouping Genomes.
 
-##### data structure
+##### <A NAME="genome-set-ds"></A>data structure
 
 Note: either *ref* or *data* is defined for an element, but not both.
 - optional metadata
@@ -1244,7 +1274,7 @@ Note: either *ref* or *data* is defined for an element, but not both.
     }
 ```
 
-##### setup
+##### <A NAME="genome-set-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
@@ -1309,7 +1339,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         genomeSet = ws.get_objects([{'ref':genomeSetRef}])[0]['data']
 ```
 
-##### using
+##### <A NAME="genome-set-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
@@ -1332,7 +1362,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
             SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
-##### storing
+##### <A NAME="genome-set-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
@@ -1380,7 +1410,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ### <A NAME="genome"></A>Genome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 
-##### data structure
+- [data structure](#genome-ds)
+- [setup](#genome-setup)
+- [obtaining](#genome-obtaining)
+- [using](#genome-using)
+- [storing](#genome-storing)
+- 
+
+The Genome object stores genomes.  There is an API that will replace direct access to the Genome structure, but for the time being, have at it!
+
+##### <A NAME="genome-ds"></A>data structure
 
 optional:
 - quality
@@ -1506,7 +1545,7 @@ optional:
     }
 ```
 
-##### setup
+##### <A NAME="genome-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
@@ -1561,7 +1600,7 @@ class <ModuleName>:
     	...
 ```
 
-##### obtaining
+##### <A NAME="genome-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
@@ -1570,7 +1609,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         genome = ws.get_objects([{'ref':genomeRef}])[0]['data']
 ```
 
-##### using
+##### <A NAME="genome-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
@@ -1589,7 +1628,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
     	SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
-##### storing
+##### <A NAME="genome-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
@@ -1660,9 +1699,18 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 #### <A NAME="domain-annotation"></A>DomainAnnotation
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation
-##### data structure
 
-##### setup
+- [data structure](#domain-annotation-ds)
+- [setup](#domain-annotation-setup)
+- [obtaining](#domain-annotation-obtaining)
+- [using](#domain-annotation-using)
+- [storing](#domain-annotation-storing)
+
+DomainAnnotation objects store domain and gene family annotations of the genes in a genome, such as by COG or Pfam.
+
+##### <A NAME="domain-annotation-ds"></A>data structure
+
+##### <A NAME="domain-annotation-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
@@ -1689,19 +1737,19 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         sys.stdout.flush()
 ```
 
-##### obtaining
+##### <A NAME="domain-annotation-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```
 ```
 
-##### using
+##### <A NAME="domain-annotation-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```
 ```
 
-##### storing
+##### <A NAME="domain-annotation-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```
@@ -1713,9 +1761,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ### <A NAME="msa"></A>MSA
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.MSA
 
+- [data structure](#msa-ds)
+- [setup](#msa-setup)
+- [obtaining](#msa-obtaining)
+- [using](#msa-using)
+- [storing](#msa-storing)
+
 Multiple Sequence Alignments (MSA) are used for examining sequence variation across homologous sequences and as inputs to phylogenetic reconstructions, such as Trees.
 
-##### data structure
+##### <A NAME="msa-ds"></A>data structure
 optional:
 - name
 - description
@@ -1758,28 +1812,43 @@ optional:
                          },
 	     ‘row_id_2’: ...
 	   },
-  parent_msa_ref: ws_msa_ref                  # reference to parental alignment object to which 
-                                              # this object adds some new aligned sequences 
+  parent_msa_ref: 'ws_msa_ref'                  # reference to parental alignment object to which 
+                                                # this object adds some new aligned sequences 
 }
 ```
 
-##### setup
+##### <A NAME="msa-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
-    from biokbase.workspace.client import Workspace as workspaceService
-    from Bio import SeqIO
-    from Bio.Seq import Seq
-    from Bio.SeqRecord import SeqRecord
-    from Bio.Alphabet import generic_protein
-
-    def getContext(self):
-        return self.__class__.ctx
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import generic_protein
+from biokbase.workspace.client import Workspace as workspaceService
         
+class <ModuleName>:
+
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
     def __init__(self, config):
-        ctx = self.getContext()
         self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
 
         self.scratch = os.path.abspath(config['scratch'])
         if not os.path.exists(self.scratch):
@@ -1787,47 +1856,96 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
            
     # target is a list for collecting log messages
     def log(self, target, message):
-        # we should do something better here...
         if target is not None:
             target.append(message)
         print(message)
         sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
 ```
 
-##### obtaining
+##### <A NAME="msa-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```python
+        MSA_ref = params['workspace_name']+'/'+params['MSA_name']
+        self.log(console, 'getting MSA object: '+MSA_ref)
+        MSA = ws.get_objects([{'ref': MSA_ref}])[0]['data']
 ```
 
-##### using
+##### <A NAME="msa-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
+        # export contig sequences to FASTA file
+        fasta_file_location = os.path.join(self.scratch, params['MSA_name']+".fasta")
+        self.log(console, 'writing '+MSA_ref+' to fasta file: '+fasta_file_location)
+
+        records = []
+        for row_id in MSA['row_order']:
+            aln_sequence = MSA['alignment'][row_id]
+            record = SeqRecord(Seq(aln_sequence), id=row_id, description=contig_id)
+            records.append(record)
+        SeqIO.write(records, fasta_file_location, "fasta")
 ```
 
-##### storing
+##### <A NAME="msa-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```python
-    def createMSA(self, ws, workspace_name, featureset_id, msa_id):
-        alignment_length = 0
-        msa = {
-            'name' : 'multiple alignmemnt for FeatureSet: ' + featureset_id,
+        self.log(console, 'storing MSA object: '+params['workspace_name']+'/'+params['output_MSA_name'])
+
+        # parse the output and save back to KBase
+        output_MSA = os.path.join(output_dir, 'final.msa.fa')
+
+        MSA_data = {
+            'name' : 'multiple alignmemnt for FeatureSet: ' + params['featureset_name'],
             'sequence_type': 'protein',
             'alignment_length': 0,
             'alignment': {},
             'row_order': []
         }
-        for record in SeqIO.parse( self.fileOutputName, "fasta"):
-            msa['row_order'].append(record.id)
+        for record in SeqIO.parse(output_MSA, "fasta"):
             sequence = str(record.seq)
-            msa['alignment'][record.id] = sequence
             alignment_length = len(sequence)
-            msa['alignment_length'] = alignment_length
+            MSA_data['row_order'].append(record.id)
+            MSA_data['alignment'][record.id] = sequence
+            MSA_data['alignment_length'] = alignment_length
         
-        ws.save_objects({'workspace':workspace_name, 'objects':[{'name':msa_id, 'type':'KBaseTrees.MSA', 'data': msa}]})
-        return str(msa)
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+        provenance[0]['input_ws_objects'] = []
+        if 'featureset_name' in params:
+            provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['featureset_name'])
+        if 'parent_msa_ref' in MSA:
+            provenance[0]['input_ws_objects'].append(MSA['parent_msa_ref')
+        provenance[0]['service'] = 'MyModule'
+        provenance[0]['method'] = 'MyMethod'
+        
+        # save object in workspace
+        new_obj_info = ws.save_objects({
+							'workspace': params['workspace_name'],
+							'objects':[{
+									'type': 'KBaseTrees.MSA',
+									'data': MSA_data,
+									'name': params['output_MSA_name'],
+									'meta': {},
+									'provenance': provenance
+								}]
+                        })
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1836,9 +1954,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ### <A NAME="tree"></A>Tree
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.Tree
 
+- [data structure](#tree-ds)
+- [setup](#tree-setup)
+- [obtaining](#tree-obtaining)
+- [using](#tree-using)
+- [storing](#tree-storing)
+
 Phylogenetic trees may represent the evolutionary relationships of either species/genomes or genes.
 
-##### data structure
+##### <A NAME="tree-ds"></A>data structure
 ref_type:
 An enumeration of reference types for a node.  Either the one letter abbreviation or full name can be given.<br>
 Supported types include:<br>
@@ -1883,7 +2007,7 @@ optional:
 }
 ```
 
-##### setup
+##### <A NAME="tree-setup"></A>setup
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
 
 ```python
@@ -1910,19 +2034,19 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         sys.stdout.flush()
 ```
 
-##### obtaining
+##### <A NAME="tree-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
 ```
 ```
 
-##### using
+##### <A NAME="tree-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```
 ```
 
-##### storing
+##### <A NAME="tree-storing"></A>storing
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
 
 ```
