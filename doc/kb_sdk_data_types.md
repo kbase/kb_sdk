@@ -1985,7 +1985,7 @@ optional:
 { ## KBaseTrees.Tree
   name: ‘tree_name’,
   description: ‘tree_desc’,
-  type: ‘tree_type’,
+  type: ‘tree_type’, # 'SpeciesTree' or 'GeneTree'
   tree: ‘newick_string’,
   tree_attributes: { 'attr_1': 'val_1',
                      'attr_2': 'val_2',
@@ -2108,37 +2108,37 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
         self.log(console, 'storing tree object: '+params['workspace_name']+'/'+params['output_tree_name'])
 
-	output_tree_file_location = os.path.join(self.scratch, params['output_tree_name']+".newick")
-	output_tree_data_format = 'newick'
-	output_tree = Phylo.read(output_tree_file_location, output_tree_data_format)
+        output_tree_file_location = os.path.join(self.scratch, params['output_tree_name']+".newick")
+        with open (output_tree_file_location, 'r') as newick_file_handle:
+            output_newick_buf = newick_file_handle.read().replace('\n','')
+        output_tree_data_format = 'newick'
+        output_tree_phylo = Phylo.read(output_tree_file_location, output_tree_data_format)
 
-
+	tree_type = 'SpeciesTree'  # or 'GeneTree'
+	ref_type = 'genome'   # if ids parsed from output are genome ids
+	#ref_type = 'protein'  # if ids parsed from output are protein ids
+	#ref_type = 'dna'      # if ids parsed from output are any dna ids
+	#ref_type = 'feature'  # if ids parsed from output are feature ids
+	
         tree_data = { ## KBaseTrees.Tree
 			name: params['output_tree_name'],
 			description: params['output_tree_desc'],
-			type: 'species',   # or 'gene'
+			type: tree_type,   
 			tree: output_newick_buf,
 			tree_attributes: {},
-			default_node_labels: { 'node_id_1': 'label_1',
-					       'node_id_2', 'label_2',
-			},
-			ws_refs: { ‘node_id_1’: { ‘ref_type’: [‘ws_obj_id_1’, ...] },
-					‘node_id_2’: ...
-			},
-			kb_refs: { ‘node_id_1’: { ‘ref_type’: [‘kbase_id_1’, ...] },
-					‘node_id_2’: ...
-			},
-			leaf_list: [‘node_id_1’, ‘node_id_2’, ...]
+			default_node_labels: {},
+			ws_refs: {},
+			kb_refs: {},
+			leaf_list: []
 	}
-        genomes = []
-        for feature in feature_list:
-            feature_id = feature['feature_id']
-            featureset_data['element_ordering'].append(feature_id);
-            featureset_data['elements'][feature_id] = []
-            for genome_ref in feature['genomes']:
-                featureset_data['elements'][feature_id].append(genome_ref)
-		if not genome_ref in genomes:
-		    genomes.append(genome_ref)
+	for leaf in output_tree_phylo.get_terminals():  # for just leaf nodes
+	    tree_data['leaf_list'].append(leaf.name)
+	#for node in output_tree_phylo.get_nonterminals():  # for just non-leaf nodes
+	#    print node.name
+	for node in output_tree_phylo.find_clades():  # for all internal and leaf nodes
+	    tree_data['default_node_labels'][node.name] = node.name  # don't have an alternate label
+	    tree_data['ws_refs'][node.name] = { ref_type: [node.name] }  # if names in newick file are ws_refs
+	    #tree_data['kb_refs'][node.name] = { ref_type: [node.name] }  # if names in newick file are kbase_ids
 
         # load the method provenance from the context object
         provenance = [{}]
