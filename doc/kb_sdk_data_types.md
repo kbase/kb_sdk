@@ -382,14 +382,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         
         # save object in workspace
         new_obj_info = ws.save_objects({
-			    'workspace': params['workspace_name'],
-			    'objects':[{
-			    'type': 'KBaseFile.SingleEndLibrary',
-			    'data': single_end_library,
-			    'name': params['output_read_library_name'],
-			    'meta': {},
-			    'provenance': provenance
-			    }]
+					'workspace': params['workspace_name'],
+					'objects':[{
+					'type': 'KBaseFile.SingleEndLibrary',
+					'data': single_end_library,
+					'name': params['output_read_library_name'],
+					'meta': {},
+					'provenance': provenance
+					}]
 			})
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
@@ -823,16 +823,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
-        new_obj_info = self.ws.save_objects({
-					      'workspace': params['workspace_name'],
-					      'objects':[{
-							   'type': 'KBaseFile.PairedEndLibrary',
-							   'data': paired_end_library,
-							   'name': params['output_read_library_name'],
-							   'meta': {},
-							   'provenance': provenance
-							 }]
-					    })
+        new_obj_info = ws.save_objects({
+					'workspace': params['workspace_name'],
+					'objects':[{
+					'type': 'KBaseFile.PairedEndLibrary',
+					'data': paired_end_library,
+					'name': params['output_read_library_name'],
+					'meta': {},
+					'provenance': provenance
+					}]
+			})
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
         
@@ -1041,14 +1041,14 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         
         # save object in workspace
         new_obj_info = ws.save_objects({
-				      'workspace': params['workspace_name'],
-				      'objects':[{
-						   'type': 'KBaseGenomes.ContigSet',
-						   'data': contigset_data,
-						   'name': params['output_contigset_name'],
-						   'meta': {},
-						   'provenance': provenance
-						 }]
+					'workspace': params['workspace_name'],
+					'objects':[{
+					'type': 'KBaseGenomes.ContigSet',
+					'data': contigset_data,
+					'name': params['output_contigset_name'],
+					'meta': {},
+					'provenance': provenance
+					}]
                         })
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
@@ -1153,7 +1153,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 
 ```python
-	# export features to FASTA file
+        # export features to FASTA file
         fasta_file_location = os.path.join(self.scratch, params['featureset_name']+".fasta")
         self.log(console, 'writing fasta file: '+fasta_file_location)
         records = []
@@ -1195,20 +1195,20 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         # add additional info to provenance here, in this case the input data object reference, service, and method
         provenance[0]['input_ws_objects'] = []
         for genome_ref in genomes:
-	    provenance[0]['input_ws_objects'].append(genome_ref)
+            provenance[0]['input_ws_objects'].append(genome_ref)
         provenance[0]['service'] = 'MyModule'
         provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = ws.save_objects({
-				      'workspace': params['workspace_name'],
-				      'objects':[{
-						   'type': 'KBaseCollections.FeatureSet',
-						   'data': featureset_data,
-						   'name': params['output_featureset_name'],
-						   'meta': {},
-						   'provenance': provenance
-						 }]
+					'workspace': params['workspace_name'],
+					'objects':[{
+					'type': 'KBaseCollections.FeatureSet',
+					'data': featureset_data,
+					'name': params['output_featureset_name'],
+					'meta': {},
+					'provenance': provenance
+					}]
                         })
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
