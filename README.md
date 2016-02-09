@@ -1,4 +1,4 @@
-# KBase SDK
+# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK
 
 **This software is still in beta and should only be used for internal KBase development.**
 
@@ -14,27 +14,73 @@ There are a number of restrictions on module functionality that will gradually b
 - Wrapper written in Python, Java, or Perl
 
 
-For more details on developing modules for KBase see:
+## <A NAME="steps"></A>Steps in Using SDK
+1. [Install SDK Dependencies](#install-sdk-dependencies)
+2. [Install and Build SDK](#install-and-build-sdk)
+3. [Create Module and Method(s)](#create-module-and-method)
+4. [Edit Module and Method(s)](#edit-module-and-method)
+5. [Test Module and Method(s)](#test-module-and-method)
+6. [Register Module](#register-module)
+7. [Test in KBase](#test-in-kbase)
+8. [Complete Module Info](#complete-module-info)
+9. [Deploy](#deploy)
 
-- KBase Developer Policies
-- [Full Installation Guide](doc/installation.md)
-- [Anatomy of a KBase Module](doc/module_overview.md)
-- [Building and Registering Your First Module](doc/getting_started.md)
-- [Old Module Builder CLI docs](doc/Module_builder.md) - still has good information, but getting merged into the Building your first module guide above
-- Wrapping an Existing Command-Line Tool
-- [Module Testing Framework](doc/testing.md)
-- [Debugging Your Module](doc/Docker_deployment.md)
-- KBase SDK Coding Style Guide and Best Practices
-- Managing Your Module Release Cycle
-- Working with KBase Data Types
-- KBase Interface Description Language (KIDL) Guide
-- Narrative Method Specification Guide
-- (Visualization Widget Development Guide)
-- SDK command-line interface quick reference
+
+### Additional Documentation
 - FAQ
+- Troubleshooting
+- KBase Developer Policies
+- KBase SDK Coding Style Guide and Best Practices
+- [Anatomy of a KBase Module](doc/module_overview.md)
+- Working with KBase Data Types
+- Wrapping an Existing Command-Line Tool
+- Using Custom Reference Data 
+- [kb-sdk Command Line Interface](doc/Module_builder.md) (NEEDS UPDATING)
+- KBase Interface Definition Language (KIDL)
+- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
+- Managing Your Module Release Cycle
+- KBase Interface Description Language (KIDL) Guide
+- (Combine "Narrative Method Specification Guide" with "Visualization Widget Development Guide")
+
+BRING INTO TOP-LEVEL DOC
+- [Full Installation Guide](doc/installation.md)
+- [Building and Registering Your First Module](doc/getting_started.md)
 
 
-### Quick Install Guide
+### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
+
+[back to top](#steps)
+
+### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
+
+[back to top](#steps)
+
+### <A NAME="create-module-and-methods"></A>3. Create Module and Method(s)
+
+[back to top](#steps)
+
+### <A NAME="edit-module-and-methods"></A>4. Edit Module and Method(s)
+
+[back to top](#steps)
+
+### <A NAME="test-module-and-methods"></A>5. Test Module and Method(s)
+
+[back to top](#steps)
+
+### <A NAME="register-module"></A>6. Register Module
+
+[back to top](#steps)
+
+### <A NAME="test-in-kbase"></A>7. Test in KBase
+
+[back to top](#steps)
+
+### <A NAME="complete-module-info"></A>8. Complete Module Info
+
+[back to top](#steps)
+
+### <A NAME="deploy"></A>9. Deploy
+
 
 Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
 
