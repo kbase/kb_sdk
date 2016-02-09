@@ -32,7 +32,7 @@ There are a number of restrictions on module functionality that will gradually b
 - KBase Developer Policies
 - KBase SDK Coding Style Guide and Best Practices
 - [Anatomy of a KBase Module](doc/module_overview.md)
-- Working with KBase Data Types](doc/kb_sdk_data_types.md)
+- [Working with KBase Data Types](doc/kb_sdk_data_types.md)
 - Wrapping an Existing Command-Line Tool
 - Using Custom Reference Data 
 - [kb-sdk Command Line Interface](doc/Module_builder.md) (NEEDS UPDATING)
