@@ -25,11 +25,10 @@ There are a number of restrictions on module functionality that will gradually b
 8. [Complete Module Info](#complete-module-info)
 9. [Deploy](#deploy)
 
-[Examples)(#examples)
-
 ### Additional Documentation
 - FAQ
 - Troubleshooting
+- [Examples](#examples)
 - KBase Developer Policies
 - KBase SDK Coding Style Guide and Best Practices
 - [Anatomy of a KBase Module](doc/module_overview.md)
