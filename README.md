@@ -19,12 +19,13 @@ There are a number of restrictions on module functionality that will gradually b
 2. [Install and Build SDK](#install-and-build-sdk)
 3. [Create Module and Method(s)](#create-module-and-method)
 4. [Edit Module and Method(s)](#edit-module-and-method)
-5. [Test Module and Method(s)](#test-module-and-method)
+5. [Locally Test Module and Method(s)](#test-module-and-method)
 6. [Register Module](#register-module)
 7. [Test in KBase](#test-in-kbase)
 8. [Complete Module Info](#complete-module-info)
 9. [Deploy](#deploy)
 
+[Examples)(#examples)
 
 ### Additional Documentation
 - FAQ
@@ -41,58 +42,30 @@ There are a number of restrictions on module functionality that will gradually b
 - Managing Your Module Release Cycle
 - KBase Interface Description Language (KIDL) Guide
 - (Combine "Narrative Method Specification Guide" with "Visualization Widget Development Guide")
+- [KBase Catalog API](#https://github.com/kbase/catalog/blob/master/catalog.spec)
 
 BRING INTO TOP-LEVEL DOC
 - [Full Installation Guide](doc/installation.md)
 - [Building and Registering Your First Module](doc/getting_started.md)
 
 
-### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
-
-[back to top](#steps)
-
-### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
-
-[back to top](#steps)
-
-### <A NAME="create-module-and-methods"></A>3. Create Module and Method(s)
-
-[back to top](#steps)
-
-### <A NAME="edit-module-and-methods"></A>4. Edit Module and Method(s)
-
-[back to top](#steps)
-
-### <A NAME="test-module-and-methods"></A>5. Test Module and Method(s)
-
-[back to top](#steps)
-
-### <A NAME="register-module"></A>6. Register Module
-
-[back to top](#steps)
-
-### <A NAME="test-in-kbase"></A>7. Test in KBase
-
-[back to top](#steps)
-
-### <A NAME="complete-module-info"></A>8. Complete Module Info
-
-[back to top](#steps)
-
-### <A NAME="deploy"></A>9. Deploy
-
-
-Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
-
-#### Installation Only
+#### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
 
 System Dependencies:
-
 - Mac OS X 10.8+ or Linux
 - Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
+
+(If you plan to build from source)
+- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- JAVA_HOME environment variable set to JDK installation path
+- Apache Ant http://ant.apache.org
+
+[back to top](#steps)
+
+#### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
 
 Get the SDK:
 
@@ -101,7 +74,7 @@ Get the SDK:
 Pull dependencies and configure the SDK:
 
     cd kb_sdk
-    make bin
+    make bin  # or just 'make' if you are building from source
 
 Download the local KBase SDK base Docker image:
 
@@ -117,22 +90,9 @@ Test installation:
 
     kb-sdk help
 
+[back to top](#steps)
 
-#### Build from source
-
-Additional System Dependencies:
-
-- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
-- JAVA_HOME environment variable set to JDK installation path
-- Apache Ant http://ant.apache.org
-
-Follow basic instructions above.  Instead of running `make bin` you can run `make` to compile the SDK:
-
-    cd kb_sdk
-    make
-
-
-### Quick Start Guide
+#### <A NAME="create-module-and-methods"></A>3. Create Module and Method(s)
 
 Initialize a new module populated with the ContigCount example (module names need to be unique in KBase, so you should pick a different name):
 
@@ -143,7 +103,15 @@ Enter your new module directory and do the initial build:
     cd ContigCount
     make
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
+[back to top](#steps)
+
+#### <A NAME="edit-module-and-methods"></A>4. Edit Module and Method(s)
+
+[back to top](#steps)
+
+#### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
+
+Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied):
 
     test_user = TEST_USER_NAME
     test_password = TEST_PASSWORD
@@ -163,6 +131,11 @@ When you make changes to the Narrative method specifications, you can validate t
 
     kb-sdk validate
 
+[back to top](#steps)
+
+#### <A NAME="register-module"></A>6. Register Module
+
+
 Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
     cd ContigCount
@@ -175,6 +148,12 @@ Add your repo to [GitHub](http://github.com) (or any other public git repository
 
 Go to https://narrative-ci.kbase.us and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
+
+
+[back to top](#steps)
+
+#### <A NAME="test-in-kbase"></A>7. Test in KBase
+
 Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
 
 Explore the other SDK methods in the Narrative method panel.  For finer-grain control of the KBase Catalog registration process, use a code cell:
@@ -185,8 +164,16 @@ Explore the other SDK methods in the Narrative method panel.  For finer-grain co
 
 The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
 
+[back to top](#steps)
 
-#### Example Modules
+#### <A NAME="complete-module-info"></A>8. Complete Module Info
+
+[back to top](#steps)
+
+#### <A NAME="deploy"></A>9. Deploy
+
+
+### <A NAME="examples"></A>Example Modules
 
 There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
 
@@ -196,7 +183,6 @@ There are a number of modules that we continually update and modify to demonstra
  - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
 
 
-
-#### Need more?
+### Need more?
 
 If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us
