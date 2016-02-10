@@ -112,6 +112,9 @@ On Linux Docker is fairly easy to install.  On a Mac the standard installer will
 
 #### Fetch the code from GitHub:
 
+Create a directory in which you want to work.  All your work should go here.  All commands that follow are assuming you are using a UNIX shell.
+
+    cd <working_dir>
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
 
@@ -119,7 +122,7 @@ Some newer features are on other branches, such as develop.  If you do not need 
 
     cd kb_sdk
     git checkout <branch>
-    make
+    make bin  # or "make" to compile from scratch
     
 You should now have the kb-sdk program built in kb_sdk/bin. It will be helpful to add this to your execution path.  From within the kb_sdk directory, you can run in Bash:
 
@@ -191,11 +194,11 @@ Module names in KBase need to be unique accross the system (for now- they will l
 
 ### <A NAME="edit-module-and-methods"></A>4. Edit Module and create Method(s)
 
-#### Update kbase.yml
+#### 4A. Update kbase.yml
 
 Open and edit the kbase.yml file to include a better description of your module.  The default generated description isn't very good.
 
-#### Create KIDL specification for Module
+#### 4B. Create KIDL specification for Module
 
 The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.
 
@@ -232,14 +235,14 @@ We can use any defined types as input/output parameters to functions.  We define
 
 Optionally, as we have shown in the example, your method can require authentication by adding that declaration at the end of the method.  In general, all your methods will require authentication.
 
-#### Validate
+#### 4C. Validate
 
 When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base directory of your module:
 
     kb-sdk validate
 
 
-#### Create stubs for methods
+#### 4D. Create stubs for methods
 
 After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs by running
 
@@ -247,13 +250,13 @@ After editing the <MyModule>.spec KIDL file, generate the Python (or other langu
 
 This will call `kb-sdk compile` with a set of parameters predefined for you.
 
-#### Edit Impl file
+#### 4E. Edit Impl file
 
 In the lib/<MyModule>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
 
 ##### Using Data Types
 
-In addition to taking advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
+Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
 
 ##### Logging
 
@@ -276,14 +279,224 @@ Logging where you are is key to tracking progress and debugging.  Our recommende
         self.log(console, pformat(params))
 ```    
 
+##### Provenance
+
+Data objects in KBase contain provenance (historical information of their creation and objects from which they are derived).  When you create new objects, you must carry forward and add provenance information to them.  Additionally, Report objects should receive that provenance data (see below).  Examples of adding provenance to objects can be found in the [KBase Data Types](docs/kb_sdk_data_types.md).
+
+```python
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects']=[]
+        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['read_library_name'])
+```
+
 ##### Building output Report
+
+```python
+        # create a Report
+        report = ''
+        report += 'ContigSet saved to: '+params['workspace_name']+'/'+params['output_contigset_name']+'\n'
+        report += 'Assembled into '+str(len(contigset_data['contigs'])) + ' contigs.\n'
+        report += 'Avg Length: '+str(sum(lengths)/float(len(lengths))) + ' bp.\n'
+
+        # compute a simple contig length distribution
+        bins = 10
+        counts, edges = np.histogram(lengths, bins)
+        report += 'Contig Length Distribution (# of contigs -- min to max basepairs):\n'
+        for c in range(bins):
+            report += '   '+str(counts[c]) + '\t--\t' + str(edges[c]) + ' to ' + str(edges[c+1]) + ' bp\n'
+
+        reportObj = {
+            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_contigset_name'], 'description':'Assembled contigs'}],
+            'text_message':report
+        }
+
+        reportName = 'megahit_report_'+str(hex(uuid.getnode()))
+        report_obj_info = ws.save_objects({
+                'id':info[6],
+                'objects':[
+                    {
+                        'type':'KBaseReport.Report',
+                        'data':reportObj,
+                        'name':reportName,
+                        'meta':{},
+                        'hidden':1,
+                        'provenance':provenance
+                    }
+                ]
+            })[0]
+
+        output = { 'report_name': reportName, 'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]) }
+```
 
 ##### Invoking Command Line Tool
 
+```python
+        command_line_tool_params_str = " ".join(command_line_tool_params)
+        command_line_tool_cmd_str = " ".join(command_line_tool_path, command_line_tool_params_str)
+        
+        # run <command_line_tool>, capture output as it happens
+        self.log(console, 'running <command_line_tool>:')
+        self.log(console, '    '+command_line_tool_cmd_str))
+        p = subprocess.Popen(command_line_tool_cmd_str,
+                    cwd = self.scratch,
+                    stdout = subprocess.PIPE, 
+                    stderr = subprocess.STDOUT, shell = False)
 
-#### Creating Narrative UI Input Widget
+        while True:
+            line = p.stdout.readline()
+            if not line: break
+            self.log(console, line.replace('\n', ''))
 
-#### Creating a Git Repo
+        p.stdout.close()
+        p.wait()
+        self.log(console, 'return code: ' + str(p.returncode))
+        if p.returncode != 0:
+            raise ValueError('Error running <command_line_tool>, return code: '+str(p.returncode) + 
+                '\n\n'+ '\n'.join(console))
+ ```
+
+#### 4F. Creating Narrative UI Input Widget
+
+Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.
+
+##### Creating fields in the input widget cell
+
+Edit *display.yaml*
+
+```
+name: MegaHit
+tooltip: |
+	Run megahit for metagenome assembly
+screenshots: []
+
+icon: kb_logo.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+	apps:
+		related:
+			[]
+		next:
+			[]
+	methods:
+		related:
+			[]
+		next:
+			[]
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    read_library_name :
+        ui-name : Read Library
+        short-hint : Read library (only PairedEnd Libs supported now)
+    output_contigset_name:
+        ui-name : Output ContigSet name
+        short-hint : Enter a name for the assembled contigs data object
+
+description : |
+	<p>This is a KBase wrapper for MEGAHIT.</p>
+    <p>MEGAHIT is a single node assembler for large and complex metagenomics NGS reads, such as soil. It makes use of succinct de Bruijn graph (SdBG) to achieve low memory assembly.</p>
+publications :
+    -
+        pmid: 25609793
+        display-text : |
+            'Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033'
+        link: http://www.ncbi.nlm.nih.gov/pubmed/25609793
+```
+
+##### Configure passing variables from Narrative Input to SDK method.
+
+```
+{
+	"ver": "1.0.0",
+	
+	"authors": [
+		"YourName"
+	],
+	"contact": "help@kbase.us",
+	"visible": true,
+	"categories": ["active","assembly"],
+	"widgets": {
+		"input": null,
+		"output": "kbaseReportView"
+	},
+	"parameters": [ 
+		{
+			"id": "read_library_name",
+			"optional": false,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": [ "" ],
+			"field_type": "text",
+			"text_options": {
+				"valid_ws_types": ["KBaseAssembly.PairedEndLibrary","KBaseFile.PairedEndLibrary"]
+			}
+		},
+		{
+		    "id" : "output_contigset_name",
+		    "optional" : false,
+		    "advanced" : false,
+		    "allow_multiple" : false,
+		    "default_values" : [ "MegaHit.contigs" ],
+		    "field_type" : "text",
+		    "text_options" : {
+		     	"valid_ws_types" : [ "KBaseGenomes.ContigSet" ],
+		    	"is_output_name":true
+		    }
+		}
+	],
+	"behavior": {
+		"service-mapping": {
+			"url": "",
+			"name": "MegaHit",
+			"method": "run_megahit",
+			"input_mapping": [
+				{
+					"narrative_system_variable": "workspace",
+					"target_property": "workspace_name"
+				},
+				{
+					"input_parameter": "read_library_name",
+          			"target_property": "read_library_name"
+				},
+				{
+					"input_parameter": "output_contigset_name",
+          			"target_property": "output_contigset_name"
+				}
+			],
+			"output_mapping": [
+				{
+					"narrative_system_variable": "workspace",
+					"target_property": "workspace_name"
+				},
+				{
+					"service_method_output_path": [0,"report_name"],
+					"target_property": "report_name"
+				},
+				{
+					"service_method_output_path": [0,"report_ref"],
+					"target_property": "report_ref"
+				},
+				{
+					"constant_value": "16",
+					"target_property": "report_window_line_height"
+				}
+			]
+		}
+	},
+	"job_id_output_field": "docker"
+}
+```
+
+#### 4G. Creating a Git Repo
 
 You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Since functionality in KBase is pulled into KBase from public git repositories, you will need to put your module code into a public git repository.  Here we'll show a brief example using [GitHub](http://github.com).  First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
 
@@ -308,7 +521,7 @@ use the name of your module as the name for your new repository.
 
 ### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
 
-#### Edit Dockerfile
+#### 5A. Edit Dockerfile
 
 The base KBase Docker image contains a KBase Ubuntu image, but not much else.  You will need to add whatever dependencies, including the installation of whatever tool you are wrapping, to the Dockerfile that is executed to build a custom Docker image that can run your Module.
 
@@ -328,7 +541,7 @@ You will also need to add your KBase SDK module to the Dockerfile.  For example:
     RUN git clone https://github.com/dcchivian/kb_vsearch_test_data
     WORKDIR ../
 
-#### Build tests of your methods
+#### 5B. Build tests of your methods
 
 Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied):
 
@@ -351,6 +564,7 @@ Inspect the Docker container by dropping into a bash console and poke around, fr
 
 ### <A NAME="register-module"></A>6. Register Module
 
+#### 6A. Create Git Repo
 
 If you haven't already, add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
@@ -362,15 +576,28 @@ If you haven't already, add your repo to [GitHub](http://github.com) (or any oth
     git remote add origin https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME].git
     git push -u origin master
 
-Go to https://narrative-ci.kbase.us and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
+#### 6B. Register with KBase
+
+Go to
+
+    https://narrative-ci.kbase.us
+
+and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url
+
+e.g.
+
+    https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]
+    
+and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
 
 [back to top](#steps)
 
+
 ### <A NAME="test-in-kbase"></A>7. Test in KBase
 
-#### Start a Narrative Session
+#### 7A. Start a Narrative Session
 
 Go to https://narrative-ci.kbase.us and start a new Narrative.
 
@@ -386,9 +613,15 @@ The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/mas
 
 [back to top](#steps)
 
+
 ### <A NAME="complete-module-info"></A>8. Complete Module Info
 
 Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
+
+#### 8A. Adding an Icon
+
+#### 8B. Adding Text Info
+
 
 [back to top](#steps)
 
