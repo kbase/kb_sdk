@@ -38,7 +38,6 @@ In order to follow the registration instructions, you have to be an approved KBa
 - Wrapping an Existing Command-Line Tool
 - Using Custom Reference Data 
 - [kb-sdk Command Line Interface](doc/Module_builder.md) (NEEDS UPDATING)
-- KBase Interface Definition Language (KIDL)
 - (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - Managing Your Module Release Cycle
 - KBase Interface Description Language (KIDL) Guide
