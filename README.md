@@ -12,8 +12,10 @@ There are a number of restrictions on module functionality that will gradually b
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, or Perl
+ 
+Additionally, if you are using Mac to develop, Docker requires Mac OS X >= 10.8.
 
-In order to follow the registration instructions, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
+In order to follow the SDK registration instructions, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
@@ -249,7 +251,37 @@ This will call `kb-sdk compile` with a set of parameters predefined for you.
 
 In the lib/<MyModule>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
 
+##### Using Data Types
+
 In addition to taking advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
+
+##### Logging
+
+Logging where you are is key to tracking progress and debugging.  Our recommended style is to log to a "console" list.  Here is some example code for accomplishing this.
+
+```python
+    from pprint import pprint, pformat
+
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        # we should do something better here...
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
+
+    def run_<MyMethod>(self, ctx, params):
+        console = []
+        self.log(console,'Running run_<MyMethod> with params=')
+        self.log(console, pformat(params))
+```    
+
+##### Building output Report
+
+##### Invoking Command Line Tool
+
+
+#### Creating Narrative UI Input Widget
 
 #### Creating a Git Repo
 
