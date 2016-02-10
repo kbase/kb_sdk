@@ -254,15 +254,27 @@ public class ModuleValidator {
 	protected void validateMethodSpecMapping(String specText, KbModule parsedKidl,
 	        boolean allowSyncMethods) throws IOException {
 	    JsonNode spec = new ObjectMapper().readTree(specText);
-	    JsonNode parametersNode = get("/", spec, "parameters");
-	    Map<String, JsonNode> inputParamIdToType = new TreeMap<String, JsonNode>();
+        if (!allowSyncMethods) {
+            String jobId = get("/", spec, "job_id_output_field").asText();
+            if (!jobId.equals("docker")) {
+                throw new IllegalStateException("  **ERROR** - can't find \"docker\" value within path " +
+                        "[job_id_output_field] in spec.json");
+            }
+        } else if (spec.get("job_id_output_field") == null ||
+                !spec.get("job_id_output_field").asText().equals("docker")) {
+            System.err.println("  **WARNINGS** - method is declared as synchronous and " +
+                    "will be skipped");
+            return;
+        }
+        JsonNode parametersNode = get("/", spec, "parameters");
+        Map<String, JsonNode> inputParamIdToType = new TreeMap<String, JsonNode>();
         for (int i = 0; i < parametersNode.size(); i++) {
             JsonNode paramNode = parametersNode.get(i);
             String paramPath = "parameters/" + i;
             String paramId = get(paramPath, paramNode, "id").asText();
             inputParamIdToType.put(paramId, paramNode);
         }
-	    JsonNode behaviorNode = get("/", spec, "behavior");
+        JsonNode behaviorNode = get("/", spec, "behavior");
         JsonNode serviceMappingNode = get("behavior", behaviorNode, "service-mapping");
         String moduleName = get("behavior/service-mapping", serviceMappingNode, "name").asText();
         String methodName = get("behavior/service-mapping", serviceMappingNode, "method").asText();
@@ -270,11 +282,6 @@ public class ModuleValidator {
             String[] parts = methodName.split(Pattern.quote("."));
             moduleName = parts[0];
             methodName = parts[1];
-        }
-        if (!parsedKidl.getModuleName().equals(moduleName)) {
-            throw new IllegalStateException("  **ERROR** - value doesn't match " +
-            		"\"" + parsedKidl.getModuleName() + "\" within path " +
-                    "[behavior/service-mapping/name] in spec.json");
         }
         KbFuncdef func = null;
         for (KbModuleComp mc : parsedKidl.getModuleComponents()) {
@@ -291,17 +298,10 @@ public class ModuleValidator {
                     methodName + "\" defined within path " +
                     "[behavior/service-mapping/method] in spec.json");
         }
-        if (!allowSyncMethods) {
-            String jobId = get("/", spec, "job_id_output_field").asText();
-            if (!jobId.equals("docker")) {
-                throw new IllegalStateException("  **ERROR** - can't find \"docker\" value within path " +
-                        "[job_id_output_field] in spec.json");
-            }
-        } else if (spec.get("job_id_output_field") == null ||
-                !spec.get("job_id_output_field").asText().equals("docker")) {
-            System.err.println("  **WARNINGS** - method is declared as synchronous and " +
-                    "will be skipped");
-            return;
+        if (!parsedKidl.getModuleName().equals(moduleName)) {
+            throw new IllegalStateException("  **ERROR** - value doesn't match " +
+                    "\"" + parsedKidl.getModuleName() + "\" within path " +
+                    "[behavior/service-mapping/name] in spec.json");
         }
         String serviceUrl = get("behavior/service-mapping", serviceMappingNode, "url").asText();
         if (serviceUrl.length() > 0) {
