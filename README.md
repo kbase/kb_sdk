@@ -64,10 +64,10 @@ System Dependencies:
 - JAVA_HOME environment variable set to JDK installation path
 - Apache Ant http://ant.apache.org
 
-##### Mac OS X 10.8+ or Linux
+#### Mac OS X 10.8+ or Linux
 Windows development is not currently supported.  If you are running Windows or do not want to develop on your local machine, we recommend using [VirtualBox](https://www.virtualbox.org) and installing Ubuntu 14+.
 
-##### Java JDK 7+ 
+#### Java JDK 7+ 
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 After downloading and installing the JDK, set your `JAVA_HOME` environment variable to point to your JDK installation.  If you're not sure where that is, on a Mac the command `/usr/libexec/java_home` should tell you and on Linux `readlink -f $(which javac)` will provide the installed location of the javac, which you can use to find the base directory of the installation.  On a Mac you can set the variable like so:
@@ -79,24 +79,24 @@ After downloading and installing the JDK, set your `JAVA_HOME` environment varia
 
 You should probably add this command to the end of your `~/.bash_profile` or ~/.bashrc file so it is always set when you start a terminal.
 
-##### Apache Ant
+#### Apache Ant (is this really necessary?)
 http://ant.apache.org
 
 http://ant.apache.org/manual/install.html
 
 The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH environment variable, which is generally handled for you if you use a package manager like HomeBrew.
 
-##### (Mac only) Xcode
+#### (Mac only) Xcode
 https://developer.apple.com/xcode
 
 Xcode or the Xcode Command Line Tools will install some standard terminal commands like `make` and `git` that are necessary for building the KBase SDK and your module code.
 
-##### git
+#### git
 https://git-scm.com
 
 On a Mac this is typically already installed as part of Xcode.
 
-##### Docker
+#### Docker
 
 https://www.docker.com
 
@@ -113,7 +113,7 @@ On Linux Docker is fairly easy to install.  On a Mac the standard installer will
 
 ### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
 
-##### Fetch the code from GitHub:
+#### Fetch the code from GitHub:
 
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
@@ -134,11 +134,11 @@ Optionally, you can also install command completion with:
 
 Like `JAVA_HOME`, you should consider adding these last two commands to your `~/.bash_profile` or `~/.bashrc` file so the SDK is always available in the terminal with command completion.
 
-##### Test installation:
+#### Test installation:
 
     kb-sdk help
 
-##### Download the KBase SDK base Docker image
+#### Download the KBase SDK base Docker image
 
 KBase modules run in Docker containers.  Docker containers are built on top of existing base images.  KBase has a public base image that includes a number of installed runtimes, some basic Bioinformatics tools, and other KBase specific tools.  To run this locally, you will need to download and build the KBase SDK base image.  There is a Makefile target that does most of the work for you:
 
@@ -153,7 +153,7 @@ The Image currently is fairly large, so this will take some time to run and buil
 
 The KBase SDK provides a way to quickly bootstrap a new module by generating most of the required components.
 
-##### Initialize
+#### Initialize
 
 The basic options of the command are:
 
@@ -184,7 +184,7 @@ We'll write our implementation in Python, but most steps should apply for all th
 
 Module names in KBase need to be unique accross the system (for now- they will likely be namespaced by a user or organization name soon).
 
-##### Enter your new module directory and do the initial build:
+#### Enter your new module directory and do the initial build:
 
     cd <user_name>ContigCount
     make
@@ -194,11 +194,11 @@ Module names in KBase need to be unique accross the system (for now- they will l
 
 ### <A NAME="edit-module-and-methods"></A>4. Edit Module and create Method(s)
 
-##### Update kbase.yml
+#### Update kbase.yml
 
 Open and edit the kbase.yml file to include a better description of your module.  The default generated description isn't very good.
 
-##### Create KIDL specification for Module
+#### Create KIDL specification for Module
 
 The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.
 
@@ -235,14 +235,14 @@ We can use any defined types as input/output parameters to functions.  We define
 
 Optionally, as we have shown in the example, your method can require authentication by adding that declaration at the end of the method.  In general, all your methods will require authentication.
 
-##### Validate
+#### Validate
 
 When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base directory of your module:
 
     kb-sdk validate
 
 
-##### create stubs for methods
+#### Create stubs for methods
 
 After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs by running
 
@@ -250,13 +250,13 @@ After editing the <MyModule>.spec KIDL file, generate the Python (or other langu
 
 This will call `kb-sdk compile` with a set of parameters predefined for you.
 
-##### Edit Impl file
+#### Edit Impl file
 
 In the lib/<MyModule>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
 
 In addition to taking advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
 
-##### Creating a Git Repo
+#### Creating a Git Repo
 
 You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Since functionality in KBase is pulled into KBase from public git repositories, you will need to put your module code into a public git repository.  Here we'll show a brief example using [GitHub](http://github.com).  First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
 
@@ -281,7 +281,7 @@ use the name of your module as the name for your new repository.
 
 ### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
 
-##### Edit Dockerfile
+#### Edit Dockerfile
 
 The base KBase Docker image contains a KBase Ubuntu image, but not much else.  You will need to add whatever dependencies, including the installation of whatever tool you are wrapping, to the Dockerfile that is executed to build a custom Docker image that can run your Module.
 
@@ -301,7 +301,7 @@ You will also need to add your KBase SDK module to the Dockerfile.  For example:
     RUN git clone https://github.com/dcchivian/kb_vsearch_test_data
     WORKDIR ../
 
-##### Build tests of your methods
+#### Build tests of your methods
 
 Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied):
 
@@ -325,7 +325,7 @@ Inspect the Docker container by dropping into a bash console and poke around, fr
 ### <A NAME="register-module"></A>6. Register Module
 
 
-Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
+If you haven't already, add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
     cd ContigCount
     git init
@@ -343,6 +343,10 @@ Go to https://narrative-ci.kbase.us and start a new Narrative.  Search for the S
 
 ### <A NAME="test-in-kbase"></A>7. Test in KBase
 
+#### Start a Narrative Session
+
+Go to https://narrative-ci.kbase.us and start a new Narrative.
+
 Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
 
 Explore the other SDK methods in the Narrative method panel.  For finer-grain control of the KBase Catalog registration process, use a code cell:
@@ -357,9 +361,14 @@ The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/mas
 
 ### <A NAME="complete-module-info"></A>8. Complete Module Info
 
+Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
+
 [back to top](#steps)
 
+
 ### <A NAME="deploy"></A>9. Deploy
+
+Please email us when you think your module is ready for public use.
 
 
 ### <A NAME="examples"></A>Example Modules
