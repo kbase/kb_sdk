@@ -1,5 +1,8 @@
 # ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - FAQ
 
+- Q: [How can I tell if someone's already wrapped a tool I'm interested in?](#repeat)
+- Q: [What's already installed in the base KBase image and how do I call it?](#installed)
+- Q: [How do I find and access data?](#data)
 - Q: [What are system requirements for development workstation?](#sys-req-dev)
 - Q: [What are system requirements for execution environment?](#sys-req-exec)
 - Q: [What size data will be too big for the system?](#data-limits)
@@ -10,9 +13,17 @@
 - Q: [Can I do all the development logging in remotely to a Linux box?](#linux)
 - Q: [How do I add data and/or reference data to the system?](#config-data)
 - Q: [I need high-performance computing for my application.  Is that available?](#hpc)
-- Q: [How can I tell if someone's already wrapped a tool I'm interested in?](#repeat)
 - Q: [How do I set my favorite Apps?](#favorites)
 
+
+#### <A NAME="repeat"></A>Q: How can I tell if someone's already wrapped a tool I'm interested in?
+#### A:
+
+#### <A NAME="installed"></A>Q: What's already installed in the base KBase image and how do I call it?
+#### A:
+
+#### <A NAME="data"></A>Q: How do I find and access data?
+#### A:
 
 #### <A NAME="sys-req-dev"></A>Q: What are system requirements for development workstation?
 #### A:
@@ -42,9 +53,6 @@
 #### A:
 
 #### <A NAME="hpc"></A>Q: I need high-performance computing for my application.  Is that available?
-#### A:
-
-#### <A NAME="repeat"></A>Q: How can I tell if someone's already wrapped a tool I'm interested in?
 #### A:
 
 #### <A NAME="favorites"></A>Q: How do I set my favorite Apps?
