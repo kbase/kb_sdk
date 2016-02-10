@@ -368,7 +368,7 @@ Control of Narrative interaction is accomplished in files in the ui/narrative/me
 
 ##### Creating fields in the input widget cell
 
-Edit *display.yaml*
+Edit *display.yaml*:
 
 ```
 name: MegaHit
@@ -416,6 +416,8 @@ publications :
 ```
 
 ##### Configure passing variables from Narrative Input to SDK method.
+
+Edit *spec.json*:
 
 ```
 {
