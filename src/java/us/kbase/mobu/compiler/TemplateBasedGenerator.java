@@ -32,7 +32,7 @@ public class TemplateBasedGenerator {
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, genPerlServer, 
                 perlServerName, perlImplName, perlPsgiName, genPython, pythonClientName, 
                 genPythonServer, pythonServerName, pythonImplName, false, null, false, null, null, 
-                enableRetries, newStyle, ip, output, null, null, false);
+                enableRetries, newStyle, ip, output, null, null, false, null);
     }
     
     public static boolean genPerlServer(boolean genPerlServer, 
@@ -59,7 +59,8 @@ public class TemplateBasedGenerator {
             String pythonServerName, String pythonImplName, boolean genR, 
             String rClientName, boolean genRServer, String rServerName, String rImplName, 
             boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
-            FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault) throws Exception {
+            FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
+            String clientAsyncVer) throws Exception {
         KbService service = srvs.get(0);
         if (genJs && jsClientName == null)
             jsClientName = service.getName() + "Client";
@@ -99,6 +100,7 @@ public class TemplateBasedGenerator {
             context.put("enable_client_retry", true);
         context.put("empty_escaper", "");  // ${empty_escaper}
         context.put("display", new StringUtils());
+        context.put("async_version", clientAsyncVer);
         if (jsClientName != null) {
             Writer jsClient = output.openWriter(jsClientName + ".js");
             TemplateFormatter.formatTemplate("javascript_client", context, newStyle, jsClient);

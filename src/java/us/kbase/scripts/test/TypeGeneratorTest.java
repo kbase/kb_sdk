@@ -651,12 +651,14 @@ public class TypeGeneratorTest extends Assert {
         RunCompileCommand.generate(testFile, null, true, null, 
                 true, null, true, null, null, "service.psgi", false, true, 
                 null, true, null, null, false, false, null, null, null, false, 
-                null, false, null, false, null, null, newStyle, serverOutDir, null, true);
+                null, false, null, false, null, null, newStyle, serverOutDir, 
+                null, true, null);
         // Generate clients (always new style)
         RunCompileCommand.generate(testFile, null, true, null, 
                 true, null, false, null, null, null, false, true, 
                 null, false, null, null, false, false, null, null, null, false, 
-                null, false, null, false, null, null, true, serverOutDir, null, true);
+                null, false, null, false, null, null, true, serverOutDir, null, 
+                true, null);
         return serverOutDir;
 	}
 
@@ -1239,6 +1241,8 @@ public class TypeGeneratorTest extends Assert {
 	        ProcessHelper ph = ProcessHelper.cmd("casperjs", "--version").exec(new File("."), null, true, true);
 	        isCasperJsInstalled = false;
 	        String out = ph.getSavedOutput().trim();
+	        if (out.startsWith("Warning") && out.indexOf('\n') > 0)
+	            out = out.substring(out.indexOf('\n')).trim();
 	        if (out.contains("-"))
 	            out = out.substring(0, out.indexOf('-'));
 	        String[] parts = out.split(Pattern.quote("."));
