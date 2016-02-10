@@ -41,7 +41,7 @@ In order to register your SDK module, you have to be an approved KBase developer
 - [kb-sdk Command Line Interface](doc/Module_builder.md) (NEEDS UPDATING)
 - (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - Managing Your Module Release Cycle
-- [KBase Interface Description Language (KIDL) Guide](doc/)
+- KBase Interface Description Language (KIDL) Guide
 - Visualization Widget Development Guide
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 
