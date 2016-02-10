@@ -13,8 +13,6 @@ There are a number of restrictions on module functionality that will gradually b
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, or Perl
  
-Additionally, if you are using Mac to develop, Docker requires Mac OS X >= 10.8.
-
 In order to follow the SDK registration instructions, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
 
 
@@ -50,11 +48,12 @@ In order to follow the SDK registration instructions, you have to be an approved
 ### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
 
 System Dependencies:
-- Mac OS X 10.8+ or Linux
+- Mac OS X 10.8+ (Docker requires this) or Linux
 - Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
+- At least ??? GB free on your hard drive to install Docker, Xcode, Java JRE, etc.
 
 (If you plan to build from source)
 - Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
