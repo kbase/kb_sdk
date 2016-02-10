@@ -13,7 +13,7 @@ There are a number of restrictions on module functionality that will gradually b
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, or Perl
  
-In order to follow the SDK registration instructions, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
+In order to register your SDK module, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
