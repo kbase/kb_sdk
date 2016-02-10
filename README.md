@@ -234,6 +234,15 @@ We can use any defined types as input/output parameters to functions.  We define
 
 Optionally, as we have shown in the example, your method can require authentication by adding that declaration at the end of the method.  In general, all your methods will require authentication.
 
+Make sure you pass in the *workspace_name* in the input parameters.
+
+```
+    typedef structure {
+    	string workspace_name;
+    	...
+    } <Module>Params;
+```
+
 #### 4C. Validate
 
 When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base directory of your module:
