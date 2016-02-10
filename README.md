@@ -21,9 +21,9 @@ In order to follow the SDK registration instructions, you have to be an approved
 ## <A NAME="steps"></A>Steps in Using SDK
 1. [Install SDK Dependencies](#install-sdk-dependencies)
 2. [Install and Build SDK](#install-and-build-sdk)
-3. [Create Module and Method(s)](#create-module-and-method)
-4. [Edit Module and Method(s)](#edit-module-and-method)
-5. [Locally Test Module and Method(s)](#test-module-and-method)
+3. [Create Module and Method(s)](#create-module-and-methods)
+4. [Edit Module and Method(s)](#edit-module-and-methods)
+5. [Locally Test Module and Method(s)](#test-module-and-methods)
 6. [Register Module](#register-module)
 7. [Test in KBase](#test-in-kbase)
 8. [Complete Module Info](#complete-module-info)
