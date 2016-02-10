@@ -34,7 +34,7 @@ KBasePublicGenomesV5/kb|g.26833/1  # wsName/objName/objVer
 ```
 Since IDs are system assigned, it is preferrable to use names in code when creating and accessing your objects.  Additionally, workspace names should be passed to SDK methods using the following code.
 
-1) In the input parameter structure in the KIDL *\<module\>.spec* (see SDK doc):
+1) In the input parameter structure in the KIDL *\<module\>.spec* (see [SDK doc](../doc/README.md)):
 
 ```
     typedef structure {
@@ -43,7 +43,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
     } <Module>Params;
 ```
 
-2) Configure 'behavior' in *ui/\<method\>/spec.json* file (see SDK doc):
+2) Configure 'behavior' in *ui/\<method\>/spec.json* file (see [SDK doc](../README.md)):
 
 ```
 	"behavior": {
