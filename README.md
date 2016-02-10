@@ -13,6 +13,8 @@ There are a number of restrictions on module functionality that will gradually b
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, or Perl
 
+In order to follow the registration instructions, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
+
 
 ## <A NAME="steps"></A>Steps in Using SDK
 1. [Install SDK Dependencies](#install-sdk-dependencies)
@@ -48,7 +50,7 @@ BRING INTO TOP-LEVEL DOC
 - [Building and Registering Your First Module](doc/getting_started.md)
 
 
-#### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
+### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
 
 System Dependencies:
 - Mac OS X 10.8+ or Linux
@@ -109,7 +111,7 @@ On Linux Docker is fairly easy to install.  On a Mac the standard installer will
 [back to top](#steps)
 
 
-#### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
+### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
 
 ##### Fetch the code from GitHub:
 
@@ -147,24 +149,51 @@ The Image currently is fairly large, so this will take some time to run and buil
 [back to top](#steps)
 
 
-#### <A NAME="create-module-and-methods"></A>3. Create Module and Method(s)
+### <A NAME="create-module-and-methods"></A>3. Create Module
 
-Initialize a new module populated with the ContigCount example (module names need to be unique in KBase, so you should pick a different name):
+#### Initialize
+The KBase SDK provides a way to quickly bootstrap a new module by generating most of the required components.  The basic options of the command are:
 
-    kb-sdk init --example -l python -u [your_kbase_user_name] ContigCount
+    kb-sdk init [-ev] [-l language] [-u username] ModuleName
 
-Enter your new module directory and do the initial build:
+e.g.
 
-    cd ContigCount
+    kb-sdk init --example -l python -u <your_kbase_user_name> <user_name>ContigCount
+
+This command will create a new module with the specified `ModuleName` configured based on the options provided.  You should always provide a username option so that the kbase.yml configuration file for your module includes you as a module owner.  The other key option is to set the programming language that you want to write your implementation in.  You can select either Python, Perl or Java.
+
+The other **kb-sdk** options are:
+
+    -v, --verbose    Show verbose output about which files and directories
+                     are being created.
+    -u, --username   Set the KBase username of the first module owner
+    -e, --example    Populate your repo with an example module in the language
+                     set by -l
+    -l, --language   Choose a programming language to base your repo on.
+                     Currently, we support Python, Python, and Java. Default is
+                     Python
+
+For this guide, let's start by creating a new module to count the number of contigs in a KBase ContigSet object.  This is the same function that is defined in the basic example generated when you run `kbase init` with the `-e` flag, so you can always generate those files and compare.  In this example, we will instead put together the various pieces by hand.
+
+We'll write our implementation in Python, but most steps should apply for all the languages.  Let's start by generating the module directory with the `init` method.  Open a terminal and change to a working directory of your choice.  Start by running:
+
+    kb-sdk init -u [user_name] -l python ContigCount
+
+Module names in KBase need to be unique accross the system (for now- they will likely be namespaced by a user or organization name soon).  Since you're not the first one trying out this tutorial, the name ContigCount is probably already taken so you should name it something like MikeContigCount, replacing your name with Mike of course.
+
+##### Enter your new module directory and do the initial build:
+
+    cd <user_name>ContigCount
     make
+    
+[back to top](#steps)
+
+
+### <A NAME="edit-module-and-methods"></A>4. Edit Module and create Method(s)
 
 [back to top](#steps)
 
-#### <A NAME="edit-module-and-methods"></A>4. Edit Module and Method(s)
-
-[back to top](#steps)
-
-#### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
+### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
 
 Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied):
 
@@ -188,7 +217,7 @@ When you make changes to the Narrative method specifications, you can validate t
 
 [back to top](#steps)
 
-#### <A NAME="register-module"></A>6. Register Module
+### <A NAME="register-module"></A>6. Register Module
 
 
 Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
@@ -207,7 +236,7 @@ Go to https://narrative-ci.kbase.us and start a new Narrative.  Search for the S
 
 [back to top](#steps)
 
-#### <A NAME="test-in-kbase"></A>7. Test in KBase
+### <A NAME="test-in-kbase"></A>7. Test in KBase
 
 Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
 
@@ -221,11 +250,11 @@ The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/mas
 
 [back to top](#steps)
 
-#### <A NAME="complete-module-info"></A>8. Complete Module Info
+### <A NAME="complete-module-info"></A>8. Complete Module Info
 
 [back to top](#steps)
 
-#### <A NAME="deploy"></A>9. Deploy
+### <A NAME="deploy"></A>9. Deploy
 
 
 ### <A NAME="examples"></A>Example Modules
