@@ -45,10 +45,6 @@ In order to follow the registration instructions, you have to be an approved KBa
 - (Combine "Narrative Method Specification Guide" with "Visualization Widget Development Guide")
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 
-BRING INTO TOP-LEVEL DOC
-- [Full Installation Guide](doc/installation.md)
-- [Building and Registering Your First Module](doc/getting_started.md)
-
 
 ### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
 
