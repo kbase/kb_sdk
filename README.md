@@ -509,6 +509,21 @@ Edit *spec.json*:
 }
 ```
 
+Make sure you configure *workspace_name*
+
+```
+	"behavior": {
+		"service-mapping": {
+			"input_mapping": [
+				{
+					"narrative_system_variable": "workspace",
+					"target_property": "workspace_name"
+				}
+			]
+		}
+	}
+```
+
 #### 4G. Creating a Git Repo
 
 You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Since functionality in KBase is pulled into KBase from public git repositories, you will need to put your module code into a public git repository.  Here we'll show a brief example using [GitHub](http://github.com).  First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
