@@ -118,7 +118,7 @@ Create a directory in which you want to work.  All your work should go here.  Al
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
 
-Some newer features are on other branches, such as develop.  If you do not need these features you do not need to check out a different branch.
+Some newer features are on other branches, such as *develop* (currently please do use the *develop* branch).  If you do not need these features you do not need to check out a different branch.
 
     cd kb_sdk
     git checkout <branch>
