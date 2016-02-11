@@ -2,7 +2,7 @@
 
 <A NAME="top"></A>
 - Q: [How can I tell if someone's already wrapped a tool I'm interested in?](#repeat)
-- Q: [What's already installed in the base KBase image and how do I call it?](#installed)
+- Q: [What's already installed in the base KBase Docker image and how do I call it?](#installed)
 - Q: [How do I find and access data?](#data)
 - Q: [What are system requirements for development workstation?](#sys-req-dev)
 - Q: [What are system requirements for execution environment?](#sys-req-exec)
@@ -23,7 +23,7 @@
 [back to top](#top)
 
 
-#### <A NAME="installed"></A>Q: What's already installed in the base KBase image and how do I call it?
+#### <A NAME="installed"></A>Q: What's already installed in the base KBase Docker image and how do I call it?
 #### A:
 
 [back to top](#top)
