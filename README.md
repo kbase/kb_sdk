@@ -50,7 +50,7 @@ In order to register your SDK module, you have to be an approved KBase developer
 
 ### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
 
-[More Detail on Intall SDK Dependencies](doc/kb_sdk_dependencies.md)
+[More Detail on Install SDK Dependencies](doc/kb_sdk_dependencies.md)
 
 System Dependencies:
 - Mac OS X 10.8+ (Docker requires this) or Linux
@@ -65,9 +65,9 @@ System Dependencies:
 
 ### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
 
-[More Detail on Intall and Build SDK](doc/kb_sdk_install_and_build.md)
+[More Detail on Install and Build SDK](doc/kb_sdk_install_and_build.md)
 
-Create a directory in which you want to work.  All your work should go here.  All commands that follow are assuming you are using a UNIX shell.
+Create a directory in which you want to work.  All your work should go here.
 
 Fetch the code from GitHub:
 
@@ -77,7 +77,7 @@ Fetch the code from GitHub:
     git clone https://github.com/kbase/jars
 ```
 
-Some newer features are on other branches, such as *develop* (currently please do use the *develop* branch).  If you do not need these features you do not need to check out a different branch.
+Some newer features are on other branches, such as *develop* (currently please do use the *develop* branch).
 
 ```
     cd kb_sdk
