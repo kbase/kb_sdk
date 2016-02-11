@@ -45,8 +45,8 @@ public class RunCompileCommand {
             String javaPackageParent, String javaSrcPath, String javaLibPath, 
             boolean withJavaBuildXml, String javaGwtPackage, boolean rClientSide, 
             String rClientName, boolean rServerSide, String rServerName, 
-            String rImplName, boolean newStyle, File outDir, 
-            String jsonSchemaPath, boolean createMakefile) throws Exception {
+            String rImplName, boolean newStyle, File outDir, String jsonSchemaPath, 
+            boolean createMakefile, String clientAsyncVer) throws Exception {
     	
         FileSaver javaSrcDir = null;
         if (javaSrcPath != null)
@@ -110,13 +110,14 @@ public class RunCompileCommand {
         if (javaClientSide)
             javaParsingData = JavaTypeGenerator.processSpec(services, javaSrcDir, 
                     javaPackageParent, javaServerSide, javaLibDir, javaGwtPackage, 
-                    url == null ? null : new URL(url), javaBuildXml, javaMakefile);
+                    url == null ? null : new URL(url), javaBuildXml, javaMakefile,
+                    clientAsyncVer);
         TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
                 pyServerSide, pyServerName, pyImplName, rClientSide, rClientName, 
                 rServerSide, rServerName, rImplName, perlEnableRetries, newStyle, 
-                ip, output, perlMakefile, pyMakefile, newStyle);
+                ip, output, perlMakefile, pyMakefile, newStyle, clientAsyncVer);
         String reportFile = System.getenv("KB_SDK_COMPILE_REPORT_FILE");
         if (reportFile == null || reportFile.isEmpty())
             reportFile = System.getProperty("KB_SDK_COMPILE_REPORT_FILE");

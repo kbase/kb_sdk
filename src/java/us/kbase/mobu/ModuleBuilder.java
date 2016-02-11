@@ -36,7 +36,7 @@ public class ModuleBuilder {
     
     public static final String DEFAULT_METHOD_STORE_URL = "https://ci.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "0.1.1";
+    public static final String VERSION = "0.1.2";
     
     
     public static void main(String[] args) throws Exception {
@@ -217,7 +217,8 @@ public class ModuleBuilder {
 			        a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
 			        a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
 			        a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
-                    a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, a.makefile);
+                    a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
+                    a.makefile, a.clAsyncVer);
 		} catch (Exception e) {
 			System.err.println("Error compiling KIDL specfication:");
 			System.err.println(e.getMessage());
@@ -467,6 +468,10 @@ public class ModuleBuilder {
     	
     	@Parameter(names="--makefile",description="Will generate makefile templates for servers and/or java client")
         boolean makefile = false;
+
+        @Parameter(names="--clasyncver",description="Will set in client code version of service for asyncronous calls " +
+        		"(it could be git commit hash of version registered in catalog or one of version tags: dev/beta/release)")
+        String clAsyncVer = null;
 
         @Parameter(required=true, description="<KIDL spec file>")
         List <String> specFileNames;
