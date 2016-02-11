@@ -67,41 +67,34 @@ System Dependencies:
 
 [More Detail on Intall and Build SDK](doc/kb_sdk_install_and_build.md)
 
-#### Fetch the code from GitHub:
-
 Create a directory in which you want to work.  All your work should go here.  All commands that follow are assuming you are using a UNIX shell.
 
+Fetch the code from GitHub:
+
+```
     cd <working_dir>
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
+```
 
 Some newer features are on other branches, such as *develop* (currently please do use the *develop* branch).  If you do not need these features you do not need to check out a different branch.
 
+```
     cd kb_sdk
     git checkout <branch>
     make bin  # or "make" to compile from scratch
-    
-You should now have the kb-sdk program built in kb_sdk/bin. It will be helpful to add this to your execution path.  From within the kb_sdk directory, you can run in Bash:
 
     export PATH=$(pwd)/bin:$PATH
-
-Optionally, you can also install command completion with:
-
     source src/sh/sdk-completion.sh
+```
 
-Like `JAVA_HOME`, you should consider adding these last two commands to your `~/.bash_profile` or `~/.bashrc` file so the SDK is always available in the terminal with command completion.
-
-#### Test installation:
+Test installation:
 
     kb-sdk help
 
-#### Download the KBase SDK base Docker image
-
-KBase modules run in Docker containers.  Docker containers are built on top of existing base images.  KBase has a public base image that includes a number of installed runtimes, some basic Bioinformatics tools, and other KBase specific tools.  To run this locally, you will need to download and build the KBase SDK base image.  There is a Makefile target that does most of the work for you:
+Download the KBase SDK base Docker image
 
     make sdkbase
-
-The Image currently is fairly large, so this will take some time to run and build the image.  This step is required for running tests locally.
 
 [back to top](#steps)
 
