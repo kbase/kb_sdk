@@ -99,7 +99,7 @@ public class ModuleTester {
             TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
             System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
             return;
-        } if (kbaseYmlConfig.get("data-version") != null) {
+        } else if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
                 TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
