@@ -101,6 +101,8 @@ Download the KBase SDK base Docker image
 
 ### <A NAME="create-module"></A>3. Create Module
 
+[More Detail on Create Module](doc/kb_sdk_create_module.md)
+
 The KBase SDK provides a way to quickly bootstrap a new module by generating most of the required components.
 
 Initialize module:
