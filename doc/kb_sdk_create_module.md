@@ -45,5 +45,5 @@ Module names in KBase need to be unique accross the system (for now- they will l
     
     
 [\[Back to top\]](#top)<br>
-[\[Back to steps\]](#steps)
+[\[Back to steps\]](#../README.md#steps)
 
