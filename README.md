@@ -45,267 +45,104 @@ In order to register your SDK module, you have to be an approved KBase developer
 - Visualization Widget Development Guide
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 
+### Quick Install Guide
 
-## Quick Start
+Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
 
-### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
-
-More Detail on [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
+#### Installation Only
 
 System Dependencies:
-- Mac OS X 10.8+ (Docker requires this) or Linux
+
+- Mac OS X 10.8+ or Linux
 - Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
-- At least ??? GB free on your hard drive to install Docker, Xcode, Java JRE, etc.
 
-[back to top](#steps)
+Get the SDK:
 
-
-### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
-
-More Detail on [Install and Build SDK](doc/kb_sdk_install_and_build.md)
-
-Create a directory in which you want to work.  All your work should go here.
-
-##### Fetch the code from GitHub:
-
-```
-    cd <working_dir>
     git clone https://github.com/kbase/kb_sdk
-    git clone https://github.com/kbase/jars
-```
 
-##### Some newer features are on other branches, such as *develop* (currently please do use the *develop* branch).
+Pull dependencies and configure the SDK:
 
-```
     cd kb_sdk
-    git checkout <branch>
-    make bin  # or "make" to compile from scratch
+    make bin
 
+Download the local KBase SDK base Docker image:
+
+    make sdkbase 
+
+Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk directory:
+
+    # for bash
     export PATH=$(pwd)/bin:$PATH
     source src/sh/sdk-completion.sh
-```
 
-##### Test installation:
+Test installation:
 
     kb-sdk help
 
-##### Download the KBase SDK base Docker image
 
-    make sdkbase
+#### Build from source
 
-[back to top](#steps)
+Additional System Dependencies:
 
+- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- JAVA_HOME environment variable set to JDK installation path
+- Apache Ant http://ant.apache.org
 
-### <A NAME="create-module"></A>3. Create Module
+Follow basic instructions above.  Instead of running `make bin` you can run `make` to compile the SDK:
 
-More Detail on [Create Module](doc/kb_sdk_create_module.md)
-
-The KBase SDK provides a way to quickly bootstrap a new module by generating most of the required components.
-
-##### Initialize module:
-
-    kb-sdk init --example -l python -u <your_kbase_user_name> <MyModule>
-
-##### Enter your new module directory and do the initial build:
-
-    cd <MyModule>
-    make
-    
-[back to top](#steps)
-
-
-### <A NAME="edit-module-and-methods"></A>4. Edit Module and create Method(s)
-
-More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md)
-
-##### 4A) Add a description of your Module
-
-```
-    edit kbase.yaml
-```
-
-##### 4B) Create KIDL specification for Module
-
-```
-    edit <MyModule>.spec
-```
-
-e.g.
-
-```
-	typedef structure {
-		string workspace_name;
-		string read_library_name;
-		string output_contigset_name;
-		
-		int min_count;
-	} MegaHitParams;
-	
-	typedef structure {
-		string report_name;
-		string report_ref;
-	} MegaHitOutput;
-	
-	funcdef run_megahit(MegaHitParams params) returns(MegaHitOutput output)
-		authentication required;
-```
-
-##### 4C) Validate that KIDL file is syntactically correct
-
-    kb-sdk validate
-
-
-##### 4D) Create stubs for methods
-
-After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs by running
-
+    cd kb_sdk
     make
 
-This will call `kb-sdk compile` with a set of parameters predefined for you.
 
+### Quick Start Guide
 
-##### 4E) Edit Impl file
+Initialize a new module populated with the ContigCount example (module names need to be unique in KBase, so you should pick a different name):
 
-```
-    cd lib/<MyModule>/
-    edit <MyMethod>Impl.py
-```
+    kb-sdk init --example -l python -u [your_kbase_user_name] ContigCount
 
-###### 4E.1) Using Data Types
+Enter your new module directory and do the initial build:
 
-Follow guidance and code snippets for using [KBase Data Types](doc/kb_sdk_data_types.md).
+    cd ContigCount
+    make
 
-###### 4E.2) Logging
-
-Please use logging to track progress and aid debugging your code.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
-
-
-###### 4E.3) Provenance
-
-We track historical information for Data objects using provenance.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
-
-
-###### 4E.4) Building output Report
-
-We use a Report Data object type to return results from SDK methods.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
-
-
-##### 4F) Creating Narrative UI Input Widget
-
-Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
-
-
-##### 4G) <A NAME="git-instructions"></A>Creating a Git Repo
-
-You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Register for a git account and set that as your username.
-
-    cd <MyModule>
-    git init
-    git add .
-    git commit -m 'initial commit'
-    git remote add origin https://github.com/<GITHUB_USER_OR_ORG_NAME>/<MyModule>.git
-    git push -u origin master
-
-*Remember to update your code in the Git Repo as you change it via "git commit / pull / push" cycles.*
-
-[back to top](#steps)
-
-
-### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
-
-More Detail on [Locally Test Module and Methods](doc/kb_sdk_local_test_module.md)
-
-##### Edit Dockerfile
-
-Add whatever dependencies and installation commands for the tool you are wrapping.
-
-    edit Dockerfile
-
-##### Build tests of your methods
-
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that test_local is in .gitignore so will not be copied):
+Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
 
     test_user = TEST_USER_NAME
     test_password = TEST_PASSWORD
 
-Create and Run tests:
+Run tests:
 
-    cd test
-    edit <MyModule>_server_test.py
+    cd test_local
     kb-sdk test
 
-[back to top](#steps)
+This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.
 
-
-### <A NAME="register-module"></A>6. Register Module
-
-More Detail on [Register Module](doc/kb_sdk_register_module.md)
-
-##### Create Git Repo
-
-If you haven't already, add your repo to [GitHub](http://github.com) (see [above](#git-instructions))
-
-
-##### Register with KBase
-
-Go to
-
-    https://narrative-ci.kbase.us
-
-and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url
-
-e.g.
-
-    https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]
+Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
     
-and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
+    ./run_bash.sh
 
+When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base directory of your module:
 
-[back to top](#steps)
+    kb-sdk validate
 
+Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
-### <A NAME="test-in-kbase"></A>7. Test in KBase
+    cd ContigCount
+    git init
+    git add .
+    git commit -m 'initial commit'
+    # go to github and create a new repo that is not initialized
+    git remote add origin https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME].git
+    git push -u origin master
 
-More Detail on [Test in KBase](doc/kb_sdk_test_in_kbase.md)
+Go to https://narrative-ci.kbase.us and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
+Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
 
-#### 7A. Start a Narrative Session
-
-Go to
-
-    https://narrative-ci.kbase.us
-    
-and start a new Narrative.
-
-Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it.
-
-The Output Console cell will have your process information and can be used to track execution and discover errors.
-
-[back to top](#steps)
-
-
-### <A NAME="complete-module-info"></A>8. Complete Module Info
-
-More Detail on [Complete Module Info](doc/kb_sdk_complete_module_info.md)
-
-Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
-
-
-##### Adding an Icon
-
-**MORE HERE**
-
-##### Adding Text Info
-
-**MORE HERE**
-
-[back to top](#steps)
-
-
-### <A NAME="deploy"></A>9. Deploy
+Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 Please email us when you think your module is ready for public use.
 
