@@ -1,5 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Install and Build
-### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+
+[\[1. Install SDK Dependencies\]](kb_sdk_dependencies.md) \[2. Install and Build SDK\] [\[3. Create Module\]](kb_sdk_create_module.md)
+
+
+### 2. Install and Build SDK
 
 #### Fetch the code from GitHub:
 
@@ -36,3 +40,7 @@ KBase modules run in Docker containers.  Docker containers are built on top of e
     make sdkbase
 
 The Image currently is fairly large, so this will take some time to run and build the image.  This step is required for running tests locally.
+
+
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](#steps)
