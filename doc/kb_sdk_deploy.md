@@ -8,7 +8,7 @@
 6. [Register Module](kb_sdk_register_module.md)
 7. [Test in KBase](kb_sdk_test_in_kbase.md)
 8. [Complete Module Info](kb_sdk_complete_module_info.md)
-9. **Deploy**
+**9. Deploy**
  
 
 ### 9. Deploy Module
