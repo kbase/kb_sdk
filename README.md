@@ -269,29 +269,30 @@ and register your repo.  Wait for the registration to complete.  Note that you m
 
 ### <A NAME="test-in-kbase"></A>7. Test in KBase
 
-More Detail on [Register Module](doc/kb_sdk_test_in_kbase.md)
+More Detail on [Test in KBase](doc/kb_sdk_test_in_kbase.md)
 
 
 #### 7A. Start a Narrative Session
 
-Go to https://narrative-ci.kbase.us and start a new Narrative.
+Go to
 
-Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
+    https://narrative-ci.kbase.us
+    
+and start a new Narrative.
 
-Explore the other SDK methods in the Narrative method panel.  For finer-grain control of the KBase Catalog registration process, use a code cell:
+Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it.
 
-    from biokbase.catalog.Client import Catalog
-    catalog = Catalog(url="https://ci.kbase.us/services/catalog")
-    catalog.version()
-
-The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
+The Output Console cell will have your process information and can be used to track execution and discover errors.
 
 [back to top](#steps)
 
 
 ### <A NAME="complete-module-info"></A>8. Complete Module Info
 
+More Detail on [Complete Module Info](doc/kb_sdk_complete_module_info.md)
+
 Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
+
 
 #### 8A. Adding an Icon
 
