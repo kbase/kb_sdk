@@ -50,7 +50,7 @@ In order to register your SDK module, you have to be an approved KBase developer
 
 ### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
 
-[More Detail on Install SDK Dependencies](doc/kb_sdk_dependencies.md)
+More Detail on [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
 
 System Dependencies:
 - Mac OS X 10.8+ (Docker requires this) or Linux
@@ -65,7 +65,7 @@ System Dependencies:
 
 ### <A NAME="install-and-build-sdk"></A>2. Install and Build SDK
 
-[More Detail on Install and Build SDK](doc/kb_sdk_install_and_build.md)
+More Detail on [Install and Build SDK](doc/kb_sdk_install_and_build.md)
 
 Create a directory in which you want to work.  All your work should go here.
 
@@ -101,7 +101,7 @@ Create a directory in which you want to work.  All your work should go here.
 
 ### <A NAME="create-module"></A>3. Create Module
 
-[More Detail on Create Module](doc/kb_sdk_create_module.md)
+More Detail on [Create Module](doc/kb_sdk_create_module.md)
 
 The KBase SDK provides a way to quickly bootstrap a new module by generating most of the required components.
 
@@ -119,7 +119,7 @@ The KBase SDK provides a way to quickly bootstrap a new module by generating mos
 
 ### <A NAME="edit-module-and-methods"></A>4. Edit Module and create Method(s)
 
-[More Detail on Edit Module and Create Methods](doc/kb_sdk_edit_module.md)
+More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md)
 
 ##### 4A) Add a description of your Module
 
@@ -180,24 +180,22 @@ Follow guidance and code snippets for using [KBase Data Types](doc/kb_sdk_data_t
 
 ###### 4E.2) Logging
 
-Please use logging to track progress and aid debugging your code.  See [More Detail on Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
+Please use logging to track progress and aid debugging your code.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
 
 
 ###### 4E.3) Provenance
 
-We track historical information for Data objects using provenance.  See [More Detail on Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
+We track historical information for Data objects using provenance.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
 
 
 ###### 4E.4) Building output Report
 
-We use a Report Data object type to return results from SDK methods.  See [More Detail on Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
+We use a Report Data object type to return results from SDK methods.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
 
 
 ##### 4F) Creating Narrative UI Input Widget
 
-Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.
-
-See [More Detail on Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
+Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
 
 
 ##### 4G) Creating a Git Repo
@@ -218,7 +216,7 @@ You will need to check your SDK Module into Git in order for it to be available 
 
 ### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
 
-[More Detail on Locally Test Module and Methods](doc/kb_sdk_local_test_module.md)
+More Detail on [Locally Test Module and Methods](doc/kb_sdk_local_test_module.md)
 
 #### 5A. Edit Dockerfile
 
