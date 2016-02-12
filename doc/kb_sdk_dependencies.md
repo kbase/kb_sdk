@@ -1,7 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Dependencies
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 
-### <A NAME="install-sdk-dependencies"></A>1. Install SDK Dependencies
+
+
+### 1. Install SDK Dependencies
 
 System Dependencies:
 - Mac OS X 10.8+ (Docker requires this) or Linux
@@ -59,3 +61,7 @@ On Linux Docker is fairly easy to install.  On a Mac the standard installer will
 - https://github.com/kitematic/kitematic/issues/825
 - http://stackoverflow.com/questions/32485723/docker-increase-disk-space
 - http://stackoverflow.com/questions/30498397/how-to-customize-virtualbox-configuration-using-docker-machine
+- 
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](#../README.md#steps)
+
