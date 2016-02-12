@@ -1,7 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Create Module
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+
+[\[2. Install and Build SDK\]](kb_sdk_install_and_build.md) \[3. Create Module\] [\[4. Edit Module and Method(s)\]](kb_sdk_edit_module.md)
 
 
-### <A NAME="create-module"></A>3. Create Module
+### 3. Create Module
 
 The KBase SDK provides a way to quickly bootstrap a new module by generating most of the required components.
 
@@ -41,5 +43,7 @@ Module names in KBase need to be unique accross the system (for now- they will l
     cd <user_name>ContigCount
     make
     
-[back to top](#steps)
+    
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](#steps)
 
