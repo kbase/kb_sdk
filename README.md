@@ -198,7 +198,7 @@ We use a Report Data object type to return results from SDK methods.  See More D
 Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.  See More Detail on [Edit Module and Create Methods](doc/kb_sdk_edit_module.md).
 
 
-##### 4G) Creating a Git Repo
+##### 4G) <A NAME="git-instructions"></A>Creating a Git Repo
 
 You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Register for a git account and set that as your username.
 
@@ -244,20 +244,12 @@ Create and Run tests:
 
 More Detail on [Register Module](doc/kb_sdk_register_module.md)
 
-#### 6A. Create Git Repo
+##### Create Git Repo
 
-If you haven't already, add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
-
-    cd ContigCount
-    git init
-    git add .
-    git commit -m 'initial commit'
-    # go to github and create a new repo that is not initialized
-    git remote add origin https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME].git
-    git push -u origin master
+If you haven't already, add your repo to [GitHub](http://github.com) (see [above](#git-instructions))
 
 
-#### 6B. Register with KBase
+##### Register with KBase
 
 Go to
 
@@ -276,6 +268,9 @@ and register your repo.  Wait for the registration to complete.  Note that you m
 
 
 ### <A NAME="test-in-kbase"></A>7. Test in KBase
+
+More Detail on [Register Module](doc/kb_sdk_test_in_kbase.md)
+
 
 #### 7A. Start a Narrative Session
 
