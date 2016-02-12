@@ -1,4 +1,4 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Complete Module Info
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Complete Module Info
 
 
 ### <A NAME="complete-module-info"></A>8. Complete Module Info
@@ -10,3 +10,7 @@ Icons, Publications, Original tool authors, Institutional Affiliations, Contact 
 #### 8A. Adding an Icon
 
 #### 8B. Adding Text Info
+
+
+[Back to top](#top)
+[Back to steps](../README.md#steps)
