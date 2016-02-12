@@ -1,6 +1,5 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
-## <A NAME="steps"></A>Steps in Using SDK
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install and Build SDK](kb_sdk_install_and_build.md)
 3. [Create Module](kb_sdk_create_module.md)
