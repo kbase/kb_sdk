@@ -17,15 +17,15 @@ In order to register your SDK module, you have to be an approved KBase developer
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
-1. [Install SDK Dependencies](#install-sdk-dependencies)
-2. [Install and Build SDK](#install-and-build-sdk)
-3. [Create Module](#create-module)
-4. [Edit Module and Method(s)](#edit-module-and-methods)
-5. [Locally Test Module and Method(s)](#test-module-and-methods)
-6. [Register Module](#register-module)
-7. [Test in KBase](#test-in-kbase)
-8. [Complete Module Info](#complete-module-info)
-9. [Deploy](#deploy)
+1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
+2. [Install and Build SDK](doc/kb_sdk_install_and_build.md)
+3. [Create Module](doc/kb_sdk_create_module.md)
+4. [Edit Module and Method(s)](doc/kb_sdk_edit_module.md)
+5. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
+6. [Register Module](doc/kb_sdk_register_module.md)
+7. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
+8. [Complete Module Info](doc/kb_sdk_complete_module_info.md)
+9. [Deploy](doc/kb_sdk_deploy.md)
 
 ### Additional Documentation
 - [FAQ](doc/FAQ.md)
