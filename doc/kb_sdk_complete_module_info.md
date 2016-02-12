@@ -1,4 +1,4 @@
-# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 [\[7. Test in KBase\]](kb_sdk_test_in_kbase.md) \[8. Complete Module Info\] [\[9. Deploy Module\]](kb_sdk_deploy.md)
 
