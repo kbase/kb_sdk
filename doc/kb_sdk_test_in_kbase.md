@@ -6,7 +6,7 @@
 4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
 5. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
 6. [Register Module](kb_sdk_register_module.md)
-7. [Test in KBase](kb_sdk_test_in_kbase.md)
+7. **Test in KBase**
 8. [Complete Module Info](kb_sdk_complete_module_info.md)
 9. [Deploy](kb_sdk_deploy.md)
 
