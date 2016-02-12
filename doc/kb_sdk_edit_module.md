@@ -1,7 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Edit Module and Create Methods
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+
+[\[3. Create Module\]](kb_sdk_create_module.md) \[4. Edit Module and Create Method(s)\] [\[5. Locally Test Module and Method(s)\]](kb_sdk_local_test_module.md)
 
 
-### <A NAME="edit-module-and-methods"></A>4. Edit Module and create Method(s)
+### 4. Edit Module and create Method(s)
 
 #### A. Update kbase.yml
 
@@ -356,3 +358,6 @@ use the name of your module as the name for your new repository.
 
 *Remember to update the code in the Git Repo as you change it via "git commit / pull / push" cycles.*
 
+
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](../README.md#steps)
