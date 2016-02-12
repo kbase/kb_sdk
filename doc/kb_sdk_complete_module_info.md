@@ -13,5 +13,5 @@ Icons, Publications, Original tool authors, Institutional Affiliations, Contact 
 #### 8B. Adding Text Info
 
 
-[Back to top](#top)<br>
-[Back to steps](../README.md#steps)
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](../README.md#steps)
