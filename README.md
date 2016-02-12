@@ -218,48 +218,31 @@ You will need to check your SDK Module into Git in order for it to be available 
 
 More Detail on [Locally Test Module and Methods](doc/kb_sdk_local_test_module.md)
 
-#### 5A. Edit Dockerfile
+##### Edit Dockerfile
 
-The base KBase Docker image contains a KBase Ubuntu image, but not much else.  You will need to add whatever dependencies, including the installation of whatever tool you are wrapping, to the Dockerfile that is executed to build a custom Docker image that can run your Module.
+Add whatever dependencies and installation commands for the tool you are wrapping.
 
-For example:
+    edit Dockerfile
 
-    RUN git clone https://github.com/torognes/vsearch
-    WORKDIR vsearch
-    RUN ./configure 
-    RUN make
-    RUN make install
-    WORKDIR ../
+##### Build tests of your methods
 
-You will also need to add your KBase SDK module to the Dockerfile.  For example:
-
-    RUN mkdir -p /kb/module/test
-    WORKDIR test
-    RUN git clone https://github.com/dcchivian/kb_vsearch_test_data
-    WORKDIR ../
-
-#### 5B. Build tests of your methods
-
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied):
+Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that test_local is in .gitignore so will not be copied):
 
     test_user = TEST_USER_NAME
     test_password = TEST_PASSWORD
 
-Run tests:
+Create and Run tests:
 
-    cd test_local
+    cd test
+    edit <MyModule>_server_test.py
     kb-sdk test
-
-This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.
-
-Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
-    
-    ./run_bash.sh
-
 
 [back to top](#steps)
 
+
 ### <A NAME="register-module"></A>6. Register Module
+
+More Detail on [Register Module](doc/kb_sdk_register_module.md)
 
 #### 6A. Create Git Repo
 
