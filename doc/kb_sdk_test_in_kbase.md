@@ -19,5 +19,5 @@ Explore the other SDK methods in the Narrative method panel.  For finer-grain co
 
 The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
 
-[Back to top](#top)<br>
-[Back to steps](../README.md#steps)
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](../README.md#steps)
