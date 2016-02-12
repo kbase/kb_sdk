@@ -71,5 +71,5 @@ On Linux Docker is fairly easy to install.  On a Mac the standard installer will
 - http://stackoverflow.com/questions/30498397/how-to-customize-virtualbox-configuration-using-docker-machine
  
 [\[Back to top\]](#top)<br>
-[\[Back to steps\]](#../README.md#steps)
+[\[Back to steps\]](../README.md#steps)
 
