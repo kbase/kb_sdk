@@ -1,7 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Register Module
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+
+[\[5. Locally Test Module and Method(s)\]](kb_sdk_local_test_module.md) \[6. Register Module\] [\[7. Test in KBase\]](kb_sdk_test_in_kbase.md)
 
 
-### <A NAME="register-module"></A>6. Register Module
+### 6. Register Module
 
 
 #### 6A. Create Git Repo
@@ -30,3 +32,6 @@ e.g.
     https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]
     
 and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
+
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](../README.md#steps)
