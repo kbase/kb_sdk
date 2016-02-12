@@ -294,10 +294,13 @@ More Detail on [Complete Module Info](doc/kb_sdk_complete_module_info.md)
 Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
 
 
-#### 8A. Adding an Icon
+##### Adding an Icon
 
-#### 8B. Adding Text Info
+**MORE HERE**
 
+##### Adding Text Info
+
+**MORE HERE**
 
 [back to top](#steps)
 
