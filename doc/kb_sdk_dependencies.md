@@ -69,7 +69,7 @@ On Linux Docker is fairly easy to install.  On a Mac the standard installer will
 - https://github.com/kitematic/kitematic/issues/825
 - http://stackoverflow.com/questions/32485723/docker-increase-disk-space
 - http://stackoverflow.com/questions/30498397/how-to-customize-virtualbox-configuration-using-docker-machine
-- 
+ 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](#../README.md#steps)
 
