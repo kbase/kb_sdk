@@ -2,9 +2,9 @@
 
 | Data Type        | Description           | Upload Format(s) | Download Format(s) |
 |:---------------- |:---------------------:|-----------------:|-------------------:|
-| [SingleEndLibrary ](kb_sdk_data_types.md#single-end-library) | | | |
-| [PairedEndLibrary](kb_sdk_data_types.md#paired-end-library) | | | |
-| [ContigSet](kb_sdk_data_types.md#contig-set) | | | |
+| [SingleEndLibrary ](kb_sdk_data_types.md#single-end-library) | Sequencing Reads | FASTA, FASTQ | FASTA, FASTQ, JSON |
+| [PairedEndLibrary](kb_sdk_data_types.md#paired-end-library) | Sequencing Reads | FASTA, FASTQ | FASTA, FASTQ, JSON |
+| [ContigSet](kb_sdk_data_types.md#contig-set) | Assembled Genomic Fragments | FASTA | FASTA, JSON |
 | [FeatureSet](kb_sdk_data_types.md#feature-set) | | | |
 | [GenomeSet](kb_sdk_data_types.md#genome-set) | | | |
 | [Genome](kb_sdk_data_types.md#genome) | | | |
