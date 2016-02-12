@@ -1,8 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Test in KBase
+# <A NAME="top></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+
+[\[6. Register Module\]](kb_sdk_register_module.md) \[7. Test in KBase\] [\[8. Complete Module Info\]](kb_sdk_complete_module_info.md)
 
 
-### <A NAME="test-in-kbase"></A>7. Test in KBase
-
+### 7. Test in KBase
 
 #### 7A. Start a Narrative Session
 
@@ -17,3 +18,6 @@ Explore the other SDK methods in the Narrative method panel.  For finer-grain co
     catalog.version()
 
 The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
+
+[Back to top](#top)<br>
+[Back to steps](../README.md#steps)
