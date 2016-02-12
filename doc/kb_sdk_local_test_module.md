@@ -1,7 +1,9 @@
-# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Locally Test Module and Method(s)
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+
+[\[4. Edit Module and Method(s)\]](kb_sdk_edit_module.md) \[5. Locally Test Module and Method(s)\] [\[6. Register Module\]](kb_sdk_register_module.md)
 
 
-### <A NAME="test-module-and-methods"></A>5. Locally Test Module and Method(s)
+### 5. Locally Test Module and Method(s)
 
 
 #### 5A. Edit Dockerfile
@@ -42,3 +44,6 @@ Inspect the Docker container by dropping into a bash console and poke around, fr
     
     ./run_bash.sh
 
+
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](../README.md#steps)
