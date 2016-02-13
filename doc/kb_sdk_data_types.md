@@ -72,6 +72,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [MSA](#msa)
 - [Tree](#tree)
 - [Pangenome](#pangenome) (MISSING)
+- [GenomeComparison](#genome-comparison) (MISSING)
 - [ProteomeComparison](#proteome-comparison) (MISSING)
 - [ReferenceAssembly](#reference-assembly) (MISSING)
 - [FBAModel](#fba-model) (MISSING)
