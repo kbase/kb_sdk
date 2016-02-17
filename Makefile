@@ -5,14 +5,12 @@ VER := $(GITCOMMIT)
 
 EPOCH := $(shell date +%s)
 
-EXT_KIDL_JAR = kbase-kidl-parser-$(EPOCH)-$(VER).jar
+#EXT_KIDL_JAR = kbase-kidl-parser-$(EPOCH)-$(VER).jar
 TAGS := $(shell git tag --contains $(GITCOMMIT))
 
 TOP_DIR = $(shell python -c "import os.path as p; print(p.abspath('../..'))")
 TOP_DIR_NAME = $(shell basename $(TOP_DIR))
 DIR = $(shell pwd)
-
-EXT_KIDL_JAR = kbase-kidl-parser-$(EPOCH)-$(VER).jar
 
 ANT ?= ant
 ANT_OPTIONS =
