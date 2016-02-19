@@ -39,7 +39,11 @@ e.g.
 
     https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]
     
-and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
+and register your repo.  Please wait for the registration to complete (it may take awhile on the first registration as it has to build the Docker image that is specific to your Module from scratch).  Note that you must be an approved developer to register a new module.
 
+As you make changes to your Module, you will need to re-commit those changes to the git repo, and then re-register.  The KBase SDK Catalog service will automatically pull the most recent version.  If for some reason you wish to revert to an older version, you can add the checksum of that old version, available by typing
+
+    git log
+    
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)
