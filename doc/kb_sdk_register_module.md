@@ -31,7 +31,7 @@ If you haven't already, add your repo to [GitHub](http://github.com) (or any oth
 
 Go to
 
-    https://narrative-ci.kbase.us
+    https://appdev.kbase.us
 
 and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url
 
