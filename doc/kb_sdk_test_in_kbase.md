@@ -15,11 +15,15 @@
 
 #### 7A. Start a Narrative Session
 
-Go to https://narrative-ci.kbase.us and start a new Narrative.
+Go to https://appdev.kbase.us and start a new Narrative.
 
 Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
 
-Explore the other SDK methods in the Narrative method panel.  For finer-grain control of the KBase Catalog registration process, use a code cell:
+Explore the other SDK methods in the Narrative method panel
+
+    https://appdev.kbase.us/#appcatalog/
+    
+For finer-grain control of the KBase Catalog registration process, use a code cell:
 
     from biokbase.catalog.Client import Catalog
     catalog = Catalog(url="https://ci.kbase.us/services/catalog")
