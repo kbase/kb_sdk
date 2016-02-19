@@ -16,6 +16,8 @@
 
 Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
 
+    https://appdev.kbase.us/#appcatalog/
+
 
 #### 8A. Adding an Icon
 
