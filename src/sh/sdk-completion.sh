@@ -101,7 +101,7 @@ _SetupSDKCompletion ()
                     ;;
                 ${VALIDATE_CMD})
                     # note: something funky going on here with the ':' in the url
-                    local METHOD_STORE_URLS='https://ci.kbase.us/services/narrative_method_store/rpc'
+                    local METHOD_STORE_URLS='https://appdev.kbase.us/services/narrative_method_store/rpc'
                     case ${prev} in
                       # if options are added to the validate command that take parameters, they should be placed here
                       "-m") COMPREPLY=($(compgen -W "${METHOD_STORE_URLS}" -- "${cur}"));;
