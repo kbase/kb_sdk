@@ -43,7 +43,7 @@ else
 ###############################
 
 compile: jars-submodule-init
-	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -Djardir=submodules/jars/lib/jars/
+	$(ANT) -Djardir=submodules/jars/lib/jars/
 
 endif
 

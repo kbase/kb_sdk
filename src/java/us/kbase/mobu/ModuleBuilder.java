@@ -34,9 +34,9 @@ public class ModuleBuilder {
     private static final String TEST_COMMAND     = "test";
     private static final String VERSION_COMMAND     = "version";
     
-    public static final String DEFAULT_METHOD_STORE_URL = "https://ci.kbase.us/services/narrative_method_store/rpc";
+    public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "0.1.2";
+    public static final String VERSION = "0.1.3";
     
     
     public static void main(String[] args) throws Exception {
