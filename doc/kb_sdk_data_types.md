@@ -15,12 +15,12 @@ A KBase ID is a string starting with the characters "kb|".  KBase IDs are typed.
 Data objects are stored in an object database.  Individual Narratives have "workspaces" associated with them where all data is stored for a given Narrative analysis.  Methods should interact with the data objects within a single workspace.
 
 The KBase workspace is documented here:<br>
-https://ci.kbase.us/services/ws/docs/
+https://kbase.us/services/ws/docs/
 
 Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and not guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
 
 Data object reference syntax is described here:<br>
-https://ci.kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
+https://kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
 
 A data object reference, used in retrieving and storing data objects, has the workspace name/ID, the data object name/ID, and possible a trailing version, delimited by slashes.
   
