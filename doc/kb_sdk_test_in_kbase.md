@@ -26,7 +26,7 @@ Explore the other SDK methods in the Narrative method panel
 For finer-grain control of the KBase Catalog registration process, use a code cell:
 
     from biokbase.catalog.Client import Catalog
-    catalog = Catalog(url="https://ci.kbase.us/services/catalog")
+    catalog = Catalog(url="https://appdev.kbase.us/services/catalog")
     catalog.version()
 
 The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
