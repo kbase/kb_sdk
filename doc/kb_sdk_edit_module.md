@@ -306,6 +306,8 @@ publications :
         display-text : |
             'Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033'
         link: http://www.ncbi.nlm.nih.gov/pubmed/25609793
+    -
+        link: https://github.com/voutcn/megahit
 ```
 
 ##### G.2. Configure passing variables from Narrative Input to SDK method.
@@ -321,7 +323,7 @@ Edit *spec.json*:
 	],
 	"contact": "help@kbase.us",
 	"visible": true,
-	"categories": ["active","assembly"],
+	"categories": ["active","assembly","communities"],
 	"widgets": {
 		"input": null,
 		"output": "kbaseReportView"
