@@ -18,7 +18,7 @@
 
 If you haven't already, add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
-    cd ContigCount
+    cd ContigFilter
     git init
     git add .
     git commit -m 'initial commit'
