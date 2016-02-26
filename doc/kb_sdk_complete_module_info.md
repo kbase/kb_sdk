@@ -90,8 +90,10 @@ The fields that should be configured are
 - publications
 - screenshots
 
+##### Name, Icon, Tooltip, Description
 **name:** and **icon:** are explained above.  You must also add a **tooltip:** as a secondary short description, as well as a **description:** for a more detailed description.  If you are wrapping an existing tool, please add links to the open-source repo for that tool in both the **description:** field and the **publications:** field.  If there is a home page for the tool, please also add a link to that.
 
+##### Links and Publications
 Relevant publications, especially if you are wrapping an existing tool, are added with subfields.  Each publication should start with a "-" on a blank line, followed by the fields **pmid:** for PubMed ID, **display-text:** for the publication (please include the DOI), and a **link:** to the publication.  Additional entries for tool home pages and open source repos should also be included as **link:** fields.
 
 An example:
@@ -107,6 +109,22 @@ publications :
     	link: http://www.usadellab.org/cms/?page=trimmomatic
 ```
 
+##### Screenshots
+You can add screenshots (or other relevant images) to the "img/" folder in the same fashion as the icon image.  These screenshots should be configured in the **display.yaml** file as a list with hyphens for each element, such as
+
+```
+screenshots:
+    - screenshot_1.png
+    - screenshot_2.png
+```
+
+If you do not want to have any screenshots, leave the **screenshots:** list configuration blank
+
+```
+screenshots: []
+```
+
+##### Example
 For an example of a complete App Info page that would be acceptable for public deployment, please see:
 
     https://appdev.kbase.us/#appcatalog/app/kb_trimmomatic/run_trimmomatic/dev
