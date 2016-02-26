@@ -39,7 +39,7 @@ in the file:
 
     https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
 
-add the line:
+the **icon:** is configured by the line:
 
     icon: trimmomatic-orange.png
 
