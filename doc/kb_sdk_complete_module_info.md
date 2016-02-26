@@ -33,7 +33,13 @@ Then edit the *display.yaml* file found at:
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/display.yaml
 
-and add an "icon:" configuration (NOTE: just add the name of the image file and do not include the path, so *not* "img/foo.png").  For example, add the line:
+and add an "icon:" configuration (NOTE: just add the name of the image file and do not include the path, so *not* "img/foo.png").  For an example:
+
+in the file:
+
+    https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
+
+add the line:
 
     icon: trimmomatic-orange.png
 
