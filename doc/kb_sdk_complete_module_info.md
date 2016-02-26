@@ -107,7 +107,7 @@ publications :
     	link: http://www.usadellab.org/cms/?page=trimmomatic
 ```
 
-For an example of a complete App Info page, please see:
+For an example of a complete App Info page that would be acceptable for public deployment, please see:
 
     https://appdev.kbase.us/#appcatalog/app/kb_trimmomatic/run_trimmomatic/dev
     https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
