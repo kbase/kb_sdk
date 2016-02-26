@@ -36,7 +36,7 @@ public class ModuleBuilder {
     
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "0.1.3";
+    public static final String VERSION = "1.0.0";
     
     
     public static void main(String[] args) throws Exception {
@@ -500,7 +500,7 @@ public class ModuleBuilder {
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();
     	out.println("");
-    	out.println(MODULE_BUILDER_SH_NAME + " - KBase MOdule BUilder - a developer tool for building and validating KBase modules");
+    	out.println(MODULE_BUILDER_SH_NAME + " - a developer tool for building and validating KBase modules");
     	out.println("");
     	out.println("usage: "+MODULE_BUILDER_SH_NAME+" <command> [options]");
     	out.println("");
