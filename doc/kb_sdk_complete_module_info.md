@@ -48,7 +48,7 @@ and add a "name:" configuration.  If you are wrapping an existing tool with a kn
 
     name: MEGAHIT - Assemble metagneomic reads
 
-You should tag your method with one (or multiple) "categories" to your method.  This is done in the *spec.json* file found at:
+You should tag your method with one (or multiple) "categories" to your method.  This is done in the *spec.json* file at:
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/spec.json
 
@@ -71,8 +71,38 @@ Please leave the category "active" at the beginning of the tags as this is a spe
 
 #### 8C. Writing your App Info page
 
+Information for the App Info page is configured in the *display.yaml* file at:
 
+    https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/display.yaml
 
+The fields that should be configured are
+
+- name
+- icon
+- tooltip
+- description
+- publications
+- screenshots
+
+*name:* and *icon:* are explained above.  You must also add a "tooltip:" as a secondary short description, as well as a *description:* for a more detailed description.  If you are wrapping an existing tool, please add links to the open-source repo for that tool in both the *description:* field and the *publications:* field.  If there is a home page for the tool, please also add a link to that.
+
+Relevant publications, especially if you are wrapping an existing tool, are added with subfields.  Each publication should start with a "-" on a blank line, followed by the fields *pmid:* for PubMed ID, *display-text:* for the publication (please include DOI), and a *link:* to the publication.  Additional entries for tool home pages and open source repos should also be included as *link:* fields.
+
+An example:
+
+    -
+        pmid: 24695404
+        display-text : |
+            'Bolger AM, Lohse M, Usadel B., (2014) Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics. 2014 Aug 1;30(15):2114-20. doi: 10.1093/bioinformatics/btu170.'
+        link: http://www.ncbi.nlm.nih.gov/pubmed/24695404
+    -
+    	link: http://www.usadellab.org/cms/?page=trimmomatic
+
+For an example of a complete App Info page, please see:
+
+    https://appdev.kbase.us/#appcatalog/app/kb_trimmomatic/run_trimmomatic/dev
+    https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
+    
 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)
