@@ -35,7 +35,7 @@ Then edit the *display.yaml* file found at:
 
 and add an "icon:" configuration (NOTE: just add the name of the image file and do not include the path, so *not* "img/foo.png").  For example, add the line:
 
-    icon: megahit-blue.png
+    icon: trimmomatic-orange.png
 
 
 #### 8B. Naming and Categorizing
@@ -46,7 +46,7 @@ Each method should be have a unique display name.  The display name is configure
 
 and add a "name:" configuration.  If you are wrapping an existing tool with a known name, please include that name in all CAPS to make it easier for people to find it, such as
 
-    name: MEGAHIT - Assemble metagneomic reads
+    name: TRIMMOMATIC - Read Trimming
 
 You should tag your method with one (or multiple) "categories" to your method.  This is done in the *spec.json* file at:
 
@@ -64,7 +64,7 @@ Currently, we offer the following categories (please contact us via http://kbase
 
 An example of a category line is:
 
-	"categories": ["active","assembly","communities"],
+	"categories": ["active","assembly","util"],
 
 Please leave the category "active" at the beginning of the tags as this is a special category that indicates whether your method should be shown at all in the App Catalog.  The rest of the categories are treated as normal tags.
 
@@ -90,6 +90,8 @@ Relevant publications, especially if you are wrapping an existing tool, are adde
 
 An example:
 
+```
+publications :
     -
         pmid: 24695404
         display-text : |
@@ -97,6 +99,7 @@ An example:
         link: http://www.ncbi.nlm.nih.gov/pubmed/24695404
     -
     	link: http://www.usadellab.org/cms/?page=trimmomatic
+```
 
 For an example of a complete App Info page, please see:
 
