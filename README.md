@@ -1,8 +1,8 @@
 # ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK
 
-The KBase SDK is a set of tools for developing new KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase Catalog, you can build and run a new Hello World App in KBase in minutes.
+The KBase SDK is a set of tools for developing new KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase App Catalog, you can build and run a new "Hello World!" App in KBase in minutes.
 
-There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current set of restrictions are:
+There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
 
 - Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
@@ -13,7 +13,7 @@ There are still some general restrictions on functionality that will gradually b
 
 If you have a tool you would like to register with KBase that cannot meet these requirements, please contact us to discuss possible solutions.
 
-In order to register your SDK module, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us with your username and we will help with the next steps.
+In order to register your SDK module, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us at http://kbase.us/contact-us with your username and we will help with the next steps.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
@@ -143,7 +143,7 @@ Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git r
 
 Your method is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us and start a new narrative.  Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to filter some contigs.
 
-Your method will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog and https://narrative.kbase.us/#appcatalog.  From your module page (e.g. https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
+Your method will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog/browse/dev and https://narrative.kbase.us/#appcatalog/browse/dev.  From your module page (e.g. https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
 
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
