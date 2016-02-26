@@ -34,8 +34,9 @@ In order to register your SDK module, you have to be an approved KBase developer
 - [Anatomy of a KBase Module](doc/module_overview.md)
 - [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
 - [Working with KBase Data Types](doc/kb_sdk_data_types.md)
-- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
+
+- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - KBase SDK Coding Style Guide and Best Practices
 - Wrapping an Existing Command-Line Tool
 - Using Custom Reference Data 
