@@ -1,19 +1,19 @@
 # ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK
 
-**This software is still in beta and should only be used for internal KBase development.**
+The KBase SDK is a set of tools for developing new KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase App Catalog, you can build and run a new "Hello World!" App in KBase in minutes.
 
-The KBase SDK is a set of tools for developing new modules that can be dynamically registered and run on the KBase platform.  Modules include all code, specification files, and documentation needed to define and run a set of methods in the KBase Narrative interface.
+There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
 
-There are a number of restrictions on module functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current set of restrictions are:
-
-- Runs on a standard KBase worker node (at least 2 cores and 22GB memory)
+- Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
 - Requires either no or fairly limited amounts of reference data
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
-- Wrapper written in Python, Java, or Perl
- 
-In order to register your SDK module, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us.  Once you have an account, please contact us with your username and we will help with the next steps.
+- Wrapper written in Python, Java, R, or Perl
+
+If you have a tool you would like to register with KBase that cannot meet these requirements, please contact us to discuss possible solutions.
+
+In order to register your SDK module, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us at http://kbase.us/contact-us with your username and we will help with the next steps.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
@@ -29,21 +29,22 @@ In order to register your SDK module, you have to be an approved KBase developer
 
 ### Additional Documentation
 - [FAQ](doc/FAQ.md)
-- Troubleshooting
 - [Examples](#examples)
-- KBase Developer Policies
-- KBase SDK Coding Style Guide and Best Practices
+- [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
 - [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
 - [Working with KBase Data Types](doc/kb_sdk_data_types.md)
+- [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
+
+**NOT DONE**
+- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
+- KBase SDK Coding Style Guide and Best Practices
 - Wrapping an Existing Command-Line Tool
 - Using Custom Reference Data 
-- [kb-sdk Command Line Interface](doc/Module_builder.md) (NEEDS UPDATING)
-- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - Managing Your Module Release Cycle
 - KBase Interface Description Language (KIDL) Guide
 - Visualization Widget Development Guide
-- [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
+- Troubleshooting
 
 ### Quick Install Guide
 
@@ -99,13 +100,13 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
 
 ### Quick Start Guide
 
-Initialize a new module populated with the ContigCount example (module names need to be unique in KBase, so you should pick a different name):
+Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
 
-    kb-sdk init --example -l python -u [your_kbase_user_name] ContigCount
+    kb-sdk init --example -l python -u [your_kbase_user_name] MyContigFilter
 
 Enter your new module directory and do the initial build:
 
-    cd ContigCount
+    cd MyContigFilter
     make
 
 Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
@@ -128,9 +129,9 @@ When you make changes to the Narrative method specifications, you can validate t
 
     kb-sdk validate
 
-Add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
+Add your repo to [GitHub](http://github.com) (or any other public git repository), from the MyContigFilter base directory:
 
-    cd ContigCount
+    cd MyContigFilter
     git init
     git add .
     git commit -m 'initial commit'
@@ -138,13 +139,13 @@ Add your repo to [GitHub](http://github.com) (or any other public git repository
     git remote add origin https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME].git
     git push -u origin master
 
-Go to https://narrative-ci.kbase.us and start a new Narrative.  Search for the SDK Register Repo method, and click on it.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and register your repo.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
+Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and submit.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
-Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
+Your method is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us and start a new narrative.  Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to filter some contigs.
+
+Your method will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog/browse/dev and https://narrative.kbase.us/#appcatalog/browse/dev.  From your module page (e.g. https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
 
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
-
-Please email us when you think your module is ready for public use.
 
 
 ### <A NAME="examples"></A>Example Modules
@@ -159,4 +160,4 @@ There are a number of modules that we continually update and modify to demonstra
 
 ### Need more?
 
-If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us
+If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us

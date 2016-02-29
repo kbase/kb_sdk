@@ -47,7 +47,7 @@ use the name of your module as the name for your new repository.
 
 #### <A NAME="edit-desc"></A>B. Edit Module Description
 
-Open and edit the kbase.yml file to include a better description of your module.  The default generated description isn't very good.
+Open and edit the **kbase.yml** file to include a better description of your module.  The default generated description isn't very good.
 
 [\[Back to top\]](#top)
 
@@ -56,12 +56,12 @@ Open and edit the kbase.yml file to include a better description of your module.
 
 The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.
 
-Open the `ContigCount.spec` file in a text editor, and you will see this:
+Open the `ContigFilter.spec` file in a text editor, and you will see this:
 
     /*
-    A KBase module: MikeContigCount
+    A KBase module: MikeContigFilter
     */
-    module MikeContigCount {
+    module MikeContigFilter {
         /*
         Insert your typespec information here.
         */
@@ -72,10 +72,11 @@ Comments are enclosed in `/* comment */`.  In this module, we want to define a f
     typedef string contigset_id;
     typedef structure {
         int contig_count;
-    } CountContigsResults;
+        int filtered_contig_count;
+    } FilterContigResults;
 
-    funcdef count_contigs(string workspace_name, contigset_id contigset)
-                returns (CountContigsResults) authentication required;
+    funcdef filter_contigs(string workspace_name, contigset_id contigset)
+                returns (FilterContigResults) authentication required;
 
 There a few things introduced here that are part of the KBase Interface Description Language (KIDL).  First, we use `typedef` to define the structure of input/output parameters using the syntax:
 
@@ -306,6 +307,8 @@ publications :
         display-text : |
             'Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033'
         link: http://www.ncbi.nlm.nih.gov/pubmed/25609793
+    -
+        link: https://github.com/voutcn/megahit
 ```
 
 ##### G.2. Configure passing variables from Narrative Input to SDK method.
@@ -321,7 +324,7 @@ Edit *spec.json*:
 	],
 	"contact": "help@kbase.us",
 	"visible": true,
-	"categories": ["active","assembly"],
+	"categories": ["active","assembly","communities"],
 	"widgets": {
 		"input": null,
 		"output": "kbaseReportView"
