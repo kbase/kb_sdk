@@ -58,16 +58,16 @@ You should tag your method with one (or multiple) "categories" to your method.  
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/spec.json
 
-Currently, we offer the following categories (please contact us via http://kbase.us if you have suggestions for more... we expect to at least be adding subcategories in the near future):
+Currently, we offer the following categories (please contact us via http://kbase.us/contact-us if you have suggestions for more... we expect to at least be adding subcategories in the near future):
 
-- assembly (Assembly)
-- annotation (Annotation)
-- sequence (Sequence Search / Alignment)
-- comparative_genomics (Comparative Genomics)
-- metabolic_modeling (Metabolic Modeling)
-- expression (Expression)
-- communities (Communities)
-- util (Utilities)
+- **assembly** (Assembly)
+- **annotation** (Annotation)
+- **sequence** (Sequence Search / Alignment)
+- **comparative_genomics** (Comparative Genomics)
+- **metabolic_modeling** (Metabolic Modeling)
+- **expression** (Expression)
+- **communities** (Communities)
+- **util** (Utilities)
 
 An example of a category configuration line is:
 
