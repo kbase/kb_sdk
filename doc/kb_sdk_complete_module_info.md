@@ -62,7 +62,7 @@ Currently, we offer the following categories (please contact us via http://kbase
 
 - assembly (Assembly)
 - annotation (Annotation)
-- sequence (Seqeunce Search / Alignment)
+- sequence (Sequence Search / Alignment)
 - comparative_genomics (Comparative Genomics)
 - metabolic_modeling (Metabolic Modeling)
 - expression (Expression)
