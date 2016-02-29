@@ -60,15 +60,16 @@ You should tag your method with one (or multiple) "categories" to your method.  
 
 Currently, we offer the following categories (please contact us via http://kbase.us if you have suggestions for more... we expect to at least be adding subcategories in the near future):
 
-- assembly
-- annotation
-- comparative_genomics
-- metabolic_modeling
-- expression
-- communities
-- util
+- assembly (Assembly)
+- annotation (Annotation)
+- sequence (Seqeunce Search / Alignment)
+- comparative_genomics (Comparative Genomics)
+- metabolic_modeling (Metabolic Modeling)
+- expression (Expression)
+- communities (Communities)
+- util (Utilities)
 
-An example of a category line is:
+An example of a category configuration line is:
 
     "categories": ["active","assembly","util"],
 
@@ -91,7 +92,9 @@ The fields that should be configured are
 - screenshots
 
 ##### Name, Icon, Tooltip, Description
-**name:** and **icon:** are explained above.  You must also add a **tooltip:** as a secondary short description, as well as a **description:** for a more detailed description.  If you are wrapping an existing tool, please add links to the open-source repo for that tool in both the **description:** field and the **publications:** field.  If there is a home page for the tool, please also add a link to that.
+**name:** and **icon:** are explained above.  You must also add a **tooltip:** as a secondary short description.
+
+The **description:** field is for a more detailed description, as well as including several recommended pieces of information.  For example, the exemplar Narrative showing the correct use of the SDK method should be linked here.  If you are wrapping an existing tool, please add links to the open-source repo for that tool in both the **description:** field and the **publications:** field.  If there is a home page for the tool, please also add a link to that.
 
 ##### Links and Publications
 Relevant publications, especially if you are wrapping an existing tool, are added with subfields.  Each publication should start with a "-" on a blank line, followed by the fields **pmid:** for PubMed ID, **display-text:** for the publication (please include the DOI), and a **link:** to the publication.  Additional entries for tool home pages and open source repos should also be included as **link:** fields.
