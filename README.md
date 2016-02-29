@@ -160,4 +160,4 @@ There are a number of modules that we continually update and modify to demonstra
 
 ### Need more?
 
-If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us
+If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
