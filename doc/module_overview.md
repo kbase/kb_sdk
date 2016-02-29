@@ -5,7 +5,7 @@ KBase modules consist of a set of code, configurations, and specifications that 
 
 ## Overview
 
-To explore the contents of a module yourself, you can use the kb-sdk tool to create an example module.
+To explore the contents of a module yourself, you can use the kb-sdk tool to create an example module. (Please see [these instructions](https://github.com/kbase/kb_sdk/blob/master/doc/installation.md) on how to install kb-sdk.)
 
     kb-sdk init --example -l python --user YOURUSERNAME MyModule
     cd MyModule
@@ -164,7 +164,7 @@ Note that your implementation code will be defined between `#BEGIN contig_counts
 It is good practice to limit the amount of code you place directly in the implementation files.  Instead, create your own modules and packages that perform most of the logic, and only include calls to those libraries from within the generated Implementation file.
 
 
-## Narrative Method Specifcations
+## Narrative Method Specifications
 
     MyModule
     └── ui
@@ -176,9 +176,9 @@ It is good practice to limit the amount of code you place directly in the implem
         │           ├── img
         │           └── spec.json
 
-Methods in the Narrative interface are defined by method specifications that consist of a JSON specification file and a YAML file for documentation and display labels.  In this example, this module has only a single Narrative method defined in a folder named count_contigs_in_set.  This folder name also serves as the method ID. Method IDs must therefore be unique within a module.  You can add more methods simply by adding another directory in the methods folder.
+Methods in the Narrative interface are defined by method specifications that consist of a JSON specification file and a YAML file for documentation and display labels.  In this example, this module has only a single Narrative method defined in a folder named count_contigs_in_set.  This folder name also serves as the method ID. Method IDs must therefore be unique within a module.  You can add more methods by simply adding another directory in the methods folder.
 
-These method specifications indicate what parameters are exposed to the user, how those parameters are selected (e.g., dropdown, text field, checkbox) and how those parameters map to your implementation.  An optional `img` directory allows you to attach screenshots or other images that will automatically be included in the methods detail page for your Narrative method.
+These method specifications indicate which parameters are exposed to the user, how those parameters are selected (e.g., dropdown, text field, checkbox) and how those parameters map to your implementation.  An optional `img` directory allows you to attach screenshots or other images that will automatically be included in the methods detail page for your Narrative method.
 
 Right now you have to write the method specifications by hand, but in the future templates for each method defined in the KIDL specification will be generated.
 
@@ -196,7 +196,7 @@ Right now you have to write the method specifications by hand, but in the future
     │   ├── run_bash.sh
     │   └── test.cfg
 
-The test directory contains a basic template for performing unit tests of the code in your module implmentation. This is useful for both debugging and ensuring your module is robust and operates well on a range of input data.  The test_local directory is created by `make` to create a scratch space for running tests locally.  It is important that you do not check in any test configuration files with passwords to public git repositories.
+The test directory contains a basic template for performing unit tests of the code in your module implmentation. This is useful for both debugging and ensuring your module is robust and operates well on a range of input data.  The test_local directory is created by `make` to create a scratch space for running tests locally.  It is important that you do not include any passwords in configuration files that you are committing to public git repositories.
 
 
 ## Scripts Directory for Utility/Docker Scripts

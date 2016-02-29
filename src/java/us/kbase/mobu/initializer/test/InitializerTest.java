@@ -17,9 +17,9 @@ import us.kbase.mobu.initializer.ModuleInitializer;
 
 public class InitializerTest {
 
-	private static final String[] LANGS = { "python", "perl", "java" };
 	private static final String SIMPLE_MODULE_NAME = "a_simple_module_for_unit_testing";
-	private static final String EXAMPLE_METHOD_NAME = "count_contigs_in_set"; 
+	private static final String EXAMPLE_OLD_METHOD_NAME = "count_contigs_in_set"; 
+    private static final String EXAMPLE_METHOD_NAME = "filter_contigs"; 
 	private static final String USER_NAME = "kbasedev";
 	private static final String[] EXPECTED_PATHS = {
 	   "docs", 
@@ -51,6 +51,7 @@ public class InitializerTest {
 	private static List<String> perlPaths;
 	private static List<String> pythonPaths;
 	private static List<String> javaPaths;
+    private static List<String> rPaths;
 	
 	@After
 	public void tearDownModule() throws IOException {
@@ -96,6 +97,9 @@ public class InitializerTest {
 				case "java":
 					langPaths = javaPaths;
 					break;
+                case "r":
+                    langPaths = rPaths;
+                    break;
 				default:
 					langPaths = pythonPaths;
 					break;
@@ -116,20 +120,35 @@ public class InitializerTest {
 		allExpectedExamplePaths.add(SIMPLE_MODULE_NAME + ".spec");
 		allExpectedExamplePaths.add("scripts/entrypoint.sh");
         allExpectedExamplePaths.add("scripts/run_async.sh");
-		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME);
-		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/img");
-		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/spec.json");
-		allExpectedExamplePaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/display.yaml");
 		
 		perlPaths = new ArrayList<String>();
 		perlPaths.add("lib/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "Impl.pm");
+		perlPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME);
+		perlPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/img");
+		perlPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/spec.json");
+		perlPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/display.yaml");
 
 		pythonPaths = new ArrayList<String>();
 		pythonPaths.add("lib/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "Impl.py");
+		pythonPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME);
+		pythonPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/img");
+		pythonPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/spec.json");
+		pythonPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/display.yaml");
 
 		javaPaths = new ArrayList<String>();
 		javaPaths.add("lib/src/asimplemoduleforunittesting/ASimpleModuleForUnitTestingServer.java");
-		
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME);
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/img");
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/spec.json");
+		javaPaths.add("ui/narrative/methods/" + EXAMPLE_METHOD_NAME + "/display.yaml");
+
+		rPaths = new ArrayList<String>();
+		rPaths.add("lib/" + SIMPLE_MODULE_NAME + "/" + SIMPLE_MODULE_NAME + "Impl.r");
+		rPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME);
+		rPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/img");
+		rPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/spec.json");
+		rPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/display.yaml");
+
 	}
 	
 	@Test
@@ -190,4 +209,13 @@ public class InitializerTest {
 		initer.initialize(useExample);
 		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, lang));
 	}
+
+    @Test
+    public void testRModuleExample() throws Exception {
+        boolean useExample = true;
+        String lang = "r";
+        ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, false);
+        initer.initialize(useExample);
+        Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, lang));
+    }
 }

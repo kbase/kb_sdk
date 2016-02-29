@@ -75,7 +75,7 @@ public class ModuleInitializer {
 
 		List<String> subdirList = new ArrayList<String>(Arrays.asList(subdirs));
 		if (example) {
-		    if (this.language.equals("python") || this.language.equals("perl")) {
+		    if (this.language.equals("python") || this.language.equals("perl") || this.language.equals("java")) {
 	            subdirList.add("ui/narrative/methods/filter_contigs");
 	            subdirList.add("ui/narrative/methods/filter_contigs/img");
 		    } else {
@@ -131,7 +131,7 @@ public class ModuleInitializer {
         templateFiles.put("module_dockerignore", Paths.get(this.moduleName, ".dockerignore"));
         templateFiles.put("module_readme_test_local", Paths.get(this.moduleName, "test_local", "readme.txt"));
         templateFiles.put("module_test_cfg", Paths.get(this.moduleName, "test_local", "test.cfg"));
-        templateFiles.put("module_build_run_tests", Paths.get(this.moduleName, "test_local", "build_run_tests.sh"));
+        templateFiles.put("module_run_tests", Paths.get(this.moduleName, "test_local", "run_tests.sh"));
         templateFiles.put("module_run_bash", Paths.get(this.moduleName, "test_local", "run_bash.sh"));
 		
 		switch (language) {
@@ -165,7 +165,7 @@ public class ModuleInitializer {
 		}
 		
 		if (example) {
-            if (this.language.equals("python") || this.language.equals("perl")) {
+            if (this.language.equals("python") || this.language.equals("perl") || this.language.equals("java")) {
                 templateFiles.put("module_method_spec_json", Paths.get(this.moduleName, "ui", "narrative", "methods", "filter_contigs", "spec.json"));
                 templateFiles.put("module_method_spec_yaml", Paths.get(this.moduleName, "ui", "narrative", "methods", "filter_contigs", "display.yaml"));
             } else {
@@ -224,7 +224,8 @@ public class ModuleInitializer {
 		if (example) {
 			System.out.println("Compile and run the example methods with the following inputs:");
 			System.out.println("  cd " + this.moduleName);
-			System.out.println("  make");
+			System.out.println("  make          (could be necessary after changes in " + new File(specFile).getName() + ")");
+            System.out.println("  kb-sdk test   (will require to set GlobusOnline test account in test_local/test.cfg)");
 			System.out.println();
 		}
 	}
