@@ -1,6 +1,8 @@
 package us.kbase.tools;
 
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +67,11 @@ public class WorkspaceTools {
             tester.transform(cmdArgs);
         }
         catch (Exception e) {
-            showError("Error while transforming fastX file(s) into Reads object", e.getMessage());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            pw.close();
+            showError("Error while transforming fastX file(s) into Reads object", sw.toString());
             return 1;
         }
         return 0;

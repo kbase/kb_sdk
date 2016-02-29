@@ -50,10 +50,6 @@ public class FastX2reads {
         String outputWsName = args.outputWsName;
         String outputObjName = args.outputObjName;
         File provFile = args.provFile;
-        //String provService;
-        //String provServiceVer; 
-        //String provMethod;
-        //String provMethodParams;
         if (token == null || token.trim().isEmpty())
             token = System.getenv("KB_AUTH_TOKEN");
         if (token == null || token.trim().isEmpty())
@@ -157,6 +153,7 @@ public class FastX2reads {
                     .withFileName(node.getFileInformation().getName()).withRemoteMd5(node.getFileInformation().getChecksum("md5")));
         }
         file.put("hid", hid);
+        file.put("file_name", inputFile.getName());
     }
 
     @Parameters(commandDescription = "Transforms fasta/fastq files into Reads object in workspace")

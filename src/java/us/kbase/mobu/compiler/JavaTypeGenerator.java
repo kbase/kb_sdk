@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -154,12 +155,20 @@ public class JavaTypeGenerator {
 		return processSpec(services, new DiskFileSaver(srcOutDir), packageParent, 
 		        createServer, libOut, gwtPackage, url, buildXmlOut, makefileOut);
 	}
-		
+
+	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
+	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
+	        FileSaver buildXml, FileSaver makefile) throws Exception {
+	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
+	            buildXml, makefile, null);
+	}
+
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-			FileSaver buildXml, FileSaver makefile) throws Exception {		
+			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion) throws Exception {		
 		JavaData data = prepareDataStructures(services);
-		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, makefile);
+		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
+		        makefile, clientAsyncVersion);
 		return data;
 	}
 
@@ -215,12 +224,12 @@ public class JavaTypeGenerator {
 
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
-			FileSaver buildXml, FileSaver makefile) throws Exception {
+			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion) throws Exception {
 	    if (packageParent.equals("."))  // Special value meaning top level package.
 	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
-		generateClientClass(data, srcOutDir, packageParent, url);
+		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion);
 		if (createServers)
 			generateServerClass(data, srcOutDir, packageParent);
 		List<String> jars = checkLibs(libOutDir, createServers, buildXml);
@@ -397,7 +406,12 @@ public class JavaTypeGenerator {
 	}
 
 	private static void generateClientClass(JavaData data, FileSaver srcOutDir,
-			String packageParent, URL url) throws Exception {
+			String packageParent, URL url, String asyncVersion) throws Exception {
+        if (asyncVersion != null) {
+            if (Pattern.compile("[^a-zA-Z0-9]").matcher(asyncVersion).find())
+                throw new IllegalStateException("Unsupported non-alfanumeric characters in client " +
+                        "asynchronous version: " + asyncVersion);
+        }
 		Map<String, JavaType> originalToJavaTypes = getOriginalToJavaTypesMap(data);
 		for (JavaModule module : data.getModules()) {
 			String moduleDir = sub(packageParent, module.getModulePackage()).replace('.', '/');
@@ -412,7 +426,7 @@ public class JavaTypeGenerator {
 					break;
 				}
 			}
-            boolean anyAsync = anyAsync(module);
+            boolean anyAsync = asyncVersion != null || anyAsync(module);
 			List<String> classLines = new ArrayList<String>();
 			String urlClass = model.ref("java.net.URL");
 			String tokenClass = model.ref("us.kbase.auth.AuthToken");
@@ -421,8 +435,11 @@ public class JavaTypeGenerator {
 					"public class " + clientClassName + " {",
 					"    private " + callerClass + " caller;"
 					));
-			if (anyAsync)
+			if (anyAsync) {
 			    classLines.add("    private long asyncJobCheckTimeMs = 5000;");
+			    classLines.add("    private String asyncVersion = " + 
+			            (asyncVersion == null ? "null" : ("\"" + asyncVersion + "\"")) + ";");
+			}
 			if (url != null) {
 				classLines.addAll(Arrays.asList(
 					"    private static URL DEFAULT_URL = null;",
@@ -602,7 +619,7 @@ public class JavaTypeGenerator {
 					"        caller.setFileForNextRpcResponse(f);",
 					"    }"
 					));
-			if (anyAsync)
+			if (anyAsync) {
 			    classLines.addAll(Arrays.asList(
 			            "",
 			            "    public long getAsyncJobCheckTimeMs() {",
@@ -613,6 +630,17 @@ public class JavaTypeGenerator {
                         "        this.asyncJobCheckTimeMs = newValue;",
                         "    }"
 			            ));
+			    classLines.addAll(Arrays.asList(
+			            "",
+			            "    public String getAsyncVersion() {",
+			            "        return this.asyncVersion;",
+			            "    }",
+			            "",
+			            "    public void setAsyncVersion(String newValue) {",
+			            "        this.asyncVersion = newValue;",
+			            "    }"
+			            ));
+			}
 			for (JavaFunc func : module.getFuncs()) {
                 JavaType retType = null;
                 if (func.getRetMultyType() == null) {
@@ -637,12 +665,23 @@ public class JavaTypeGenerator {
                 String arrayListClass = model.ref("java.util.ArrayList");
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
-			    if (func.getOriginal().isAsync()) {
+                String normalSuffix = "";
+			    if (func.getOriginal().isAsync() || asyncVersion != null) {
+			        normalSuffix = "Sync";
 			        if (!func.isAuthRequired())
 			            throw new IllegalStateException("Function " + func.getOriginal().getName() + " is async but doesn't require authentication");
 			        classLines.add("");
 			        printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
 			        classLines.add("    public String " + func.getJavaName() + "Async(" + funcParams + ") " + exceptions+ " {");
+			        if (asyncVersion != null) {
+	                    classLines.addAll(Arrays.asList(
+	                            "        if (asyncVersion != null) {",
+	                            "            if (" + contextField + " == null || " + contextField + ".length == 0 || " + contextField + "[0] == null)",
+	                            "                " + contextField + " = new " + contextType + "[] {new " + contextType + "()};",
+	                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", asyncVersion);",
+	                            "        }"
+	                            ));
+			        }
 			        classLines.add("        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();");
 			        for (JavaFuncParam param : func.getParams()) {
 			            classLines.add("        args.add(" + param.getJavaName() + ");");
@@ -690,10 +729,11 @@ public class JavaTypeGenerator {
                             "        }",
                             "    }"
                             ));
-			    } else {
+			    }
+			    {
 			        classLines.add("");
 			        printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
-			        classLines.add("    public " + retTypeName + " " + func.getJavaName() + "(" + funcParams + ") " + exceptions+ " {");
+			        classLines.add("    public " + retTypeName + " " + func.getJavaName() + normalSuffix + "(" + funcParams + ") " + exceptions+ " {");
 			        classLines.add("        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();");
 			        for (JavaFuncParam param : func.getParams()) {
 			            classLines.add("        args.add(" + param.getJavaName() + ");");

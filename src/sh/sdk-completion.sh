@@ -78,7 +78,7 @@ _SetupSDKCompletion ()
                     esac
                     ;;
                 ${INIT_CMD})
-                    # currently there are no init options
+                    # init options
                     local INIT_OPTS='-e --example -l --language -u --user -v --verbose'
                     case ${prev} in
                       "-l") COMPREPLY=($(compgen -W "python perl java r" -- "${cur}"));;
@@ -96,23 +96,36 @@ _SetupSDKCompletion ()
                     COMPREPLY=()
                     ;;
                 ${TEST_CMD})
-                    # currently there are no init options
-                    COMPREPLY=()
-                    ;;
-                ${VALIDATE_CMD})
-                    # note: something funky going on here with the ':' in the url
-                    local METHOD_STORE_URLS='https://ci.kbase.us/services/narrative_method_store/rpc'
+                     # test options
+                    local METHOD_STORE_URLS='https://appdev.kbase.us/services/narrative_method_store/rpc'
                     case ${prev} in
                       # if options are added to the validate command that take parameters, they should be placed here
                       "-m") COMPREPLY=($(compgen -W "${METHOD_STORE_URLS}" -- "${cur}"));;
                       "--method_store") COMPREPLY=($(compgen -W "${METHOD_STORE_URLS}" -- "${cur}"));;
-                      "--verbose") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      "-a") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      "--allow_sync_method") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      "-s") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      "--skip_validation") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      *) COMPREPLY=($(compgen -W "-v --verbose -m --method_store -s --skip_validation" -- ${cur}) $(compgen -d -- "${cur}"));;
+                    esac
+                    ;;
+                ${VALIDATE_CMD})
+                    # note: something funky going on here with the ':' in the url
+                    local METHOD_STORE_URLS='https://appdev.kbase.us/services/narrative_method_store/rpc'
+                    case ${prev} in
+                      # if options are added to the validate command that take parameters, they should be placed here
+                      "-m") COMPREPLY=($(compgen -W "${METHOD_STORE_URLS}" -- "${cur}"));;
+                      "--method_store") COMPREPLY=($(compgen -W "${METHOD_STORE_URLS}" -- "${cur}"));;
+                      "-a") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      "--allow_sync_method") COMPREPLY=($(compgen -d -- "${cur}"));;
                       "-v") COMPREPLY=($(compgen -d -- "${cur}"));;
-                      *) COMPREPLY=($(compgen -W "-v --verbose -m --method_store" -- ${cur}) $(compgen -d -- "${cur}"));;
+                      "--verbose") COMPREPLY=($(compgen -d -- "${cur}"));;
+                      *) COMPREPLY=($(compgen -W "-v --verbose -m --method_store -a --allow_sync_method" -- ${cur}) $(compgen -d -- "${cur}"));;
                     esac
                     ;;
                 ${HELP_CMD})
                     case ${COMP_CWORD} in
+                      # purposely exclude the --all option because it makes auto complete a little more confusing
                       2)
                         COMPREPLY=($(compgen -W "${VER_CMD} ${INIT_CMD} ${VALIDATE_CMD} ${COMPILE_CMD} ${TEST_CMD}" ${cur}))
                         ;;
