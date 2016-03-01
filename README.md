@@ -46,7 +46,8 @@ In order to register your SDK module, you have to be an approved KBase developer
 - KBase Interface Description Language (KIDL) Guide
 - Visualization Widget Development Guide
 
-### Quick Install Guide
+<br>
+## Quick Install Guide
 
 Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
 
@@ -97,8 +98,8 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
     cd kb_sdk
     make
 
-
-### Quick Start Guide
+<br>
+## Quick Start Guide
 
 Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
 
