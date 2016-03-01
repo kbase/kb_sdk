@@ -28,7 +28,6 @@ In order to register your SDK module, you have to be an approved KBase developer
 9. [Deploy](doc/kb_sdk_deploy.md)
 
 ### Additional Documentation
-- [FAQ](doc/FAQ.md)
 - [Examples](#examples)
 - [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
@@ -37,6 +36,8 @@ In order to register your SDK module, you have to be an approved KBase developer
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 
 **NOT DONE**
+- [FAQ](doc/FAQ.md)
+- [Troubleshooting](doc/kb_sdk_troubleshooting.md)
 - (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - KBase SDK Coding Style Guide and Best Practices
 - Wrapping an Existing Command-Line Tool
@@ -44,7 +45,6 @@ In order to register your SDK module, you have to be an approved KBase developer
 - Managing Your Module Release Cycle
 - KBase Interface Description Language (KIDL) Guide
 - Visualization Widget Development Guide
-- Troubleshooting
 
 ### Quick Install Guide
 
