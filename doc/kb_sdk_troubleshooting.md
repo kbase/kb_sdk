@@ -19,7 +19,7 @@ Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=
 make: *** [sdkbase] Error 1
 ```
 
-You likely have not started your Docker daemon.<br>
+You likely have not started your Docker daemon.  See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance.<br>
 [back to top](#top)
 
 
