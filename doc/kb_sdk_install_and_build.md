@@ -47,7 +47,7 @@ KBase modules run in Docker containers.  Docker containers are built on top of e
 
     make sdkbase
 
-You will get a failure if the Docker daemon is not running when you invoke the above command.  See  [Install SDK Dependencies](kb_sdk_dependencies.md#docker) for guidance.
+You will get a failure if the Docker daemon is not running when you invoke the above command.  See  [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance.
 
 The Image currently is fairly large, so this will take some time to run and build the image.  This step is required for running tests locally.
 
