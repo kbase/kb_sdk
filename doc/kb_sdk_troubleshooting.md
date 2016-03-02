@@ -1,7 +1,12 @@
+# ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Troubleshooting
+
+<A NAME="top"></A>
+- [Trying to run *make sdkbase* virtual image errors out](#make-sdkbase)
+- [I am having trouble getting Docker working on Mac](#docker-mac)
+- [I am having trouble getting Docker working on Linux](#docker-linux)
 
 
-
-##### Trying to run *make sdkbase* virtual image errors out.
+##### <A NAME="make-sdkbase"></A>Trying to run *make sdkbase* virtual image errors out.
 
 When you try to run *make sdkbase*, if you see a message like:
 
@@ -16,7 +21,7 @@ make: *** [sdkbase] Error 1
 You likely have not started your Docker daemon.
 
 
-##### I am having trouble getting Docker working on Mac
+##### <A NAME="docker-mac"></A>I am having trouble getting Docker working on Mac
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
 
@@ -25,7 +30,7 @@ It may be that your Docker installation may be incorrect, out of date, or the da
 for instructions.
 
 
-##### I am having trouble getting Docker working on Linux
+##### <A NAME="docker-linux"></A>I am having trouble getting Docker working on Linux
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
 
