@@ -149,7 +149,8 @@ Your method will now also be visible in the App Catalog when displaying Apps in 
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 
-### <A NAME="examples"></A>Example Modules
+<br>
+## <A NAME="examples"></A>Example Modules
 
 There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
 
@@ -159,6 +160,7 @@ There are a number of modules that we continually update and modify to demonstra
  - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
 
 
-### Need more?
+<br>
+## Need more?
 
 If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
