@@ -68,7 +68,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [FeatureSet](#feature-set)
 - [GenomeSet](#genome-set)
 - [Genome](#genome)
-- [DomainAnnotation](#domain-annotation)
+- [DomainAnnotation](#domain-annotation) (INCOMPLETE)
 - [MSA](#msa)
 - [Tree](#tree)
 - [Pangenome](#pangenome) (MISSING)
@@ -89,7 +89,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [RNASeqSampleAlignment](#rna-seq-sample-alignment) (MISSING)
 - [PhenotypeSet](#phenotype-set) (MISSING)
 - [PhenotypeSimulationSet](#phenotype-simulation-set) (MISSING)
-- [Network](#network) (MISSING)
+- [Network](#network) (INCOMPLETE)
 
 
 ### <A NAME="single-end-library"></A>SingleEndLibrary
