@@ -34,11 +34,11 @@ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 After downloading and installing the JDK, set your `JAVA_HOME` environment variable to point to your JDK installation.  If you're not sure where that is, on a Mac the command `/usr/libexec/java_home` should tell you and on Linux `readlink -f $(which javac)` will provide the installed location of the javac, which you can use to find the base directory of the installation.  On a Mac you can set the variable like so:
 
-    # for tcsh/csh
-    setenv JAVA_HOME `/usr/libexec/java_home`  
     # for bash
     export JAVA_HOME=`/usr/libexec/java_home`
-
+    # for tcsh/csh
+    setenv JAVA_HOME `/usr/libexec/java_home`  
+    
 You should probably add this command to the end of your `~/.bash_profile` or ~/.bashrc file so it is always set when you start a terminal.
 
 #### Apache Ant (is this really necessary?)
