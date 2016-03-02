@@ -13,7 +13,7 @@
 
 ### 9. Deploy Module
 
-Go to your module page on the app catalog (e.g. https://appdev.kbase.us/#appcatalog/module/kb_trimmomatic).  If you are listed as an owner, you’ll see a ‘Module Admin Tools’ menu.  If you expand that, there is a button to migrate the dev version to beta, and another button to request a new release from beta.
+Go to your module page on the app catalog (e.g. https://appdev.kbase.us/#appcatalog/module/kb_trimmomatic).  If you are listed as an owner, you’ll see a ‘Module Admin Tools’ menu.  If you expand that, there is a button to migrate the dev version to beta (which is public), and another button to request a new release from beta.
 
 Please bear in mind that for public release, your Module **MUST** meet all the requirements laid out in the [KBase SDK Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md).  We reserve the right to delay public release of SDK Modules until all requirements are met.  Please take the time to familiarize yourself with these policies to avoid delay in releasing your Module.
 

@@ -20,6 +20,15 @@ The base KBase Docker image contains a KBase Ubuntu image, but not much else.  Y
 
 For example:
 
+```
+RUN \
+  git clone https://github.com/voutcn/megahit.git && \
+  cd megahit && \
+  git checkout tags/v1.0.3 && \
+  make
+```
+
+<!--
     RUN git clone https://github.com/torognes/vsearch
     WORKDIR vsearch
     RUN ./configure 
@@ -27,12 +36,14 @@ For example:
     RUN make install
     WORKDIR ../
 
-You will also need to add your KBase SDK module to the Dockerfile.  For example:
+You will also need to add your KBase SDK module, and any necessary data, to the Dockerfile.  For example:
 
     RUN mkdir -p /kb/module/test
     WORKDIR test
+    RUN git clone https://github.com/dcchivian/kb_vsearch
     RUN git clone https://github.com/dcchivian/kb_vsearch_test_data
     WORKDIR ../
+-->
 
 #### 5B. Build tests of your methods
 
@@ -41,12 +52,12 @@ Edit the local test config file (`test_local/test.cfg`) with a KBase user accoun
     test_user = TEST_USER_NAME
     test_password = TEST_PASSWORD
 
-Run tests:
+In the Docker shell, run tests:
 
     cd test_local
     kb-sdk test
 
-This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.
+This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.  
 
 Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
     

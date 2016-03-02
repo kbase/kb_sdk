@@ -28,15 +28,17 @@ In order to register your SDK module, you have to be an approved KBase developer
 9. [Deploy](doc/kb_sdk_deploy.md)
 
 ### Additional Documentation
-- [FAQ](doc/FAQ.md)
 - [Examples](#examples)
+- [FAQ](doc/FAQ.md)
+- [Troubleshooting](doc/kb_sdk_troubleshooting.md)
 - [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
 - [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
 - [Working with KBase Data Types](doc/kb_sdk_data_types.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 
-**NOT DONE**
+<!--NOT DONE
+
 - (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
 - KBase SDK Coding Style Guide and Best Practices
 - Wrapping an Existing Command-Line Tool
@@ -44,9 +46,11 @@ In order to register your SDK module, you have to be an approved KBase developer
 - Managing Your Module Release Cycle
 - KBase Interface Description Language (KIDL) Guide
 - Visualization Widget Development Guide
-- Troubleshooting
+-->
 
-### Quick Install Guide
+
+<br>
+## Quick Install Guide
 
 Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
 
@@ -97,8 +101,8 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
     cd kb_sdk
     make
 
-
-### Quick Start Guide
+<br>
+## Quick Start Guide
 
 Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
 
@@ -148,7 +152,8 @@ Your method will now also be visible in the App Catalog when displaying Apps in 
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 
-### <A NAME="examples"></A>Example Modules
+<br>
+## <A NAME="examples"></A>Example Modules
 
 There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
 
@@ -158,6 +163,7 @@ There are a number of modules that we continually update and modify to demonstra
  - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
 
 
-### Need more?
+<br>
+## Need more?
 
 If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
