@@ -6,7 +6,7 @@
 - [I am having trouble getting Docker working on Linux](#docker-linux)
 
 
-<br><br>
+<br>
 #### <A NAME="make-sdkbase"></A>Trying to run *make sdkbase* virtual image errors out.
 
 When you try to run *make sdkbase*, if you see a message like:
@@ -24,7 +24,6 @@ You likely have not started your Docker daemon.
 [back to top](#top)
 
 
-<br>
 #### <A NAME="docker-mac"></A>I am having trouble getting Docker working on Mac
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
@@ -36,7 +35,6 @@ for instructions.
 [back to top](#top)
 
 
-<br>
 #### <A NAME="docker-linux"></A>I am having trouble getting Docker working on Linux
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
