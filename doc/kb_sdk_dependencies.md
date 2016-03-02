@@ -69,12 +69,12 @@ Docker Installation and Daemon starting Instructions:
     https://www.docker.com/mac
     https://www.docker.com/linux
 
-On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Instructions on the Docker website are very good, but on a Mac you may need to increase your VirtualBox virtual machine disk size to handle the full KBase runtime.  This is a limitation both of the current KBase runtime which will likely be reduced in size soon, and Docker which does not yet allow configurable disk sizes on a standard Docker install, which is actually a feature on the Docker roadmap.  For now, here are some references that may help deal with this problem:
+On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start Kitematic and then launch the "CLI" Command Line Interface to start the Docker daemon.  Instructions on the Docker website are very good, but on a Mac you may need to increase your VirtualBox virtual machine disk size to handle the full KBase runtime.  This is a limitation both of the current KBase runtime which will likely be reduced in size soon, and Docker which does not yet allow configurable disk sizes on a standard Docker install, which is actually a feature on the Docker roadmap.  For now, here are some references that may help deal with this problem:
 
 - https://github.com/kitematic/kitematic/issues/825
 - http://stackoverflow.com/questions/32485723/docker-increase-disk-space
 - http://stackoverflow.com/questions/30498397/how-to-customize-virtualbox-configuration-using-docker-machine
- 
+
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)
 
