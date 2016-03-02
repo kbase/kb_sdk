@@ -20,6 +20,15 @@ The base KBase Docker image contains a KBase Ubuntu image, but not much else.  Y
 
 For example:
 
+```
+RUN \
+  git clone https://github.com/voutcn/megahit.git && \
+  cd megahit && \
+  git checkout tags/v1.0.3 && \
+  make
+```
+
+<!--
     RUN git clone https://github.com/torognes/vsearch
     WORKDIR vsearch
     RUN ./configure 
@@ -27,12 +36,14 @@ For example:
     RUN make install
     WORKDIR ../
 
-You will also need to add your KBase SDK module to the Dockerfile.  For example:
+You will also need to add your KBase SDK module, and any necessary data, to the Dockerfile.  For example:
 
     RUN mkdir -p /kb/module/test
     WORKDIR test
     RUN git clone https://github.com/dcchivian/kb_vsearch
+    RUN git clone https://github.com/dcchivian/kb_vsearch_test_data
     WORKDIR ../
+-->
 
 #### 5B. Build tests of your methods
 
