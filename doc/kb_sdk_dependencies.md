@@ -58,11 +58,16 @@ https://git-scm.com
 
 On a Mac this is typically already installed as part of Xcode.
 
-#### Docker
+#### <A NAME="docker"></A>Docker
 
 https://www.docker.com
 
 This is *highly* recommended for KBase module development, but not strictly required.  KBase module code is run in KBase using Docker, which allows you to easily install all system tools and dependencies your module requires.  Installing Docker locally allows you to test your build and run tests on your own computer before registering your module with KBase which significantly accellerate development.
+
+Docker Installation and Daemon starting Instructions:
+
+    https://www.docker.com/mac
+    https://www.docker.com/linux
 
 On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Instructions on the Docker website are very good, but on a Mac you may need to increase your VirtualBox virtual machine disk size to handle the full KBase runtime.  This is a limitation both of the current KBase runtime which will likely be reduced in size soon, and Docker which does not yet allow configurable disk sizes on a standard Docker install, which is actually a feature on the Docker roadmap.  For now, here are some references that may help deal with this problem:
 
