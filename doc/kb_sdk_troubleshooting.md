@@ -2,8 +2,9 @@
 
 <A NAME="top"></A>
 - [Trying to run *make sdkbase* virtual image errors out](#make-sdkbase)
-- [I am having trouble getting Docker working on Mac](#docker-mac)
-- [I am having trouble getting Docker working on Linux](#docker-linux)
+- [Having trouble getting Docker working on Mac](#docker-mac)
+- [Having trouble getting Docker working on Linux](#docker-linux)
+- [Getting Java-related errors trying to run kb-sdk](#java_home)
 
 
 <br>
@@ -23,7 +24,7 @@ You likely have not started your Docker daemon.  See [Install SDK Dependencies -
 [back to top](#top)
 
 
-#### <A NAME="docker-mac"></A>I am having trouble getting Docker working on Mac
+#### <A NAME="docker-mac"></A>Having trouble getting Docker working on Mac
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
 
@@ -32,11 +33,26 @@ It may be that your Docker installation may be incorrect, out of date, or the da
 [back to top](#top)
 
 
-#### <A NAME="docker-linux"></A>I am having trouble getting Docker working on Linux
+#### <A NAME="docker-linux"></A>Having trouble getting Docker working on Linux
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
 
     https://docs.docker.com/linux/
 
 [back to top](#top)
+
+
+#### <A NAME="java-home"></A>Getting Java-related errors trying to run kb-sdk
+
+JAVA may not be installed or the path may not be set properly.  Please follow the directions for installation of java at https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_dependencies.md
+
+and then set your *JAVA_HOME* with 
+
+    # for bash
+    export JAVA_HOME=`/usr/libexec/java_home`
+    # for tcsh/csh
+    setenv JAVA_HOME `/usr/libexec/java_home`  
+    
+[back to top](#top)
+
 
