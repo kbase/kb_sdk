@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 docker run --rm --entrypoint cat kbase/deplbase:latest /kb/deployment/deployment.cfg > cluster.ini
 ./create_certs

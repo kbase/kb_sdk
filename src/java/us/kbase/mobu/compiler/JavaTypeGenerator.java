@@ -1181,7 +1181,7 @@ public class JavaTypeGenerator {
 		                    "  <target name=\"make_async_job_script\" depends=\"compile\" description=\"make batch script for async job running\">",
 		                    "    <property name=\"jar.absolute.path\" location=\"${dist}/${jar.file}\"/>",
 		                    "    <pathconvert targetos=\"unix\" property=\"lib.classpath\" refid=\"compile.classpath\"/>",
-		                    "    <echo file=\"${dist}/" + shellFileName + "\">#!/bin/sh",
+		                    "    <echo file=\"${dist}/" + shellFileName + "\">#!/bin/bash",
 		                    "java -cp ${jar.absolute.path}:${lib.classpath} us.kbase." + module.getModulePackage() + "." + module.getModuleName() + "Server" + " $1 $2 $3",
 		                    "    </echo>",
 		                    "<chmod file=\"${dist}/" + shellFileName + "\" perm=\"a+x\"/>",
