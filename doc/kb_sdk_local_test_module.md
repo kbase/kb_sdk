@@ -52,12 +52,12 @@ Edit the local test config file (`test_local/test.cfg`) with a KBase user accoun
     test_user = TEST_USER_NAME
     test_password = TEST_PASSWORD
 
-Run tests:
+In the Docker shell, run tests:
 
     cd test_local
     kb-sdk test
 
-This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.
+This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.  
 
 Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
     
