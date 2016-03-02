@@ -20,7 +20,6 @@ make: *** [sdkbase] Error 1
 ```
 
 You likely have not started your Docker daemon.
-
 [back to top](#top)
 
 
@@ -30,8 +29,6 @@ It may be that your Docker installation may be incorrect, out of date, or the da
 
     https://docs.docker.com/mac/
 
-for instructions.
-
 [back to top](#top)
 
 
@@ -40,8 +37,6 @@ for instructions.
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
 
     https://docs.docker.com/linux/
-
-for instructions.
 
 [back to top](#top)
 
