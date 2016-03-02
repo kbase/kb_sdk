@@ -31,10 +31,10 @@ In order to register your SDK module, you have to be an approved KBase developer
 - [Examples](#examples)
 - [FAQ](doc/FAQ.md)
 - [Troubleshooting](doc/kb_sdk_troubleshooting.md)
-- [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) **NOT DONE**
+- [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
-- [KBase Data Types Table](doc/kb_sdk_data_types_table.md) **NOT DONE**
-- [Working with KBase Data Types](doc/kb_sdk_data_types.md) **NOT DONE**
+- [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
+- [Working with KBase Data Types](doc/kb_sdk_data_types.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 
 <!--NOT DONE
