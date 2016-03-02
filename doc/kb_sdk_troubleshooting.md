@@ -1,9 +1,9 @@
 
 
 
-##### Trying to make sdkbase virtual image errors out.
+##### Trying to run *make sdkbase* virtual image errors out.
 
-If you see a message like
+When you try to run *make sdkbase*, if you see a message like:
 
 ```
 docker build -t kbase/kbase:sdkbase.latest sdkbase
