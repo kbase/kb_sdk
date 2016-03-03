@@ -61,9 +61,7 @@ In the Docker shell, run tests:
 
 This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.  
 
-Inspect the Docker container, such as seeing whether your wrapped tool was installed properly, by dropping into a bash console and poke around.
-
-From the `test_local` directory:
+Inspect the Docker container, such as seeing whether your wrapped tool was installed properly, by dropping into a bash console and poke around.  From the `test_local` directory:
     
     ./run_bash.sh
 
