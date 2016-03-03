@@ -68,12 +68,12 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [FeatureSet](#feature-set)
 - [GenomeSet](#genome-set)
 - [Genome](#genome)
-- [DomainAnnotation](#domain-annotation)
 - [MSA](#msa)
 - [Tree](#tree)
 - [Network](#network)
 
 <!--
+- [DomainAnnotation](#domain-annotation)
 - [Pangenome](#pangenome) (MISSING)
 - [GenomeComparison](#genome-comparison) (MISSING)
 - [ProteomeComparison](#proteome-comparison) (MISSING)
@@ -1699,7 +1699,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 [\[back to data type list\]](#data-type-list)
 
 
-
+<!--
 #### <A NAME="domain-annotation"></A>DomainAnnotation
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation
 
@@ -1758,7 +1758,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 ```
 [\[back to data type list\]](#data-type-list)
-
+-->
 
 
 ### <A NAME="msa"></A>MSA
