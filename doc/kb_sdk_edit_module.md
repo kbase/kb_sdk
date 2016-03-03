@@ -54,7 +54,7 @@ Open and edit the **kbase.yml** file to include a better description of your mod
 
 #### <A NAME="kidl-spec"></A>C. Create KIDL specification for Module
 
-The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.
+The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.  **You must rerun *make* after each change to the KIDL specification to [create or update the implementation stubs](#stubs).**
 
 Open the `ContigFilter.spec` file in a text editor, and you will see this:
 
@@ -112,7 +112,7 @@ When you make changes to the Narrative method specifications, you can validate t
 
 #### <A NAME="stubs"></A>E. Create stubs for methods
 
-After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs by running
+After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs (e.g. the \<MyModule\>Impl.py file) by running
 
     make
 
