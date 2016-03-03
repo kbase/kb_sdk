@@ -54,7 +54,7 @@ Edit the local test config file (`test_local/test.cfg`) with a KBase user accoun
     test_user = TEST_USER_NAME
     test_password = TEST_PASSWORD
 
-In the Docker shell, run tests:
+*In the Docker shell*, run tests:
 
     cd test_local
     kb-sdk test
@@ -66,6 +66,8 @@ Inspect the Docker container, such as seeing whether your wrapped tool was insta
     ./run_bash.sh
 
 Unfortunately, you will have to rebuild the Docker image each time you change your module code (e.g. KIDL \<MyModule\>.spec, \<MyModule\>Impl.py, and your testing code) but this happens automatically for you when you run *kb-sdk test*, so it just slows you down rather than add any extra effort.  However, if you change the KIDL \<MyModule\>.spec file, you will have to rerun *make* to propagate those changes to the \<MyModule\>Client and \<MyModule\>Impl code (and likely will have some tweaks to apply to the Impl code to match the spec changes).  Happy debugging!
+
+**(don't forget to *git commit* and *git push* your edits to your github repo)**
 
 
 [\[Back to top\]](#top)<br>
