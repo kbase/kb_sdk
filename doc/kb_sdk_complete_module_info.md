@@ -23,7 +23,7 @@ Please be aware that your module implementation and information must conform to 
 
 #### 8A. Adding an Icon
 
-You can make a custom icon for each method in your module, or use an existing one that corresponds the tool that you have wrapped.  Feel free to repurpose the examples from KBase methods, or make your own.  Your icon can be PNG, GIF, or JPEG (the KBase ones are PNG) and should fit in a square 200x200 pixels.  We think rounded corner squares look best and ours used a 40 pixel rounding on the corner on the 200x200 image (you can do this in Adobe Illustrator).  If you want to match our font, it's Futura Condensed Medium, 72 point height and line spacing, white face with a 1pt white border.  If you use Adobe Illustrator, export as PDF and convert to a 72dpi PNG with Adobe Photoshop.
+You can make a custom icon for each method in your module, or use an existing one that corresponds the tool that you have wrapped.  Feel free to repurpose the examples from KBase methods, or make your own.  Your icon can be PNG, GIF, or JPEG (the KBase ones are PNG) and should fit in a square 200x200 pixels.  We think rounded corner squares look best and ours used a 40 pixel rounding on the corner on the 200x200 image (you can do this in Adobe Illustrator).  If you want to match our font, it's Futura Condensed Medium, 72 point height and line spacing, white face with a 1pt white border.  If you use Adobe Illustrator, export as PDF and convert to a 72dpi PNG with Adobe Photoshop.  PDF vector and PNG bitmap versions that we used for our icons are available at https://github.com/kbase/kb_sdk/img/ if you would like to use them as a starting point.
 
 This image should then be added to your KBase SDK module github repo in the **img** image folder for each method at:
 
