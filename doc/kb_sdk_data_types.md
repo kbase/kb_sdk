@@ -212,8 +212,10 @@ import uuid
 from datetime import datetime
 from pprint import pprint, pformat
 import numpy as np
+from requests_toolbelt import MultipartEncoder
 from Bio import SeqIO
 from biokbase.workspace.client import Workspace as workspaceService
+from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
         
 class <ModuleName>:
 
