@@ -68,9 +68,12 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [FeatureSet](#feature-set)
 - [GenomeSet](#genome-set)
 - [Genome](#genome)
-- [DomainAnnotation](#domain-annotation) (INCOMPLETE)
+- [DomainAnnotation](#domain-annotation)
 - [MSA](#msa)
 - [Tree](#tree)
+- [Network](#network)
+
+<!--
 - [Pangenome](#pangenome) (MISSING)
 - [GenomeComparison](#genome-comparison) (MISSING)
 - [ProteomeComparison](#proteome-comparison) (MISSING)
@@ -89,8 +92,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [RNASeqSampleAlignment](#rna-seq-sample-alignment) (MISSING)
 - [PhenotypeSet](#phenotype-set) (MISSING)
 - [PhenotypeSimulationSet](#phenotype-simulation-set) (MISSING)
-- [Network](#network) (INCOMPLETE)
-
+-->
 
 ### <A NAME="single-end-library"></A>SingleEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.SingleEndLibrary<br>
@@ -2168,6 +2170,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 [\[back to data type list\]](#data-type-list)
 
 
+<!--
 ### <A NAME="pangenome"></A>Pangenome
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Pangenome
 
@@ -2250,6 +2253,7 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBasePhenotypes.Phenotype
 
 ### <A NAME="phenotype-simulation-set"></A>PhenotypeSimulationSet
 
+-->
 
 
 ### <A NAME="network"></A>Network
