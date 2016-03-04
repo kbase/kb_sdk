@@ -17,7 +17,7 @@
 
 Go to https://appdev.kbase.us and start a new Narrative.
 
-Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
+Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it.  If you encounter errors, you should make your edits/debugging statements to your code, commit those changes, push it to your SDK Module repo, reregister with the "SDK Register" App, and rerun to see if your fixes did the trick.  You must push your edits to your repo and reregister for each test for the Docker image to contain those changes.  We recommend getting as many bugs out in the [Local Testing](kb_sdk_local_testing.md) stage as possible.
 
 Explore the other SDK methods in the Narrative method panel
 
