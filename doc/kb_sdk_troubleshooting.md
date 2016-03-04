@@ -1,14 +1,15 @@
 # ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK - Troubleshooting
 
 <A NAME="top"></A>
-- [Trying to run *make sdkbase* virtual image errors out](#make-sdkbase)
+- [Trying to run *make sdkbase* and seeing errors that include *TLS-enabled daemon* and/or *docker daemon*](#make-sdkbase)
+- [Trying to run *kb-sdk test* and seeing errors that include *TLS-enabled daemon* and/or *docker daemon*](#docker-daemon)
 - [Having trouble getting Docker working on Mac](#docker-mac)
 - [Having trouble getting Docker working on Linux](#docker-linux)
 - [Getting Java-related errors trying to run kb-sdk](#java_home)
 
 
 <br>
-#### <A NAME="make-sdkbase"></A>Trying to run *make sdkbase* virtual image errors out.
+#### <A NAME="make-sdkbase"></A>Trying to run *make sdkbase* and seeing errors that include *TLS-enabled daemon* and/or *docker daemon*
 
 When you try to run *make sdkbase*, if you see a message like:
 
@@ -20,10 +21,27 @@ Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=
 make: *** [sdkbase] Error 1
 ```
 
-You likely have not started your Docker daemon.  See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance.<br>
+You likely have not started your Docker daemon.  On a Mac, that means running in a shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
 [back to top](#top)
 
 
+<br>
+#### <A NAME="docker-daemon"></A>Trying to run *kb-sdk test* and eeing errors that include *TLS-enabled daemon* and/or *docker daemon*
+
+When you try to run *kb-sdk test, if you see a message like:
+
+```
+Build Docker image
+Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=0&cpusetcpus=&cpusetmems=&cpushares=0&dockerfile=Dockerfile&memory=0&memswap=0&rm=1&t=test%2Fkb_vsearch%3Alatest&ulimits=null: dial unix /var/run/docker.sock: no such file or directory.
+* Are you trying to connect to a TLS-enabled daemon without TLS?
+* Is your docker daemon up and running?
+```
+
+You likely have not started your Docker daemon.  On a Mac, that means running in a shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
+[back to top](#top)
+
+
+<br>
 #### <A NAME="docker-mac"></A>Having trouble getting Docker working on Mac
 
 It may be that your Docker installation may be incorrect, out of date, or the daemon may not have been started.  Please see
