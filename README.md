@@ -52,7 +52,7 @@ In order to register your SDK module, you have to be an approved KBase developer
 <br>
 ## Quick Install Guide
 
-Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/installation.md).
+Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
 
 #### Installation Only
 
