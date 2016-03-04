@@ -106,6 +106,6 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="favorites"></A>Q: How do I set my favorite Apps?
-**A:** After logging into KBase, go to the [App Catalog](https://appdev.kbase.us/#appcatalog), and then click on the stars for your favorite Apps.  You must be logged in for it to associate it with your account.
+**A:** After logging into the [Appdev KBase](https://appdev.kbase.us), go to the [App Catalog](https://appdev.kbase.us/#appcatalog), and then click on the stars for your favorite Apps.  You must be logged in for it to associate it with your account.
 
 [back to top](#top)
