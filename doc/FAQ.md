@@ -18,7 +18,7 @@
 
 
 #### <A NAME="repeat"></A>Q: How can I tell if someone's already wrapped a tool I'm interested in?
-#### A: Go to the development [App Catalog](https://appdev.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline.
+**A:** Go to the development [App Catalog](https://appdev.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline.
 
 It may be the case that someone is wrapping a tool, but is doing so in a way that doesn't serve your needs exactly.  Feel free to rewrap the tool using your approach, or ask the previous tool wrapper to tweak their implementation to expose the parameters or other functionality you are looking for.
 
@@ -26,78 +26,78 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 
 
 #### <A NAME="installed"></A>Q: What's already installed in the base KBase Docker image and how do I call it?
-#### A:  The base KBase Docker image contains an Ubuntu Linux image with kbase tools for connecting to KBase services and data installed.  Please see the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples) for how to access these services and data.
+**A:**  The base KBase Docker image contains an Ubuntu Linux image with kbase tools for connecting to KBase services and data installed.  Please see the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples) for how to access these services and data.
 
 [back to top](#top)
 
 
 #### <A NAME="data"></A>Q: How do I find and access data?
-#### A: There are both public reference data sets and individual user data sets (both public and private).  Public reference data can be found with [KBase Data Search](https://narrative.kbase.us/search/#/search/?q=*), and should be copied into your Narrative to be used.  Accessing Data Objects from your SDK Methods is explained in [Working with KBase Data Types](https://github.com/kbase/kb_sdk/doc/kb_sdk_data_types.md) and illustrated in the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples).
+**A:** There are both public reference data sets and individual user data sets (both public and private).  Public reference data can be found with [KBase Data Search](https://narrative.kbase.us/search/#/search/?q=*), and should be copied into your Narrative to be used.  Accessing Data Objects from your SDK Methods is explained in [Working with KBase Data Types](https://github.com/kbase/kb_sdk/doc/kb_sdk_data_types.md) and illustrated in the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples).
 
 [back to top](#top)
 
 
 #### <A NAME="sys-req-dev"></A>Q: What are system requirements for development workstation?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="sys-req-exec"></A>Q: What are system requirements for execution environment?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="data-limits"></A>Q: What size data will be too big for the system?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="code-repo"></A>Q: Where should my code be?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="github-req"></A>Q: Do you need to use GitHub?  What about BitBucket?  SourceForge?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="github-copy"></A>Q: Do I need to copy the tool I'm using into my github repo?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="windows"></A>Q: Can I develop on Windows?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="linux"></A>Q: Can I do all the development logging in remotely to a Linux box?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="config-data"></A>Q: How do I add custom data and/or configuration data to the system?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="hpc"></A>Q: I need high-performance computing for my application.  Is that available?
-#### A:
+**A:**
 
 [back to top](#top)
 
 
 #### <A NAME="favorites"></A>Q: How do I set my favorite Apps?
-#### A:
+**A:**
 
 [back to top](#top)
