@@ -18,7 +18,7 @@
 
 
 #### <A NAME="repeat"></A>Q: How can I tell if someone's already wrapped a tool I'm interested in?
-**A:** Go to the development [App Catalog](https://appdev.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline by selecting them from the "Version" dropdown.
+**A:** Go to the development [App Catalog](https://narrative.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline by selecting them from the "Version" dropdown.
 
 It may be the case that someone is wrapping a tool, but is doing so in a way that doesn't serve your needs exactly.  Feel free to rewrap the tool using your approach, or ask the previous tool wrapper to tweak their implementation to expose the parameters or other functionality you are looking for.
 
@@ -106,6 +106,6 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="favorites"></A>Q: How do I set my favorite Apps?
-**A:** After logging into the [Appdev KBase](https://appdev.kbase.us), go to the [App Catalog](https://appdev.kbase.us/#appcatalog), and then click on the stars for your favorite Apps.  You must be logged in for it to associate it with your account.
+**A:** After logging into [KBase](https://kbase.us), go to the [App Catalog](https://narrative.kbase.us/#appcatalog), and then click on the stars for your favorite Apps.  You must be logged in for it to associate it with your account.
 
 [back to top](#top)
