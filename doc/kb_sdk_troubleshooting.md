@@ -21,12 +21,12 @@ Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=
 make: *** [sdkbase] Error 1
 ```
 
-You likely have not started your Docker daemon.  On a Mac, that means running in a shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
+You likely have not started your Docker daemon.  On a Mac, that means running in the Docker CLI shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
 [back to top](#top)
 
 
 <br>
-#### <A NAME="docker-daemon"></A>Trying to run *kb-sdk test* and eeing errors that include *TLS-enabled daemon* and/or *docker daemon*
+#### <A NAME="docker-daemon"></A>Trying to run *kb-sdk test* and seeing errors that include *TLS-enabled daemon* and/or *docker daemon*
 
 When you try to run *kb-sdk test, if you see a message like:
 
@@ -37,7 +37,7 @@ Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=
 * Is your docker daemon up and running?
 ```
 
-You likely have not started your Docker daemon.  On a Mac, that means running in a shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
+You likely have not started your Docker daemon.  On a Mac, that means running in the Docker CLI shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
 [back to top](#top)
 
 
