@@ -38,19 +38,27 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 
 
 #### <A NAME="sys-req-dev"></A>Q: What are system requirements for development workstation?
-**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, Java, or R).  You will need about 1-2 GB free to install the [rest of the dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
+**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, Java, or R).  You will need about 1-2 GB free to install the [dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
 
 [back to top](#top)
 
 
 #### <A NAME="sys-req-exec"></A>Q: What are system requirements for execution environment?
-**A:**
+**A:** 
+- Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
+- Operates only on supported KBase data types
+- Requires either no or fairly limited amounts of reference data
+- Uses existing data visualization widgets
+- Does not require new uploaders/downloaders
+- Wrapper written in Python, Java, R, or Perl
 
 [back to top](#top)
 
 
 #### <A NAME="data-limits"></A>Q: What size data will be too big for the system?
-**A:**
+**A:** Currently we support up to about 10 GB of accessory data for a tool (meaning reference DBs, etc).  Please contact us at https://kbase.us/contact-us if you need to use something larger.
+
+As for processing, once it's uploaded to the system (which can take awhile for larger data sets), it depends on how you are using it.  Currently SDK methods are limited in their memory footprint to the 22 GB of the worker nodes, so your code plus any data you load into memory must fit within that.  As in any situation, we recommend the use of graceful exception handling and efficient implementations in your coding style.
 
 [back to top](#top)
 
