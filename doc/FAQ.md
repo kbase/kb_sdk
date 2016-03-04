@@ -38,7 +38,7 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 
 
 #### <A NAME="sys-req-dev"></A>Q: What are system requirements for development workstation?
-**A:**
+**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, Java, or R).  You will need about 1-2 GB free to install the [rest of the dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
 
 [back to top](#top)
 
