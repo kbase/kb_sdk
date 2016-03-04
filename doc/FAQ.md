@@ -64,19 +64,19 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="code-repo"></A>Q: Where should my code be?
-**A:**
+**A:** Your SDK Module code should be in a single repo.  That means you can develop on your personal workstation as long as you check in all changes to a public revision control system such as github.com.  For the time being, we ask that you put your code into your own directory rather than in the kbase github account.
 
 [back to top](#top)
 
 
 #### <A NAME="github-req"></A>Q: Do you need to use GitHub?  What about BitBucket?  SourceForge?
-**A:**
+**A:** You can use any public open-source revision control system.  We use GitHub.  The path to your repo is what you provide to the SDK Registration method to register your SDK Module.
 
 [back to top](#top)
 
 
 #### <A NAME="github-copy"></A>Q: Do I need to copy the tool I'm using into my github repo?
-**A:**
+**A:** You do not if there is a public way to retrieve the code such as by using a *git clone*, *curl*, or other way of pulling the data down into the Docker image.  This is accomplished by [modifying the Dockerfile](https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_local_test_module.md#dockerfile)  to configure the Docker image build.
 
 [back to top](#top)
 
