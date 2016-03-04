@@ -13,6 +13,8 @@
 | [DomainAnnotation](kb_sdk_data_types.md#domain-annotation) | Gene and Domain Family Functional Annotation of a Genome | N/A | JSON |
 | [MSA](kb_sdk_data_types.md#msa) | Multiple Sequence Alignment | N/A | JSON |
 | [Tree](kb_sdk_data_types.md#tree) | Phylogenentic Graph | N/A | JSON |
+| [Network](kb_sdk_data_types.md#network) | Interaction Graph | N/A | JSON |
+<!--
 | [Pangenome](kb_sdk_data_types.md#pangenome) | Collection of Genes for a set of Genomes | N/A | TSV, EXCEL, JSON |
 | [Genome Comparison](kb_sdk_data_types.md#genome-comparison) | Gene presence/absence Calculation | N/A | JSON |
 | [ProteomeComparison](kb_sdk_data_types.md#proteome-comparison) | Protein-coding Gene presence/absence Calculation | N/A | JSON |
@@ -31,4 +33,4 @@
 | [RNASeqSampleAlignment](kb_sdk_data_types.md#rna-seq-sample-alignment)| RNA-Seq Alignment | N/A | JSON |
 | [PhenotypeSet](kb_sdk_data_types.md#phenotype-set) | Growth / No Growth Media Conditions | Tab-Separated Values (TSV) | JSON |
 | [PhenotypeSimulationSet](kb_sdk_data_types.md#phenotype-simulation-set) | Predicted Phenotypes | N/A | TSV, EXCEL, JSON |
-| [Network](kb_sdk_data_types.md#network) | Interaction Graph | N/A | JSON |
+-->
