@@ -18,7 +18,7 @@
 
 
 #### <A NAME="repeat"></A>Q: How can I tell if someone's already wrapped a tool I'm interested in?
-**A:** Go to the development [App Catalog](https://appdev.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline.
+**A:** Go to the development [App Catalog](https://appdev.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline by selecting them from the "Version" dropdown.
 
 It may be the case that someone is wrapping a tool, but is doing so in a way that doesn't serve your needs exactly.  Feel free to rewrap the tool using your approach, or ask the previous tool wrapper to tweak their implementation to expose the parameters or other functionality you are looking for.
 
@@ -76,36 +76,36 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="github-copy"></A>Q: Do I need to copy the tool I'm using into my github repo?
-**A:** You do not if there is a public way to retrieve the code such as by using a *git clone*, *curl*, or other way of pulling the data down into the Docker image.  This is accomplished by [modifying the Dockerfile](https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_local_test_module.md#dockerfile)  to configure the Docker image build.
+**A:** You do not if there is a public way to retrieve the code such as by using a *git clone*, *curl*, or other way of pulling the data down into the Docker image.  This is accomplished by [modifying the Dockerfile](https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_local_test_module.md#dockerfile) to configure the Docker image build.
 
 [back to top](#top)
 
 
 #### <A NAME="windows"></A>Q: Can I develop on Windows?
-**A:**
+**A:** If you can get all the dependencies installed, sure.  We don't actively support it.
 
 [back to top](#top)
 
 
-#### <A NAME="linux"></A>Q: Can I do all the development logging in remotely to a Linux box?
-**A:**
+#### <A NAME="linux"></A>Q: Can I do all the development on a remote Linux box?
+**A:** Yes.  All [graphical-user-interface requiring steps](https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_test_in_kbase.md) in the process are accomplished by using a web browser.
 
 [back to top](#top)
 
 
 #### <A NAME="config-data"></A>Q: How do I add custom data and/or configuration data to the system?
-**A:**
+**A:** If it's less than 10 GB, you can add it to the Docker image by [editing the Dockerfile]((https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_local_test_module.md#dockerfile).  Please contact us at https://kbase.us/contact-us if you need to use something larger.
 
 [back to top](#top)
 
 
 #### <A NAME="hpc"></A>Q: I need high-performance computing for my application.  Is that available?
-**A:**
+**A:** Not yet.  We're working on it!
 
 [back to top](#top)
 
 
 #### <A NAME="favorites"></A>Q: How do I set my favorite Apps?
-**A:**
+**A:** After logging into KBase, go to the [App Catalog](https://appdev.kbase.us/#appcatalog), and then click on the stars for your favorite Apps.  You must be logged in for it to associate it with your account.
 
 [back to top](#top)
