@@ -14,7 +14,7 @@
 ### 5. Locally Test Module and Method(s)
 
 
-#### 5A. Edit Dockerfile
+#### <A NAME="dockerfile"></A>5A. Edit Dockerfile
 
 The base KBase Docker image contains a KBase Ubuntu image, but not much else.  You will need to add whatever dependencies, including the installation of whatever tool you are wrapping, to the Dockerfile that is executed to build a custom Docker image that can run your Module.
 
@@ -47,7 +47,7 @@ You will also need to add your KBase SDK module, and any necessary data, to the 
     WORKDIR ../
 -->
 
-#### 5B. Build tests of your methods
+#### <A NAME="build-tests"></A>5B. Build tests of your methods
 
 Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
 
