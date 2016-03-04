@@ -2090,7 +2090,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 		domain_annotation = ws.get_objects([{'ref': domain_annotation_ref}])[0]['data']
 ```
 
-##### using
+##### <A NAME="domain-annotation-using"></A>using
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
 ```python
 		# Write a list of domain hits in a DomainAnnotation object
