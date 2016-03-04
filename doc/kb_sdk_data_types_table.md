@@ -8,8 +8,8 @@
 | [FeatureSet](kb_sdk_data_types.md#feature-set) | A Set of Genes or other Features | N/A | JSON |
 | [GenomeSet](kb_sdk_data_types.md#genome-set) | Set of Genomes | N/A | JSON |
 | [Genome](kb_sdk_data_types.md#genome) | RAST Annotated Genome | GENBANK | GENBANK, JSON |
-| [DomainLibrary](kb_sdk_data_types.md#domain-library) |  | N/A | JSON |
-| [DomainModelSet](kb_sdk_data_types.md#domain-model-set) | A Collection of Gene and Domain Families | N/A | JSON |
+| [DomainLibrary](kb_sdk_data_types.md#domain-library) | A Public Set of Domain Models (e.g. a particular release version of Pfam) | N/A | JSON |
+| [DomainModelSet](kb_sdk_data_types.md#domain-model-set) | A Collection of DomainLibraries used to Scan a Genome | N/A | JSON |
 | [DomainAnnotation](kb_sdk_data_types.md#domain-annotation) | Gene and Domain Family Functional Annotation of a Genome | N/A | JSON |
 | [MSA](kb_sdk_data_types.md#msa) | Multiple Sequence Alignment | N/A | JSON |
 | [Tree](kb_sdk_data_types.md#tree) | Phylogenentic Graph | N/A | JSON |
