@@ -48,6 +48,12 @@ From your module page
     
 you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
 
+Open
+
+    Module Admin Tools
+    
+and then click on the **REGISTER** button (you will not need to add the URL for your repo after the first time).
+
 As you make changes to your Module, **you will need to re-commit those changes to the git repo, and then re-register**.  The KBase SDK Catalog service will automatically pull the most recent version.  If for some reason you wish to revert to an older version, you can add the checksum of that old version, available by typing
 
     git log
