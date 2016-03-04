@@ -21,7 +21,7 @@ Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=
 make: *** [sdkbase] Error 1
 ```
 
-You likely have not started your Docker daemon.  On a Mac, that means running in the Docker CLI shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
+You likely have not started your Docker daemon.  On a Mac, that means running in the Docker CLI shell after starting Docker Kitematic and clicking on "Docker CLI" in the lower left corner (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
 [back to top](#top)
 
 
@@ -37,7 +37,7 @@ Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=
 * Is your docker daemon up and running?
 ```
 
-You likely have not started your Docker daemon.  On a Mac, that means running in the Docker CLI shell after starting Docker Kitematic and running the "CLI" (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
+You likely have not started your Docker daemon.  On a Mac, that means running in the Docker CLI shell after starting Docker Kitematic and clicking on "Docker CLI" in the lower left corner (See [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance).<br>
 [back to top](#top)
 
 
