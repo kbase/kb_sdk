@@ -168,14 +168,14 @@ commit=${git.commit}</echo>
     <pathconvert targetos="unix" property="lib.classpath" refid="compile.classpath"/>
 
     <!-- Create main shell script-->
-    <echo file="${bin.local}/${module_builder.sh.file}">#!/bin/sh
+    <echo file="${bin.local}/${module_builder.sh.file}">#!/bin/bash
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${bin.local}/${module_builder.sh.file}" perm="a+x"/>
     <!-- Create old main shell script-->
-    <echo file="${bin.local}/${module_builder.sh.old.file}">#!/bin/sh
+    <echo file="${bin.local}/${module_builder.sh.old.file}">#!/bin/bash
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
@@ -183,7 +183,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.Modu
     <chmod file="${bin.local}/${module_builder.sh.old.file}" perm="a+x"/>
     <echo>Successfully built: ${bin.local}/${module_builder.sh.file}</echo>
     <!-- Create ws-tools shell script-->
-    <echo file="${bin.local}/${ws_tools.sh.file}">#!/bin/sh
+    <echo file="${bin.local}/${ws_tools.sh.file}">#!/bin/bash
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.WorkspaceTools $@
@@ -277,21 +277,21 @@ kill $(&lt;"$DIR/pid.txt")
     <!-- Define classpath string with : delimiter from list of lib-jar files-->
     <pathconvert targetos="unix" property="lib.classpath" refid="compile.classpath"/>
     <!-- Create main shell script-->
-    <echo file="${BIN_TARGET}/${module_builder.sh.file}">#!/bin/sh
+    <echo file="${BIN_TARGET}/${module_builder.sh.file}">#!/bin/bash
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${BIN_TARGET}/${module_builder.sh.file}" perm="a+x"/>
     <!-- Create old main shell script-->
-    <echo file="${BIN_TARGET}/${module_builder.sh.old.file}">#!/bin/sh
+    <echo file="${BIN_TARGET}/${module_builder.sh.old.file}">#!/bin/bash
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${BIN_TARGET}/${module_builder.sh.old.file}" perm="a+x"/>
     <!-- Create ws-tools shell script-->
-    <echo file="${BIN_TARGET}/${ws_tools.sh.file}">#!/bin/sh
+    <echo file="${BIN_TARGET}/${ws_tools.sh.file}">#!/bin/bash
 export JAVA_HOME=${env.JAVA_HOME}
 export PATH=$JAVA_HOME/bin:$PATH
 $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.WorkspaceTools $@
