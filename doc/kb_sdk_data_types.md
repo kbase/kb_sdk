@@ -1554,16 +1554,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
         # Write feature DNA sequence and protein sequence
         #
-	protein_fasta_file_location = os.path.join(self.scratch, params['feature_name']+".fasta")
-	dna_fasta_file_location = os.path.join(self.scratch, params['feature_name]'+".fna")
-	self.log(console, 'writing protein fasta file: '+protein_fasta_file_location)
-	self.log(console, 'writing dna fasta file: '+dna_fasta_file_location)
+    	protein_fasta_file_location = os.path.join(self.scratch, params['feature_name']+".fasta")
+    	dna_fasta_file_location = os.path.join(self.scratch, params['feature_name]'+".fna")
+    	self.log(console, 'writing protein fasta file: '+protein_fasta_file_location)
+    	self.log(console, 'writing dna fasta file: '+dna_fasta_file_location)
             
     	if feature['type'] == 'CDS':
     	    protein_record = SeqRecord(Seq(feature['protein_translation']), \
 					id=feature['id'], \
 					description='['+feature['genome_id']+'] '+feature['type']+":"+feature['function'])
-	if feature['type'] == 'CDS':
+    	if feature['type'] == 'CDS':
     	    dna_record = SeqRecord(Seq(feature['dna_sequence']), \
 					id=feature['id'], \
 					description='['+feature['genome_id']+'] '+feature['type']+":"+feature['function'])
@@ -1597,12 +1597,12 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
         if 'provenance' in ctx:
             provenance = ctx['provenance']
         # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects'] = []
-	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
-	# OR e.g.
-	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genomeSet_name'])
-        provenance[0]['service'] = 'MyModule'
-        provenance[0]['method'] = 'MyMethod'
+    	provenance[0]['input_ws_objects'] = []
+    	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
+    	# OR e.g.
+    	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genomeSet_name'])
+    	provenance[0]['service'] = 'MyModule'
+    	provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = ws.save_objects({
@@ -1829,8 +1829,8 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
         # Write translated feature sequences (CDS only) of genome fasta files
         #
-	fasta_file_location = os.path.join(self.scratch, params['genome_name']+".fasta")
-	self.log(console, 'writing fasta file: '+fasta_file_location)
+    	fasta_file_location = os.path.join(self.scratch, params['genome_name']+".fasta")
+    	self.log(console, 'writing fasta file: '+fasta_file_location)
             
     	records = []
     	for feature in genome['features']:
@@ -1882,16 +1882,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 		 }
         
         # load the method provenance from the context object
-        provenance = [{}]
-        if 'provenance' in ctx:
+    	provenance = [{}]
+    	if 'provenance' in ctx:
             provenance = ctx['provenance']
-        # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects'] = []
-	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['contigset_name'])
-	# OR e.g.
-	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
-        provenance[0]['service'] = 'MyModule'
-        provenance[0]['method'] = 'MyMethod'
+    	# add additional info to provenance here, in this case the input data object reference, service, and method
+    	provenance[0]['input_ws_objects'] = []
+    	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['contigset_name'])
+    	# OR e.g.
+    	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
+    	provenance[0]['service'] = 'MyModule'
+    	provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = ws.save_objects({
