@@ -67,6 +67,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [ContigSet](#contig-set)
 - [FeatureSet](#feature-set)
 - [GenomeSet](#genome-set)
+- [Feature](#feature)
 - [Genome](#genome)
 - [DomainLibrary](#domain-library)
 - [DomainModelSet](#domain-model-set)
@@ -76,7 +77,6 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [Network](#network)
 
 <!--
-- [Feature](#feature) (MISSING)
 - [Pangenome](#pangenome) (MISSING)
 - [GenomeComparison](#genome-comparison) (MISSING)
 - [ProteomeComparison](#proteome-comparison) (MISSING)
