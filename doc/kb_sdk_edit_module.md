@@ -135,7 +135,7 @@ In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implem
 
 ##### <A NAME="impl-setup"></A>F.1. Imports and Setup
 
-Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Imp file should start if you are working in Python (some of it you may not use, such as some of the BioPython stuff, but probably best to leave it in just in case).
+Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Impl file should start if you are working in Python (you may not need all of it, such as *Bio Phylo* if you're not working with Trees.  Feel free to comment out what you are not using).
 
 ```python
 import os
@@ -151,6 +151,7 @@ from datetime import datetime
 from pprint import pprint, pformat
 import numpy as np
 from Bio import SeqIO
+from Bio import Phylo
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import generic_protein
