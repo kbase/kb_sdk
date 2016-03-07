@@ -133,7 +133,7 @@ In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implem
 - F.6. [Invoking Shell Tool](#impl-shell-tool)
 - F.7. [Adding Data to Your Method](#impl-adding-data)
 
-##### <A NAME="impl-data-types"></A>F.1. Imports and Setup
+##### <A NAME="impl-setup"></A>F.1. Imports and Setup
 
 Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Imp file should start if you are working in Python (some of it you may not use, such as some of the BioPython stuff, but probably best to leave it in just in case).
 
