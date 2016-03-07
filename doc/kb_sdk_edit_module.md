@@ -193,14 +193,14 @@ class <ModuleName>:
 [\[Back to Edit Impl\]](#impl)
 
 
-##### <A NAME="impl-data-types"></A>F.1. Using Data Types
+##### <A NAME="impl-data-types"></A>F.2. Using Data Types
 
 Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
 
 [\[Back to Edit Impl\]](#impl)
 
 
-##### <A NAME="impl-logging"></A>F.2. Logging
+##### <A NAME="impl-logging"></A>F.3. Logging
 
 Logging where you are is key to tracking progress and debugging.  Our recommended style is to log to a "console" list.  Here is some example code for accomplishing this.
 
@@ -223,7 +223,7 @@ Logging where you are is key to tracking progress and debugging.  Our recommende
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-provenance"></A>F.3. Provenance
+##### <A NAME="impl-provenance"></A>F.4. Provenance
 
 Data objects in KBase contain provenance (historical information of their creation and objects from which they are derived).  When you create new objects, you must carry forward and add provenance information to them.  Additionally, Report objects should receive that provenance data (see below).  Examples of adding provenance to objects can be found in the [KBase Data Types](docs/kb_sdk_data_types.md).
 
@@ -239,7 +239,7 @@ Data objects in KBase contain provenance (historical information of their creati
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-report"></A>F.4. Building Output Report
+##### <A NAME="impl-report"></A>F.5. Building Output Report
 
 ```python
         # create a Report
@@ -280,7 +280,7 @@ Data objects in KBase contain provenance (historical information of their creati
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-shell-tool"></A>F.5. Invoking Shell Tool
+##### <A NAME="impl-shell-tool"></A>F.6. Invoking Shell Tool
 
 ```python
         command_line_tool_params_str = " ".join(command_line_tool_params)
@@ -309,7 +309,7 @@ Data objects in KBase contain provenance (historical information of their creati
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-adding-data"></A>F.6. Adding Data To Your Method
+##### <A NAME="impl-adding-data"></A>F.7. Adding Data To Your Method
 
 Data that is supported by [KBase Data Types](doc/kb_sdk_data_types_table.md) should be added as a workspace object.  Other data that is used to configure a method may be added to the repo with the code.  Large data sets that exceed a reasonable limit (> 1 GB) should be added to a shared mount point.  This can be accomplished by contacting kbase administrators at http://kbase.us.
 
