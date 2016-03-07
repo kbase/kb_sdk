@@ -125,18 +125,79 @@ This will call `kb-sdk compile` with a set of parameters predefined for you.
 
 In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
 
-- F.1. [Using Data Types](#impl-data-types)
-- F.2. [Logging](#impl-logging)
-- F.3. [Provenance](#impl-provenance)
-- F.4. [Building Output Report](#impl-report)
-- F.5. [Invoking Shell Tool](#impl-shell-tool)
-- F.6. [Adding Data to Your Method](#impl-adding-data)
+- F.1. [Imports and Setup](#impl-setup)
+- F.2. [Using Data Types](#impl-data-types)
+- F.3. [Logging](#impl-logging)
+- F.4. [Provenance](#impl-provenance)
+- F.5. [Building Output Report](#impl-report)
+- F.6. [Invoking Shell Tool](#impl-shell-tool)
+- F.7. [Adding Data to Your Method](#impl-adding-data)
+
+##### <A NAME="impl-data-types"></A>F.1. Imports and Setup
+
+Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Imp file should start if you are working in Python (some of it you may not use, such as some of the BioPython stuff, but probably best to leave it in just in case).
+
+```python
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import generic_protein
+from requests_toolbelt import MultipartEncoder
+from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
+from biokbase.workspace.client import Workspace as workspaceService
+
+class <ModuleName>:
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
+```
+[\[Back to Edit Impl\]](#impl)
+
 
 ##### <A NAME="impl-data-types"></A>F.1. Using Data Types
 
 Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
 
 [\[Back to Edit Impl\]](#impl)
+
 
 ##### <A NAME="impl-logging"></A>F.2. Logging
 
