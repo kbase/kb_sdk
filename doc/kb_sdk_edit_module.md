@@ -82,7 +82,7 @@ There a few things introduced here that are part of the KBase Interface Descript
 
     typedef [type definition] [TypeName]
 
-The type definition can either be another previously defined type name, a primitive type (string, int, float), a container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure named `CountContigResults` with a single integer field named `contig_count`.
+The type definition can either be another previously defined type name, a primitive type (string, int, float), a container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure named `FilterContigResults` with two integer fields named `contig_count` and `filtered_contig_count`.
 
 We can use any defined types as input/output parameters to functions.  We define functions using the `funcdef` keyword in this syntax:
 
