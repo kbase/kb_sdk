@@ -1035,7 +1035,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 
 
-#### <A NAME="genome-set"></A>GenomeSet
+### <A NAME="genome-set"></A>GenomeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet
 
 - [data structure](#genome-set-ds)
