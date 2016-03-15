@@ -195,7 +195,11 @@ class <ModuleName>:
 
 ##### <A NAME="impl-data-types"></A>F.2. Using Data Types
 
-Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
+Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
+
+Please see:
+
+    [KBase Data Types](kb_sdk_data_types.md)
 
 [\[Back to Edit Impl\]](#impl)
 
