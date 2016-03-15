@@ -199,7 +199,7 @@ Data objects are typed and structured in KBase.  You may write code that takes a
 
 Please see:
 
-    [KBase Data Types](kb_sdk_data_types.md)
+    https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_data_types.md
 
 [\[Back to Edit Impl\]](#impl)
 
