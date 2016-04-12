@@ -70,7 +70,9 @@ https://www.docker.com/mac
 
 https://www.docker.com/linux
 
-On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start the Docker Kitematic and then launch the "Docker CLI" Command Line Interface to start the Docker daemon and **run commands that depend on docker (e.g. *make sdkbase*) within that shell**.
+On Linux Docker is fairly easy to install, although note that the service runs as the root user. As such, all Docker commands require root permissions and any KB_SDK commands that interact with Docker (such as `make sdkbase`) will require root permissions. An alterative to this is to create a docker group for Docker users as described in the Docker installation instructions.
+
+On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start the Docker Kitematic and then launch the "Docker CLI" Command Line Interface to start the Docker daemon and **run commands that depend on docker (e.g. *make sdkbase*) within that shell**.
 
 Instructions on the Docker website are very good, but on a Mac you may need to increase your VirtualBox virtual machine disk size to handle the full KBase runtime.  This is a limitation both of the current KBase runtime which will likely be reduced in size soon, and Docker which does not yet allow configurable disk sizes on a standard Docker install, which is actually a feature on the Docker roadmap.  For now, here are some references that may help deal with this problem:
 
