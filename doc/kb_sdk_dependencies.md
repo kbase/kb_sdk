@@ -66,8 +66,8 @@ This is *highly* recommended for KBase module development, but not strictly requ
 
 Docker Installation and Daemon starting Instructions:
 
-    https://www.docker.com/mac
-    https://www.docker.com/linux
+https://www.docker.com/mac
+https://www.docker.com/linux
 
 On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start the Docker Kitematic and then launch the "Docker CLI" Command Line Interface to start the Docker daemon and **run commands that depend on docker (e.g. *make sdkbase*) within that shell**.
 
