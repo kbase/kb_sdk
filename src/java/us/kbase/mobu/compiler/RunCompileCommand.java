@@ -112,7 +112,7 @@ public class RunCompileCommand {
             javaParsingData = JavaTypeGenerator.processSpec(services, javaSrcDir, 
                     javaPackageParent, javaServerSide, javaLibDir, javaGwtPackage, 
                     url == null ? null : new URL(url), javaBuildXml, javaMakefile,
-                    clientAsyncVer);
+                    clientAsyncVer, semanticVersion, gitUrl, gitCommitHash);
         TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
