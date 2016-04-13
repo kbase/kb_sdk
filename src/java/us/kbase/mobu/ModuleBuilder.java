@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -20,6 +24,8 @@ import com.beust.jcommander.Parameters;
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.tester.ModuleTester;
+import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
 
 public class ModuleBuilder {
@@ -210,6 +216,34 @@ public class ModuleBuilder {
             }
         }
         
+        // Step 4: info collection for status method
+        File moduleDir = specFile.getAbsoluteFile().getParentFile();
+        String semanticVersion = null;
+        try {
+            File kbaseYmlFile = new File(moduleDir, "kbase.yml");
+            String kbaseYml = TextUtils.readFileText(kbaseYmlFile);
+            @SuppressWarnings("unchecked")
+            Map<String,Object> kbaseYmlConfig = (Map<String, Object>)new Yaml().load(kbaseYml);
+            semanticVersion = (String)kbaseYmlConfig.get("module-version");
+            if (semanticVersion == null)
+                semanticVersion = "0.0.1";
+        } catch (Exception ex) {
+            showError("Error collecting semantic version", ex.getMessage());
+            return 1;
+        }
+        String gitUrl = "";
+        try {
+            gitUrl = getCmdOutput(moduleDir, "git", "config", "--get", "remote.origin.url");
+        } catch (Exception ex) {
+            System.out.println("WARNING! Couldn't collect git URL: " + ex.getMessage());
+        }
+        String gitCommitHash = "";
+        try {
+            gitCommitHash = getCmdOutput(moduleDir, "git", "rev-parse", "HEAD");
+        } catch (Exception ex) {
+            System.out.println("WARNING! Couldn't collect git commit hash: " + ex.getMessage());
+        }
+        
         try {
 			RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
 			        a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
@@ -218,7 +252,7 @@ public class ModuleBuilder {
 			        a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
 			        a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
-                    a.makefile, a.clAsyncVer);
+                    a.makefile, a.clAsyncVer, semanticVersion, gitUrl, gitCommitHash);
 		} catch (Exception e) {
 			System.err.println("Error compiling KIDL specfication:");
 			System.err.println(e.getMessage());
@@ -227,6 +261,13 @@ public class ModuleBuilder {
         return 0;
     }
     
+	private static String getCmdOutput(File workDir, String... cmd) throws Exception {
+	    StringWriter sw = new StringWriter();
+	    PrintWriter pw = new PrintWriter(sw);
+	    ProcessHelper.cmd(cmd).exec(workDir, null, pw);
+	    return sw.toString().trim();
+	}
+	
     static List<File> convertToFiles(List<String> filenames) throws IOException {
     	List <File> files = new ArrayList<File>(filenames.size());
     	for(String filename: filenames) {

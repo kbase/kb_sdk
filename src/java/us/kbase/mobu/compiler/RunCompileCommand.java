@@ -46,7 +46,8 @@ public class RunCompileCommand {
             boolean withJavaBuildXml, String javaGwtPackage, boolean rClientSide, 
             String rClientName, boolean rServerSide, String rServerName, 
             String rImplName, boolean newStyle, File outDir, String jsonSchemaPath, 
-            boolean createMakefile, String clientAsyncVer) throws Exception {
+            boolean createMakefile, String clientAsyncVer, String semanticVersion, 
+            String gitUrl, String gitCommitHash) throws Exception {
     	
         FileSaver javaSrcDir = null;
         if (javaSrcPath != null)
@@ -117,7 +118,8 @@ public class RunCompileCommand {
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
                 pyServerSide, pyServerName, pyImplName, rClientSide, rClientName, 
                 rServerSide, rServerName, rImplName, perlEnableRetries, newStyle, 
-                ip, output, perlMakefile, pyMakefile, newStyle, clientAsyncVer);
+                ip, output, perlMakefile, pyMakefile, newStyle, clientAsyncVer,
+                semanticVersion, gitUrl, gitCommitHash);
         String reportFile = System.getenv("KB_SDK_COMPILE_REPORT_FILE");
         if (reportFile == null || reportFile.isEmpty())
             reportFile = System.getProperty("KB_SDK_COMPILE_REPORT_FILE");

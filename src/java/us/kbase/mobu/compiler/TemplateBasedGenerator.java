@@ -32,7 +32,7 @@ public class TemplateBasedGenerator {
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, genPerlServer, 
                 perlServerName, perlImplName, perlPsgiName, genPython, pythonClientName, 
                 genPythonServer, pythonServerName, pythonImplName, false, null, false, null, null, 
-                enableRetries, newStyle, ip, output, null, null, false, null);
+                enableRetries, newStyle, ip, output, null, null, false, null, null, null, null);
     }
     
     public static boolean genPerlServer(boolean genPerlServer, 
@@ -60,7 +60,14 @@ public class TemplateBasedGenerator {
             String rClientName, boolean genRServer, String rServerName, String rImplName, 
             boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
-            String clientAsyncVer) throws Exception {
+            String clientAsyncVer, String semanticVersion, String gitUrl,
+            String gitCommitHash) throws Exception {
+        if (semanticVersion == null)
+            semanticVersion = "";
+        if (gitUrl == null)
+            gitUrl = "";
+        if (gitCommitHash == null)
+            gitCommitHash = "";
         KbService service = srvs.get(0);
         if (genJs && jsClientName == null)
             jsClientName = service.getName() + "Client";
@@ -178,6 +185,9 @@ public class TemplateBasedGenerator {
             List<Map<String, Object>> modules = (List<Map<String, Object>>)context.get("modules");
             for (int modulePos = 0; modulePos < modules.size(); modulePos++) {
                 Map<String, Object> module = new LinkedHashMap<String, Object>(modules.get(modulePos));
+                module.put("semantic_version", semanticVersion);
+                module.put("git_url", gitUrl);
+                module.put("git_commit_hash", gitCommitHash);
                 perlMakefileContext.put("module", module);
                 pyMakefileContext.put("module", module);
                 List<Map<String, Object>> methods = (List<Map<String, Object>>)module.get("methods");
@@ -192,6 +202,7 @@ public class TemplateBasedGenerator {
                             output.getAsFileOrNull(perlImplPath), "#", methodNames, false);
                     module.put("module_header", prevCode.get(PrevCodeParser.HEADER));
                     module.put("module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
+                    module.put("module_status", prevCode.get(PrevCodeParser.STATUS));
                     for (Map<String, Object> method : methods) {
                         String code = prevCode.get(PrevCodeParser.METHOD + method.get("name"));
                         method.put("user_code", code == null ? "" : code);
@@ -208,6 +219,7 @@ public class TemplateBasedGenerator {
                     module.put("py_module_header", prevCode.get(PrevCodeParser.HEADER));
                     module.put("py_module_class_header", prevCode.get(PrevCodeParser.CLSHEADER));
                     module.put("py_module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
+                    module.put("py_module_status", prevCode.get(PrevCodeParser.STATUS));
                     for (Map<String, Object> method : methods) {
                         String code = prevCode.get(PrevCodeParser.METHOD + method.get("name"));
                         method.put("py_user_code", code == null ? "" : code);
