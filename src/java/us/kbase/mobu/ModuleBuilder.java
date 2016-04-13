@@ -221,29 +221,31 @@ public class ModuleBuilder {
         String semanticVersion = null;
         try {
             File kbaseYmlFile = new File(moduleDir, "kbase.yml");
-            String kbaseYml = TextUtils.readFileText(kbaseYmlFile);
-            @SuppressWarnings("unchecked")
-            Map<String,Object> kbaseYmlConfig = (Map<String, Object>)new Yaml().load(kbaseYml);
-            semanticVersion = (String)kbaseYmlConfig.get("module-version");
-            if (semanticVersion == null)
-                semanticVersion = "0.0.1";
+            if (kbaseYmlFile.exists()) {
+                String kbaseYml = TextUtils.readFileText(kbaseYmlFile);
+                @SuppressWarnings("unchecked")
+                Map<String,Object> kbaseYmlConfig = (Map<String, Object>)new Yaml().load(kbaseYml);
+                semanticVersion = (String)kbaseYmlConfig.get("module-version");
+            }
         } catch (Exception ex) {
-            showError("Error collecting semantic version", ex.getMessage());
-            return 1;
+            System.out.println("WARNING! Couldn't collect semantic version: " + ex.getMessage());
         }
+        if (semanticVersion == null)
+            semanticVersion = "0.0.1";
         String gitUrl = "";
-        try {
-            gitUrl = getCmdOutput(moduleDir, "git", "config", "--get", "remote.origin.url");
-        } catch (Exception ex) {
-            System.out.println("WARNING! Couldn't collect git URL: " + ex.getMessage());
-        }
         String gitCommitHash = "";
-        try {
-            gitCommitHash = getCmdOutput(moduleDir, "git", "rev-parse", "HEAD");
-        } catch (Exception ex) {
-            System.out.println("WARNING! Couldn't collect git commit hash: " + ex.getMessage());
+        if (new File(moduleDir, ".git").exists()) {
+            try {
+                gitUrl = getCmdOutput(moduleDir, "git", "config", "--get", "remote.origin.url");
+            } catch (Exception ex) {
+                System.out.println("WARNING! Couldn't collect git URL: " + ex.getMessage());
+            }
+            try {
+                gitCommitHash = getCmdOutput(moduleDir, "git", "rev-parse", "HEAD");
+            } catch (Exception ex) {
+                System.out.println("WARNING! Couldn't collect git commit hash: " + ex.getMessage());
+            }
         }
-        
         try {
 			RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
 			        a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
