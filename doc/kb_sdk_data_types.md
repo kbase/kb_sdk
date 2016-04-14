@@ -17,7 +17,7 @@ Data objects are stored in an object database.  Individual Narratives have "work
 The KBase workspace is documented here:<br>
 https://kbase.us/services/ws/docs/
 
-Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and not guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
+Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and are guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
 
 Data object reference syntax is described here:<br>
 https://kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
