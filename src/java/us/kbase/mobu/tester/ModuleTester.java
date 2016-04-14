@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import us.kbase.auth.AuthService;
+import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
@@ -33,13 +34,7 @@ public class ModuleTester {
     private Map<String, Object> moduleContext;
 
     public ModuleTester() throws Exception {
-        File dir = new File(".").getCanonicalFile();
-        while (!isModuleDir(dir)) {
-            dir = dir.getParentFile();
-            if (dir == null)
-                throw new IllegalStateException("You're currently not in module folder");
-        }
-        moduleDir = dir;
+        moduleDir = DirUtils.findModuleDir();
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
         @SuppressWarnings("unchecked")
         Map<String,Object> config = (Map<String, Object>)new Yaml().load(kbaseYml);
@@ -50,16 +45,6 @@ public class ModuleTester {
         if (kbaseYmlConfig.get("data-version") != null) {
             moduleContext.put("data_version", kbaseYmlConfig.get("data-version"));
         }
-    }
-    
-    private static boolean isModuleDir(File dir) {
-        return  new File(dir, "Dockerfile").exists() &&
-                new File(dir, "Makefile").exists() &&
-                new File(dir, "kbase.yml").exists() &&
-                new File(dir, "lib").exists() &&
-                new File(dir, "scripts").exists() &&
-                new File(dir, "test").exists() &&
-                new File(dir, "ui").exists();
     }
     
     private static void checkIgnoreLine(File f, String line) throws IOException {
