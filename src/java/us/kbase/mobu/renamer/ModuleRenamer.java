@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import us.kbase.jkidl.FileIncludeProvider;
@@ -211,7 +212,13 @@ public class ModuleRenamer {
             if (origFile.exists()) {
                 String origContent = TextUtils.readFileText(origFile);
                 String newContent = generatedFiles.get(key).toString();
-                changes.add(new ChangeEvent(origFile, newFile, origContent, newContent));
+                if (origFile.equals(newFile)) {
+                    boolean isChanged = !origContent.trim().equals(newContent.trim());
+                    if (isChanged)
+                        changes.add(new ChangeEvent(origFile, origContent, newContent));
+                } else {
+                    changes.add(new ChangeEvent(origFile, newFile, origContent, newContent));
+                }
             }
         }
         return changes;
@@ -238,24 +245,56 @@ public class ModuleRenamer {
     }
     
     public void applyChanges(List<ChangeEvent> changes) throws Exception {
-        
+        for (ChangeEvent ce : changes) {
+            ce.isStarted = true;
+            if (ce.isDeletion()) {
+                System.out.println("Deleting " + ce.origFile);
+                ce.origFile.delete();
+            } else if (ce.isFileMoving()) {
+                System.out.println("Moving " + ce.origFile + " -> " + ce.newFile);
+                FileUtils.write(ce.newFile, ce.newContent);
+                ce.origFile.delete();
+            } else if (ce.isNewFile()) {
+                System.out.println("Creating " + ce.newFile);
+                FileUtils.write(ce.newFile, ce.newContent);
+            } else {
+                System.out.println("Changing " + ce.origFile);
+                FileUtils.write(ce.origFile, ce.newContent);
+            }
+        }
     }
 
     public void rollbackChanges(List<ChangeEvent> changes) throws Exception {
-        
+        for (ChangeEvent ce : changes) {
+            if (!ce.isStarted)
+                continue;
+            try {
+                if (ce.isDeletion()) {
+                    System.out.println("Rolling back for deletion of " + ce.origFile);
+                    FileUtils.write(ce.origFile, ce.origContent);
+                } else if (ce.isFileMoving()) {
+                    System.out.println("Rolling back for move " + ce.origFile + " -> " + ce.newFile);
+                    FileUtils.write(ce.origFile, ce.origContent);
+                    ce.newFile.delete();
+                } else if (ce.isNewFile()) {
+                    System.out.println("Rolling back for creation of " + ce.newFile);
+                    ce.newFile.delete();
+                } else {
+                    System.out.println("Rolling back for changes in " + ce.origFile);
+                    FileUtils.write(ce.origFile, ce.origContent);
+                }
+            } catch (Exception ex) {
+                System.err.println("Error rolling change back: " + ex);
+            }
+        }
     }
 
-    public static void main(String[] args) throws Exception {
-        List<ChangeEvent> changes = new ModuleRenamer(
-                new File("/Users/rsutormin/Temp/k/ContigFilterR")).collectChanges("NewModule_test");
-    }
-    
     private static class ChangeEvent {
         File origFile;      // null for new files
         File newFile;       // is set for file moving, null for local changes and deletions
         String origContent; // null for new files
         String newContent;  // is set for local changes (and files moving), null for deletions
-        boolean isDone = false;
+        boolean isStarted = false;
 
         ChangeEvent(File origFile, String origContent) {
             this(origFile, null, origContent, null);  // to delete
@@ -266,10 +305,15 @@ public class ModuleRenamer {
         }
         
         ChangeEvent(File origFile, File newFile, String origContent, String newContent) {
+            // In case of new file: origFile = null and origContent = null
             this.origFile = origFile;
             this.newFile = newFile;
             this.origContent = origContent;
             this.newContent = newContent;
+        }
+        
+        boolean isNewFile() {
+            return origContent == null;
         }
         
         boolean isDeletion() {
