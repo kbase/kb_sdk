@@ -13,7 +13,7 @@ import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.renamer.ModuleRenamer;
 
 public class ModuleRenamerTest {
-    private static final String SIMPLE_MODULE_NAME = "a_simple_module_for_unit_testing";
+    private static final String SIMPLE_MODULE_NAME = "a_SimpleModule_for_unit_testing";
     private static final String TARGET_MODULE_NAME = "TargetModule_for_unit_testing";
     private static final List<File> dirsToRemove = new ArrayList<File>();
 

@@ -94,6 +94,12 @@ public class ModuleRenamer {
         String newSpec = replace(origSpec, "module\\s*(" + oldModuleName + ")\\s*\\{", newModuleName, 
                 "Module name is not found in " + origSpecFile);
         changes.add(new ChangeEvent(origSpecFile, newSpecFile, origSpec, newSpec));
+        // deploy.cfg
+        File deployCfgFile = new File(moduleDir, "deploy.cfg");
+        String origDeployCfg = TextUtils.readFileText(deployCfgFile);
+        String newDeployCfg = replace(origDeployCfg, "\\[(" + oldModuleName + ")\\]", newModuleName, 
+                "Module name block is not found in " + deployCfgFile);
+        changes.add(new ChangeEvent(deployCfgFile, origDeployCfg, newDeployCfg));
         // Clients and Impl's
         JavaData origParsingData = JavaTypeGenerator.parseSpec(origSpecFile);
         JavaModule origModule = origParsingData.getModules().get(0);
@@ -166,6 +172,15 @@ public class ModuleRenamer {
         if (!origImplFile.exists())
             throw new IllegalStateException("Implementation file not found: " + origImplFile);
         Map<String, String> prevCode = PrevCodeParser.parsePrevCode(origImplFile, commentPrefix, methodNames, withClassHeader);
+        for (String key : prevCode.keySet()) {
+            String origValue = prevCode.get(key);
+            String newValue = replaceAll(origValue, "\\'(" + oldModuleName + ")\\'", 
+                    newModuleName);
+            newValue = replaceAll(newValue, "\\\"(" + oldModuleName + ")\\\"", 
+                    newModuleName);
+            if (!newValue.equals(origValue))
+                prevCode.put(key, newValue);
+        }
         IncludeProvider ip = new FileIncludeProvider(moduleDir);
         List<KbService> newParsing = KbService.loadFromMap(KidlParser.parseSpecInt(new StringReader(newSpec), null, ip));
         final Map<String, StringWriter> generatedFiles = new LinkedHashMap<String, StringWriter>();
@@ -221,6 +236,60 @@ public class ModuleRenamer {
                 }
             }
         }
+        // Method-specs
+        File methodsDir = new File(moduleDir, "ui/narrative/methods");
+        if (methodsDir.exists()) {
+            for (File methodDir : methodsDir.listFiles()) {
+                File specJsonFile = new File(methodDir, "spec.json");
+                if (specJsonFile.exists()) {
+                    String origContent = TextUtils.readFileText(specJsonFile);
+                    String newContent = replace(origContent, "\"name\"\\s*:\\s*\"(" + oldModuleName + ")\",", 
+                            newModuleName, "name key is not found in 'service-mapping' of " + specJsonFile);
+                    changes.add(new ChangeEvent(specJsonFile, origContent, newContent));
+                }
+            }
+        }
+        // Tests
+        for (File f : FileUtils.listFiles(new File(moduleDir, "test"), 
+                new String[] {"java", "py", "pl", "pm", "r", "R", "sh"}, true)) {
+            String origContent = TextUtils.readFileText(f);
+            String newContent = origContent;
+            if (f.getName().endsWith("java")) {
+                String oldCap = TextUtils.capitalize(oldModuleName);
+                String newCap = TextUtils.capitalize(newModuleName);
+                newContent = replaceAll(newContent, "(import " + oldCap.toLowerCase() + ")", 
+                        "import " + newCap.toLowerCase());
+                newContent = replaceAll(newContent, "(" + oldCap + "Client)", 
+                        newCap + "Client");
+                newContent = replaceAll(newContent, "(" + oldCap + "Server)", 
+                        newCap + "Server");
+                newContent = replaceAll(newContent, "(test_" + oldCap + "_)", "test_" + newCap + "_");
+                newContent = replaceAll(newContent, "(\"" + oldModuleName + "\")", "\"" + newModuleName + "\"");
+            } else {
+                newContent = replaceAll(newContent, "(" + oldModuleName + "Client)", 
+                        newModuleName + "Client");
+                newContent = replaceAll(newContent, "(" + oldModuleName + "Impl)", 
+                        newModuleName + "Impl");
+                newContent = replaceAll(newContent, "(" + oldModuleName + "Server)", 
+                        newModuleName + "Server");
+                newContent = replaceAll(newContent, "(" + oldModuleName + ")", 
+                        newModuleName);
+                newContent = replaceAll(newContent, "(" + oldModuleName.toLowerCase() + ")", 
+                        newModuleName.toLowerCase());
+                newContent = replaceAll(newContent, "(test_" + oldModuleName + "_)", 
+                        "test_" + newModuleName + "_");
+            }
+            if (!newContent.equals(origContent)) 
+                changes.add(new ChangeEvent(f, origContent, newContent));
+        }
+        // Scripts in test_local
+        for (File f : FileUtils.listFiles(new File(moduleDir, "test_local"), new String[] {"sh"}, false)) {
+            String origContent = TextUtils.readFileText(f);
+            String newContent = replaceAll(origContent, "(" + oldModuleName.toLowerCase() + ")", 
+                    newModuleName.toLowerCase());
+            if (!newContent.equals(origContent)) 
+                changes.add(new ChangeEvent(f, origContent, newContent));
+        }
         return changes;
     }
 
@@ -231,7 +300,7 @@ public class ModuleRenamer {
     
     public String replace(String text, String pattern, String changeTo,
             String error, boolean required) {
-        Pattern p1 = Pattern.compile(".*" + pattern + "(\\s.*)?", Pattern.DOTALL);
+        Pattern p1 = Pattern.compile(".*" + pattern + "(\\W.*)?", Pattern.DOTALL);
         Matcher m1 = p1.matcher(text);
         if (m1.matches()) {
             int start = m1.start(1);
@@ -240,6 +309,16 @@ public class ModuleRenamer {
                     (end < text.length() ? text.substring(end) : "");
         } else if (required) {
             throw new IllegalStateException(error);
+        }
+        return text;
+    }
+
+    public String replaceAll(String text, String pattern, String changeTo) {
+        while (true) {
+            String text2 = replace(text, pattern, changeTo, null, false);
+            if (text2.equals(text))
+                break;
+            text = text2;
         }
         return text;
     }
