@@ -50,15 +50,17 @@ public class ModuleRenamer {
         language = (String)kbaseYmlConfig.get("service-language");
     }
     
-    public void rename(String newModuleName) throws Exception {
+    public int rename(String newModuleName) throws Exception {
         // Let's try to do it assuming simple case. If we fail then all changes 
         // should be rolled back.
         List<ChangeEvent> changes = collectChanges(newModuleName);
         try {
             applyChanges(changes);
+            return 0;
         } catch (Exception ex) {
             System.err.println("Error applying changes for renaming: " + ex);
             rollbackChanges(changes);
+            return 1;
         }
     }
     
@@ -82,10 +84,10 @@ public class ModuleRenamer {
                 newModuleName, "SPEC_FILE variable is not found in " + makefileFile);
         newMakefile = replace(newMakefile, "URL\\s*=\\s*https://kbase.us/services/(" + oldModuleLower + ")", 
                 newModuleName.toLowerCase(), "URL variable is not found in " + makefileFile);
-        if (newMakefile.toLowerCase().contains(oldModuleLower)) {
+        /*if (newMakefile.toLowerCase().contains(oldModuleLower)) {
             System.out.println("WARNING! Some non-standard occurances of old module name were " +
             		"detected in " + makefileFile + ". Please check and correct them manually.");
-        }
+        }*/
         changes.add(new ChangeEvent(makefileFile, origMakefile, newMakefile));
         // KIDL .spec file
         File origSpecFile = new File(moduleDir, oldModuleName + ".spec");
