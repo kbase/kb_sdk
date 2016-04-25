@@ -9,7 +9,6 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -23,6 +22,7 @@ import com.beust.jcommander.Parameters;
 
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.renamer.ModuleRenamer;
 import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
@@ -38,7 +38,8 @@ public class ModuleBuilder {
     private static final String COMPILE_COMMAND  = "compile";
     private static final String HELP_COMMAND     = "help";
     private static final String TEST_COMMAND     = "test";
-    private static final String VERSION_COMMAND     = "version";
+    private static final String VERSION_COMMAND  = "version";
+    private static final String RENAME_COMMAND   = "rename";
     
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
@@ -77,6 +78,10 @@ public class ModuleBuilder {
         VersionCommandArgs versionArgs = new VersionCommandArgs();
         jc.addCommand(VERSION_COMMAND, versionArgs);
 
+        // add the 'rename' command
+        RenameCommandArgs renameArgs = new RenameCommandArgs();
+        jc.addCommand(RENAME_COMMAND, renameArgs);
+
     	// parse the arguments and gracefully catch any errors
     	try {
     		jc.parse(args);
@@ -112,6 +117,8 @@ public class ModuleBuilder {
             returnCode = runTestCommand(testArgs,jc);
 	    } else if (jc.getParsedCommand().equals(VERSION_COMMAND)) {
 	        returnCode = runVersionCommand(versionArgs, jc);
+	    } else if (jc.getParsedCommand().equals(RENAME_COMMAND)) {
+	        returnCode = runRenameCommand(renameArgs, jc);
 	    }
 	    
 	    if(returnCode!=0) {
@@ -328,7 +335,20 @@ public class ModuleBuilder {
         printVersion();
         return 0;
     }
-    
+
+    private static int runRenameCommand(RenameCommandArgs renameArgs, JCommander jc) {
+        if (renameArgs.newModuleName == null || renameArgs.newModuleName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", "One and only one module name should be provided");
+            return 1;
+        }
+        try {
+            return new ModuleRenamer().rename(renameArgs.newModuleName.get(0));
+        } catch (Exception e) {
+            showError("Error while renaming module", e.getMessage());
+            return 1;
+        }
+    }
+
     @Parameters(commandDescription = "Validate a module or modules.")
     private static class ValidateCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
@@ -538,7 +558,12 @@ public class ModuleBuilder {
     private static class VersionCommandArgs {
     }
     
-    
+    @Parameters(commandDescription = "Rename a module name.")
+    private static class RenameCommandArgs {
+        @Parameter(required=true, description="<new module name>")
+        List<String> newModuleName;
+    }
+
     
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();

@@ -160,20 +160,29 @@ public class JavaTypeGenerator {
 	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
 	        FileSaver buildXml, FileSaver makefile) throws Exception {
 	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
-	            buildXml, makefile, null, null, null, null);
+	            buildXml, makefile, null, null, null, null, null);
+	}
+
+	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
+	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
+	        FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
+	        String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {        
+	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
+	            buildXml, makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, null);
 	}
 
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
 			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
-			String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {		
+			String semanticVersion, String gitUrl, String gitCommitHash,
+			Map<String, String> originalCode) throws Exception {		
 		JavaData data = prepareDataStructures(services);
 		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
-		        makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash);
+		        makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, originalCode);
 		return data;
 	}
 
-	public static JavaData parseSpec(File specFile) throws Exception {        
+	public static JavaData parseSpec(File specFile) throws Exception {
 	    List<KbService> services = KidlParser.parseSpec(specFile, null, null, null, true);
 	    return prepareDataStructures(services);
 	}
@@ -226,14 +235,16 @@ public class JavaTypeGenerator {
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
 			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
-			String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {
+			String semanticVersion, String gitUrl, String gitCommitHash,
+			Map<String, String> originalCode) throws Exception {
 	    if (packageParent.equals("."))  // Special value meaning top level package.
 	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
 		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion);
 		if (createServers)
-			generateServerClass(data, srcOutDir, packageParent, semanticVersion, gitUrl, gitCommitHash);
+			generateServerClass(data, srcOutDir, packageParent, semanticVersion, gitUrl, 
+			        gitCommitHash, originalCode);
 		List<String> jars = checkLibs(libOutDir, createServers, buildXml);
 		generateBuildXml(data, jars, createServers, buildXml);
 		generateMakefile(data, createServers, makefile);
@@ -932,7 +943,8 @@ public class JavaTypeGenerator {
 	}
 	
 	private static void generateServerClass(JavaData data, FileSaver srcOutDir, String packageParent,
-	        String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {
+	        String semanticVersion, String gitUrl, String gitCommitHash, 
+	        Map<String, String> originalCode) throws Exception {
 	    if (semanticVersion == null)
 	        semanticVersion = "";
 	    if (gitUrl == null)
@@ -945,7 +957,8 @@ public class JavaTypeGenerator {
 			JavaImportHolder model = new JavaImportHolder(sub(packageParent, module.getModulePackage()));
 			String serverClassName = TextUtils.capitalize(module.getModuleName()) + "Server";
 			String classFile = moduleDir + "/" + serverClassName + ".java";
-			HashMap<String, String> originalCode = parsePrevCode(srcOutDir.getAsFileOrNull(classFile), module.getFuncs());
+			if (originalCode == null)
+			    originalCode = parsePrevCode(srcOutDir.getAsFileOrNull(classFile), module.getFuncs());
 			List<String> classLines = new ArrayList<String>();
 			printModuleComment(module, classLines);
 			classLines.addAll(Arrays.asList(

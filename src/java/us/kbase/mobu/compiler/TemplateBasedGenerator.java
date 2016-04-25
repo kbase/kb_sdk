@@ -50,7 +50,6 @@ public class TemplateBasedGenerator {
         return genRServer || rServerName != null || rImplName != null;
     }
 
-    @SuppressWarnings("unchecked")
     public static void generate(List<KbService> srvs, String defaultUrl, 
             boolean genJs, String jsClientName,
             boolean genPerl, String perlClientName, boolean genPerlServer, 
@@ -62,6 +61,26 @@ public class TemplateBasedGenerator {
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
             String clientAsyncVer, String semanticVersion, String gitUrl,
             String gitCommitHash) throws Exception {
+        generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, 
+                genPerlServer, perlServerName, perlImplName, perlPsgiName, genPython, 
+                pythonClientName, genPythonServer, pythonServerName, pythonImplName, 
+                genR, rClientName, genRServer, rServerName, rImplName, enableRetries, 
+                newStyle, ip, output, perlMakefile, pyMakefile, asyncByDefault, 
+                clientAsyncVer, semanticVersion, gitUrl, gitCommitHash, null);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void generate(List<KbService> srvs, String defaultUrl, 
+            boolean genJs, String jsClientName,
+            boolean genPerl, String perlClientName, boolean genPerlServer, 
+            String perlServerName, String perlImplName, String perlPsgiName, 
+            boolean genPython, String pythonClientName, boolean genPythonServer,
+            String pythonServerName, String pythonImplName, boolean genR, 
+            String rClientName, boolean genRServer, String rServerName, String rImplName, 
+            boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
+            FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
+            String clientAsyncVer, String semanticVersion, String gitUrl,
+            String gitCommitHash, Map<String, String> prevCode) throws Exception {
         if (semanticVersion == null)
             semanticVersion = "";
         if (gitUrl == null)
@@ -198,8 +217,9 @@ public class TemplateBasedGenerator {
                 if (genPerlServer) {
                     String perlModuleImplName = (String)module.get("impl_package_name");
                     perlImplPath = fixPath(perlModuleImplName, "::") + ".pm";
-                    Map<String, String> prevCode = PrevCodeParser.parsePrevCode(
-                            output.getAsFileOrNull(perlImplPath), "#", methodNames, false);
+                    if (prevCode == null)
+                        prevCode = PrevCodeParser.parsePrevCode(
+                                output.getAsFileOrNull(perlImplPath), "#", methodNames, false);
                     module.put("module_header", prevCode.get(PrevCodeParser.HEADER));
                     module.put("module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
                     module.put("module_status", prevCode.get(PrevCodeParser.STATUS));
@@ -214,8 +234,9 @@ public class TemplateBasedGenerator {
                 if (genPythonServer) {
                     String pythonModuleImplName = (String)module.get("pymodule");
                     pythonImplPath = fixPath(pythonModuleImplName, ".") + ".py";
-                    Map<String, String> prevCode = PrevCodeParser.parsePrevCode(
-                            output.getAsFileOrNull(pythonImplPath), "#", methodNames, true);
+                    if (prevCode == null)
+                        prevCode = PrevCodeParser.parsePrevCode(
+                                output.getAsFileOrNull(pythonImplPath), "#", methodNames, true);
                     module.put("py_module_header", prevCode.get(PrevCodeParser.HEADER));
                     module.put("py_module_class_header", prevCode.get(PrevCodeParser.CLSHEADER));
                     module.put("py_module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
@@ -230,8 +251,9 @@ public class TemplateBasedGenerator {
                 String rImplPath = null;
                 if (genRServer) {
                     rImplPath = rImplName + ".r";
-                    Map<String, String> prevCode = PrevCodeParser.parsePrevCode(
-                            output.getAsFileOrNull(rImplPath), "#", methodNames, false);
+                    if (prevCode == null)
+                        prevCode = PrevCodeParser.parsePrevCode(
+                                output.getAsFileOrNull(rImplPath), "#", methodNames, false);
                     module.put("r_module_header", prevCode.get(PrevCodeParser.HEADER));
                     module.put("r_module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
                     for (Map<String, Object> method : methods) {
