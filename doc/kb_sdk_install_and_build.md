@@ -20,11 +20,7 @@ Create a directory in which you want to work.  All your work should go here.  Al
     cd <working_dir>
     git clone https://github.com/kbase/kb_sdk
     git clone https://github.com/kbase/jars
-
-Some newer features are on other branches, such as *develop* (currently please do use the *develop* branch).  If you do not need these features you do not need to check out a different branch.
-
     cd kb_sdk
-    git checkout <branch>
     make bin  # or "make" to compile from scratch
     
 You should now have the kb-sdk program built in kb_sdk/bin. It will be helpful to add this to your execution path.  From within the kb_sdk directory, you can run in Bash:
@@ -46,6 +42,8 @@ Like `JAVA_HOME`, you should consider adding these last two commands to your `~/
 KBase modules run in Docker containers.  Docker containers are built on top of existing base images.  KBase has a public base image that includes a number of installed runtimes, some basic Bioinformatics tools, and other KBase specific tools.  To run this locally, you will need to download and build the KBase SDK base image.  There is a Makefile target that does most of the work for you:
 
     make sdkbase
+
+You will get a failure if the Docker daemon is not running when you invoke the above command.  See  [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance.
 
 The Image currently is fairly large, so this will take some time to run and build the image.  This step is required for running tests locally.
 

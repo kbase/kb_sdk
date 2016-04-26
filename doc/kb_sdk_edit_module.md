@@ -47,21 +47,21 @@ use the name of your module as the name for your new repository.
 
 #### <A NAME="edit-desc"></A>B. Edit Module Description
 
-Open and edit the kbase.yml file to include a better description of your module.  The default generated description isn't very good.
+Open and edit the **kbase.yml** file to include a better description of your module.  The default generated description isn't very good.
 
 [\[Back to top\]](#top)
 
 
 #### <A NAME="kidl-spec"></A>C. Create KIDL specification for Module
 
-The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.
+The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.  **You must rerun *make* after each change to the KIDL specification to [create or update the implementation stubs](#stubs).**
 
-Open the `ContigCount.spec` file in a text editor, and you will see this:
+Open the `ContigFilter.spec` file in a text editor, and you will see this:
 
     /*
-    A KBase module: MikeContigCount
+    A KBase module: MikeContigFilter
     */
-    module MikeContigCount {
+    module MikeContigFilter {
         /*
         Insert your typespec information here.
         */
@@ -72,16 +72,17 @@ Comments are enclosed in `/* comment */`.  In this module, we want to define a f
     typedef string contigset_id;
     typedef structure {
         int contig_count;
-    } CountContigsResults;
+        int filtered_contig_count;
+    } FilterContigResults;
 
-    funcdef count_contigs(string workspace_name, contigset_id contigset)
-                returns (CountContigsResults) authentication required;
+    funcdef filter_contigs(string workspace_name, contigset_id contigset)
+                returns (FilterContigResults) authentication required;
 
 There a few things introduced here that are part of the KBase Interface Description Language (KIDL).  First, we use `typedef` to define the structure of input/output parameters using the syntax:
 
     typedef [type definition] [TypeName]
 
-The type definition can either be another previously defined type name, a primitive type (string, int, float), a container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure named `CountContigResults` with a single integer field named `contig_count`.
+The type definition can either be another previously defined type name, a primitive type (string, int, float), a container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure named `FilterContigResults` with two integer fields named `contig_count` and `filtered_contig_count`.
 
 We can use any defined types as input/output parameters to functions.  We define functions using the `funcdef` keyword in this syntax:
 
@@ -111,7 +112,7 @@ When you make changes to the Narrative method specifications, you can validate t
 
 #### <A NAME="stubs"></A>E. Create stubs for methods
 
-After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs by running
+After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs (e.g. the \<MyModule\>Impl.py file) by running
 
     make
 
@@ -124,20 +125,86 @@ This will call `kb-sdk compile` with a set of parameters predefined for you.
 
 In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
 
-- F.1. [Using Data Types](#impl-data-types)
-- F.2. [Logging](#impl-logging)
-- F.3. [Provenance](#impl-provenance)
-- F.4. [Building Output Report](#impl-report)
-- F.5. [Invoking Shell Tool](#impl-shell-tool)
-- F.6. [Adding Data to Your Method](#impl-adding-data)
+- F.1. [Imports and Setup](#impl-setup)
+- F.2. [Using Data Types](#impl-data-types)
+- F.3. [Logging](#impl-logging)
+- F.4. [Provenance](#impl-provenance)
+- F.5. [Building Output Report](#impl-report)
+- F.6. [Invoking Shell Tool](#impl-shell-tool)
+- F.7. [Adding Data to Your Method](#impl-adding-data)
 
-##### <A NAME="impl-data-types"></A>F.1. Using Data Types
+##### <A NAME="impl-setup"></A>F.1. Imports and Setup
 
-Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](doc/kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
+Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Impl file should start if you are working in Python (you may not need all of it, such as *Bio Phylo* if you're not working with Trees.  Feel free to comment out what you are not using).
+
+```python
+import os
+import sys
+import shutil
+import hashlib
+import subprocess
+import requests
+import re
+import traceback
+import uuid
+from datetime import datetime
+from pprint import pprint, pformat
+import numpy as np
+from Bio import SeqIO
+from Bio import Phylo
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.Alphabet import generic_protein
+from requests_toolbelt import MultipartEncoder
+from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
+from biokbase.workspace.client import Workspace as workspaceService
+
+class <ModuleName>:
+    workspaceURL = None
+    shockURL = None
+    handleURL = None
+    
+    def __init__(self, config):
+        self.workspaceURL = config['workspace-url']
+        self.shockURL = config['shock-url']
+        self.handleURL = config['handle-service-url']
+
+        self.scratch = os.path.abspath(config['scratch'])
+        if not os.path.exists(self.scratch):
+            os.makedirs(self.scratch)
+           
+    # target is a list for collecting log messages
+    def log(self, target, message):
+        if target is not None:
+            target.append(message)
+        print(message)
+        sys.stdout.flush()
+        
+    def run_<method_name> (self, ctx, params):
+        console = []
+        self.log(console,'Running run_<method_name> with params=')
+        self.log(console, pformat(params))
+
+        token = ctx['token']
+        ws = workspaceService(self.workspaceURL, token=token)
+        
+    	...
+```
+[\[Back to Edit Impl\]](#impl)
+
+
+##### <A NAME="impl-data-types"></A>F.2. Using Data Types
+
+Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
+
+Please see:
+
+    https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_data_types.md
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-logging"></A>F.2. Logging
+
+##### <A NAME="impl-logging"></A>F.3. Logging
 
 Logging where you are is key to tracking progress and debugging.  Our recommended style is to log to a "console" list.  Here is some example code for accomplishing this.
 
@@ -160,7 +227,7 @@ Logging where you are is key to tracking progress and debugging.  Our recommende
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-provenance"></A>F.3. Provenance
+##### <A NAME="impl-provenance"></A>F.4. Provenance
 
 Data objects in KBase contain provenance (historical information of their creation and objects from which they are derived).  When you create new objects, you must carry forward and add provenance information to them.  Additionally, Report objects should receive that provenance data (see below).  Examples of adding provenance to objects can be found in the [KBase Data Types](docs/kb_sdk_data_types.md).
 
@@ -176,7 +243,7 @@ Data objects in KBase contain provenance (historical information of their creati
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-report"></A>F.4. Building Output Report
+##### <A NAME="impl-report"></A>F.5. Building Output Report
 
 ```python
         # create a Report
@@ -217,7 +284,7 @@ Data objects in KBase contain provenance (historical information of their creati
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-shell-tool"></A>F.5. Invoking Shell Tool
+##### <A NAME="impl-shell-tool"></A>F.6. Invoking Shell Tool
 
 ```python
         command_line_tool_params_str = " ".join(command_line_tool_params)
@@ -246,7 +313,7 @@ Data objects in KBase contain provenance (historical information of their creati
 
 [\[Back to Edit Impl\]](#impl)
 
-##### <A NAME="impl-adding-data"></A>F.6. Adding Data To Your Method
+##### <A NAME="impl-adding-data"></A>F.7. Adding Data To Your Method
 
 Data that is supported by [KBase Data Types](doc/kb_sdk_data_types_table.md) should be added as a workspace object.  Other data that is used to configure a method may be added to the repo with the code.  Large data sets that exceed a reasonable limit (> 1 GB) should be added to a shared mount point.  This can be accomplished by contacting kbase administrators at http://kbase.us.
 
@@ -306,6 +373,8 @@ publications :
         display-text : |
             'Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033'
         link: http://www.ncbi.nlm.nih.gov/pubmed/25609793
+    -
+        link: https://github.com/voutcn/megahit
 ```
 
 ##### G.2. Configure passing variables from Narrative Input to SDK method.
@@ -321,7 +390,7 @@ Edit *spec.json*:
 	],
 	"contact": "help@kbase.us",
 	"visible": true,
-	"categories": ["active","assembly"],
+	"categories": ["active","assembly","communities"],
 	"widgets": {
 		"input": null,
 		"output": "kbaseReportView"

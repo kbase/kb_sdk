@@ -452,6 +452,25 @@ public class TypeGeneratorTest extends Assert {
         runJavaServerTest(testNum, true, testPackage, libDir, binDir, parsingData, serverOutDir, portNum);
     }
 
+    @Test
+    public void testStatus() throws Exception {
+        int testNum = 19;
+        File workDir = prepareWorkDir(testNum);
+        System.out.println();
+        System.out.println("Test " + testNum + " (testStatus) is starting in directory: " + workDir.getName());
+        String testPackage = rootPackageName + ".test" + testNum;
+        File libDir = new File(workDir, "lib");
+        File binDir = new File(workDir, "bin");
+        JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
+        File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
+        runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort());
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort());
+        runJavaServerTest(testNum, true, testPackage, libDir,
+                binDir, parsingData, serverOutDir, findFreePort());
+    }
+
     private Server startJobService(File binDir, File tempDir) throws Exception {
         Server jettyServer = new Server(findFreePort());
 	    ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -652,13 +671,13 @@ public class TypeGeneratorTest extends Assert {
                 true, null, true, null, null, "service.psgi", false, true, 
                 null, true, null, null, false, false, null, null, null, false, 
                 null, false, null, false, null, null, newStyle, serverOutDir, 
-                null, true, null);
+                null, true, null, null, null, null);
         // Generate clients (always new style)
         RunCompileCommand.generate(testFile, null, true, null, 
                 true, null, false, null, null, null, false, true, 
                 null, false, null, null, false, false, null, null, null, false, 
                 null, false, null, false, null, null, true, serverOutDir, null, 
-                true, null);
+                true, null, null, null, null);
         return serverOutDir;
 	}
 

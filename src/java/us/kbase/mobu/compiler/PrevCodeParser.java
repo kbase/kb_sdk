@@ -19,6 +19,7 @@ public class PrevCodeParser {
     public static final String HEADER = "HEADER";
     public static final String CLSHEADER = "CLASS_HEADER";
     public static final String CONSTRUCTOR = "CONSTRUCTOR";
+    public static final String STATUS = "STATUS";
     public static final String METHOD = "METHOD_";
     
     public static HashMap<String, String> parsePrevCode(File implFile, String commentPrefix,
@@ -30,6 +31,8 @@ public class PrevCodeParser {
                 "BEGIN_CLASS_HEADER\n(.*\n)?[ \t]*" + commentPrefix + "END_CLASS_HEADER\n.*", Pattern.DOTALL);
         Pattern PAT_CONSTRUCTOR = Pattern.compile(".*" + commentPrefix + "BEGIN_CONSTRUCTOR\n(.*\n)?[ \t]*" + 
                 commentPrefix + "END_CONSTRUCTOR\n.*", Pattern.DOTALL);
+        Pattern PAT_STATUS = Pattern.compile(".*" + commentPrefix + "BEGIN_STATUS\n(.*\n)?[ \t]*" + 
+                commentPrefix + "END_STATUS\n.*", Pattern.DOTALL);
         HashMap<String, String> code = new HashMap<String, String>();
         if (implFile == null || !implFile.exists()) {
             code.put(HEADER, "");
@@ -46,6 +49,7 @@ public class PrevCodeParser {
         if (withClassHeader)
             checkMatch(code, PAT_CLASS_HEADER, oldserver, CLSHEADER, "class header", true, implFile);
         checkMatch(code, PAT_CONSTRUCTOR, oldserver, CONSTRUCTOR, "constructor", true, implFile);
+        checkMatch(code, PAT_STATUS, oldserver, STATUS, "method status", false, implFile);
         for (String funcName : funcs) {
             Pattern p = Pattern.compile(MessageFormat.format(".*" + commentPrefix + "BEGIN {0}\n(.*\n)?[ \t]*" + 
                     commentPrefix + "END {0}\n.*", funcName), Pattern.DOTALL);

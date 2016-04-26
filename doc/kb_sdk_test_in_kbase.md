@@ -15,9 +15,9 @@
 
 #### 7A. Start a Narrative Session
 
-Go to https://appdev.kbase.us and start a new Narrative.
+Go to https://appdev.kbase.us, log in, and start a new Narrative.
 
-Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to count some contigs.
+Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it.  If you encounter errors, you should make your edits/debugging statements to your code, commit those changes, push it to your SDK Module git (or other open-source) repo, reregister with the "SDK Register" App, and rerun to see if your fixes did the trick.  You must push your edits to your repo and reregister for each test for the Docker image to contain those changes.  We recommend getting as many bugs out in the [Local Testing](kb_sdk_local_test_module.md) stage as possible.
 
 Explore the other SDK methods in the Narrative method panel
 
@@ -26,7 +26,7 @@ Explore the other SDK methods in the Narrative method panel
 For finer-grain control of the KBase Catalog registration process, use a code cell:
 
     from biokbase.catalog.Client import Catalog
-    catalog = Catalog(url="https://ci.kbase.us/services/catalog")
+    catalog = Catalog(url="https://appdev.kbase.us/services/catalog")
     catalog.version()
 
 The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
