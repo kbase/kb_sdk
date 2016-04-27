@@ -160,19 +160,29 @@ public class JavaTypeGenerator {
 	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
 	        FileSaver buildXml, FileSaver makefile) throws Exception {
 	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
-	            buildXml, makefile, null);
+	            buildXml, makefile, null, null, null, null, null);
+	}
+
+	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
+	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
+	        FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
+	        String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {        
+	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
+	            buildXml, makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, null);
 	}
 
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion) throws Exception {		
+			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
+			String semanticVersion, String gitUrl, String gitCommitHash,
+			Map<String, String> originalCode) throws Exception {		
 		JavaData data = prepareDataStructures(services);
 		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
-		        makefile, clientAsyncVersion);
+		        makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, originalCode);
 		return data;
 	}
 
-	public static JavaData parseSpec(File specFile) throws Exception {        
+	public static JavaData parseSpec(File specFile) throws Exception {
 	    List<KbService> services = KidlParser.parseSpec(specFile, null, null, null, true);
 	    return prepareDataStructures(services);
 	}
@@ -224,14 +234,17 @@ public class JavaTypeGenerator {
 
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
-			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion) throws Exception {
+			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
+			String semanticVersion, String gitUrl, String gitCommitHash,
+			Map<String, String> originalCode) throws Exception {
 	    if (packageParent.equals("."))  // Special value meaning top level package.
 	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
 		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion);
 		if (createServers)
-			generateServerClass(data, srcOutDir, packageParent);
+			generateServerClass(data, srcOutDir, packageParent, semanticVersion, gitUrl, 
+			        gitCommitHash, originalCode);
 		List<String> jars = checkLibs(libOutDir, createServers, buildXml);
 		generateBuildXml(data, jars, createServers, buildXml);
 		generateMakefile(data, createServers, makefile);
@@ -929,19 +942,31 @@ public class JavaTypeGenerator {
 		return Arrays.asList(code.split("\n"));
 	}
 	
-	private static void generateServerClass(JavaData data, FileSaver srcOutDir, String packageParent) throws Exception {
+	private static void generateServerClass(JavaData data, FileSaver srcOutDir, String packageParent,
+	        String semanticVersion, String gitUrl, String gitCommitHash, 
+	        Map<String, String> originalCode) throws Exception {
+	    if (semanticVersion == null)
+	        semanticVersion = "";
+	    if (gitUrl == null)
+	        gitUrl = "";
+	    if (gitCommitHash == null)
+	        gitCommitHash = "";
 		Map<String, JavaType> originalToJavaTypes = getOriginalToJavaTypesMap(data);
 		for (JavaModule module : data.getModules()) {
 			String moduleDir = sub(packageParent, module.getModulePackage()).replace('.', '/');
 			JavaImportHolder model = new JavaImportHolder(sub(packageParent, module.getModulePackage()));
 			String serverClassName = TextUtils.capitalize(module.getModuleName()) + "Server";
 			String classFile = moduleDir + "/" + serverClassName + ".java";
-			HashMap<String, String> originalCode = parsePrevCode(srcOutDir.getAsFileOrNull(classFile), module.getFuncs());
+			if (originalCode == null)
+			    originalCode = parsePrevCode(srcOutDir.getAsFileOrNull(classFile), module.getFuncs());
 			List<String> classLines = new ArrayList<String>();
 			printModuleComment(module, classLines);
 			classLines.addAll(Arrays.asList(
 					"public class " + serverClassName + " extends " + model.ref(utilPackage + ".JsonServerServlet") + " {",
 					"    private static final long serialVersionUID = 1L;",
+                    "    private static final String version = \"" + semanticVersion + "\";",
+                    "    private static final String gitUrl = \"" + gitUrl + "\";",
+                    "    private static final String gitCommitHash = \"" + gitCommitHash + "\";",
 					""
 					));
 			classLines.add("    //BEGIN_CLASS_HEADER");
@@ -959,7 +984,10 @@ public class JavaTypeGenerator {
 					"        //END_CONSTRUCTOR",
 					"    }"
 					));
+			boolean isStatusInKidl = false;
 			for (JavaFunc func : module.getFuncs()) {
+			    if (func.getOriginal().getName().equals("status"))
+			        isStatusInKidl = true;
 				JavaType retType = null;
 				if (func.getRetMultyType() == null) {
 					if (func.getReturns().size() > 0) {
@@ -1017,6 +1045,33 @@ public class JavaTypeGenerator {
 					classLines.add("        return returnVal;");
 					classLines.add("    }");					
 				}
+			}
+			if (!isStatusInKidl) {
+			    model.ref("java.util.LinkedHashMap");
+                classLines.addAll(Arrays.asList(
+                        "    @" + model.ref(utilPackage + ".JsonServerMethod") + "(" +
+                        		"rpc = \"" + module.getOriginal().getModuleName() + ".status\")",
+                        "    public " + model.ref("java.util.Map") + "<String, Object> status() {",
+                        "        " + model.ref("java.util.Map") + "<String, Object> returnVal = null;",
+                        "        //BEGIN_STATUS"
+                        ));
+                if (originalCode.containsKey(PrevCodeParser.STATUS)) {
+                    classLines.addAll(splitCodeLines(originalCode.get(PrevCodeParser.STATUS)));
+                } else {
+                    classLines.addAll(Arrays.asList(
+                            "        returnVal = new " + model.ref("java.util.LinkedHashMap") + "<String, Object>();",
+                            "        returnVal.put(\"state\", \"OK\");",
+                            "        returnVal.put(\"message\", \"\");",
+                            "        returnVal.put(\"version\", version);",
+                            "        returnVal.put(\"git_url\", gitUrl);",
+                            "        returnVal.put(\"git_commit_hash\", gitCommitHash);"
+                            ));
+                }
+                classLines.addAll(Arrays.asList(
+                        "        //END_STATUS",
+                        "        return returnVal;",
+                        "    }"
+                        ));
 			}
 			String fileType = model.ref("java.io.File");
 			String JsonServerSyslogType = model.ref(utilPackage + ".JsonServerSyslog");
@@ -1181,7 +1236,7 @@ public class JavaTypeGenerator {
 		                    "  <target name=\"make_async_job_script\" depends=\"compile\" description=\"make batch script for async job running\">",
 		                    "    <property name=\"jar.absolute.path\" location=\"${dist}/${jar.file}\"/>",
 		                    "    <pathconvert targetos=\"unix\" property=\"lib.classpath\" refid=\"compile.classpath\"/>",
-		                    "    <echo file=\"${dist}/" + shellFileName + "\">#!/bin/sh",
+		                    "    <echo file=\"${dist}/" + shellFileName + "\">#!/bin/bash",
 		                    "java -cp ${jar.absolute.path}:${lib.classpath} us.kbase." + module.getModulePackage() + "." + module.getModuleName() + "Server" + " $1 $2 $3",
 		                    "    </echo>",
 		                    "<chmod file=\"${dist}/" + shellFileName + "\" perm=\"a+x\"/>",
