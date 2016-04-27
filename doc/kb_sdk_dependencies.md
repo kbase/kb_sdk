@@ -72,7 +72,12 @@ https://www.docker.com/linux
 
 On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start the Docker Kitematic and then launch the "Docker CLI" Command Line Interface to start the Docker daemon and **run commands that depend on docker (e.g. *make sdkbase*) within that shell**.
 
-Instructions on the Docker website are very good, but on a Mac you may need to increase your VirtualBox virtual machine disk size to handle the full KBase runtime.  This is a limitation both of the current KBase runtime which will likely be reduced in size soon, and Docker which does not yet allow configurable disk sizes on a standard Docker install, which is actually a feature on the Docker roadmap.  For now, here are some references that may help deal with this problem:
+In order to be able to pull remote images, you may need to modify your VirtualBox network settings.  From a command prompt run
+
+    VBoxManage modifyvm "default" --natdnshostresolver1 on
+    VBoxManage modifyvm "default" --natdnsproxy1 on
+
+Instructions on the Docker website are very good, but you may need to increase your VirtualBox virtual machine disk size to handle the full KBase runtime.  This is a limitation both of the current KBase runtime which will likely be reduced in size soon, and Docker which does not yet allow configurable disk sizes on a standard Docker install, which is a feature on the Docker roadmap.  For now, here are some references that may help deal with this problem:
 
 - https://github.com/kitematic/kitematic/issues/825
 - http://stackoverflow.com/questions/32485723/docker-increase-disk-space
