@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,10 +20,15 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.yaml.snakeyaml.Yaml;
 
 import us.kbase.auth.AuthService;
+import us.kbase.common.service.JsonServerServlet;
 import us.kbase.mobu.util.DirUtils;
+import us.kbase.mobu.util.NetUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
@@ -32,7 +38,7 @@ public class ModuleTester {
     private File moduleDir;
     protected Map<String,Object> kbaseYmlConfig;
     private Map<String, Object> moduleContext;
-
+    
     public ModuleTester() throws Exception {
         moduleDir = DirUtils.findModuleDir();
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
@@ -153,21 +159,56 @@ public class ModuleTester {
                 ProcessHelper.cmd("docker", "rmi", oldImageId).exec(tlDir);
             }
         }
-        if (!runTestsSh.exists()) {
-            pw = new PrintWriter(runTestsSh);
-            try {
-                String dockerRunCmd = "docker run -v " + tlDir.getCanonicalPath() + "/workdir:" +
-                        "/kb/module/work " + imageName + " test";
-                pw.println(dockerRunCmd);
-            } finally {
-                pw.close();
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        List<String> hostIps = NetUtils.findNetworkAddresses("docker0", "vboxnet0");
+        String hostIp = null;
+        if (hostIps.isEmpty()) {
+            System.out.println("WARNING! No SDK host IP addresses was found. Subsequent local calls are not supported in test mode.");
+        } else {
+            hostIp = hostIps.get(0);
+            if (hostIps.size() > 1) {
+                System.out.println("WARNING! Several SDK host IP addresses are detected, first one is used: " + hostIp);
+            } else {
+                System.out.println("SDK host IP address is detected: " + hostIp);
             }
         }
-        System.out.println();
-        ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-        ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath()).exec(tlDir);
+        int callbackPort = findFreePort();
+        String callbackUrl = hostIp == null ? "" : ("http://" + hostIp + ":" + callbackPort);
+        JsonServerServlet catalogSrv = new CallbackServer();
+        Server jettyServer = new Server(callbackPort);
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        jettyServer.setHandler(context);
+        context.addServlet(new ServletHolder(catalogSrv),"/*");
+        jettyServer.start();
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        try {
+            if (!runTestsSh.exists()) {
+                pw = new PrintWriter(runTestsSh);
+                try {
+                    String dockerRunCmd = "docker run -v " + tlDir.getCanonicalPath() + "/workdir:" +
+                            "/kb/module/work -e \"SDK_CALLBACK_URL=$1\" " + imageName + " test";
+                    pw.println(dockerRunCmd);
+                } finally {
+                    pw.close();
+                }
+            }
+            System.out.println();
+            ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
+            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(), callbackUrl).exec(tlDir);
+        } finally {
+            System.out.println("Shutting down callback server...");
+            jettyServer.stop();
+        }
     }
 
+    private static int findFreePort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {}
+        throw new IllegalStateException("Can not find available port in system");
+    }
+    
     public String findImageIdByName(File tlDir, String imageName)
             throws Exception {
         List<String> lines;
