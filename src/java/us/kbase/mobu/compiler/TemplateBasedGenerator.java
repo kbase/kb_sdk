@@ -217,14 +217,15 @@ public class TemplateBasedGenerator {
                 if (genPerlServer) {
                     String perlModuleImplName = (String)module.get("impl_package_name");
                     perlImplPath = fixPath(perlModuleImplName, "::") + ".pm";
-                    if (prevCode == null)
-                        prevCode = PrevCodeParser.parsePrevCode(
+                    Map<String, String> innerPrevCode = prevCode;
+                    if (innerPrevCode == null)
+                        innerPrevCode = PrevCodeParser.parsePrevCode(
                                 output.getAsFileOrNull(perlImplPath), "#", methodNames, false);
-                    module.put("module_header", prevCode.get(PrevCodeParser.HEADER));
-                    module.put("module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
-                    module.put("module_status", prevCode.get(PrevCodeParser.STATUS));
+                    module.put("module_header", innerPrevCode.get(PrevCodeParser.HEADER));
+                    module.put("module_constructor", innerPrevCode.get(PrevCodeParser.CONSTRUCTOR));
+                    module.put("module_status", innerPrevCode.get(PrevCodeParser.STATUS));
                     for (Map<String, Object> method : methods) {
-                        String code = prevCode.get(PrevCodeParser.METHOD + method.get("name"));
+                        String code = innerPrevCode.get(PrevCodeParser.METHOD + method.get("name"));
                         method.put("user_code", code == null ? "" : code);
                     }
                     perlMakefileContext.put("impl_package_name", perlModuleImplName);
@@ -234,15 +235,16 @@ public class TemplateBasedGenerator {
                 if (genPythonServer) {
                     String pythonModuleImplName = (String)module.get("pymodule");
                     pythonImplPath = fixPath(pythonModuleImplName, ".") + ".py";
-                    if (prevCode == null)
-                        prevCode = PrevCodeParser.parsePrevCode(
+                    Map<String, String> innerPrevCode = prevCode;
+                    if (innerPrevCode == null)
+                        innerPrevCode = PrevCodeParser.parsePrevCode(
                                 output.getAsFileOrNull(pythonImplPath), "#", methodNames, true);
-                    module.put("py_module_header", prevCode.get(PrevCodeParser.HEADER));
-                    module.put("py_module_class_header", prevCode.get(PrevCodeParser.CLSHEADER));
-                    module.put("py_module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
-                    module.put("py_module_status", prevCode.get(PrevCodeParser.STATUS));
+                    module.put("py_module_header", innerPrevCode.get(PrevCodeParser.HEADER));
+                    module.put("py_module_class_header", innerPrevCode.get(PrevCodeParser.CLSHEADER));
+                    module.put("py_module_constructor", innerPrevCode.get(PrevCodeParser.CONSTRUCTOR));
+                    module.put("py_module_status", innerPrevCode.get(PrevCodeParser.STATUS));
                     for (Map<String, Object> method : methods) {
-                        String code = prevCode.get(PrevCodeParser.METHOD + method.get("name"));
+                        String code = innerPrevCode.get(PrevCodeParser.METHOD + method.get("name"));
                         method.put("py_user_code", code == null ? "" : code);
                     }
                     pyMakefileContext.put("impl_package_name", pythonModuleImplName);
@@ -251,13 +253,14 @@ public class TemplateBasedGenerator {
                 String rImplPath = null;
                 if (genRServer) {
                     rImplPath = rImplName + ".r";
-                    if (prevCode == null)
-                        prevCode = PrevCodeParser.parsePrevCode(
+                    Map<String, String> innerPrevCode = prevCode;
+                    if (innerPrevCode == null)
+                        innerPrevCode = PrevCodeParser.parsePrevCode(
                                 output.getAsFileOrNull(rImplPath), "#", methodNames, false);
-                    module.put("r_module_header", prevCode.get(PrevCodeParser.HEADER));
-                    module.put("r_module_constructor", prevCode.get(PrevCodeParser.CONSTRUCTOR));
+                    module.put("r_module_header", innerPrevCode.get(PrevCodeParser.HEADER));
+                    module.put("r_module_constructor", innerPrevCode.get(PrevCodeParser.CONSTRUCTOR));
                     for (Map<String, Object> method : methods) {
-                        String code = prevCode.get(PrevCodeParser.METHOD + method.get("name"));
+                        String code = innerPrevCode.get(PrevCodeParser.METHOD + method.get("name"));
                         method.put("r_user_code", code == null ? "" : code);
                     }
                 }
