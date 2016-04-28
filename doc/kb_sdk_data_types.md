@@ -349,7 +349,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-			})
+			})[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
         
@@ -745,7 +745,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-			})
+			})[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
         
@@ -916,7 +916,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1027,7 +1027,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1137,7 +1137,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1286,7 +1286,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1519,7 +1519,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1658,7 +1658,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				'name': params['output_domain_library_name'],
 				'meta': {},
 				'provenance': provenance
-				} ] })
+				} ] })[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1769,7 +1769,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				'name': params['output_domain_model_set_name'],
 				'meta': {},
 				'provenance': provenance
-				} ] })
+				} ] })[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -1936,7 +1936,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				'name': params['output_domain_annotation_name'],
 				'meta': {},
 				'provenance': provenance
-				} ] })
+				} ] })[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -2071,7 +2071,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -2231,7 +2231,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
