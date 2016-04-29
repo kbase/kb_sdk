@@ -159,7 +159,35 @@ public class ModuleTester {
                 ProcessHelper.cmd("docker", "rmi", oldImageId).exec(tlDir);
             }
         }
+        File subjobsDir = new File(tlDir, "subjobs");
+        if (subjobsDir.exists())
+            TextUtils.deleteRecursively(subjobsDir);
+        File scratchDir = new File(tlDir, "scratch");
+        if (scratchDir.exists())
+            TextUtils.deleteRecursively(scratchDir);
+        scratchDir.mkdir();
         ///////////////////////////////////////////////////////////////////////////////////////////////
+        int callbackPort = findFreePort();
+        String callbackUrl = getCallbackUrl(tlDir, callbackPort);
+        JsonServerServlet catalogSrv = new CallbackServer(callbackPort);
+        Server jettyServer = new Server(callbackPort);
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        jettyServer.setHandler(context);
+        context.addServlet(new ServletHolder(catalogSrv),"/*");
+        jettyServer.start();
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        try {
+            System.out.println();
+            ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
+            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(), callbackUrl).exec(tlDir);
+        } finally {
+            System.out.println("Shutting down callback server...");
+            jettyServer.stop();
+        }
+    }
+
+    public static String getCallbackUrl(File testLocalDir, int callbackPort) throws Exception {
         List<String> hostIps = NetUtils.findNetworkAddresses("docker0", "vboxnet0");
         String hostIp = null;
         if (hostIps.isEmpty()) {
@@ -172,34 +200,8 @@ public class ModuleTester {
                 System.out.println("SDK host IP address is detected: " + hostIp);
             }
         }
-        int callbackPort = findFreePort();
         String callbackUrl = hostIp == null ? "" : ("http://" + hostIp + ":" + callbackPort);
-        JsonServerServlet catalogSrv = new CallbackServer();
-        Server jettyServer = new Server(callbackPort);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        jettyServer.setHandler(context);
-        context.addServlet(new ServletHolder(catalogSrv),"/*");
-        jettyServer.start();
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        try {
-            if (!runTestsSh.exists()) {
-                pw = new PrintWriter(runTestsSh);
-                try {
-                    String dockerRunCmd = "docker run -v " + tlDir.getCanonicalPath() + "/workdir:" +
-                            "/kb/module/work -e \"SDK_CALLBACK_URL=$1\" " + imageName + " test";
-                    pw.println(dockerRunCmd);
-                } finally {
-                    pw.close();
-                }
-            }
-            System.out.println();
-            ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(), callbackUrl).exec(tlDir);
-        } finally {
-            System.out.println("Shutting down callback server...");
-            jettyServer.stop();
-        }
+        return callbackUrl;
     }
 
     private static int findFreePort() {

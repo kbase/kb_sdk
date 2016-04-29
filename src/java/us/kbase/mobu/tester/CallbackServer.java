@@ -3,7 +3,6 @@ package us.kbase.mobu.tester;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +17,11 @@ import us.kbase.common.service.UObject;
 public class CallbackServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
     
-    public CallbackServer() {
+    private final int callbackPort;
+    
+    public CallbackServer(int callbackPort) {
         super("CallbackServer");
+        this.callbackPort = callbackPort;
     }
     
     @JsonServerMethod(rpc = "CallbackServer.test")
@@ -37,7 +39,6 @@ public class CallbackServer extends JsonServerServlet {
             super.processRpcCall(rpcCallData, token, info, requestHeaderXForwardedFor, response, output, commandLine);
         } else {
             String rpcName = rpcCallData.getMethod();
-            List<UObject> paramsList = rpcCallData.getParams();
             Map<String, Object> jsonRpcResponse = null;
             String errorMessage = null;
             ObjectMapper mapper = new ObjectMapper().registerModule(new JacksonTupleModule());
@@ -46,11 +47,11 @@ public class CallbackServer extends JsonServerServlet {
                 String serviceVer = rpcCallData.getContext() == null ? null : 
                     (String)rpcCallData.getContext().getAdditionalProperties().get("service_ver");
                 // Request docker image name from Catalog
-                SubsequentCallRunner runner = new SubsequentCallRunner(methodName, serviceVer, paramsList);
+                SubsequentCallRunner runner = new SubsequentCallRunner(methodName, serviceVer, 
+                        callbackPort);
                 // Run method in local docker container
-                jsonRpcResponse = runner.run();
+                jsonRpcResponse = runner.run(rpcCallData);
             } catch (Exception ex) {
-                ex.printStackTrace();
                 errorMessage = ex.getMessage();
             }
             try {
