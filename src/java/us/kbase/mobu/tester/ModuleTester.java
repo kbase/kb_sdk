@@ -162,7 +162,7 @@ public class ModuleTester {
         File subjobsDir = new File(tlDir, "subjobs");
         if (subjobsDir.exists())
             TextUtils.deleteRecursively(subjobsDir);
-        File scratchDir = new File(tlDir, "scratch");
+        File scratchDir = new File(workDir, "tmp");
         if (scratchDir.exists())
             TextUtils.deleteRecursively(scratchDir);
         scratchDir.mkdir();
