@@ -88,7 +88,8 @@ public class SubsequentCallRunner {
             }
         }
         imageName = mvi.getDockerImgName();
-        this.sharedScratchDir = new File(this.testLocalDir, "scratch");
+        File srcWorkDir = new File(testLocalDir, "workdir");
+        this.sharedScratchDir = new File(srcWorkDir, "tmp");
         File subjobsDir = new File(testLocalDir, "subjobs");
         if (!subjobsDir.exists())
             subjobsDir.mkdirs();
@@ -118,7 +119,6 @@ public class SubsequentCallRunner {
         System.out.println();
         ProcessHelper.cmd("chmod", "+x", runSubJobsSh.getCanonicalPath()).exec(testLocalDir);
         this.callbackUrl = ModuleTester.getCallbackUrl(testLocalDir, callbackPort);
-        File srcWorkDir = new File(testLocalDir, "workdir");
         File srcTokenFile = new File(srcWorkDir, "token");
         File dstTokenFile = new File(jobWorkDir, "token");
         FileUtils.copyFile(srcTokenFile, dstTokenFile);
