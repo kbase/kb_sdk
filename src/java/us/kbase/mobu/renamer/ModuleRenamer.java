@@ -285,12 +285,15 @@ public class ModuleRenamer {
                 changes.add(new ChangeEvent(f, origContent, newContent));
         }
         // Scripts in test_local
-        for (File f : FileUtils.listFiles(new File(moduleDir, "test_local"), new String[] {"sh"}, false)) {
-            String origContent = TextUtils.readFileText(f);
-            String newContent = replaceAll(origContent, "(" + oldModuleName.toLowerCase() + ")", 
-                    newModuleName.toLowerCase());
-            if (!newContent.equals(origContent)) 
-                changes.add(new ChangeEvent(f, origContent, newContent));
+        File tlDir = new File(moduleDir, "test_local");
+        if (tlDir.exists()) {
+            for (File f : FileUtils.listFiles(tlDir, new String[] {"sh"}, false)) {
+                String origContent = TextUtils.readFileText(f);
+                String newContent = replaceAll(origContent, "(" + oldModuleName.toLowerCase() + ")", 
+                        newModuleName.toLowerCase());
+                if (!newContent.equals(origContent)) 
+                    changes.add(new ChangeEvent(f, origContent, newContent));
+            }
         }
         return changes;
     }
