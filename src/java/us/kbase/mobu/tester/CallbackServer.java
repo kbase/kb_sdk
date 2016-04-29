@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import us.kbase.common.service.JacksonTupleModule;
@@ -56,6 +58,7 @@ public class CallbackServer extends JsonServerServlet {
             }
             try {
                 if (jsonRpcResponse == null) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     if (errorMessage == null)
                         errorMessage = "Unknown server error";
                     Map<String, Object> error = new LinkedHashMap<String, Object>();
@@ -66,6 +69,9 @@ public class CallbackServer extends JsonServerServlet {
                     jsonRpcResponse = new LinkedHashMap<String, Object>();
                     jsonRpcResponse.put("version", "1.1");
                     jsonRpcResponse.put("error", error);
+                } else {
+                    if (jsonRpcResponse.containsKey("error"))
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 }
                 mapper.writeValue(new UnclosableOutputStream(output), jsonRpcResponse);
             } catch (Exception ex) {
