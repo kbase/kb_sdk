@@ -175,6 +175,8 @@ public class ModuleBuilder {
 			initer.initialize(initArgs.example);
 		}
 		catch (Exception e) {
+            if (initArgs.verbose)
+                e.printStackTrace();
 			showError("Error while initializing module", e.getMessage());
 			return 1;
 		}
@@ -308,6 +310,8 @@ public class ModuleBuilder {
             tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
         }
         catch (Exception e) {
+            if (testArgs.verbose)
+                e.printStackTrace();
             showError("Error while testing module", e.getMessage());
             return 1;
         }
@@ -344,6 +348,8 @@ public class ModuleBuilder {
         try {
             return new ModuleRenamer().rename(renameArgs.newModuleName.get(0));
         } catch (Exception e) {
+            if (renameArgs.verbose)
+                e.printStackTrace();
             showError("Error while renaming module", e.getMessage());
             return 1;
         }
@@ -552,6 +558,9 @@ public class ModuleBuilder {
         @Parameter(names={"-a","--allow_sync_method"}, description="Allow synchonous methods " +
                 "(advanced option, part of validation settings, default value is false)")
         boolean allowSyncMethods = false;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
     }
     
     @Parameters(commandDescription = "Print current version of kb-sdk.")
@@ -560,6 +569,9 @@ public class ModuleBuilder {
     
     @Parameters(commandDescription = "Rename a module name.")
     private static class RenameCommandArgs {
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
+
         @Parameter(required=true, description="<new module name>")
         List<String> newModuleName;
     }
