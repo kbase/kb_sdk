@@ -58,6 +58,7 @@ bin: jars-submodule-init
 submodule-init:
 	git submodule init
 	git submodule update
+	cp submodules_hacks/AuthConstants.pm submodules/auth/Bio-KBase-Auth/lib/Bio/KBase/
 
 jars-submodule-init:
 	git submodule update --init submodules/jars

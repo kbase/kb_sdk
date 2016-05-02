@@ -10,6 +10,7 @@ def getErrorMessage(error):
     return message
 
 def main(argv):
+    sys.path.append('./')
     tests_filepath = None
     endpoint = None
     user = None

@@ -590,13 +590,13 @@ public class TypeGeneratorTest extends Assert {
 			    lines.add("export KB_JOB_SERVICE_URL=" + jobServiceUrl);
 			//JavaTypeGenerator.checkEnvVars(lines, "PYTHONPATH");
 			lines.addAll(Arrays.asList(
-			        "cd \"" + serverOutDir.getAbsolutePath() + "\"",
-			        "if [ ! -d biokbase ]; then",
-			        "  cp -r ../../../lib/biokbase ./",
-                    "  cp -r $KB_TOP/modules/auth/lib/biokbase ./",
-			        "fi",
-			        "python " + serverFile.getName() + " --host localhost --port " + portNum + 
-			            " >py_server.out 2>py_server.err & pid=$!",
+					"cd \"" + serverOutDir.getAbsolutePath() + "\"",
+					"if [ ! -d biokbase ]; then",
+					"  cp -r ../../../lib/biokbase ./",
+					"  cp -r ../../../submodules/auth/python-libs/biokbase ./",
+					"fi",
+					"python " + serverFile.getName() + " --host localhost --port " + portNum + 
+						" >py_server.out 2>py_server.err & pid=$!",
 					"echo $pid > " + pidFile.getName()
 					));
 			TextUtils.writeFileLines(lines, uwsgiFile);
@@ -668,11 +668,11 @@ public class TypeGeneratorTest extends Assert {
 			    lines.add("export KB_JOB_SERVICE_URL=" + jobServiceUrl);
 			//JavaTypeGenerator.checkEnvVars(lines, "PERL5LIB");
 			lines.addAll(Arrays.asList(
-                    "cd \"" + serverOutDir.getAbsolutePath() + "\"",
-                    "if [ ! -d Bio ]; then",
-                    "  cp -r ../../../lib/Bio ./",
-                    "  cp -r $KB_TOP/modules/auth/lib/Bio ./",
-                    "fi",
+					"cd \"" + serverOutDir.getAbsolutePath() + "\"",
+					"if [ ! -d Bio ]; then",
+					"  cp -r ../../../lib/Bio ./",
+					"  cp -r ../../../submodules/auth/Bio-KBase-Auth/lib/Bio ./",
+					"fi",
 					"plackup --listen :" + portNum + " service.psgi >perl_server.out 2>perl_server.err & pid=$!",
 					"echo $pid > " + pidFile.getAbsolutePath()
 					));
