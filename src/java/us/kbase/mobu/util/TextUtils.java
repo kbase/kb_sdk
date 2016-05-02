@@ -77,7 +77,7 @@ public class TextUtils {
 	public static void writeFileLines(List<String> lines, Writer targetFile) throws IOException {
 		PrintWriter pw = new PrintWriter(targetFile);
 		for (String l : lines)
-			pw.println(l);
+			pw.print(l + "\n");
 		pw.close();
 	}
 	

@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -51,6 +52,7 @@ import us.kbase.mobu.compiler.JavaData;
 import us.kbase.mobu.compiler.JavaFunc;
 import us.kbase.mobu.compiler.JavaModule;
 import us.kbase.mobu.compiler.JavaTypeGenerator;
+import us.kbase.mobu.compiler.PrevCodeParser;
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.util.DiskFileSaver;
 import us.kbase.mobu.util.ProcessHelper;
@@ -288,6 +290,34 @@ public class TypeGeneratorTest extends Assert {
             Assert.assertTrue(text.contains("myValue = 3"));
             Assert.assertTrue(text.contains("myValue = 4"));
         }
+        ///////////////////////////////// Windows EOL chars /////////////////////////////////
+        String codeText = "" +
+                "#BEGIN_HEADER\r\n" +
+                "text1\r\n" +
+                "#END_HEADER\r\n" +
+                "\r\n" +
+                "class Storing:\r\n" +
+                "    #BEGIN_CLASS_HEADER\r\n" +
+                "    text2\r\n" +
+                "    #END_CLASS_HEADER\r\n" +
+                "    \r\n" +
+                "    def __init__(self, config):\r\n" +
+                "        #BEGIN_CONSTRUCTOR\r\n" +
+                "        text3\r\n" +
+                "        #END_CONSTRUCTOR\r\n" +
+                "    \r\n" +
+                "    def m1(self, ctx):\r\n" +
+                "        #BEGIN m1\r\n" +
+                "        text4\r\n" +
+                "        #END m1\r\n";
+        File tempFile = new File(workDir, "test.py");
+        FileUtils.write(tempFile, codeText);
+        Map<String, String> prevCode = PrevCodeParser.parsePrevCode(tempFile, "#", 
+                Arrays.asList("m1"), true);
+        Assert.assertEquals("text1", prevCode.get(PrevCodeParser.HEADER).trim());
+        Assert.assertEquals("text2", prevCode.get(PrevCodeParser.CLSHEADER).trim());
+        Assert.assertEquals("text3", prevCode.get(PrevCodeParser.CONSTRUCTOR).trim());
+        Assert.assertEquals("text4", prevCode.get(PrevCodeParser.METHOD + "m1").trim());
 	}
 
 	@Test

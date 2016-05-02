@@ -3,6 +3,7 @@ package us.kbase.mobu.compiler;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,6 +15,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
+import us.kbase.mobu.util.TextUtils;
 
 public class PrevCodeParser {
     public static final String HEADER = "HEADER";
@@ -44,7 +47,12 @@ public class PrevCodeParser {
         String backupExtension = ".bak-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
         File backup = new File(implFile.getAbsoluteFile() + backupExtension);
         FileUtils.copyFile(implFile, backup);
-        String oldserver = IOUtils.toString(new FileReader(implFile));
+        List<String> fileLines = TextUtils.readFileLines(implFile);
+        // Getting rid of windows end-of-line chars (\r\n -> \n)
+        StringWriter sw = new StringWriter();
+        TextUtils.writeFileLines(fileLines, sw);
+        sw.close();
+        String oldserver = sw.toString();
         checkMatch(code, PAT_HEADER, oldserver, HEADER, "header", true, implFile);
         if (withClassHeader)
             checkMatch(code, PAT_CLASS_HEADER, oldserver, CLSHEADER, "class header", true, implFile);

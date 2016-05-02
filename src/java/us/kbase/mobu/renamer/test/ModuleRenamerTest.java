@@ -59,4 +59,19 @@ public class ModuleRenamerTest {
         String newModuleName = TARGET_MODULE_NAME + "_r";
         new ModuleRenamer(initRepo("r")).rename(newModuleName);
     }
+    
+    @Test
+    public void testWindowsEOFs() throws Exception {
+        String oldModuleName = "a_SimpleModule_for_unit_testing";
+        String newModuleName = "a_SimpleModule_for_UnitTesting";
+        String text = "" +
+        		"module-name:\n" +
+                "    " + oldModuleName + "\n" +
+                "\n" +
+                "module-description:\n" +
+                "    A KBase module\n";
+        String newText = ModuleRenamer.replace(text, "module-name:\\s*(" + oldModuleName + ")", 
+                newModuleName, "module-name key is not found");
+        System.out.println(newText);
+    }
 }
