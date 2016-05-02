@@ -298,12 +298,12 @@ public class ModuleRenamer {
         return changes;
     }
 
-    public String replace(String text, String pattern, String changeTo,
+    public static String replace(String text, String pattern, String changeTo,
             String error) {
         return replace(text, pattern, changeTo, error, true);
     }
     
-    public String replace(String text, String pattern, String changeTo,
+    public static String replace(String text, String pattern, String changeTo,
             String error, boolean required) {
         Pattern p1 = Pattern.compile(".*" + pattern + "(\\W.*)?", Pattern.DOTALL);
         Matcher m1 = p1.matcher(text);
@@ -318,7 +318,7 @@ public class ModuleRenamer {
         return text;
     }
 
-    public String replaceAll(String text, String pattern, String changeTo) {
+    public static String replaceAll(String text, String pattern, String changeTo) {
         while (true) {
             String text2 = replace(text, pattern, changeTo, null, false);
             if (text2.equals(text))
@@ -380,6 +380,7 @@ public class ModuleRenamer {
         String newContent;  // is set for local changes (and files moving), null for deletions
         boolean isStarted = false;
 
+        @SuppressWarnings("unused")
         ChangeEvent(File origFile, String origContent) {
             this(origFile, null, origContent, null);  // to delete
         }
