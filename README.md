@@ -73,6 +73,7 @@ Pull dependencies and configure the SDK:
     cd kb_sdk
     make bin
 
+NEEDED FIRST TO FIRE UP THE DOCKER QUICKSTART TERMINAL ON MY MAC, THEN RUN THIS COMMAND IN THE SAME TERMINAL WINDOW AFTER THE "DEFAULT" MACHINE STARTED.
 Download the local KBase SDK base Docker image:
 
     make sdkbase 
