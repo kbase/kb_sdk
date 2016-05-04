@@ -150,6 +150,8 @@ import uuid
 from datetime import datetime
 from pprint import pprint, pformat
 import numpy as np
+import math
+import gzip
 from Bio import SeqIO
 from Bio import Phylo
 from Bio.Seq import Seq
@@ -158,6 +160,9 @@ from Bio.Alphabet import generic_protein
 from requests_toolbelt import MultipartEncoder
 from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
 from biokbase.workspace.client import Workspace as workspaceService
+
+import requests
+requests.packages.urllib3.disable_warnings()  # silence whining
 
 class <ModuleName>:
     workspaceURL = None
