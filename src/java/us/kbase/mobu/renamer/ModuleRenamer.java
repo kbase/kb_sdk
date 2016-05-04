@@ -102,6 +102,12 @@ public class ModuleRenamer {
         String newDeployCfg = replace(origDeployCfg, "\\[(" + oldModuleName + ")\\]", newModuleName, 
                 "Module name block is not found in " + deployCfgFile);
         changes.add(new ChangeEvent(deployCfgFile, origDeployCfg, newDeployCfg));
+        // run_async.sh
+        File runAsyncFile = new File(moduleDir, "scripts/run_async.sh");
+        String origRunAsync = TextUtils.readFileText(runAsyncFile);
+        String newRunAsync = replace(origRunAsync, "run_(" + oldModuleName + ")_async_job.sh", 
+                newModuleName, "Module name is not found in runner script name in " + runAsyncFile);
+        changes.add(new ChangeEvent(runAsyncFile, origRunAsync, newRunAsync));
         // Clients and Impl's
         JavaData origParsingData = JavaTypeGenerator.parseSpec(origSpecFile);
         JavaModule origModule = origParsingData.getModules().get(0);
