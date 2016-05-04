@@ -16,13 +16,15 @@ public class ModuleRenamerTest {
     private static final String SIMPLE_MODULE_NAME = "a_SimpleModule_for_unit_testing";
     private static final String TARGET_MODULE_NAME = "TargetModule_for_unit_testing";
     private static final List<File> dirsToRemove = new ArrayList<File>();
+    private static final boolean deleteTempDirs = true;
 
     @AfterClass
     public static void tearDownModule() throws IOException {
-        for (File module : dirsToRemove) {
-            if (module.exists() && module.isDirectory())
-                FileUtils.deleteDirectory(module);
-        }
+        if (deleteTempDirs)
+            for (File module : dirsToRemove) {
+                if (module.exists() && module.isDirectory())
+                    FileUtils.deleteDirectory(module);
+            }
     }
 
     private static File initRepo(String lang) throws Exception {
