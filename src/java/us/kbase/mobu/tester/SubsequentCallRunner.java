@@ -2,7 +2,6 @@ package us.kbase.mobu.tester;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -25,7 +24,6 @@ import us.kbase.catalog.SelectModuleVersionParams;
 import us.kbase.catalog.SelectOneModuleParams;
 import us.kbase.common.service.UObject;
 import us.kbase.common.service.JsonServerServlet.RpcCallData;
-import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
 
 public class SubsequentCallRunner {
@@ -33,8 +31,6 @@ public class SubsequentCallRunner {
             new LinkedHashSet<String>(Arrays.asList("dev", "beta", "release")));
 
     private String jobId;
-    private File moduleDir;
-    private File testLocalDir;
     private File runSubJobsSh;
     private File sharedScratchDir;
     private File jobDir;
@@ -42,15 +38,8 @@ public class SubsequentCallRunner {
     private String imageName;
     private String callbackUrl;
     
-    public SubsequentCallRunner(String methodName, String serviceVer,
-            int callbackPort) throws Exception {
-        this(DirUtils.findModuleDir(), methodName, serviceVer, callbackPort);
-    }
-    
-    public SubsequentCallRunner(File moduleDir, String methodName, 
+    public SubsequentCallRunner(File testLocalDir, String methodName, 
             String serviceVer, int callbackPort) throws Exception {
-        this.moduleDir = moduleDir;
-        this.testLocalDir = new File(this.moduleDir, "test_local");
         Properties props = new Properties();
         InputStream is = new FileInputStream(new File(testLocalDir, "test.cfg"));
         try {
@@ -108,7 +97,9 @@ public class SubsequentCallRunner {
         if (!runSubJobsSh.exists()) {
             PrintWriter pw = new PrintWriter(runSubJobsSh);
             try {
-                String dockerRunCmd = "docker run -v " + subjobsDir.getCanonicalPath() + 
+                pw.println("#!/bin/bash");
+                boolean isMac = System.getProperty("os.name").toLowerCase().contains("mac");
+                String dockerRunCmd = testLocalDir.getCanonicalPath() + "/run_docker.sh run " + (isMac ? "" : "--user $(id -u) ") + "-v " + subjobsDir.getCanonicalPath() + 
                         "/$1/workdir:/kb/module/work -v " + sharedScratchDir.getCanonicalPath() +
                         ":/kb/module/work/tmp -e \"SDK_CALLBACK_URL=$3\" $2 async";
                 pw.println(dockerRunCmd);

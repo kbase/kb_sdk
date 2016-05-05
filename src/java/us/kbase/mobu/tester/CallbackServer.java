@@ -1,5 +1,6 @@
 package us.kbase.mobu.tester;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
@@ -18,11 +19,13 @@ import us.kbase.common.service.UObject;
 
 public class CallbackServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
-    
+
+    private final File testLocalDir;
     private final int callbackPort;
     
-    public CallbackServer(int callbackPort) {
+    public CallbackServer(File testLocalDir, int callbackPort) {
         super("CallbackServer");
+        this.testLocalDir = testLocalDir;
         this.callbackPort = callbackPort;
     }
     
@@ -34,11 +37,13 @@ public class CallbackServer extends JsonServerServlet {
         return new UObject(data);
     }
 
-    protected void processRpcCall(RpcCallData rpcCallData, String token, JsonServerSyslog.RpcInfo info, 
-            String requestHeaderXForwardedFor, ResponseStatusSetter response, OutputStream output,
+    protected void processRpcCall(RpcCallData rpcCallData, String token, 
+            JsonServerSyslog.RpcInfo info, String requestHeaderXForwardedFor, 
+            ResponseStatusSetter response, OutputStream output,
             boolean commandLine) {
         if (rpcCallData.getMethod().startsWith("CallbackServer.")) {
-            super.processRpcCall(rpcCallData, token, info, requestHeaderXForwardedFor, response, output, commandLine);
+            super.processRpcCall(rpcCallData, token, info, requestHeaderXForwardedFor, 
+                    response, output, commandLine);
         } else {
             String rpcName = rpcCallData.getMethod();
             Map<String, Object> jsonRpcResponse = null;
@@ -49,8 +54,8 @@ public class CallbackServer extends JsonServerServlet {
                 String serviceVer = rpcCallData.getContext() == null ? null : 
                     (String)rpcCallData.getContext().getAdditionalProperties().get("service_ver");
                 // Request docker image name from Catalog
-                SubsequentCallRunner runner = new SubsequentCallRunner(methodName, serviceVer, 
-                        callbackPort);
+                SubsequentCallRunner runner = new SubsequentCallRunner(testLocalDir, methodName, 
+                        serviceVer, callbackPort);
                 // Run method in local docker container
                 jsonRpcResponse = runner.run(rpcCallData);
             } catch (Exception ex) {
