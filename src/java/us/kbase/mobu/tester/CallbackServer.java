@@ -50,11 +50,10 @@ public class CallbackServer extends JsonServerServlet {
             String errorMessage = null;
             ObjectMapper mapper = new ObjectMapper().registerModule(new JacksonTupleModule());
             try {
-                String methodName = rpcName.substring(0, rpcName.lastIndexOf('_'));
                 String serviceVer = rpcCallData.getContext() == null ? null : 
                     (String)rpcCallData.getContext().getAdditionalProperties().get("service_ver");
                 // Request docker image name from Catalog
-                SubsequentCallRunner runner = new SubsequentCallRunner(testLocalDir, methodName, 
+                SubsequentCallRunner runner = new SubsequentCallRunner(testLocalDir, rpcName, 
                         serviceVer, callbackPort);
                 // Run method in local docker container
                 jsonRpcResponse = runner.run(rpcCallData);
