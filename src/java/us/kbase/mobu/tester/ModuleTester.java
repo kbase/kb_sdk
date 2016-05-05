@@ -51,6 +51,7 @@ public class ModuleTester {
         if (kbaseYmlConfig.get("data-version") != null) {
             moduleContext.put("data_version", kbaseYmlConfig.get("data-version"));
         }
+        moduleContext.put("os_name", System.getProperty("os.name"));
     }
     
     private static void checkIgnoreLine(File f, String line) throws IOException {
@@ -80,25 +81,32 @@ public class ModuleTester {
         checkIgnoreLine(new File(moduleDir, ".gitignore"), testLocal);
         checkIgnoreLine(new File(moduleDir, ".dockerignore"), testLocal);
         File tlDir = new File(moduleDir, testLocal);
+        File readmeFile = new File(tlDir, "readme.txt");
+        File testCfg = new File(tlDir, "test.cfg");
         File runTestsSh = new File(tlDir, "run_tests.sh");
         File runBashSh = new File(tlDir, "run_bash.sh");
-        if (!tlDir.exists()) {
+        File runDockerSh = new File(tlDir, "run_docker.sh");
+        if (!tlDir.exists())
             tlDir.mkdir();
-            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, new File(tlDir, "readme.txt"));
-            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, new File(tlDir, "test.cfg"));
-            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
-            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
-            System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
-            return;
-        } else if (kbaseYmlConfig.get("data-version") != null) {
+        if (!readmeFile.exists())
+            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, readmeFile);
+        if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
                 TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
                 refDataDir.mkdir();
             }
         }
-        if (!runTestsSh.exists()) {
+        if (!runTestsSh.exists())
             TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
+        if (!runBashSh.exists())
+            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
+        if (!runDockerSh.exists())
+            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, true, runDockerSh);
+        if (!testCfg.exists()) {
+            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, testCfg);
+            System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
+            return;
         }
         Properties props = new Properties();
         InputStream is = new FileInputStream(new File(tlDir, "test.cfg"));
@@ -134,29 +142,30 @@ public class ModuleTester {
             pw.close();
         }
         ProcessHelper.cmd("chmod", "+x", runBashSh.getCanonicalPath()).exec(tlDir);
+        ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(tlDir);
         String moduleName = (String)kbaseYmlConfig.get("module-name");
         String imageName = "test/" + moduleName.toLowerCase() + ":latest";
         System.out.println();
         System.out.println("Delete old Docker containers");
-        List<String> lines = exec(tlDir, "docker", "ps", "-a");
+        List<String> lines = exec(tlDir, "bash", "run_docker.sh", "ps", "-a");
         for (String line : lines) {
             String[] parts = splitByWhiteSpaces(line);
             if (parts[1].equals(imageName)) {
                 String cntId = parts[0];
-                ProcessHelper.cmd("docker", "rm", "-v", "-f", cntId).exec(tlDir);
+                ProcessHelper.cmd("bash", "run_docker.sh", "rm", "-v", "-f", cntId).exec(tlDir);
             }
         }
         String oldImageId = findImageIdByName(tlDir, imageName);    
         System.out.println();
         System.out.println("Build Docker image");
-        boolean ok = buildImage(moduleDir, imageName);
+        boolean ok = buildImage(moduleDir, imageName, runDockerSh);
         if (!ok)
             return;
         if (oldImageId != null) {
             String newImageId = findImageIdByName(tlDir, imageName);
             if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
                 System.out.println("Delete old Docker image");
-                ProcessHelper.cmd("docker", "rmi", oldImageId).exec(tlDir);
+                ProcessHelper.cmd("bash", "run_docker.sh", "rmi", oldImageId).exec(tlDir);
             }
         }
         File subjobsDir = new File(tlDir, "subjobs");
@@ -169,7 +178,7 @@ public class ModuleTester {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = findFreePort();
         String callbackUrl = getCallbackUrl(tlDir, callbackPort);
-        JsonServerServlet catalogSrv = new CallbackServer(callbackPort);
+        JsonServerServlet catalogSrv = new CallbackServer(tlDir, callbackPort);
         Server jettyServer = new Server(callbackPort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -215,7 +224,7 @@ public class ModuleTester {
             throws Exception {
         List<String> lines;
         String ret = null;
-        lines = exec(tlDir, "docker", "images");
+        lines = exec(tlDir, "bash", "run_docker.sh", "images");
         for (String line : lines) {
             String[] parts = splitByWhiteSpaces(line);
             String name = parts[0] + ":" + parts[1];
@@ -249,8 +258,10 @@ public class ModuleTester {
         return ret;
     }
     
-    private boolean buildImage(File repoDir, String targetImageName) throws Exception {
-        Process p = Runtime.getRuntime().exec(new String[] {"docker", "build", "--rm", "-t", 
+    private boolean buildImage(File repoDir, String targetImageName, 
+            File runDockerSh) throws Exception {
+        Process p = Runtime.getRuntime().exec(new String[] {"bash", 
+                runDockerSh.getCanonicalPath(), "build", "--rm", "-t", 
                 targetImageName, repoDir.getCanonicalPath()});
         List<Thread> workers = new ArrayList<Thread>();
         InputStream[] inputStreams = new InputStream[] {p.getInputStream(), p.getErrorStream()};
@@ -305,7 +316,8 @@ public class ModuleTester {
                 if (cntIdToDelete[0] != null) {
                     System.out.println("Cleaning up building container: " + cntIdToDelete[0]);
                     Thread.sleep(1000);
-                    ProcessHelper.cmd("docker", "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
+                    ProcessHelper.cmd("bash", runDockerSh.getCanonicalPath(), 
+                            "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
                 }
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
