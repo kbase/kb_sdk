@@ -62,4 +62,9 @@ public class KbMapping extends KbBasicType {
 		}
 		return ret;
 	}
+	
+	@Override
+	public String getSpecName() {
+	    return "mapping<" + keyType.getSpecName() + "," + valueType.getSpecName() + ">";
+	}
 }

@@ -139,4 +139,15 @@ public class KbTuple extends KbBasicType {
 		}
 		elementNames = Collections.unmodifiableList(newElementNames); 
 	}
+	
+	@Override
+	public String getSpecName() {
+	    StringBuilder ret = new StringBuilder();
+	    for (KbType type : elementTypes) {
+	        if (ret.length() > 0)
+	            ret.append(",");
+	        ret.append(type.getSpecName());
+	    }
+	    return "tuple<" + ret + ">";
+	}
 }

@@ -14,6 +14,7 @@ public class KbUnspecifiedObject extends KbBasicType {
 		return "UObject";
 	}
 	
+    @Override
 	public String getSpecName() {
 		return "UnspecifiedObject";
 	}
