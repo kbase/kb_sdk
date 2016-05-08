@@ -3,7 +3,10 @@ package us.kbase.mobu.tester;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +19,7 @@ import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
+import us.kbase.workspace.ProvenanceAction;
 
 public class CallbackServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
@@ -35,6 +39,16 @@ public class CallbackServer extends JsonServerServlet {
         Map<String, Object> data = input.asClassInstance(Map.class);
         data.put("test", "passed");
         return new UObject(data);
+    }
+    
+    @JsonServerMethod(rpc = "CallbackServer.get_provenance")
+    public List<ProvenanceAction> getProvenance() throws IOException, JsonClientException {
+        ProvenanceAction prov = new ProvenanceAction()
+            .withService("Here's")
+            .withMethod("some fake")
+            .withMethodParams(Arrays.asList(new UObject(
+                    Arrays.asList("test", "data"))));
+        return new LinkedList<ProvenanceAction>(Arrays.asList(prov));
     }
 
     protected void processRpcCall(RpcCallData rpcCallData, String token, 
