@@ -154,4 +154,9 @@ public class KbStruct extends KbBasicType {
 		}
 		return ret;
 	}
+	
+	@Override
+	public String getSpecName() {
+	    return "structure";
+	}
 }

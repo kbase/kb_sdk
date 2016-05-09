@@ -144,4 +144,9 @@ public class KbTypedef implements KbModuleComp, KbType {
             ret.append(add).append("\n");
         return ret.toString();
     }
+    
+    @Override
+    public String getSpecName() {
+        return module + "." + name;
+    }
 }
