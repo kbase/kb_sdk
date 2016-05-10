@@ -89,6 +89,11 @@ public class KbTypedef implements KbModuleComp, KbType {
 		return toString().hashCode();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+	    return obj != null && toString().equals(obj.toString());
+	}
+	
 	public KbAnnotations getAnnotations() {
 		return annotations;
 	}
