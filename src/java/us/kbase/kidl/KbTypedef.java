@@ -61,7 +61,7 @@ public class KbTypedef implements KbModuleComp, KbType {
 	
 	public String getName() {
 		return name;
-	}
+	}  
 	
 	public String getModule() {
 		return module;
@@ -91,7 +91,7 @@ public class KbTypedef implements KbModuleComp, KbType {
 	
 	@Override
 	public boolean equals(Object obj) {
-	    return obj != null && toString().equals(obj.toString());
+	    return obj != null && (obj instanceof KbTypedef) && toString().equals(obj.toString());
 	}
 	
 	public KbAnnotations getAnnotations() {
