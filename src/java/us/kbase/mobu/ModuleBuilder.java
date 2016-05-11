@@ -264,7 +264,7 @@ public class ModuleBuilder {
 			        a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
                     a.makefile, a.clAsyncVer, semanticVersion, gitUrl, gitCommitHash);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			System.err.println("Error compiling KIDL specfication:");
 			System.err.println(e.getMessage());
 			return 1;

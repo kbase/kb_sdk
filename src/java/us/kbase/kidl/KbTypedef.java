@@ -61,7 +61,7 @@ public class KbTypedef implements KbModuleComp, KbType {
 	
 	public String getName() {
 		return name;
-	}
+	}  
 	
 	public String getModule() {
 		return module;
@@ -87,6 +87,11 @@ public class KbTypedef implements KbModuleComp, KbType {
 	@Override
 	public int hashCode() {
 		return toString().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    return obj != null && (obj instanceof KbTypedef) && toString().equals(obj.toString());
 	}
 	
 	public KbAnnotations getAnnotations() {
@@ -143,5 +148,10 @@ public class KbTypedef implements KbModuleComp, KbType {
         for (String add : additional)
             ret.append(add).append("\n");
         return ret.toString();
+    }
+    
+    @Override
+    public String getSpecName() {
+        return module + "." + name;
     }
 }

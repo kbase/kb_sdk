@@ -47,6 +47,7 @@ public class KbScalar extends KbBasicType {
 		return scalarType;
 	}
 	
+    @Override
 	public String getSpecName() {
 		String ret = scalarType.toString();
 		return ret.substring(0, ret.length() - 4);
