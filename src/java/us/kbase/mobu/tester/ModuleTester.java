@@ -1,6 +1,7 @@
 package us.kbase.mobu.tester;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -117,8 +118,12 @@ public class ModuleTester {
         }
         String user = props.getProperty("test_user");
         String password = props.getProperty("test_password");
-        if (user == null || user.trim().isEmpty() || password == null) {
+        if (user == null || user.trim().isEmpty()) {
             throw new IllegalStateException("Error: KBase account credentials are not set in test_local/test.cfg");
+        }
+        if (password == null || password.isEmpty()) {
+            System.out.println("You haven't preset your password in test_local/test.cfg file. Please enter it now.");
+            password = new String(System.console().readPassword("Password: "));
         }
         String token = AuthService.login(user, password).getTokenString();
         File workDir = new File(tlDir, "workdir");
@@ -130,14 +135,26 @@ public class ModuleTester {
         } finally {
             fw.close();
         }
+        String endPoint = props.getProperty("kbase_endpoint");
+        if (endPoint == null)
+            throw new IllegalStateException("Error: KBase services end-point is not set in test_local/test.cfg");
+        String jobSrvUrl = props.getProperty("job_service_url");
+        if (jobSrvUrl == null)
+            jobSrvUrl = endPoint + "/userandjobstate";
+        String wsUrl = props.getProperty("workspace_url");
+        if (wsUrl == null)
+            wsUrl = endPoint + "/ws";
+        String shockUrl = props.getProperty("shock_url");
+        if (shockUrl == null)
+            shockUrl = endPoint + "/shock-api";
         File configPropsFile = new File(workDir, "config.properties");
         PrintWriter pw = new PrintWriter(configPropsFile);
         try {
             pw.println("[global]");
-            pw.println("job_service_url = " + props.getProperty("job_service_url"));
-            pw.println("workspace_url = " + props.getProperty("workspace_url"));
-            pw.println("shock_url = " + props.getProperty("shock_url"));
-            pw.println("kbase_endpoint = " + props.getProperty("kbase_endpoint"));
+            pw.println("job_service_url = " + jobSrvUrl);
+            pw.println("workspace_url = " + wsUrl);
+            pw.println("shock_url = " + shockUrl);
+            pw.println("kbase_endpoint = " + endPoint);
         } finally {
             pw.close();
         }
