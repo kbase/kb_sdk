@@ -1,0 +1,110 @@
+# BEGIN_HEADER
+${module.py_module_header}  # END_HEADER
+
+
+# set( $specToPy = {} )
+# set( $void = $specToPy.put("list", "list") )
+# set( $void = $specToPy.put("tuple", "list") )
+# set( $void = $specToPy.put("struct", "dict") )
+# set( $void = $specToPy.put("mapping", "dict") )
+# set( $void = $specToPy.put("int", "int") )
+# set( $void = $specToPy.put("float", "float") )
+# set( $void = $specToPy.put("string", "basestring") )
+# set( $void = $specToPy.put("UnspecifiedObject", "object") )
+
+class ${module.module_name}:
+    '''
+    Module Name:
+    ${module.module_name}
+
+    Module Description:
+    ${module.module_doc}
+    '''
+
+    # [[    ######## WARNING FOR GEVENT USERS #######]]#
+    # Since asynchronous IO can lead to methods - even the same method -
+    # interrupting each other, you must be *very* careful when using global
+    # state. A method could easily clobber the state set by another while
+    # the latter method is running.
+    # [[    #########################################]]#
+    VERSION = "${module.semantic_version}"
+    GIT_URL = "${module.git_url}"
+    GIT_COMMIT_HASH = "${module.git_commit_hash}"
+
+    # BEGIN_CLASS_HEADER
+
+${module.py_module_class_header}  # END_CLASS_HEADER
+
+
+# config contains contents of config file in a hash or None if it couldn't
+# be found
+def __init__(self, config):
+
+# BEGIN_CONSTRUCTOR
+${module.py_module_constructor}  # END_CONSTRUCTOR
+pass
+
+
+# set( $status_in_kidl = false )
+# foreach( $method in $module.methods )
+# if( ${method.name} == "status" )
+# set( $status_in_kidl = true )
+# end
+
+# set( $paramlist = [] )
+# foreach( $p in $method.params )
+# set( $void = $paramlist.add($p.name) )
+# end
+# set( $retlist = [] )
+# foreach( $var in $method.returns )
+# if( $var.name == "return" )
+# set( $var.name = "returnVal" )
+# end
+# set( $void = $retlist.add($var.name) )
+# end
+# if( $method.arg_count > 0 )
+def ${method.name}(self, ctx,
+
+$display.join($paramlist, ', ')):
+# else
+def ${method.name}(self, ctx)
+
+:
+# end
+# ctx is the context object
+# if( $method.ret_count > 0 )
+# return variables are: $display.join($retlist, ", ")
+# end
+# BEGIN ${method.name}
+${method.py_user_code}  # [[#END]]# ${method.name}
+# if( $method.ret_count > 0 )
+
+# At some point might do deeper type checking...
+# foreach( $ret in $method.returns )
+# set( $spectype = $ret.baretype )
+# set( $type = $specToPy.get($spectype) )
+if not isinstance(${ret.name}, ${type}):
+    raise ValueError('Method ${method.name} return value ' +
+                     '${ret.name} is not type ${type} as required.')
+# end
+# return the results
+return [$display.join($retlist, ', ')]
+# else
+pass
+
+
+# end
+# end
+# if( !$status_in_kidl )
+
+def status(self, ctx):
+
+# BEGIN_STATUS
+# if( ${module.py_module_status} )
+${module.py_module_status}  # else
+returnVal = {'state': "OK", 'message': "", 'version': self.VERSION,
+             'git_url': self.GIT_URL, 'git_commit_hash': self.GIT_COMMIT_HASH}
+# end
+# END_STATUS
+return [returnVal]
+# end
