@@ -6,9 +6,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import static us.kbase.narrativejobservice.test.AweClientDockerJobScriptTest.loadConfig;
-import static us.kbase.narrativejobservice.test.AweClientDockerJobScriptTest.getMVI;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -25,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -46,30 +42,43 @@ import com.google.common.collect.ImmutableMap;
 import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.catalog.CatalogClient;
+import us.kbase.catalog.ModuleInfo;
+import us.kbase.catalog.ModuleVersionInfo;
 import us.kbase.catalog.SelectOneModuleParams;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonClientException;
-import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
 import us.kbase.common.utils.ModuleMethod;
-import us.kbase.narrativejobservice.LineLogger;
-import us.kbase.narrativejobservice.NarrativeJobServiceServer;
-import us.kbase.narrativejobservice.subjobs.CallbackServer;
-import us.kbase.narrativejobservice.subjobs.NJSCallbackServer;
-import us.kbase.narrativejobservice.subjobs.CallbackServerConfigBuilder;
-import us.kbase.narrativejobservice.subjobs.ModuleRunVersion;
-import us.kbase.narrativejobservice.subjobs.CallbackServerConfigBuilder.CallbackServerConfig;
+import us.kbase.mobu.tester.CallbackServer;
+import us.kbase.mobu.tester.CallbackServerConfigBuilder;
+import us.kbase.mobu.tester.CallbackServerConfigBuilder.CallbackServerConfig;
+import us.kbase.mobu.tester.LineLogger;
+import us.kbase.mobu.tester.ModuleRunVersion;
+import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SubAction;
 
 public class CallbackServerTest {
 
-    public static final Path TEST_DIR = Paths.get("temp_test_callback");
+    private static final Path TEST_DIR = Paths.get("temp_test_callback");
+    private static final String KBASE_ENDPOINT =
+            "https://ci.kbase.us/services/";
     
-    public static AuthToken token;
+    private static AuthToken token;
+    private static CatalogClient CAT_CLI;
 
+    
+    public static ModuleVersionInfo getMVI(ModuleInfo mi, String release) {
+        if (release.equals("dev")) {
+            return mi.getDev();
+        } else if (release.equals("beta")) {
+            return mi.getBeta();
+        } else {
+            return mi.getRelease();
+        }
+    }
     
     private final static DateTimeFormatter DATE_PARSER =
             new DateTimeFormatterBuilder()
@@ -83,9 +92,17 @@ public class CallbackServerTest {
         FileUtils.deleteDirectory(TEST_DIR.toFile());
         Files.deleteIfExists(TEST_DIR);
         Files.createDirectories(TEST_DIR);
-        final Properties props = TesterUtils.props();
-        token =  AuthService.login(get(props, "user"),
-                get(props, "password")).getToken();
+
+        String user = System.getProperty("test.user");
+        String password = System.getProperty("test.pwd");
+        if (user == null || user.trim().isEmpty()) {
+            throw new IllegalStateException("Missing test.user from system properties");
+        }
+        if (password == null || password.isEmpty()) {
+            throw new IllegalStateException("Missing test.pwd from system properties");
+        }
+        token =  AuthService.login(user, password).getToken();
+        CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
         
     }
 
@@ -115,14 +132,18 @@ public class CallbackServerTest {
             }
         };
         final int callbackPort = ControllerCommon.findFreePort();
-        final URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+//        final URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        final URL callbackUrl = new URL(ModuleTester.getCallbackUrl(callbackPort));
         final Path temp = Files.createTempDirectory(TEST_DIR, "cbt");
+//        final CallbackServerConfig cbcfg =
+//                new CallbackServerConfigBuilder(
+//                AweClientDockerJobScriptTest.loadConfig(), callbackUrl,
+//                        temp, log).build();
         final CallbackServerConfig cbcfg =
-                new CallbackServerConfigBuilder(
-                AweClientDockerJobScriptTest.loadConfig(), callbackUrl,
-                        temp, log).build();
-        final JsonServerServlet callback = new NJSCallbackServer(
-                token, cbcfg, runver, params, wsobjs);
+                new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT), callbackUrl, TEST_DIR, log).build();
+//        final CallbackServer callback = new CallbackServer(
+//                token, cbcfg, runver, params, wsobjs);
+        final CallbackServer callback = new CallbackServer(TEST_DIR.toFile(), callbackPort);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(
@@ -241,14 +262,6 @@ public class CallbackServerTest {
                 return res;
             }
         }
-    }
-    
-    private static String get(Properties props, String propName) {
-        final String ret = props.getProperty(propName);
-        if (ret == null)
-            throw new IllegalStateException("Property is not defined: " +
-                    propName);
-        return ret;
     }
     
     private void checkResults(Map<String, Object> got,
@@ -651,12 +664,11 @@ public class CallbackServerTest {
     
     private void checkSubActions(List<SubAction> gotsas,
             List<SubActionSpec> expsas) throws Exception {
-        CatalogClient cat = getCatalogClient(token, loadConfig());
         assertThat("correct # of subactions",
                 gotsas.size(), is(expsas.size()));
         for (SubActionSpec sa: expsas) {
             if (sa.commit == null) {
-                sa.commit = getMVI(cat.getModuleInfo(
+                sa.commit = getMVI(CAT_CLI.getModuleInfo(
                         new SelectOneModuleParams().withModuleName(sa.module)),
                         sa.release).getGitCommitHash();
             }
@@ -672,14 +684,5 @@ public class CallbackServerTest {
             assertThat("correct name", got.getName(), is(sa.module + ".run"));
             assertThat("correct version", got.getVer(), is(sa.getVerRel()));
         }
-    }
-    
-    private static CatalogClient getCatalogClient(AuthToken auth, 
-            Map<String, String> config) throws Exception {
-        String catUrl = config.get(
-                NarrativeJobServiceServer.CFG_PROP_CATALOG_SRV_URL);
-        CatalogClient ret = new CatalogClient(new URL(catUrl), auth);
-        ret.setIsInsecureHttpConnectionAllowed(true);
-        return ret;
     }
 }
