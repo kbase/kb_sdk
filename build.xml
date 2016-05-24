@@ -146,6 +146,9 @@ commit=${git.commit}</echo>
       <include name="apache_commons/http/httpcore-4.3.jar"/>
       <include name="apache_commons/http/httpmime-4.3.1.jar"/>
       <include name="apache_commons/commons-logging-1.1.1.jar"/>
+      <include name="joda/joda-time-2.2.jar"/>
+      <include name="google/guava-18.0.jar"/>
+      <include name="jaxrs/javax.ws.rs-api-2.0.jar"/>
       <include name="${commonjar}"/>
     </fileset>
     <!--fileset dir=".">

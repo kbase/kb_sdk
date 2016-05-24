@@ -1,7 +1,6 @@
 package us.kbase.mobu.tester;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -194,7 +193,7 @@ public class ModuleTester {
         scratchDir.mkdir();
         ///////////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = findFreePort();
-        String callbackUrl = getCallbackUrl(tlDir, callbackPort);
+        String callbackUrl = getCallbackUrl(callbackPort);
         JsonServerServlet catalogSrv = new CallbackServer(tlDir, callbackPort);
         Server jettyServer = new Server(callbackPort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -213,7 +212,7 @@ public class ModuleTester {
         }
     }
 
-    public static String getCallbackUrl(File testLocalDir, int callbackPort) throws Exception {
+    public static String getCallbackUrl(int callbackPort) throws Exception {
         List<String> hostIps = NetUtils.findNetworkAddresses("docker0", "vboxnet0");
         String hostIp = null;
         if (hostIps.isEmpty()) {

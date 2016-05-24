@@ -109,7 +109,7 @@ public class SubsequentCallRunner {
         }
         System.out.println();
         ProcessHelper.cmd("chmod", "+x", runSubJobsSh.getCanonicalPath()).exec(testLocalDir);
-        this.callbackUrl = ModuleTester.getCallbackUrl(testLocalDir, callbackPort);
+        this.callbackUrl = ModuleTester.getCallbackUrl(callbackPort);
         File srcTokenFile = new File(srcWorkDir, "token");
         File dstTokenFile = new File(jobWorkDir, "token");
         FileUtils.copyFile(srcTokenFile, dstTokenFile);
