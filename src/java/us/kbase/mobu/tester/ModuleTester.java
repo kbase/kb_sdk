@@ -1,7 +1,6 @@
 package us.kbase.mobu.tester;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -12,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +27,15 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.yaml.snakeyaml.Yaml;
 
 import us.kbase.auth.AuthService;
+import us.kbase.auth.AuthToken;
+import us.kbase.common.executionengine.CallbackServer;
+import us.kbase.common.executionengine.CallbackServerConfigBuilder;
+import us.kbase.common.executionengine.LineLogger;
+import us.kbase.common.executionengine.ModuleMethod;
+import us.kbase.common.executionengine.ModuleRunVersion;
+import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonServerServlet;
+import us.kbase.common.service.UObject;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.NetUtils;
 import us.kbase.mobu.util.ProcessHelper;
@@ -194,8 +202,22 @@ public class ModuleTester {
         scratchDir.mkdir();
         ///////////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = findFreePort();
-        String callbackUrl = getCallbackUrl(tlDir, callbackPort);
-        JsonServerServlet catalogSrv = new CallbackServer(tlDir, callbackPort);
+        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        CallbackServerConfig cfg = new CallbackServerConfigBuilder(
+                new URL(endPoint), callbackUrl, tlDir.toPath(),
+                new LineLogger() {
+                    @Override
+                    public void logNextLine(String line, boolean isError) {
+                        //do nothing, SDK callback server doesn't use a logger
+                    }
+                }).build();
+        ModuleRunVersion runver = new ModuleRunVersion(
+                new URL("https://fakefakefakefakefake.com"),
+                new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+        JsonServerServlet catalogSrv = new SDKCallbackServer(
+                new AuthToken(token), cfg, runver, new ArrayList<UObject>(),
+                new ArrayList<String>());
         Server jettyServer = new Server(callbackPort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -206,14 +228,15 @@ public class ModuleTester {
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(), callbackUrl).exec(tlDir);
+            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(),
+                    callbackUrl.toExternalForm()).exec(tlDir);
         } finally {
             System.out.println("Shutting down callback server...");
             jettyServer.stop();
         }
     }
 
-    public static String getCallbackUrl(File testLocalDir, int callbackPort) throws Exception {
+    public static String getCallbackUrl(int callbackPort) throws Exception {
         List<String> hostIps = NetUtils.findNetworkAddresses("docker0", "vboxnet0");
         String hostIp = null;
         if (hostIps.isEmpty()) {
