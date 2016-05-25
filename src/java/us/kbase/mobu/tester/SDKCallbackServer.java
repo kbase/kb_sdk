@@ -1,6 +1,8 @@
 package us.kbase.mobu.tester;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +14,9 @@ import us.kbase.common.executionengine.ModuleRunVersion;
 import us.kbase.common.executionengine.SubsequentCallRunner;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonClientException;
+import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.UObject;
+import us.kbase.workspace.ProvenanceAction;
 
 public class SDKCallbackServer extends CallbackServer {
 
@@ -39,4 +43,16 @@ public class SDKCallbackServer extends CallbackServer {
                 jobId, modmeth, serviceVer);
     }
 
+    @JsonServerMethod(rpc = "CallbackServer.set_provenance")
+    public List<ProvenanceAction> getProvenance(ProvenanceAction pa)
+            throws IOException, JsonClientException {
+        if (pa == null) {
+            throw new NullPointerException("provenance cannot be null");
+        }
+        synchronized (this) {
+            prov = pa;
+        }
+        return new LinkedList<ProvenanceAction>(Arrays.asList(prov));
+    }
+    
 }

@@ -61,7 +61,7 @@ public abstract class CallbackServer extends JsonServerServlet {
     
     private final AuthToken token;
     private final CallbackServerConfig config;
-    private final ProvenanceAction prov = new ProvenanceAction();
+    protected ProvenanceAction prov = new ProvenanceAction();
     
     private final static DateTimeFormatter DATE_FORMATTER =
             DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZoneUTC();

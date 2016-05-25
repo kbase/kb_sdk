@@ -33,6 +33,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.ini4j.InvalidFileFormatException;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -98,6 +99,9 @@ public class CallbackServerTest {
                 .appendOptional(DateTimeFormat.forPattern(".SSS").getParser())
                 .append(DateTimeFormat.forPattern("Z"))
                 .toFormatter();
+    
+    private final static DateTimeFormatter DATE_FORMATTER =
+            DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZoneUTC();
     
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -191,6 +195,16 @@ public class CallbackServerTest {
                     new TypeReference<List<ProvenanceAction>>() {};
             final List<Object> arg = new ArrayList<Object>();
             final String method = "CallbackServer.get_provenance";
+            
+            return callServer(method, arg, null, retType);
+        }
+        
+        public List<ProvenanceAction> setProvenance(final ProvenanceAction pa)
+                throws Exception {
+            final TypeReference<List<ProvenanceAction>> retType =
+                    new TypeReference<List<ProvenanceAction>>() {};
+            final List<Object> arg = new LinkedList<Object>(Arrays.asList(pa));
+            final String method = "CallbackServer.set_provenance";
             
             return callServer(method, arg, null, retType);
         }
@@ -535,6 +549,68 @@ public class CallbackServerTest {
         } catch (ServerException se) {
             assertThat("correct exception", se.getLocalizedMessage(), is(exp));
         }
+    }
+    
+    @Test
+    public void setProvenance() throws Exception {
+        final ModuleRunVersion runver = new ModuleRunVersion(
+                new URL("https://github.com/kbasetest/whooptywhoop"),
+                new ModuleMethod("whooptywhoop.run"),
+                "badhash", "1000.1.0", "beta");
+        final CallbackStuff res = startCallBackServer(
+                runver, new LinkedList<UObject>(), new LinkedList<String>());
+        System.out.println("Running setProvenance in dir " + res.tempdir);
+        
+        List<String> wsobjs = Arrays.asList("foo1", "bar1", "baz1");
+        List<UObject> params = new ArrayList<UObject>();
+        params.add(new UObject(Arrays.asList("foo1", "bar1")));
+        params.add(new UObject(ImmutableMap.<String, String>builder()
+                        .put("foo1", "bar1").build()));
+        ProvenanceAction pa = new ProvenanceAction()
+            .withMethod("amethod")
+            .withService("aservice")
+            .withServiceVer("0.0.2-dev")
+            .withTime(DATE_FORMATTER.print(new DateTime()))
+            .withMethodParams(params)
+            .withInputWsObjects(wsobjs);
+        
+        res.setProvenance(pa);
+        String moduleName = "njs_sdk_test_2";
+        String methodName = "run";
+        String release = "dev";
+        String ver = "0.0.5";
+        Map<String, Object> methparams = new HashMap<String, Object>();
+        methparams.put("id", "myid");
+        Map<String, Object> results = res.callMethod(
+                moduleName + '.' + methodName, methparams, "dev");
+        
+        List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
+        expsas.add(new SubActionSpec()
+            .withMod("whooptywhoop")
+            .withVer("1000.1.0")
+            .withRel("beta")
+            .withCommit("badhash")
+        );
+        expsas.add(new SubActionSpec()
+            .withMod(moduleName)
+            .withVer(ver)
+            .withRel(release)
+        );
+        
+        List<ProvenanceAction> p = res.getProvenance();
+        System.out.println(p);
+        checkProvenance("aservice", "amethod", "dev", "0.0.2", params,
+                expsas, wsobjs, p);
+        checkResults(results, methparams, moduleName);
+        
+        try {
+            res.setProvenance(null);
+        } catch (ServerException se) {
+            assertThat("incorrect excep msg", se.getLocalizedMessage(),
+                    is("provenance cannot be null"));
+        }
+        
+        res.server.stop();
     }
     
     @Test
