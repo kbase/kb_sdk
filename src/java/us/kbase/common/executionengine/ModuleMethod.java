@@ -12,12 +12,14 @@ public class ModuleMethod {
     //TODO NJS_SDK move to common repo
     //TODO unit tests
     
-    public static final String CHECK_SUFFIX = "_check";
-    public static final String ASYNC_SUFFIX = "_async";
+    public static final String CHECK_METHOD = "_check_job";
+    public static final String SUBMIT_SUFFIX = "_submit";
+    // methods cannot start with an underscore in the type compiler
+    public static final String METH_SPEC_PREFIX = "_";
     final private String module;
     final private String method;
-    final private boolean asyncrun;
-    final private boolean checkrun;
+    final private boolean submit;
+    final private boolean check;
     
     /** Create module / method specification.
      * @param moduleDotMethod the string specifying the module, method, and
@@ -30,24 +32,30 @@ public class ModuleMethod {
             throw new IllegalArgumentException("Illegal method name: " +
                     moduleDotMethod);
         }
-        StringUtils.checkString(modMeth[0], "Module");
+        StringUtils.checkString(modMeth[0], "Module name");
         module = modMeth[0];
         final String method = modMeth[1];
-        // TODO this seems fragile, consider a different implementation
-        if (method.endsWith(ASYNC_SUFFIX)) {
-            this.method = method.replace(ASYNC_SUFFIX, "");
-            asyncrun = true;
-            checkrun = false;
-        } else if (method.endsWith(CHECK_SUFFIX)) {
-            this.method = method.replace(CHECK_SUFFIX, "");
-            asyncrun = false;
-            checkrun = true;
+        if (method.startsWith(METH_SPEC_PREFIX)) {
+            if (method.equals(CHECK_METHOD)) {
+                check = true;
+                submit = false;
+                this.method = null;
+                return; // don't check the method name
+            } else if (method.endsWith(SUBMIT_SUFFIX)) {
+                this.method = method.substring(METH_SPEC_PREFIX.length(),
+                        method.lastIndexOf(SUBMIT_SUFFIX));
+                submit = true;
+                check = false;
+            } else {
+                throw new IllegalArgumentException("Illegal method name: " +
+                        method);
+            }
         } else {
             this.method = method;
-            asyncrun = false;
-            checkrun = false;
+            submit = false;
+            check = false;
         }
-        StringUtils.checkString("Method", this.method);
+        StringUtils.checkString(this.method, "Method name");
     }
     
     /** Returns the full method name, including the module.
@@ -64,7 +72,8 @@ public class ModuleMethod {
         return module;
     }
     
-    /** Returns the method name stripped of modifiers (e.g. _async and _check).
+    /** Returns the method name stripped of modifiers (e.g. _ and _submit) or
+     * null if the method is a check method.
      * @return the method name.
      */
     public String getMethod() {
@@ -72,26 +81,26 @@ public class ModuleMethod {
     }
     
     /** Check if the method call should be asynchronous (e.g. the method was
-     * appended with _async).
+     * appended with _submit).
      * @return true if the method should be asynchronous.
      */
-    public boolean isAsync() {
-        return asyncrun;
+    public boolean isSubmit() {
+        return submit;
     }
     
     /** Check if the method call should check on the state of the asynchronous
-     * job (e.g. the method was appended with _check).
+     * job.
      * @return true if the method should check the asynchronous state.
      */
     public boolean isCheck() {
-        return checkrun;
+        return check;
     }
     
     /** Check if this is a standard synchronous method.
      * @return true if this is a standard synchronous method.
      */
     public boolean isStandard() {
-        return !asyncrun && !checkrun;
+        return !submit && !check;
     }
 
     /* (non-Javadoc)
@@ -105,9 +114,9 @@ public class ModuleMethod {
         builder.append(", method=");
         builder.append(method);
         builder.append(", asyncrun=");
-        builder.append(asyncrun);
+        builder.append(submit);
         builder.append(", checkrun=");
-        builder.append(checkrun);
+        builder.append(check);
         builder.append("]");
         return builder.toString();
     }
