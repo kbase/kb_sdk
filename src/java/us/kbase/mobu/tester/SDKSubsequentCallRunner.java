@@ -58,17 +58,12 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
                     Files.getPosixFilePermissions(runSubJobsSh);
             perms.add(PosixFilePermission.OWNER_EXECUTE);
             Files.setPosixFilePermissions(runSubJobsSh, perms);
-            Files.write(runSubJobsSh, Arrays.asList(
-                    "#!/bin/bash",
-                    dockerRunCmd
-                    ), StandardCharsets.UTF_8);
         }
         final Path jobWorkDir = getJobWorkDir(jobId, config, imageName)
                 .toAbsolutePath();
         Files.write(jobWorkDir.resolve("token"),
                 Arrays.asList(token.toString()), StandardCharsets.UTF_8);
         
-        // jobid is wrong jobDir is wrong
         ProcessHelper.cmd("bash", runSubJobsSh.toString(),
                 jobWorkDir.getParent().getFileName().toString(), imageName,
                 config.getCallbackURL().toExternalForm())
