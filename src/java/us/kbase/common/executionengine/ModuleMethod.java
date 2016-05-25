@@ -1,4 +1,6 @@
-package us.kbase.common.utils;
+package us.kbase.common.executionengine;
+
+import us.kbase.common.utils.StringUtils;
 
 
 /** A specifier for a module and a method. If the specifier string ends with

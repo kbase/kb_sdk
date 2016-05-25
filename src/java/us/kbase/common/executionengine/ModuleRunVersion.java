@@ -1,9 +1,8 @@
-package us.kbase.mobu.tester;
+package us.kbase.common.executionengine;
 
 import java.net.URL;
 import java.util.Set;
 
-import us.kbase.common.utils.ModuleMethod;
 
 
 /** The version of a KBase SDK method run during an NJS Execution Engine job.
