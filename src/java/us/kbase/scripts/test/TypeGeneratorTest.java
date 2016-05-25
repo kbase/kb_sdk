@@ -901,7 +901,7 @@ public class TypeGeneratorTest extends Assert {
         long time = System.currentTimeMillis();
         URLClassLoader urlcl = prepareUrlClassLoader(libDir, binDir);
 		ConnectException error = null;
-		for (int n = 0; n < 10; n++) {
+		for (int n = 0; n < 50; n++) {
 			Thread.sleep(100);
 			try {
 				for (JavaModule module : parsingData.getModules()) {
