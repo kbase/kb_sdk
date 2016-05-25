@@ -11,8 +11,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.ws.rs.core.UriBuilder;
-
 public class CallbackServerConfigBuilder {
     //TODO NJS_SDK move to shared repo
     
@@ -155,8 +153,8 @@ public class CallbackServerConfigBuilder {
     
     private static URL resolveURL(final URL url, final String ext) {
         try {
-            return UriBuilder.fromUri(url.toURI()).path(ext).build().toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+            return new URL(url, ext);
+        } catch (MalformedURLException e) {
             throw new RuntimeException(e); //something is really messed up
         }
     }
