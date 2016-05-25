@@ -101,18 +101,6 @@ public class CallbackServerTest {
         FileUtils.deleteDirectory(TEST_DIR.toFile());
         Files.deleteIfExists(TEST_DIR);
         Files.createDirectories(TEST_DIR);
-//        LineLogger log = new LineLogger() {
-//            
-//            @Override
-//            public void logNextLine(String line, boolean isError) {}
-//        };
-//        CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-//                new URL(KBASE_ENDPOINT), new URL("http://foo.com"),
-//                Paths.get("foo"), log).build();
-//        cfg.writeJobConfigToFile(TEST_DIR.resolve("test.cfg"));
-//        Path workdir = TEST_DIR.resolve("workdir");
-//        Files.createDirectories(workdir);
-//        cfg.writeJobConfigToFile(workdir.resolve(JobRunnerConstants.JOB_CONFIG_FILE));
         
         String user = System.getProperty("test.user");
         String password = System.getProperty("test.pwd");
@@ -123,13 +111,7 @@ public class CallbackServerTest {
             throw new IllegalStateException("Missing test.pwd from system properties");
         }
         token =  AuthService.login(user, password).getToken();
-//        Files.write(workdir.resolve("token"), Arrays.asList(token.toString()), StandardCharsets.UTF_8);
         CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
-        
-//        Path rundocker = TEST_DIR.resolve("run_docker.sh");
-//        Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"), StandardCharsets.UTF_8);
-//        Files.setPosixFilePermissions(rundocker, perms);
-        
     }
 
     private static CallbackStuff startCallBackServer()
@@ -154,17 +136,11 @@ public class CallbackServerTest {
             public void logNextLine(String line, boolean isError) {
                 System.out.println("Docker logger std" +
                         (isError ? "err" : "out") + ": " + line);
-                
             }
         };
         final int callbackPort = ControllerCommon.findFreePort();
         final URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
-//        final URL callbackUrl = new URL(ModuleTester.getCallbackUrl(callbackPort));
         final Path temp = Files.createTempDirectory(TEST_DIR, "cbt");
-//        final CallbackServerConfig cbcfg =
-//                new CallbackServerConfigBuilder(
-//                AweClientDockerJobScriptTest.loadConfig(), callbackUrl,
-//                        temp, log).build();
         Path rundocker = temp.resolve("run_docker.sh");
         Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"),
                 StandardCharsets.UTF_8);
@@ -174,7 +150,6 @@ public class CallbackServerTest {
                         callbackUrl, temp, log).build();
         final CallbackServer callback = new SDKCallbackServer(
                 token, cbcfg, runver, params, wsobjs);
-//        final SDKCallbackServer callback = new SDKCallbackServer(TEST_DIR.toFile(), callbackPort);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(
@@ -507,19 +482,15 @@ public class CallbackServerTest {
         
         failJob(res, "njs_sdk_test_1foo.run", "beta",
                 "Error looking up module njs_sdk_test_1foo: Operation " +
-//                "Operation " +
                 "failed - module/repo is not registered.");
         failJob(res, "njs_sdk_test_1.run", "beta",
                 "There is no release version 'beta' for module njs_sdk_test_1");
-//                "Cannot extract beta version for module: njs_sdk_test_1");
         failJob(res, "njs_sdk_test_1.run", "release",
                 "There is no release version 'release' for module " +
                 "njs_sdk_test_1");
-//        "Cannot extract release version for module: njs_sdk_test_1");
         failJob(res, "njs_sdk_test_1.run", null,
                 "There is no release version 'release' for module " +
                 "njs_sdk_test_1");
-//                "Cannot extract null version for module: njs_sdk_test_1");
                 
         //TODO fix these when catalog is fixed
         //this is the newest git commit and was registered in dev but 
@@ -528,11 +499,9 @@ public class CallbackServerTest {
         failJob(res, "njs_sdk_test_1.run", git,
                 "Error looking up module njs_sdk_test_1 with version " +
                 git + ": 'NoneType' object has no attribute '__getitem__'");
-//                "Error retrieving module version info about image njs_sdk_test_1 with version b0d487271c22f793b381da29e266faa9bb0b2d1b");
         failJob(res, "njs_sdk_test_1.run", "foo",
                 "Error looking up module njs_sdk_test_1 with version foo: " +
                 "'NoneType' object has no attribute '__getitem__'");
-//                "Error retrieving module version info about image njs_sdk_test_1 with version foo");
         
         res.server.stop();
     }
@@ -542,13 +511,10 @@ public class CallbackServerTest {
         final CallbackStuff res = startCallBackServer();
         System.out.println("Running badMethod in dir " + res.tempdir);
         failJob(res, "njs_sdk_test_1run", "foo",
-//                "Can not find method [CallbackServer.njs_sdk_test_1run] " +
                 "Can not find method [CallbackServer.njs_sdk_test_1run_async] " +
                 "in server class us.kbase.mobu.tester.SDKCallbackServer");
         failJob(res, "njs_sdk_test_1.r.un", "foo",
-//                "Illegal method name: njs_sdk_test_1.r.un");
                 "Illegal method name: njs_sdk_test_1.r.un_async");
-//                "Error retrieving module version info about image njs_sdk_test_1 with version foo");
         res.server.stop();
     }
     
@@ -557,7 +523,6 @@ public class CallbackServerTest {
             throws Exception{
         try {
             cbs.callAsync(moduleMeth, new HashMap<String, Object>(), release);
-//            cbs.callMethod(moduleMeth, new HashMap<String, Object>(), release);
             fail("Ran bad job");
         } catch (ServerException se) {
             assertThat("correct exception", se.getLocalizedMessage(), is(exp));
@@ -607,7 +572,6 @@ public class CallbackServerTest {
              // this is the latest commit, but a prior commit is registered
              //for dev
              "17f87270741e6b59bdfc083f143137d208e3f135",
-//             "dev",
              moduleName2 + "." + methodName,
              "dev"), Map.class);
         List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
@@ -624,7 +588,6 @@ public class CallbackServerTest {
         Map<String, Object> results = res.callMethod(
                 moduleName + '.' + methodName, methparams, "dev");
         List<ProvenanceAction> p = res.getProvenance();
-//        expsas = new ArrayList<SubActionSpec>();
         checkProvenance(moduleName, methodName, release, ver, params,
                 expsas, wsobjs, p);
         checkResults(results, methparams, moduleName);
@@ -689,11 +652,9 @@ public class CallbackServerTest {
         assertTrue("got prov time < now ", got < now);
         assertTrue("got prov time > now - 5m", got > now - (5 * 60 * 1000));
         assertThat("correct service", pa.getService(), is(moduleName));
-//        assertThat("correct service", pa.getService(), is("Here's"));
         assertThat("correct service version", pa.getServiceVer(),
                 is(ver));
         assertThat("correct method", pa.getMethod(), is(methodName));
-//        assertThat("correct method", pa.getMethod(), is("some fake"));
         assertThat("number of params", pa.getMethodParams().size(),
                 is(methparams.size()));
         for (int i = 1; i < methparams.size(); i++) {
