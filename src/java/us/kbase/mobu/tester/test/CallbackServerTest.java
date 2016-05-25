@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
@@ -69,6 +70,8 @@ public class CallbackServerTest {
     private static final String KBASE_ENDPOINT =
             "https://ci.kbase.us/services/";
     
+    private static final Path CREDS_LOC = Paths.get("test_scripts/test.cfg");
+    
     private static AuthToken token;
     private static CatalogClient CAT_CLI;
     
@@ -102,13 +105,18 @@ public class CallbackServerTest {
         Files.deleteIfExists(TEST_DIR);
         Files.createDirectories(TEST_DIR);
         
-        String user = System.getProperty("test.user");
-        String password = System.getProperty("test.pwd");
+        Properties props = new Properties();
+        props.load(Files.newBufferedReader(CREDS_LOC, StandardCharsets.UTF_8));
+        
+        String user = props.getProperty("test.user");
+        String password = props.getProperty("test.pwd");
         if (user == null || user.trim().isEmpty()) {
-            throw new IllegalStateException("Missing test.user from system properties");
+            throw new IllegalStateException(
+                    "Missing test.user from config file " + CREDS_LOC);
         }
         if (password == null || password.isEmpty()) {
-            throw new IllegalStateException("Missing test.pwd from system properties");
+            throw new IllegalStateException(
+                    "Missing test.pwd from config file " + CREDS_LOC);
         }
         token =  AuthService.login(user, password).getToken();
         CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
