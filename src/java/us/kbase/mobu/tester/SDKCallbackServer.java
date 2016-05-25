@@ -46,13 +46,8 @@ public class SDKCallbackServer extends CallbackServer {
     @JsonServerMethod(rpc = "CallbackServer.set_provenance")
     public List<ProvenanceAction> getProvenance(ProvenanceAction pa)
             throws IOException, JsonClientException {
-        if (pa == null) {
-            throw new NullPointerException("provenance cannot be null");
-        }
-        synchronized (this) {
-            prov = pa;
-        }
-        return new LinkedList<ProvenanceAction>(Arrays.asList(prov));
+        resetProvenanceAndMethods(pa);
+        return new LinkedList<ProvenanceAction>(Arrays.asList(pa));
     }
     
 }

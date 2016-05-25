@@ -586,12 +586,6 @@ public class CallbackServerTest {
         
         List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
         expsas.add(new SubActionSpec()
-            .withMod("whooptywhoop")
-            .withVer("1000.1.0")
-            .withRel("beta")
-            .withCommit("badhash")
-        );
-        expsas.add(new SubActionSpec()
             .withMod(moduleName)
             .withVer(ver)
             .withRel(release)
@@ -607,7 +601,7 @@ public class CallbackServerTest {
             res.setProvenance(null);
         } catch (ServerException se) {
             assertThat("incorrect excep msg", se.getLocalizedMessage(),
-                    is("provenance cannot be null"));
+                    is("Provenance cannot be null"));
         }
         
         res.server.stop();

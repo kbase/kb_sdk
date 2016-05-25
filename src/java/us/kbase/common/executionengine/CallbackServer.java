@@ -61,7 +61,7 @@ public abstract class CallbackServer extends JsonServerServlet {
     
     private final AuthToken token;
     private final CallbackServerConfig config;
-    protected ProvenanceAction prov = new ProvenanceAction();
+    private ProvenanceAction prov = new ProvenanceAction();
     
     private final static DateTimeFormatter DATE_FORMATTER =
             DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZoneUTC();
@@ -108,6 +108,16 @@ public abstract class CallbackServer extends JsonServerServlet {
          * Might want to increase the cache lifetime or have a separate
          * cache for jobs that are done but haven't been checked by the user
          */
+    }
+    
+    protected void resetProvenanceAndMethods(final ProvenanceAction newProv) {
+        if (newProv == null) {
+            throw new NullPointerException("Provenance cannot be null");
+        }
+        synchronized (this) {
+            vers.clear();
+            prov = newProv;
+        }
     }
     
     @JsonServerMethod(rpc = "CallbackServer.get_provenance")
