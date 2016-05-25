@@ -55,7 +55,7 @@ import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
 import us.kbase.common.utils.ModuleMethod;
-import us.kbase.mobu.tester.CallbackServer;
+import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.tester.CallbackServerConfigBuilder;
 import us.kbase.mobu.tester.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.mobu.tester.JobRunnerConstants;
@@ -171,7 +171,7 @@ public class CallbackServerTest {
                 new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT), callbackUrl, TEST_DIR, log).build();
 //        final CallbackServer callback = new CallbackServer(
 //                token, cbcfg, runver, params, wsobjs);
-        final CallbackServer callback = new CallbackServer(TEST_DIR.toFile(), callbackPort);
+        final SDKCallbackServer callback = new SDKCallbackServer(TEST_DIR.toFile(), callbackPort);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(

@@ -26,7 +26,7 @@ import us.kbase.common.service.UObject;
 import us.kbase.common.service.JsonServerServlet.RpcCallData;
 import us.kbase.mobu.util.ProcessHelper;
 
-public class SubsequentCallRunner {
+public class SDKSubsequentCallRunner {
     private static final Set<String> asyncVersionTags = Collections.unmodifiableSet(
             new LinkedHashSet<String>(Arrays.asList("dev", "beta", "release")));
 
@@ -38,7 +38,7 @@ public class SubsequentCallRunner {
     private String imageName;
     private String callbackUrl;
     
-    public SubsequentCallRunner(File testLocalDir, String methodName, 
+    public SDKSubsequentCallRunner(File testLocalDir, String methodName, 
             String serviceVer, int callbackPort) throws Exception {
         Properties props = new Properties();
         InputStream is = new FileInputStream(new File(testLocalDir, "test.cfg"));

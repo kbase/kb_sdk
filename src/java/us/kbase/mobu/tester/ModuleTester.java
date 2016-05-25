@@ -194,7 +194,7 @@ public class ModuleTester {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = findFreePort();
         String callbackUrl = getCallbackUrl(callbackPort);
-        JsonServerServlet catalogSrv = new CallbackServer(tlDir, callbackPort);
+        JsonServerServlet catalogSrv = new SDKCallbackServer(tlDir, callbackPort);
         Server jettyServer = new Server(callbackPort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");

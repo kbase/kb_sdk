@@ -21,13 +21,13 @@ import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
 import us.kbase.workspace.ProvenanceAction;
 
-public class CallbackServer extends JsonServerServlet {
+public class SDKCallbackServer extends JsonServerServlet {
     private static final long serialVersionUID = 1L;
 
     private final File testLocalDir;
     private final int callbackPort;
     
-    public CallbackServer(File testLocalDir, int callbackPort) {
+    public SDKCallbackServer(File testLocalDir, int callbackPort) {
         super("CallbackServer");
         this.testLocalDir = testLocalDir;
         this.callbackPort = callbackPort;
@@ -67,7 +67,7 @@ public class CallbackServer extends JsonServerServlet {
                 String serviceVer = rpcCallData.getContext() == null ? null : 
                     (String)rpcCallData.getContext().getAdditionalProperties().get("service_ver");
                 // Request docker image name from Catalog
-                SubsequentCallRunner runner = new SubsequentCallRunner(testLocalDir, rpcName, 
+                SDKSubsequentCallRunner runner = new SDKSubsequentCallRunner(testLocalDir, rpcName, 
                         serviceVer, callbackPort);
                 // Run method in local docker container
                 jsonRpcResponse = runner.run(rpcCallData);
