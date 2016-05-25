@@ -2,9 +2,14 @@ package us.kbase.mobu.tester;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -12,21 +17,27 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import us.kbase.auth.AuthToken;
+import us.kbase.auth.TokenFormatException;
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleInfo;
 import us.kbase.catalog.ModuleVersionInfo;
 import us.kbase.catalog.SelectModuleVersionParams;
 import us.kbase.catalog.SelectOneModuleParams;
+import us.kbase.common.service.JsonClientException;
 import us.kbase.common.service.UObject;
 import us.kbase.common.service.JsonServerServlet.RpcCallData;
+import us.kbase.common.utils.ModuleMethod;
+import us.kbase.mobu.tester.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.mobu.util.ProcessHelper;
 
-public class SDKSubsequentCallRunner {
+public class SDKSubsequentCallRunner extends SubsequentCallRunner {
     private static final Set<String> asyncVersionTags = Collections.unmodifiableSet(
             new LinkedHashSet<String>(Arrays.asList("dev", "beta", "release")));
 
@@ -38,45 +49,21 @@ public class SDKSubsequentCallRunner {
     private String imageName;
     private String callbackUrl;
     
+    
+    public SDKSubsequentCallRunner(
+            final AuthToken token,
+            final CallbackServerConfig config,
+            final UUID jobId,
+            final ModuleMethod modmeth,
+            final String serviceVer)
+            throws IOException, JsonClientException, TokenFormatException {
+        super(token, config, jobId, modmeth, serviceVer);
+    }
+
     public SDKSubsequentCallRunner(File testLocalDir, String methodName, 
             String serviceVer, int callbackPort) throws Exception {
-        Properties props = new Properties();
-        InputStream is = new FileInputStream(new File(testLocalDir, "test.cfg"));
-        try {
-            props.load(is);
-        } finally {
-            is.close();
-        }
-        String kbaseEndpoint = props.getProperty("kbase_endpoint");
-        String catalogUrl = kbaseEndpoint + "/catalog";
-        CatalogClient catClient = new CatalogClient(new URL(catalogUrl));
-        String moduleName = methodName.substring(0, methodName.indexOf('.'));
-        String imageVersion = serviceVer;
-        ModuleVersionInfo mvi = null;
-        if (imageVersion == null || asyncVersionTags.contains(imageVersion)) {
-            ModuleInfo mi = catClient.getModuleInfo(new SelectOneModuleParams().withModuleName(moduleName));
-            if (imageVersion == null) {
-                mvi = mi.getRelease();
-            } else if (imageVersion.equals("dev")) {
-                mvi = mi.getDev();
-            } else if (imageVersion.equals("beta")) {
-                mvi = mi.getBeta();
-            } else {
-                mvi = mi.getRelease();
-            }
-            if (mvi == null)
-                throw new IllegalStateException("Cannot extract " + imageVersion + " version for module: " + moduleName);
-            imageVersion = mvi.getGitCommitHash();
-        } else {
-            try {
-                mvi = catClient.getVersionInfo(new SelectModuleVersionParams()
-                        .withModuleName(moduleName).withGitCommitHash(imageVersion));
-            } catch (Exception ex) {
-                throw new IllegalStateException("Error retrieving module version info about image " +
-                        moduleName + " with version " + imageVersion, ex);
-            }
-        }
-        imageName = mvi.getDockerImgName();
+        super(null, null, null, null, null);
+                
         File srcWorkDir = new File(testLocalDir, "workdir");
         this.sharedScratchDir = new File(srcWorkDir, "tmp");
         File subjobsDir = new File(testLocalDir, "subjobs");
@@ -118,7 +105,7 @@ public class SDKSubsequentCallRunner {
         FileUtils.copyFile(srcConfigPropsFile, dstConfigPropsFile);
     }
     
-    public Map<String, Object> run(RpcCallData rpcCallData) throws Exception {
+    public Map<String, Object> oldrun(RpcCallData rpcCallData) throws Exception {
         File inputJson = new File(jobWorkDir, "input.json");
         UObject.getMapper().writeValue(inputJson, rpcCallData);
         ProcessHelper.cmd("bash", runSubJobsSh.getCanonicalPath(), jobId, imageName, 
@@ -138,5 +125,51 @@ public class SDKSubsequentCallRunner {
             jsonRpcResponse.put("error", error);
             return jsonRpcResponse;
         }
+    }
+
+    @Override
+    protected Path runModule(
+            final UUID jobId,
+            final Path inputFile,
+            final CallbackServerConfig config,
+            final String imageName,
+            final String moduleName,
+            final AuthToken token)
+            throws IOException, InterruptedException {
+        final Path runSubJobsSh = config.getWorkDir().toAbsolutePath()
+                .resolve("run_subjob.sh");
+        if (Files.notExists(runSubJobsSh)) {
+            final boolean isMac = System.getProperty("os.name").toLowerCase()
+                    .contains("mac");
+            final String dockerRunCmd = config.getWorkDir().toAbsolutePath() +
+                    "/run_docker.sh run " + (isMac ? "" : "--user $(id -u) ") +
+                    "-v " + config.getWorkDir().resolve(SUBJOBSDIR) + 
+                    "/$1/" + WORKDIR + ":/kb/module/work -v " +
+                    getSharedScratchDir(config).toAbsolutePath() +
+                    ":/kb/module/work/tmp -e \"SDK_CALLBACK_URL=$3\" $2 async";
+            Files.write(runSubJobsSh, Arrays.asList(
+                    "#!/bin/bash",
+                    dockerRunCmd
+                    ), StandardCharsets.UTF_8);
+            final Set<PosixFilePermission> perms =
+                    Files.getPosixFilePermissions(runSubJobsSh);
+            perms.add(PosixFilePermission.OWNER_EXECUTE);
+            Files.setPosixFilePermissions(runSubJobsSh, perms);
+            Files.write(runSubJobsSh, Arrays.asList(
+                    "#!/bin/bash",
+                    dockerRunCmd
+                    ), StandardCharsets.UTF_8);
+        }
+        final Path jobWorkDir = getJobWorkDir(jobId, config, imageName)
+                .toAbsolutePath();
+        Files.write(jobWorkDir.resolve("token"),
+                Arrays.asList(token.toString()), StandardCharsets.UTF_8);
+        
+        // jobid is wrong jobDir is wrong
+        ProcessHelper.cmd("bash", runSubJobsSh.toString(),
+                jobWorkDir.getParent().getFileName().toString(), imageName,
+                config.getCallbackURL().toExternalForm())
+                .exec(jobWorkDir.getParent().toFile());
+        return jobWorkDir.resolve("output.json");
     }
 }
