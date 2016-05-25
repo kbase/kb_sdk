@@ -16,10 +16,10 @@ public class CallbackServerConfigBuilder {
     
     //TODO unit tests
     
-    private static final  String EP_WS = "/ws";
-    private static final  String EP_SHOCK = "/shock-api";
-    private static final  String EP_CAT = "/catalog";
-    private static final  String EP_UJS = "/userandjobstate";
+    private static final  String EP_WS = "ws";
+    private static final  String EP_SHOCK = "shock-api";
+    private static final  String EP_CAT = "catalog";
+    private static final  String EP_UJS = "userandjobstate";
     
     private static final String KBASE_EP = "kbase_endpoint";
     private static final String UJS_URL = "job_service_url";
@@ -151,8 +151,11 @@ public class CallbackServerConfigBuilder {
     }
 
     
-    private static URL resolveURL(final URL url, final String ext) {
+    private static URL resolveURL(URL url, final String ext) {
         try {
+            if (!url.getPath().endsWith("/")) {
+                url = new URL(url.toExternalForm() + "/");
+            }
             return new URL(url, ext);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e); //something is really messed up

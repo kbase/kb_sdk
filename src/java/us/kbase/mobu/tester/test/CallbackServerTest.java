@@ -36,7 +36,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -55,13 +54,12 @@ import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
 import us.kbase.common.utils.ModuleMethod;
+import us.kbase.mobu.tester.CallbackServer;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.tester.CallbackServerConfigBuilder;
 import us.kbase.mobu.tester.CallbackServerConfigBuilder.CallbackServerConfig;
-import us.kbase.mobu.tester.JobRunnerConstants;
 import us.kbase.mobu.tester.LineLogger;
 import us.kbase.mobu.tester.ModuleRunVersion;
-import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SubAction;
 
@@ -103,18 +101,18 @@ public class CallbackServerTest {
         FileUtils.deleteDirectory(TEST_DIR.toFile());
         Files.deleteIfExists(TEST_DIR);
         Files.createDirectories(TEST_DIR);
-        LineLogger log = new LineLogger() {
-            
-            @Override
-            public void logNextLine(String line, boolean isError) {}
-        };
-        CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-                new URL(KBASE_ENDPOINT), new URL("http://foo.com"),
-                Paths.get("foo"), log).build();
-        cfg.writeJobConfigToFile(TEST_DIR.resolve("test.cfg"));
-        Path workdir = TEST_DIR.resolve("workdir");
-        Files.createDirectories(workdir);
-        cfg.writeJobConfigToFile(workdir.resolve(JobRunnerConstants.JOB_CONFIG_FILE));
+//        LineLogger log = new LineLogger() {
+//            
+//            @Override
+//            public void logNextLine(String line, boolean isError) {}
+//        };
+//        CallbackServerConfig cfg = new CallbackServerConfigBuilder(
+//                new URL(KBASE_ENDPOINT), new URL("http://foo.com"),
+//                Paths.get("foo"), log).build();
+//        cfg.writeJobConfigToFile(TEST_DIR.resolve("test.cfg"));
+//        Path workdir = TEST_DIR.resolve("workdir");
+//        Files.createDirectories(workdir);
+//        cfg.writeJobConfigToFile(workdir.resolve(JobRunnerConstants.JOB_CONFIG_FILE));
         
         String user = System.getProperty("test.user");
         String password = System.getProperty("test.pwd");
@@ -125,12 +123,12 @@ public class CallbackServerTest {
             throw new IllegalStateException("Missing test.pwd from system properties");
         }
         token =  AuthService.login(user, password).getToken();
-        Files.write(workdir.resolve("token"), Arrays.asList(token.toString()), StandardCharsets.UTF_8);
+//        Files.write(workdir.resolve("token"), Arrays.asList(token.toString()), StandardCharsets.UTF_8);
         CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
         
-        Path rundocker = TEST_DIR.resolve("run_docker.sh");
-        Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"), StandardCharsets.UTF_8);
-        Files.setPosixFilePermissions(rundocker, perms);
+//        Path rundocker = TEST_DIR.resolve("run_docker.sh");
+//        Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"), StandardCharsets.UTF_8);
+//        Files.setPosixFilePermissions(rundocker, perms);
         
     }
 
@@ -160,18 +158,23 @@ public class CallbackServerTest {
             }
         };
         final int callbackPort = ControllerCommon.findFreePort();
-//        final URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
-        final URL callbackUrl = new URL(ModuleTester.getCallbackUrl(callbackPort));
+        final URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+//        final URL callbackUrl = new URL(ModuleTester.getCallbackUrl(callbackPort));
         final Path temp = Files.createTempDirectory(TEST_DIR, "cbt");
 //        final CallbackServerConfig cbcfg =
 //                new CallbackServerConfigBuilder(
 //                AweClientDockerJobScriptTest.loadConfig(), callbackUrl,
 //                        temp, log).build();
+        Path rundocker = temp.resolve("run_docker.sh");
+        Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"),
+                StandardCharsets.UTF_8);
+        Files.setPosixFilePermissions(rundocker, perms);
         final CallbackServerConfig cbcfg =
-                new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT), callbackUrl, TEST_DIR, log).build();
-//        final CallbackServer callback = new CallbackServer(
-//                token, cbcfg, runver, params, wsobjs);
-        final SDKCallbackServer callback = new SDKCallbackServer(TEST_DIR.toFile(), callbackPort);
+                new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT),
+                        callbackUrl, temp, log).build();
+        final CallbackServer callback = new SDKCallbackServer(
+                token, cbcfg, runver, params, wsobjs);
+//        final SDKCallbackServer callback = new SDKCallbackServer(TEST_DIR.toFile(), callbackPort);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(
@@ -349,7 +352,7 @@ public class CallbackServerTest {
             injob.put("ver", "dev");
             injob.put("params", Arrays.asList(inner2));
             if (i % 2 == 0) {
-//                injob.put("cli_async", true);
+                injob.put("cli_async", true);
             }
             Map<String, Object> innerparams = new HashMap<String, Object>();
             innerparams.put("wait", 2);
@@ -361,7 +364,7 @@ public class CallbackServerTest {
             outerjob.put("ver", "dev");
             outerjob.put("params", Arrays.asList(innerparams));
             if (i % 2 == 0) {
-//                outerjob.put("cli_async", true);
+                outerjob.put("cli_async", true);
             };
             jobs.add(outerjob);
         }
@@ -408,17 +411,16 @@ public class CallbackServerTest {
                             .put("wait", 2)
                             .build()))
                 .build());
-//        try {
-//            res.callMethod("njs_sdk_test_1.run", params, "dev");
-//        } catch (ServerException se) {
-//            assertThat("incorrect error message", se.getLocalizedMessage(),
-//                    is("No more than 10 concurrently running methods are allowed"));
-//        }
-//        
-//        res.server.stop();
+        try {
+            res.callMethod("njs_sdk_test_1.run", params, "dev");
+        } catch (ServerException se) {
+            assertThat("incorrect error message", se.getLocalizedMessage(),
+                    is("No more than 10 concurrently running methods are allowed"));
+        }
+        
+        res.server.stop();
     }
 
-    @Ignore
     @Test
     public void async() throws Exception {
         final CallbackStuff res = startCallBackServer();
@@ -467,7 +469,6 @@ public class CallbackServerTest {
         res.server.stop();
     }
     
-    @Ignore
     @Test
     public void checkWithBadArgs() throws Exception {
         final CallbackStuff res = startCallBackServer();
@@ -505,33 +506,33 @@ public class CallbackServerTest {
         // version tracking only happens for prod
         
         failJob(res, "njs_sdk_test_1foo.run", "beta",
-//                "Error looking up module njs_sdk_test_1foo: Operation " +
-                "Operation " +
+                "Error looking up module njs_sdk_test_1foo: Operation " +
+//                "Operation " +
                 "failed - module/repo is not registered.");
         failJob(res, "njs_sdk_test_1.run", "beta",
-//                "There is no release version 'beta' for module njs_sdk_test_1");
-                "Cannot extract beta version for module: njs_sdk_test_1");
+                "There is no release version 'beta' for module njs_sdk_test_1");
+//                "Cannot extract beta version for module: njs_sdk_test_1");
         failJob(res, "njs_sdk_test_1.run", "release",
-//                "There is no release version 'release' for module " +
-//                "njs_sdk_test_1");
-        "Cannot extract release version for module: njs_sdk_test_1");
+                "There is no release version 'release' for module " +
+                "njs_sdk_test_1");
+//        "Cannot extract release version for module: njs_sdk_test_1");
         failJob(res, "njs_sdk_test_1.run", null,
-//                "There is no release version 'release' for module " +
-//                "njs_sdk_test_1");
-                "Cannot extract null version for module: njs_sdk_test_1");
+                "There is no release version 'release' for module " +
+                "njs_sdk_test_1");
+//                "Cannot extract null version for module: njs_sdk_test_1");
                 
         //TODO fix these when catalog is fixed
         //this is the newest git commit and was registered in dev but 
         //then the previous git commit was registered in dev
         String git = "b0d487271c22f793b381da29e266faa9bb0b2d1b";
         failJob(res, "njs_sdk_test_1.run", git,
-//                "Error looking up module njs_sdk_test_1 with version " +
-//                git + ": 'NoneType' object has no attribute '__getitem__'");
-                "Error retrieving module version info about image njs_sdk_test_1 with version b0d487271c22f793b381da29e266faa9bb0b2d1b");
+                "Error looking up module njs_sdk_test_1 with version " +
+                git + ": 'NoneType' object has no attribute '__getitem__'");
+//                "Error retrieving module version info about image njs_sdk_test_1 with version b0d487271c22f793b381da29e266faa9bb0b2d1b");
         failJob(res, "njs_sdk_test_1.run", "foo",
-//                "Error looking up module njs_sdk_test_1 with version foo: " +
-//                "'NoneType' object has no attribute '__getitem__'");
-                "Error retrieving module version info about image njs_sdk_test_1 with version foo");
+                "Error looking up module njs_sdk_test_1 with version foo: " +
+                "'NoneType' object has no attribute '__getitem__'");
+//                "Error retrieving module version info about image njs_sdk_test_1 with version foo");
         
         res.server.stop();
     }
@@ -541,13 +542,13 @@ public class CallbackServerTest {
         final CallbackStuff res = startCallBackServer();
         System.out.println("Running badMethod in dir " + res.tempdir);
         failJob(res, "njs_sdk_test_1run", "foo",
-                "Can not find method [CallbackServer.njs_sdk_test_1run] " +
-//                "Can not find method [CallbackServer.njs_sdk_test_1run_async] " +
-                "in server class us.kbase.mobu.tester.CallbackServer");
+//                "Can not find method [CallbackServer.njs_sdk_test_1run] " +
+                "Can not find method [CallbackServer.njs_sdk_test_1run_async] " +
+                "in server class us.kbase.mobu.tester.SDKCallbackServer");
         failJob(res, "njs_sdk_test_1.r.un", "foo",
 //                "Illegal method name: njs_sdk_test_1.r.un");
-//                "Illegal method name: njs_sdk_test_1.r.un_async");
-                "Error retrieving module version info about image njs_sdk_test_1 with version foo");
+                "Illegal method name: njs_sdk_test_1.r.un_async");
+//                "Error retrieving module version info about image njs_sdk_test_1 with version foo");
         res.server.stop();
     }
     
@@ -555,8 +556,8 @@ public class CallbackServerTest {
             String exp)
             throws Exception{
         try {
-//            cbs.callAsync(moduleMeth, new HashMap<String, Object>(), release);
-            cbs.callMethod(moduleMeth, new HashMap<String, Object>(), release);
+            cbs.callAsync(moduleMeth, new HashMap<String, Object>(), release);
+//            cbs.callMethod(moduleMeth, new HashMap<String, Object>(), release);
             fail("Ran bad job");
         } catch (ServerException se) {
             assertThat("correct exception", se.getLocalizedMessage(), is(exp));
@@ -605,8 +606,8 @@ public class CallbackServerTest {
              moduleName + "." + methodName,
              // this is the latest commit, but a prior commit is registered
              //for dev
-//             "17f87270741e6b59bdfc083f143137d208e3f135",
-             "dev",
+             "17f87270741e6b59bdfc083f143137d208e3f135",
+//             "dev",
              moduleName2 + "." + methodName,
              "dev"), Map.class);
         List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
@@ -623,7 +624,7 @@ public class CallbackServerTest {
         Map<String, Object> results = res.callMethod(
                 moduleName + '.' + methodName, methparams, "dev");
         List<ProvenanceAction> p = res.getProvenance();
-        expsas = new ArrayList<SubActionSpec>();
+//        expsas = new ArrayList<SubActionSpec>();
         checkProvenance(moduleName, methodName, release, ver, params,
                 expsas, wsobjs, p);
         checkResults(results, methparams, moduleName);
@@ -683,27 +684,27 @@ public class CallbackServerTest {
         assertThat("number of provenance actions",
                 prov.size(), is(1));
         ProvenanceAction pa = prov.get(0);
-//        long got = DATE_PARSER.parseDateTime(pa.getTime()).getMillis();
-//        long now = new Date().getTime();
-//        assertTrue("got prov time < now ", got < now);
-//        assertTrue("got prov time > now - 5m", got > now - (5 * 60 * 1000));
-//        assertThat("correct service", pa.getService(), is(moduleName));
-        assertThat("correct service", pa.getService(), is("Here's"));
-//        assertThat("correct service version", pa.getServiceVer(),
-//                is(ver));
-//        assertThat("correct method", pa.getMethod(), is(methodName));
-        assertThat("correct method", pa.getMethod(), is("some fake"));
-//        assertThat("number of params", pa.getMethodParams().size(),
-//                is(methparams.size()));
-//        for (int i = 1; i < methparams.size(); i++) {
-//            assertThat("params not equal",
-//                    pa.getMethodParams().get(i).asClassInstance(Object.class),
-//                    is(methparams.get(i).asClassInstance(Object.class)));
-//        }
-//        assertThat("correct incoming ws objs",
-//                new HashSet<String>(pa.getInputWsObjects()),
-//                is(new HashSet<String>(wsobjs)));
-//        checkSubActions(pa.getSubactions(), subs);
+        long got = DATE_PARSER.parseDateTime(pa.getTime()).getMillis();
+        long now = new Date().getTime();
+        assertTrue("got prov time < now ", got < now);
+        assertTrue("got prov time > now - 5m", got > now - (5 * 60 * 1000));
+        assertThat("correct service", pa.getService(), is(moduleName));
+//        assertThat("correct service", pa.getService(), is("Here's"));
+        assertThat("correct service version", pa.getServiceVer(),
+                is(ver));
+        assertThat("correct method", pa.getMethod(), is(methodName));
+//        assertThat("correct method", pa.getMethod(), is("some fake"));
+        assertThat("number of params", pa.getMethodParams().size(),
+                is(methparams.size()));
+        for (int i = 1; i < methparams.size(); i++) {
+            assertThat("params not equal",
+                    pa.getMethodParams().get(i).asClassInstance(Object.class),
+                    is(methparams.get(i).asClassInstance(Object.class)));
+        }
+        assertThat("correct incoming ws objs",
+                new HashSet<String>(pa.getInputWsObjects()),
+                is(new HashSet<String>(wsobjs)));
+        checkSubActions(pa.getSubactions(), subs);
     }
     
     private void checkSubActions(List<SubAction> gotsas,

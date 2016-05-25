@@ -86,7 +86,8 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
             try {
                 pw.println("#!/bin/bash");
                 boolean isMac = System.getProperty("os.name").toLowerCase().contains("mac");
-                String dockerRunCmd = testLocalDir.getCanonicalPath() + "/run_docker.sh run " + (isMac ? "" : "--user $(id -u) ") + "-v " + subjobsDir.getCanonicalPath() + 
+                String dockerRunCmd = testLocalDir.getCanonicalPath() + "/run_docker.sh run " +
+                        (isMac ? "" : "--user $(id -u) ") + "-v " + subjobsDir.getCanonicalPath() + 
                         "/$1/workdir:/kb/module/work -v " + sharedScratchDir.getCanonicalPath() +
                         ":/kb/module/work/tmp -e \"SDK_CALLBACK_URL=$3\" $2 async";
                 pw.println(dockerRunCmd);
@@ -143,7 +144,8 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
                     .contains("mac");
             final String dockerRunCmd = config.getWorkDir().toAbsolutePath() +
                     "/run_docker.sh run " + (isMac ? "" : "--user $(id -u) ") +
-                    "-v " + config.getWorkDir().resolve(SUBJOBSDIR) + 
+                    "-v " + config.getWorkDir().resolve(SUBJOBSDIR)
+                        .toAbsolutePath() + 
                     "/$1/" + WORKDIR + ":/kb/module/work -v " +
                     getSharedScratchDir(config).toAbsolutePath() +
                     ":/kb/module/work/tmp -e \"SDK_CALLBACK_URL=$3\" $2 async";
