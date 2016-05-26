@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -48,6 +47,7 @@ import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
 import us.kbase.kidl.KidlParseException;
 import us.kbase.kidl.KidlParser;
+import us.kbase.kidl.Utils;
 import us.kbase.mobu.util.DiskFileSaver;
 import us.kbase.mobu.util.FileSaveCodeWriter;
 import us.kbase.mobu.util.FileSaver;
@@ -654,6 +654,25 @@ public class JavaTypeGenerator {
 			            "    }"
 			            ));
 			}
+			if (anyAsync || asyncVersion != null) {
+                String exceptions = "throws " + model.ref("java.io.IOException") 
+                        + ", " + model.ref(utilPackage + ".JsonClientException");
+                String listClass = model.ref("java.util.List");
+                String typeReferenceClass = model.ref("com.fasterxml.jackson.core.type.TypeReference");
+                String arrayListClass = model.ref("java.util.ArrayList");
+                classLines.add("");
+                String jobStateType = model.ref(utilPackage + ".JobState");
+                String trFull = typeReferenceClass + "<" + listClass + "<" + jobStateType + "<T>>>";
+                classLines.add("    protected <T> " + jobStateType + "<T> _checkJob(String jobId, " + trFull + " retType) " + exceptions+ " {");
+                classLines.add("        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();");
+                classLines.add("        args.add(jobId);");
+                classLines.addAll(Arrays.asList(
+                        "        " + listClass + "<" + jobStateType + "<T>> res = caller.jsonrpcCall(\"" + 
+                                module.getOriginal().getModuleName() + "._check_job" + "\", args, retType, true, true);",
+                        "        return res.get(0);",
+                        "    }"
+                        ));
+			}
 			for (JavaFunc func : module.getFuncs()) {
                 JavaType retType = null;
                 if (func.getRetMultyType() == null) {
@@ -678,14 +697,12 @@ public class JavaTypeGenerator {
                 String arrayListClass = model.ref("java.util.ArrayList");
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
-                String normalSuffix = "";
 			    if (func.getOriginal().isAsync() || asyncVersion != null) {
-			        normalSuffix = "Sync";
 			        if (!func.isAuthRequired())
 			            throw new IllegalStateException("Function " + func.getOriginal().getName() + " is async but doesn't require authentication");
 			        classLines.add("");
 			        printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
-			        classLines.add("    public String " + func.getJavaName() + "Async(" + funcParams + ") " + exceptions+ " {");
+			        classLines.add("    protected String _" + func.getJavaName() + "Submit(" + funcParams + ") " + exceptions+ " {");
 			        if (asyncVersion != null) {
 	                    classLines.addAll(Arrays.asList(
 	                            "        if (asyncVersion != null) {",
@@ -703,31 +720,20 @@ public class JavaTypeGenerator {
 			        String trFull = typeReferenceClass + "<" + listClass + "<String>>";
 			        classLines.addAll(Arrays.asList(
 			                "        " + trFull + " retType = new " + trFull + "() {};",
-			                "        " + listClass + "<String> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + 
-			                        func.getOriginal().getName() + "_async" + "\", args, retType, true, true, " + contextField + ");",
+			                "        " + listClass + "<String> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "._" + 
+			                        func.getOriginal().getName() + "_submit" + "\", args, retType, true, true, " + contextField + ");",
                             "        return res.get(0);",
 			                "    }"
 			                ));
-                    classLines.add("");
                     String jobStateType = model.ref(utilPackage + ".JobState");
                     String innerRetType = (func.getRetMultyType() == null) ? ((retType == null) ? "Object" : (listClass + "<" + retTypeName + ">")) : retTypeName;
-                    printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
-                    classLines.add("    public " + jobStateType + "<" + innerRetType + "> " + func.getJavaName() + "Check(String jobId) " + exceptions+ " {");
-                    classLines.add("        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();");
-                    classLines.add("        args.add(jobId);");
-                    trFull = typeReferenceClass + "<" + listClass + "<" + jobStateType + "<" + innerRetType + ">>>";
-                    classLines.addAll(Arrays.asList(
-                            "        " + trFull + " retType = new " + trFull + "() {};",
-                            "        " + listClass + "<" + jobStateType + "<" + innerRetType + ">> res = caller.jsonrpcCall(\"" + 
-                                    module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "_check" + "\", args, retType, true, true);",
-                            "        return res.get(0);",
-                            "    }"
-                            ));
                     classLines.add("");
                     printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
+                    trFull = typeReferenceClass + "<" + listClass + "<" + jobStateType + "<" + innerRetType + ">>>";
                     classLines.addAll(Arrays.asList(
                             "    public " + retTypeName + " " + func.getJavaName() + "(" + funcParams + ") " + exceptions+ " {",
-                            "        String jobId = " + func.getJavaName() + "Async(" + funcParamNames + ");",
+                            "        String jobId = _" + func.getJavaName() + "Submit(" + funcParamNames + ");",
+                            "        " + trFull + " retType = new " + trFull + "() {};",
                             "        while (true) {",
                             "            if (Thread.currentThread().isInterrupted())",
                             "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
@@ -736,17 +742,16 @@ public class JavaTypeGenerator {
                             "            } catch(Exception ex) {",
                             "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
                             "            }",
-                            "            " + jobStateType + "<" + innerRetType + "> res = " + func.getJavaName() + "Check(jobId);",
+                            "            " + jobStateType + "<" + innerRetType + "> res = _checkJob(jobId, retType);",
                             "            if (res.getFinished() != 0L)",
                             "                return" + (func.getRetMultyType() == null ? (retType == null ? "" : " res.getResult().get(0)") : " res.getResult()") + ";",
                             "        }",
                             "    }"
                             ));
-			    }
-			    {
+			    } else {
 			        classLines.add("");
 			        printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
-			        classLines.add("    public " + retTypeName + " " + func.getJavaName() + normalSuffix + "(" + funcParams + ") " + exceptions+ " {");
+			        classLines.add("    public " + retTypeName + " " + func.getJavaName() + "(" + funcParams + ") " + exceptions+ " {");
 			        classLines.add("        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();");
 			        for (JavaFuncParam param : func.getParams()) {
 			            classLines.add("        args.add(" + param.getJavaName() + ");");
@@ -806,7 +811,7 @@ public class JavaTypeGenerator {
 		List<String> funcCommentLines = new ArrayList<String>();
 		funcCommentLines.add("<p>Original spec-file function name: " + func.getOriginal().getName() + "</p>");
 		funcCommentLines.add("<pre>");
-		funcCommentLines.addAll(parseCommentLines(func.getOriginal().getComment()));
+		funcCommentLines.addAll(Utils.parseCommentLines(func.getOriginal().getComment()));
 		funcCommentLines.add("</pre>");
 		for (JavaFuncParam param : func.getParams()) {
 			String descr = getTypeDescr(originalToJavaTypes, param.getOriginal().getType(), packageParent, null);
@@ -863,7 +868,7 @@ public class JavaTypeGenerator {
 					sb.append(" (original type \"").append(ref.getName()).append("\")");
 			} else {
 				sb.append("original type \"").append(ref.getName()).append("\"");
-				List<String> refCommentLines = parseCommentLines(ref.getComment());
+				List<String> refCommentLines = Utils.parseCommentLines(ref.getComment());
 				if (refCommentLines.size() > 0) {
 					StringBuilder concatLines = new StringBuilder();
 					for (String l : refCommentLines) {
@@ -921,7 +926,7 @@ public class JavaTypeGenerator {
 		List<String> lines = new ArrayList<String>();
 		lines.add("<p>Original spec-file module name: " + module.getOriginal().getModuleName() + "</p>");
 		lines.add("<pre>");
-		lines.addAll(parseCommentLines(module.getOriginal().getComment()));
+		lines.addAll(Utils.parseCommentLines(module.getOriginal().getComment()));
 		lines.add("</pre>");
 		printCommentLines("", lines, classLines);
 	}
@@ -1116,25 +1121,6 @@ public class JavaTypeGenerator {
 		}
 	}
 
-	private static List<String> parseCommentLines(String comment) {
-		List<String> commentLines = new ArrayList<String>();
-		if (comment != null && comment.trim().length() > 0) {
-			StringTokenizer st = new StringTokenizer(comment, "\r\n");
-			while (st.hasMoreTokens()) {
-				commentLines.add(st.nextToken());
-			}
-			removeEmptyLinesOnSides(commentLines);
-		}
-		return commentLines;
-	}
-	
-	private static void removeEmptyLinesOnSides(List<String> lines) {
-		while (lines.size() > 0 && lines.get(0).trim().length() == 0)
-			lines.remove(0);
-		while (lines.size() > 0 && lines.get(lines.size() - 1).trim().length() == 0)
-			lines.remove(lines.size() - 1);
-	}
-	
 	private static List<String> checkLibs(FileSaver libOutDir, boolean createServers,
 	        FileSaver buildXml) throws Exception {
 		if (libOutDir == null && buildXml == null)
@@ -1352,7 +1338,7 @@ public class JavaTypeGenerator {
 		StringBuilder descr = new StringBuilder("<p>Original spec-file type: ").append(type.getOriginalTypeName()).append("</p>\n");
 		List<String> descrLines = new ArrayList<String>();
 		if (type.getAliasHistoryOuterToDeep().size() > 0) {
-			descrLines.addAll(parseCommentLines(type.getAliasHistoryOuterToDeep().get(0).getComment()));
+			descrLines.addAll(Utils.parseCommentLines(type.getAliasHistoryOuterToDeep().get(0).getComment()));
 			if (descrLines.size() > 0) {
 				descr.append("<pre>\n");
 				for (String l : descrLines) {
