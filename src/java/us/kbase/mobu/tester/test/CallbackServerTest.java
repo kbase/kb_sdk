@@ -223,19 +223,21 @@ public class CallbackServerTest {
                 final Map<String, Object> params,
                 final String serviceVer)
                 throws Exception {
-            return callServer(method + "_async", Arrays.asList(params),
+            final String[] modMeth = method.split("\\.");
+            return callServer(modMeth[0] + "._" + modMeth[1] + "_submit",
+                    Arrays.asList(params),
                     serviceVer, new TypeReference<UUID>() {});
         }
         
         public Map<String, Object> checkAsync(final UUID jobId)
                 throws Exception {
-            return callServer("foo.bar_check", Arrays.asList(jobId), "fake",
+            return callServer("foo._check_job", Arrays.asList(jobId), "fake",
                     new TypeReference<Map<String,Object>>() {});
         }
         
         public Map<String, Object> checkAsync(final List<?> params)
                 throws Exception {
-            return callServer("foo.bar_check", params, "fake",
+            return callServer("foo._check_job", params, "fake",
                     new TypeReference<Map<String,Object>>() {});
         }
 
@@ -533,10 +535,10 @@ public class CallbackServerTest {
         final CallbackStuff res = startCallBackServer();
         System.out.println("Running badMethod in dir " + res.tempdir);
         failJob(res, "njs_sdk_test_1run", "foo",
-                "Can not find method [CallbackServer.njs_sdk_test_1run_async] " +
+                "Can not find method [CallbackServer.njs_sdk_test_1run] " +
                 "in server class us.kbase.mobu.tester.SDKCallbackServer");
         failJob(res, "njs_sdk_test_1.r.un", "foo",
-                "Illegal method name: njs_sdk_test_1.r.un_async");
+                "Illegal method name: njs_sdk_test_1.r.un");
         res.server.stop();
     }
     
@@ -544,7 +546,7 @@ public class CallbackServerTest {
             String exp)
             throws Exception{
         try {
-            cbs.callAsync(moduleMeth, new HashMap<String, Object>(), release);
+            cbs.callMethod(moduleMeth, new HashMap<String, Object>(), release);
             fail("Ran bad job");
         } catch (ServerException se) {
             assertThat("correct exception", se.getLocalizedMessage(), is(exp));
@@ -578,7 +580,7 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_2";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.5";
+        String ver = "0.0.7";
         Map<String, Object> methparams = new HashMap<String, Object>();
         methparams.put("id", "myid");
         Map<String, Object> results = res.callMethod(
@@ -612,11 +614,11 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_1";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.1";
+        String ver = "0.0.2";
         final ModuleRunVersion runver = new ModuleRunVersion(
                 new URL("https://github.com/kbasetest/njs_sdk_test_1"),
                 new ModuleMethod(moduleName + "." + methodName),
-                "ed8038b12b9ebd424c60697204fb49f89a9df906", ver, release);
+                "d0a452d6194cf4289df03585912ab1c7d8ee180c", ver, release);
         List<String> wsobjs = Arrays.asList("foo", "bar", "baz");
         List<UObject> params = new ArrayList<UObject>();
         params.add(new UObject(Arrays.asList("foo", "bar")));
@@ -645,23 +647,23 @@ public class CallbackServerTest {
              "}",
              moduleName2 + "." + methodName,
              // dev is on this commit
-             "570b5963d50710d4e15621a77673a9bc0c7a7857",
+             "07366d715b697b6f9eac9eaba3ec0993c361b71a",
              moduleName + "." + methodName,
              // this is the latest commit, but a prior commit is registered
              //for dev
-             "17f87270741e6b59bdfc083f143137d208e3f135",
+             "5178356a8a7f63be055cc581e9ea90dd53d6aed3",
              moduleName2 + "." + methodName,
              "dev"), Map.class);
         List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
         expsas.add(new SubActionSpec()
             .withMod(moduleName)
-            .withVer("0.0.1")
+            .withVer("0.0.2")
             .withRel("dev")
         );
         expsas.add(new SubActionSpec()
             .withMod(moduleName2)
-            .withVer("0.0.5")
-            .withCommit("570b5963d50710d4e15621a77673a9bc0c7a7857")
+            .withVer("0.0.7")
+            .withCommit("07366d715b697b6f9eac9eaba3ec0993c361b71a")
         );
         Map<String, Object> results = res.callMethod(
                 moduleName + '.' + methodName, methparams, "dev");
