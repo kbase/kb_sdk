@@ -172,8 +172,8 @@ public class TemplateBasedGenerator {
                     Map<String, Object> method = methods.get(methodPos);
                     Boolean async = (Boolean)method.get("async");
                     method.put("async", true);
-                    if (async == null || !async)
-                        method.put("could_be_sync", true);
+                    //if (async == null || !async)
+                    //    method.put("could_be_sync", true);
                 }
             }
         }
