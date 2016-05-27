@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import us.kbase.common.service.Tuple2;
 
@@ -219,5 +220,24 @@ public class Utils {
         }
         us.kbase.jkidl.Utils.trimWhitespaces(sb);
         return sb.toString();
+    }
+    
+    public static List<String> parseCommentLines(String comment) {
+        List<String> commentLines = new ArrayList<String>();
+        if (comment != null && comment.trim().length() > 0) {
+            StringTokenizer st = new StringTokenizer(comment, "\r\n");
+            while (st.hasMoreTokens()) {
+                commentLines.add(st.nextToken());
+            }
+            removeEmptyLinesOnSides(commentLines);
+        }
+        return commentLines;
+    }
+    
+    public static void removeEmptyLinesOnSides(List<String> lines) {
+        while (lines.size() > 0 && lines.get(0).trim().length() == 0)
+            lines.remove(0);
+        while (lines.size() > 0 && lines.get(lines.size() - 1).trim().length() == 0)
+            lines.remove(lines.size() - 1);
     }
 }

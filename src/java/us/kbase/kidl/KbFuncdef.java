@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import us.kbase.common.service.Tuple2;
+import us.kbase.mobu.compiler.JavaFuncParam;
 
 /**
  * Class represents function definition in spec-file.
@@ -24,6 +25,9 @@ public class KbFuncdef implements KbModuleComp {
 	private List<KbParameter> parameters;
 	private List<KbParameter> returnType;
 	private Map<?,?> data = null;
+	
+	private static int pyDocstringWidth = 70;
+	private static String pyDocstringIndent = "   ";
 	
 	public KbFuncdef() {}
 
@@ -145,7 +149,39 @@ public class KbFuncdef implements KbModuleComp {
         }
         processArgDoc(typeQueue, docLines, null, true);
         ret.put("arg_doc", docLines);
-        ret.put("doc", Utils.removeStarsInComment(comment));
+        String docWithoutStars = Utils.removeStarsInComment(comment);
+        ret.put("doc", docWithoutStars);
+        List<String> pyDocLines = new ArrayList<String>();
+        for (String line : Utils.parseCommentLines(docWithoutStars)) {
+            pyDocLines.add(removeThreeQuotes(line));
+        }
+        for (int paramPos = 0; paramPos < parameters.size(); paramPos++) {
+            KbParameter arg = parameters.get(paramPos);
+            String paramName = paramNames.get(paramPos);
+            String descr = getTypeDescr(arg.getType(), null);
+            pyDocLines.addAll(cutLine(":param " + paramName + ": " + removeThreeQuotes(descr),
+                    pyDocstringWidth, pyDocstringIndent));
+        }
+        if (returnType.size() > 0) {
+            String descr;
+            if (returnType.size() == 1) {
+                KbParameter arg = returnType.get(0);
+                descr = getTypeDescr(arg.getType(), null);
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < returnType.size(); i++) {
+                    KbParameter arg = returnType.get(i);
+                    if (sb.length() > 0)
+                        sb.append(", ");
+                    sb.append('(').append((i + 1)).append(") ");
+                    sb.append(getTypeDescr(arg.getType(), arg.getName()));
+                }
+                descr = "multiple set - " + sb.toString();
+            }
+            pyDocLines.addAll(cutLine(":returns: " + removeThreeQuotes(descr), 
+                    pyDocstringWidth, pyDocstringIndent));
+        }
+        ret.put("py_doc_lines", pyDocLines);
         List<Object> params = new ArrayList<Object>();
         for (int paramPos = 0; paramPos < parameters.size(); paramPos++) {
             KbParameter param = parameters.get(paramPos);
@@ -164,6 +200,30 @@ public class KbFuncdef implements KbModuleComp {
         ret.put("returns", returns);
         if (isAsync())
             ret.put("async", true);
+        return ret;
+    }
+    
+    private static String removeThreeQuotes(String line) {
+        return line.replaceAll("\"{3,}", "\"\"");
+    }
+    
+    private static List<String> cutLine(String line, int width, String indent) {
+        if (indent.length() >= width)
+            throw new IllegalStateException("Indent width is larger than " + width);
+        line = line.trim();
+        List<String> ret = new ArrayList<String>();
+        String curLine = line;
+        boolean firstLine = true;
+        while (curLine.length() > 0) {
+            int curWidth = firstLine ? width : (width - indent.length());
+            int pos = curLine.length() <= curWidth ? curLine.length() :
+                curLine.substring(0, curWidth).lastIndexOf(' ');
+            if (pos < 0)
+                pos = curWidth;
+            ret.add((firstLine ? "" : indent) + curLine.substring(0, pos));
+            curLine = curLine.substring(pos).trim();
+            firstLine = false;
+        }
         return ret;
     }
     
@@ -251,5 +311,70 @@ public class KbFuncdef implements KbModuleComp {
             ret.append(arg);
         }
         return ret.toString();
+    }
+    
+    private static String getTypeDescr(KbType type, String paramName) {
+        StringBuilder sb = new StringBuilder();
+        if (paramName == null)
+            sb.append("instance of ");
+        createTypeDescr(type, paramName, sb);
+        return sb.toString();
+    }
+    
+    private static void createTypeDescr(KbType type, String paramName, StringBuilder sb) {
+        if (paramName != null)
+            sb.append("parameter \"").append(paramName).append("\" of ");
+        if (type instanceof KbTypedef) {
+            KbTypedef ref = (KbTypedef)type;
+            sb.append("type \"").append(ref.getName()).append("\"");
+            List<String> refCommentLines = Utils.parseCommentLines(ref.getComment());
+            if (refCommentLines.size() > 0) {
+                StringBuilder concatLines = new StringBuilder();
+                for (String l : refCommentLines) {
+                    if (concatLines.length() > 0 && concatLines.charAt(concatLines.length() - 1) != ' ')
+                        concatLines.append(' ');
+                    concatLines.append(l.trim());
+                }
+                sb.append(" (").append(concatLines).append(")");
+            }
+            if (!(ref.getAliasType() instanceof KbScalar)) {
+                sb.append(" -> ");
+                createTypeDescr(ref.getAliasType(), null, sb);
+            }
+        } else if (type instanceof KbStruct) {
+            KbStruct struct = (KbStruct)type;
+            sb.append("structure: ");
+            for (int i = 0; i < struct.getItems().size(); i++) {
+                if (i > 0)
+                    sb.append(", ");
+                String itemName = struct.getItems().get(i).getName();
+                createTypeDescr(struct.getItems().get(i).getItemType(), itemName, sb);        
+            }
+        } else if (type instanceof KbList) {
+            KbList list = (KbList)type;
+            sb.append("list of ");
+            createTypeDescr(list.getElementType(), null, sb);           
+        } else if (type instanceof KbMapping) {
+            KbMapping map = (KbMapping)type;
+            sb.append("mapping from ");
+            createTypeDescr(map.getKeyType(), null, sb);
+            sb.append(" to ");
+            createTypeDescr(map.getValueType(), null, sb);
+        } else if (type instanceof KbTuple) {
+            KbTuple tuple = (KbTuple)type;
+            sb.append("tuple of size ").append(tuple.getElementTypes().size()).append(": ");
+            for (int i = 0; i < tuple.getElementTypes().size(); i++) {
+                if (i > 0)
+                    sb.append(", ");
+                String tupleParamName = tuple.getElementNames().get(i);
+                if (tupleParamName.equals("e_" + (i + 1)))
+                    tupleParamName = null;
+                createTypeDescr(tuple.getElementTypes().get(i), tupleParamName, sb);        
+            }
+        } else if (type instanceof KbUnspecifiedObject) {
+            sb.append("unspecified object");
+        } else if (type instanceof KbScalar) {
+            sb.append(((KbScalar)type).getJavaStyleName());
+        }
     }
 }

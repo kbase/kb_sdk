@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParseException;
 import us.kbase.kidl.KidlParser;
 import us.kbase.mobu.compiler.report.CompilationReporter;
+import us.kbase.mobu.compiler.report.SpecFile;
 import us.kbase.mobu.util.DiskFileSaver;
 import us.kbase.mobu.util.FileSaver;
 import us.kbase.mobu.util.OneFileSaver;
@@ -50,8 +52,12 @@ public class RunCompileCommand {
             javaLibDir = new DiskFileSaver(correctRelativePath(javaLibPath, outDir));
         }
         final File dir = specFile.getCanonicalFile().getParentFile();
-        final Map<String, String> kidlSpecs = new LinkedHashMap<String, String>();
-        kidlSpecs.put("<module>", FileUtils.readFileToString(specFile));
+        final List<SpecFile> specFiles = new ArrayList<SpecFile>();
+        SpecFile mainSpec = new SpecFile();
+        mainSpec.fileName = specFile.getName();
+        mainSpec.isMain = true;
+        mainSpec.content = FileUtils.readFileToString(specFile);
+        specFiles.add(mainSpec);
         IncludeProvider ip = new IncludeProvider() {
             @Override
             public Map<String, KbModule> parseInclude(String includeLine) throws KidlParseException {
@@ -68,7 +74,11 @@ public class RunCompileCommand {
                 if (!specFile.exists())
                     throw new KidlParseException("Can not find included spec-file: " + specFile.getAbsolutePath());
                 try {
-                    kidlSpecs.put(specFile.getName(), FileUtils.readFileToString(specFile));
+                    SpecFile spec = new SpecFile();
+                    spec.fileName = specFile.getName();
+                    spec.isMain = false;
+                    spec.content = FileUtils.readFileToString(specFile);
+                    specFiles.add(spec);
                     SpecParser p = new SpecParser(new DataInputStream(new FileInputStream(specFile)));
                     return p.SpecStatement(this);
                 } catch (IOException e) {
@@ -156,7 +166,7 @@ public class RunCompileCommand {
                         perlServerSide, perlImplName, 
                         pyServerSide, pyImplName, rServerSide, rImplName, 
                         javaServerSide, javaPackageParent, javaSrcPath, 
-                        javaParsingData, kidlSpecs, new File(reportFile));
+                        javaParsingData, specFiles, new File(reportFile));
             } catch (Exception ex) {
                 ex.printStackTrace();
                 throw ex;
