@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -74,6 +76,6 @@ public class ModuleRenamerTest {
                 "    A KBase module\n";
         String newText = ModuleRenamer.replace(text, "module-name:\\s*(" + oldModuleName + ")", 
                 newModuleName, "module-name key is not found");
-        System.out.println(newText);
+        Assert.assertTrue(newText.contains(newModuleName));
     }
 }
