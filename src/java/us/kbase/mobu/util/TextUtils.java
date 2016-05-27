@@ -77,7 +77,7 @@ public class TextUtils {
 	public static void writeFileLines(List<String> lines, Writer targetFile) throws IOException {
 		PrintWriter pw = new PrintWriter(targetFile);
 		for (String l : lines)
-			pw.println(l);
+			pw.print(l + "\n");
 		pw.close();
 	}
 	
@@ -98,9 +98,12 @@ public class TextUtils {
 	}
 
 	public static void deleteRecursively(File fileOrDir) {
-		if (fileOrDir.isDirectory() && !Files.isSymbolicLink(fileOrDir.toPath()))
-			for (File f : fileOrDir.listFiles()) 
-				deleteRecursively(f);
+		if (fileOrDir.isDirectory() && !Files.isSymbolicLink(fileOrDir.toPath())) {
+		    File[] files = fileOrDir.listFiles();
+		    if (files != null)
+		        for (File f : files) 
+		            deleteRecursively(f);
+		}
 		fileOrDir.delete();
 	}
 

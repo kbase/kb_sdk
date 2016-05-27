@@ -48,4 +48,9 @@ public class KbList extends KbBasicType {
 		ret.put("items", getElementType().toJsonSchema(true));
 		return ret;
 	}
+	
+	@Override
+	public String getSpecName() {
+	    return "list<" + elementType.getSpecName() + ">";
+	}
 }
