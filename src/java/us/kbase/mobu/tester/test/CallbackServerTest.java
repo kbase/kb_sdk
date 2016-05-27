@@ -505,27 +505,28 @@ public class CallbackServerTest {
         // version tracking only happens for prod
         
         failJob(res, "njs_sdk_test_1foo.run", "beta",
-                "Error looking up module njs_sdk_test_1foo: Operation " +
-                "failed - module/repo is not registered.");
+                "Error looking up module njs_sdk_test_1foo with version " +
+                "beta: Module cannot be found based on module_name or " +
+                "git_url parameters.");
         failJob(res, "njs_sdk_test_1.run", "beta",
-                "There is no release version 'beta' for module njs_sdk_test_1");
+                "Error looking up module njs_sdk_test_1 with version " +
+                "beta: No module version found that matches your criteria!");
         failJob(res, "njs_sdk_test_1.run", "release",
-                "There is no release version 'release' for module " +
-                "njs_sdk_test_1");
+                "Error looking up module njs_sdk_test_1 with version " +
+                "release: No module version found that matches your criteria!");
         failJob(res, "njs_sdk_test_1.run", null,
-                "There is no release version 'release' for module " +
-                "njs_sdk_test_1");
-                
-        //TODO fix these when catalog is fixed
+                "Error looking up module njs_sdk_test_1 with version " +
+                 "release: No module version found that matches your criteria!");
+
         //this is the newest git commit and was registered in dev but 
         //then the previous git commit was registered in dev
         String git = "b0d487271c22f793b381da29e266faa9bb0b2d1b";
         failJob(res, "njs_sdk_test_1.run", git,
                 "Error looking up module njs_sdk_test_1 with version " +
-                git + ": 'NoneType' object has no attribute '__getitem__'");
+                git + ": No module version found that matches your criteria!");
         failJob(res, "njs_sdk_test_1.run", "foo",
                 "Error looking up module njs_sdk_test_1 with version foo: " +
-                "'NoneType' object has no attribute '__getitem__'");
+                "No module version found that matches your criteria!");
         
         res.server.stop();
     }
