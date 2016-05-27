@@ -19,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * include_released - optional flag indicated modules that are released are included (default:true)
  * include_unreleased - optional flag indicated modules that are not released are included (default:false)
  * with_disabled - optional flag indicating disabled repos should be included (default:false).
+ * include_modules_with_no_name_set - default to 0, if set return modules that were never
+ *                                     registered successfully (first registration failed, never
+ *                                     got a module name, but there is a git_url)
  * </pre>
  * 
  */
@@ -28,7 +31,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "owners",
     "include_released",
     "include_unreleased",
-    "include_disabled"
+    "include_disabled",
+    "include_modules_with_no_name_set"
 })
 public class ListModuleParams {
 
@@ -40,6 +44,8 @@ public class ListModuleParams {
     private Long includeUnreleased;
     @JsonProperty("include_disabled")
     private Long includeDisabled;
+    @JsonProperty("include_modules_with_no_name_set")
+    private Long includeModulesWithNoNameSet;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("owners")
@@ -102,6 +108,21 @@ public class ListModuleParams {
         return this;
     }
 
+    @JsonProperty("include_modules_with_no_name_set")
+    public Long getIncludeModulesWithNoNameSet() {
+        return includeModulesWithNoNameSet;
+    }
+
+    @JsonProperty("include_modules_with_no_name_set")
+    public void setIncludeModulesWithNoNameSet(Long includeModulesWithNoNameSet) {
+        this.includeModulesWithNoNameSet = includeModulesWithNoNameSet;
+    }
+
+    public ListModuleParams withIncludeModulesWithNoNameSet(Long includeModulesWithNoNameSet) {
+        this.includeModulesWithNoNameSet = includeModulesWithNoNameSet;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -114,7 +135,7 @@ public class ListModuleParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((("ListModuleParams"+" [owners=")+ owners)+", includeReleased=")+ includeReleased)+", includeUnreleased=")+ includeUnreleased)+", includeDisabled=")+ includeDisabled)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((("ListModuleParams"+" [owners=")+ owners)+", includeReleased=")+ includeReleased)+", includeUnreleased=")+ includeUnreleased)+", includeDisabled=")+ includeDisabled)+", includeModulesWithNoNameSet=")+ includeModulesWithNoNameSet)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

@@ -522,10 +522,10 @@ public class CallbackServerTest {
         String git = "b0d487271c22f793b381da29e266faa9bb0b2d1b";
         failJob(res, "njs_sdk_test_1.run", git,
                 "Error looking up module njs_sdk_test_1 with version " +
-                git + ": 'NoneType' object has no attribute '__getitem__'");
+                git + ": argument of type 'NoneType' is not iterable");
         failJob(res, "njs_sdk_test_1.run", "foo",
                 "Error looking up module njs_sdk_test_1 with version foo: " +
-                "'NoneType' object has no attribute '__getitem__'");
+                "argument of type 'NoneType' is not iterable");
         
         res.server.stop();
     }
