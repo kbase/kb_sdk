@@ -37,7 +37,7 @@ public class CompilationReporter {
             boolean perlServerSide, String perlImplName, boolean pyServerSide, 
             String pyImplName, boolean rServerSide, String rImplName,
             boolean javaServerSide, String javaPackageParent, String javaSrcPath, 
-            JavaData javaParsingData, Map<String, String> kidlSpecs, File reportFile) throws Exception {
+            JavaData javaParsingData, List<SpecFile> specFiles, File reportFile) throws Exception {
         System.out.println("Preparing SDK compilation report...");
         String sdkVersion = ModuleBuilder.VERSION;
         String sdkGitCommit = ModuleBuilder.getGitCommit();
@@ -87,13 +87,13 @@ public class CompilationReporter {
         }
         String implText = IOUtils.toString(new LineNumberReader(new FileReader(
                 implFile)));
-        Report report = createReport(kidlSpecs, sdkVersion, sdkGitCommit,
+        Report report = createReport(specFiles, sdkVersion, sdkGitCommit,
                 moduleName, module, implFile.getCanonicalPath(), comment, implText);
         UObject.getMapper().writeValue(reportFile, report);
         System.out.println("Report was stored into " + reportFile.getAbsolutePath());
     }
 
-    public static Report createReport(Map<String, String> kidlSpecs,
+    public static Report createReport(List<SpecFile> specFiles,
             String sdkVersion, String sdkGitCommit, String moduleName,
             KbModule module, String implFilePath, String implCommentPrefix, 
             String implText) throws Exception, IOException {
@@ -145,7 +145,7 @@ public class CompilationReporter {
         if (implPath.startsWith(rootPath))
             implPath = implPath.substring(rootPath.length());
         report.implFilePath = implPath;
-        report.kidlSpecs = kidlSpecs;
+        report.specFiles = specFiles;
         report.functionPlaces = funcPositions;
         report.functions = functions;
         return report;
