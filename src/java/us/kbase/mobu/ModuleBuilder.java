@@ -204,6 +204,12 @@ public class ModuleBuilder {
             return 1;
 		}
     	
+        if (a.clAsyncVer != null && a.dynservVer != null) {
+            showError("Bad arguments",
+                    "clasyncver and dynserver cannot both be specified");
+            return 1;
+        }
+    	
     	// Step 2: check or create the output directory
     	File outDir = a.outDir == null ? new File(".") : new File(a.outDir);
         try {
@@ -256,14 +262,15 @@ public class ModuleBuilder {
             }
         }
         try {
-			RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
-			        a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
-			        a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
-			        a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
-			        a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
-			        a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
+            RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
+                    a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
+                    a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
+                    a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
+                    a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
+                    a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
-                    a.makefile, a.clAsyncVer, semanticVersion, gitUrl, gitCommitHash);
+                    a.makefile, a.clAsyncVer, a.dynservVer, semanticVersion,
+                    gitUrl, gitCommitHash);
 		} catch (Throwable e) {
 			System.err.println("Error compiling KIDL specfication:");
 			System.err.println(e.getMessage());
@@ -541,6 +548,14 @@ public class ModuleBuilder {
         @Parameter(names="--clasyncver",description="Will set in client code version of service for asyncronous calls " +
         		"(it could be git commit hash of version registered in catalog or one of version tags: dev/beta/release)")
         String clAsyncVer = null;
+        
+        @Parameter(names="--dynservver", description="Clients will be built " +
+                "for use with KBase dynamic services (e.g. with URL lookup " +
+                "via the Service Wizard) with the specified version " +
+                "(git commit hash or dev/beta/release)." +
+                "clasyncver may not be specified if " +
+                "dynservver is specified.")
+        String dynservVer = null;
 
         @Parameter(required=true, description="<KIDL spec file>")
         List <String> specFileNames;

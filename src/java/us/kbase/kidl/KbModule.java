@@ -100,6 +100,7 @@ public class KbModule {
 							"[" + Map.class.getName() + "], it has type: " + item.getClass().getName());
 				}
 			} else {
+				@SuppressWarnings("rawtypes")
 				Map<?,?> compProps = (Map)item;
 				String compType = Utils.getPerlSimpleType(compProps);
 				if (compType.equals("Typedef")) {

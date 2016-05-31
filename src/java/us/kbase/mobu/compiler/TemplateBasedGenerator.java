@@ -32,7 +32,8 @@ public class TemplateBasedGenerator {
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, genPerlServer, 
                 perlServerName, perlImplName, perlPsgiName, genPython, pythonClientName, 
                 genPythonServer, pythonServerName, pythonImplName, false, null, false, null, null, 
-                enableRetries, newStyle, ip, output, null, null, false, null, null, null, null);
+                enableRetries, newStyle, ip, output, null, null, false, null,
+                null, null, null, null);
     }
     
     public static boolean genPerlServer(boolean genPerlServer, 
@@ -59,14 +60,14 @@ public class TemplateBasedGenerator {
             String rClientName, boolean genRServer, String rServerName, String rImplName, 
             boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
-            String clientAsyncVer, String semanticVersion, String gitUrl,
-            String gitCommitHash) throws Exception {
+            String clientAsyncVer, String dynservVer, String semanticVersion,
+            String gitUrl, String gitCommitHash) throws Exception {
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, 
                 genPerlServer, perlServerName, perlImplName, perlPsgiName, genPython, 
                 pythonClientName, genPythonServer, pythonServerName, pythonImplName, 
                 genR, rClientName, genRServer, rServerName, rImplName, enableRetries, 
                 newStyle, ip, output, perlMakefile, pyMakefile, asyncByDefault, 
-                clientAsyncVer, semanticVersion, gitUrl, gitCommitHash, null);
+                clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash, null);
     }
     
     @SuppressWarnings("unchecked")
@@ -79,8 +80,9 @@ public class TemplateBasedGenerator {
             String rClientName, boolean genRServer, String rServerName, String rImplName, 
             boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
-            String clientAsyncVer, String semanticVersion, String gitUrl,
-            String gitCommitHash, Map<String, String> prevCode) throws Exception {
+            String clientAsyncVer, String dynservVer, String semanticVersion,
+            String gitUrl, String gitCommitHash, Map<String, String> prevCode)
+            throws Exception {
         if (semanticVersion == null)
             semanticVersion = "";
         if (gitUrl == null)
@@ -127,6 +129,16 @@ public class TemplateBasedGenerator {
         context.put("empty_escaper", "");  // ${empty_escaper}
         context.put("display", new StringUtils());
         context.put("async_version", clientAsyncVer);
+        context.put("dynserv_ver", dynservVer);
+        final String serviceVer;
+        if (clientAsyncVer != null) {
+            serviceVer = clientAsyncVer;
+        } else if (dynservVer != null) {
+            serviceVer = dynservVer;
+        } else {
+            serviceVer = null;
+        }
+        context.put("service_ver", serviceVer);
         if (jsClientName != null) {
             Writer jsClient = output.openWriter(jsClientName + ".js");
             TemplateFormatter.formatTemplate("javascript_client", context, newStyle, jsClient);
@@ -170,7 +182,8 @@ public class TemplateBasedGenerator {
                     continue;
                 for (int methodPos = 0; methodPos < methods.size(); methodPos++) {
                     Map<String, Object> method = methods.get(methodPos);
-                    Boolean async = (Boolean)method.get("async");
+                    //TODO ROMAN should async go into the map or can this line be deleted?
+//                    Boolean async = (Boolean)method.get("async");
                     method.put("async", true);
                     //if (async == null || !async)
                     //    method.put("could_be_sync", true);
