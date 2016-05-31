@@ -179,7 +179,7 @@ class Client(object):
         return service_status_ret['url']
 
     def _set_up_context(self, service_ver=None, context=None):
-        if self.service_ver:
+        if service_ver:
             if not context:
                 context = {}
             context['service_ver'] = service_ver

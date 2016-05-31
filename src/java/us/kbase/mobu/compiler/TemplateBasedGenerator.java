@@ -4,15 +4,14 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
 import us.kbase.jkidl.FileIncludeProvider;
@@ -346,10 +345,9 @@ public class TemplateBasedGenerator {
                     .resolve(baseCli);
         }
         try (final InputStream input =
-                TemplateFormatter.getResource(baseCli)) {
-            Files.copy(input, output.getAsFileOrNull(
-                        baseCliPath.toString()).toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+                TemplateFormatter.getResource(baseCli);
+             final Writer w = output.openWriter(baseCliPath.toString())) {
+            IOUtils.copy(input, w);
         }
     }
 
