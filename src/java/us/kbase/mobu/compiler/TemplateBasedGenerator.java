@@ -1,8 +1,13 @@
 package us.kbase.mobu.compiler;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -139,9 +144,6 @@ public class TemplateBasedGenerator {
             serviceVer = null;
         }
         context.put("service_ver", serviceVer);
-//        System.out.println(srvs);
-//        System.out.println("******");
-//        System.out.println(context);
         if (jsClientName != null) {
             Writer jsClient = output.openWriter(jsClientName + ".js");
             TemplateFormatter.formatTemplate("javascript_client", context, newStyle, jsClient);
@@ -159,7 +161,7 @@ public class TemplateBasedGenerator {
         }
         if (pythonClientName != null) {
             String pythonClientPath = fixPath(pythonClientName, ".") + ".py";
-            initPyhtonPackages(pythonClientPath, output);
+            initPythonPackages(pythonClientPath, output);
             Writer pythonClient = output.openWriter(pythonClientPath);
             TemplateFormatter.formatTemplate("python_client", context, newStyle, pythonClient);
             pythonClient.close();
@@ -203,7 +205,7 @@ public class TemplateBasedGenerator {
         }
         if (pythonServerName != null) {
             String pythonServerPath = fixPath(pythonServerName, ".") + ".py";
-            initPyhtonPackages(pythonServerPath, output);
+            initPythonPackages(pythonServerPath, output);
             Writer pythonServer = output.openWriter(pythonServerPath);
             TemplateFormatter.formatTemplate("python_server", context, newStyle, pythonServer);
             pythonServer.close();
@@ -320,7 +322,7 @@ public class TemplateBasedGenerator {
         }
     }
     
-    private static void initPyhtonPackages(String relativePyPath, FileSaver output) throws Exception {
+    private static void initPythonPackages(String relativePyPath, FileSaver output) throws Exception {
         String path = relativePyPath;
         while (true) {
             int pos = path.lastIndexOf("/");
@@ -331,8 +333,22 @@ public class TemplateBasedGenerator {
                 break;
             String initPath = path + "/__init__.py";
             File prevFile = output.getAsFileOrNull(initPath);
-            if (prevFile == null || !prevFile.exists())
+            if (prevFile == null || !prevFile.exists()) {
                 output.openWriter(initPath).close();
+            }
+        }
+        final String baseCli = "baseclient.py";
+        final Path baseCliPath;
+        if (Paths.get(relativePyPath).getParent() == null) {
+            baseCliPath = Paths.get(baseCli);
+        } else {
+            baseCliPath = Paths.get(relativePyPath).getParent()
+                    .resolve(baseCli);
+        }
+        try (final InputStream input =
+                TemplateFormatter.getResource(baseCli)) {
+            Files.copy(input, baseCliPath,
+                    StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
