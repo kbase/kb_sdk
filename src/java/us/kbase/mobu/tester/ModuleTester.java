@@ -38,7 +38,6 @@ import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
 import us.kbase.mobu.util.DirUtils;
-import us.kbase.mobu.util.NetUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
