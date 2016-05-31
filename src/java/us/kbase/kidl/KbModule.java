@@ -184,4 +184,34 @@ public class KbModule {
             ret.put("any_async", anyAsync);
 	    return ret;
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbModule [moduleName=");
+        builder.append(moduleName);
+        builder.append(", serviceName=");
+        builder.append(serviceName);
+        builder.append(", comment=");
+        builder.append(comment);
+        builder.append(", options=");
+        builder.append(options);
+        builder.append(", moduleComponents=");
+        builder.append(moduleComponents);
+        builder.append(", typeInfoList=");
+        builder.append(typeInfoList);
+        builder.append(", nameToType=");
+        builder.append(nameToType);
+        builder.append(", annotations=");
+        builder.append(annotations);
+        builder.append(", lastAuthTempMode=");
+        builder.append(lastAuthTempMode);
+        builder.append(", data=");
+        builder.append(data);
+        builder.append("]");
+        return builder.toString();
+    }
 }

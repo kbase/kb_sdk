@@ -139,6 +139,9 @@ public class TemplateBasedGenerator {
             serviceVer = null;
         }
         context.put("service_ver", serviceVer);
+//        System.out.println(srvs);
+//        System.out.println("******");
+//        System.out.println(context);
         if (jsClientName != null) {
             Writer jsClient = output.openWriter(jsClientName + ".js");
             TemplateFormatter.formatTemplate("javascript_client", context, newStyle, jsClient);
