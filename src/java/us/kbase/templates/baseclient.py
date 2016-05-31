@@ -93,7 +93,7 @@ class _JSONObjectEncoder(_json.JSONEncoder):
         return _json.JSONEncoder.default(self, obj)
 
 
-class footest(object):
+class Client(object):
 
     def __init__(
             self, url=None, timeout=30 * 60, user_id=None,
