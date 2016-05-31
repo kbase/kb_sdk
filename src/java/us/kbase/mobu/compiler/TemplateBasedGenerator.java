@@ -347,7 +347,8 @@ public class TemplateBasedGenerator {
         }
         try (final InputStream input =
                 TemplateFormatter.getResource(baseCli)) {
-            Files.copy(input, baseCliPath,
+            Files.copy(input, output.getAsFileOrNull(
+                        baseCliPath.toString()).toPath(),
                     StandardCopyOption.REPLACE_EXISTING);
         }
     }
