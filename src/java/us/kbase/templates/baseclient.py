@@ -175,7 +175,7 @@ class Client(object):
         service, _ = service_method.split('.')
         service_status_ret = self._call(
             self.url, 'ServiceWizard.get_service_status',
-            [{'module_name': service, 'version': service_version}])[0]
+            [{'module_name': service, 'version': service_version}])
         return service_status_ret['url']
 
     def _set_up_context(self, service_ver=None, context=None):
