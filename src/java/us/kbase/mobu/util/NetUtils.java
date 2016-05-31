@@ -20,11 +20,9 @@ public class NetUtils {
     public static List<String> findNetworkAddresses(String... networkNames) throws Exception {
         Set<String> networkNameSet = new HashSet<String>(Arrays.asList(networkNames));
         List<String> ret = new ArrayList<String>();
-        System.out.println("!!!!findNetworkAddresses");
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
             NetworkInterface intf = en.nextElement();
             String networkName = intf.getName();
-            System.out.println("INTF:"+networkName);
             if (networkNameSet.contains(networkName)) {
                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     String ip = enumIpAddr.nextElement().getHostAddress();
