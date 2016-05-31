@@ -169,11 +169,10 @@ class Client(object):
             return resp['result'][0]
         return resp['result']
 
-    def _get_service_url(self, service, service_version):
+    def _get_service_url(self, service_method, service_version):
         if not self.lookup_url:
             return self.url
-        if '.' in service:
-            service, _ = service.split('.')
+        service, _ = service_method.split('.')
         service_status_ret = self._call(
             self.url, 'ServiceWizard.get_service_status',
             [{'module_name': service, 'version': service_version}])[0]
@@ -186,9 +185,8 @@ class Client(object):
             context['service_ver'] = service_ver
         return context
 
-    def _check_job(self, service_method, job_id):
-        mod, _ = service_method.split('.')
-        return self._call(self.url, mod + '._check_job', [job_id])
+    def _check_job(self, service, job_id):
+        return self._call(self.url, service + '._check_job', [job_id])
 
     def _submit_job(self, service_method, args, service_ver=None,
                     context=None):
@@ -198,10 +196,11 @@ class Client(object):
                           args, context)
 
     def run_job(self, service_method, args, service_ver=None, context=None):
+        mod, _ = service_method.split('.')
         job_id = self._submit_job(service_method, args, service_ver, context)
         while True:
             time.sleep(self.async_job_check_time)
-            job_state = self._check_job(service_method, job_id)
+            job_state = self._check_job(mod, job_id)
             if job_state['finished']:
                 if not job_state['result']:
                     return
