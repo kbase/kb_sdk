@@ -94,7 +94,29 @@ class _JSONObjectEncoder(_json.JSONEncoder):
 
 
 class Client(object):
-
+    '''
+    The KBase base client.
+    Required initialization arguments (positional):
+    url - the url of the the service to contact:
+        For SDK methods: either the url of the callback service or the
+            Narrative Job Service Wrapper.
+        For SDK dynamic services: the url of the Service Wizard.
+        For other services: the url of the service.
+    Optional arguments (keywords in positional order):
+    timeout - methods will fail if they take longer than this value in seconds.
+        Default 1800.
+    user_id - a KBase user name.
+    password - the password corresponding to the user name.
+    token - a KBase authentication token.
+    ignore_authrc - if True, don't read auth configuration from
+        ~/.kbase_config.
+    trust_all_ssl_certificates - set to True to trust self-signed certificates.
+        If you don't understand the implications, leave as the default, False.
+    auth_svc - the url of the KBase authorization service.
+    lookup_url - set to true when contacting KBase dynamic services.
+    async_job_check_time_ms - the wait time between checking job state for
+        asynchronous jobs run with the run_job method.
+    '''
     def __init__(
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
@@ -196,6 +218,16 @@ class Client(object):
                           args, context)
 
     def run_job(self, service_method, args, service_ver=None, context=None):
+        '''
+        Run a SDK method asynchronously.
+        Required arguments:
+        service_method - the service and method to run, e.g. myserv.mymeth.
+        args - a list of arguments to the method.
+        Optional arguments:
+        service_ver - the version of the service to run, e.g. a git hash
+            or dev/beta/release.
+        context - the rpc context dict.
+        '''
         mod, _ = service_method.split('.')
         job_id = self._submit_job(service_method, args, service_ver, context)
         while True:
@@ -210,6 +242,16 @@ class Client(object):
 
     def call_method(self, service_method, args, service_ver=None,
                     context=None):
+        '''
+        Call a standard or dynamic service synchronously.
+        Required arguments:
+        service_method - the service and method to run, e.g. myserv.mymeth.
+        args - a list of arguments to the method.
+        Optional arguments:
+        service_ver - the version of the service to run, e.g. a git hash
+            or dev/beta/release.
+        context - the rpc context dict.
+        '''
         url = self._get_service_url(service_method, service_ver)
         context = self._set_up_context(service_ver, context)
         return self._call(url, service_method, args, context)
