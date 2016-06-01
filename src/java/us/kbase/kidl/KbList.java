@@ -53,4 +53,16 @@ public class KbList extends KbBasicType {
 	public String getSpecName() {
 	    return "list<" + elementType.getSpecName() + ">";
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbList [elementType=");
+        builder.append(elementType);
+        builder.append("]");
+        return builder.toString();
+    }
 }

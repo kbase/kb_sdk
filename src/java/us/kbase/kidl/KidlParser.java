@@ -238,6 +238,7 @@ public class KidlParser {
 	
 	private static void correctStringAnnotations(Object node) {
 		if (node instanceof Map) {
+			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>)node;
 			Object perlType = map.get("!");
 			if (perlType != null && perlType instanceof String && 

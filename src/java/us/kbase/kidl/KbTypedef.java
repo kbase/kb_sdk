@@ -79,19 +79,42 @@ public class KbTypedef implements KbModuleComp, KbType {
 		return data;
 	}
 	
-	@Override
-	public String toString() {
-		return module + "." + name;
-	}
+	/* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbTypedef [name=");
+        builder.append(name);
+        builder.append(", module=");
+        builder.append(module);
+        builder.append(", aliasType=");
+        builder.append(aliasType);
+        builder.append(", comment=");
+        builder.append(comment);
+        builder.append(", data=");
+        builder.append(data);
+        builder.append(", annotations=");
+        builder.append(annotations);
+        builder.append("]");
+        return builder.toString();
+    }
+	
+	public String getModMeth() {
+        return module + "." + name;
+    }
 	
 	@Override
 	public int hashCode() {
-		return toString().hashCode();
+		return getModMeth().hashCode();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-	    return obj != null && (obj instanceof KbTypedef) && toString().equals(obj.toString());
+	    return obj != null &&
+	            (obj instanceof KbTypedef) &&
+	            getModMeth().equals(((KbTypedef)obj).getModMeth());
 	}
 	
 	public KbAnnotations getAnnotations() {

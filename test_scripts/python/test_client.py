@@ -58,7 +58,7 @@ def main(argv):
         ret = None
         error = None
         try:
-            ret = method_instance(*params)
+            ret = method_instance(*params, context={})
         except Exception as ex:
             error = ex
         if expected_status == 'pass' or expected_status == 'nomatch':

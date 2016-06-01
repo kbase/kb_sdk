@@ -9,7 +9,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,8 +40,9 @@ public class RunCompileCommand {
             boolean withJavaBuildXml, String javaGwtPackage, boolean rClientSide, 
             String rClientName, boolean rServerSide, String rServerName, 
             String rImplName, boolean newStyle, File outDir, String jsonSchemaPath, 
-            boolean createMakefile, String clientAsyncVer, String semanticVersion, 
-            String gitUrl, String gitCommitHash) throws Exception {
+            boolean createMakefile, String clientAsyncVer, String dynserv,
+            String semanticVersion, String gitUrl, String gitCommitHash)
+            throws Exception {
     	
         FileSaver javaSrcDir = null;
         if (javaSrcPath != null)
@@ -139,18 +139,20 @@ public class RunCompileCommand {
         if (javaGwtPackage != null)
             javaClientSide = true;
         JavaData javaParsingData = null;
-        if (javaClientSide)
+        if (javaClientSide) {
+            //TODO DYNSERV add dynamic service client generation to all clients except Python
             javaParsingData = JavaTypeGenerator.processSpec(services, javaSrcDir, 
                     javaPackageParent, javaServerSide, javaLibDir, javaGwtPackage, 
                     url == null ? null : new URL(url), javaBuildXml, javaMakefile,
                     clientAsyncVer, semanticVersion, gitUrl, gitCommitHash);
+        }
         TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
                 perlImplName, perlPsgiName, pyClientSide, pyClientName, 
                 pyServerSide, pyServerName, pyImplName, rClientSide, rClientName, 
                 rServerSide, rServerName, rImplName, perlEnableRetries, newStyle, 
                 ip, output, perlMakefile, pyMakefile, newStyle, clientAsyncVer,
-                semanticVersion, gitUrl, gitCommitHash);
+                dynserv, semanticVersion, gitUrl, gitCommitHash);
         String reportFile = System.getenv("KB_SDK_COMPILE_REPORT_FILE");
         if (reportFile == null || reportFile.isEmpty())
             reportFile = System.getProperty("KB_SDK_COMPILE_REPORT_FILE");

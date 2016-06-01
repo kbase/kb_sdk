@@ -92,4 +92,20 @@ public class KbParameter {
             throw new IllegalStateException(t.getClass().getSimpleName());
         }
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbParameter [name=");
+        builder.append(name);
+        builder.append(", nameNotNullIfPossible=");
+        builder.append(nameNotNullIfPossible);
+        builder.append(", type=");
+        builder.append(type);
+        builder.append("]");
+        return builder.toString();
+    }
 }

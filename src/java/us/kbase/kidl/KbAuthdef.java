@@ -28,4 +28,16 @@ public class KbAuthdef implements KbModuleComp {
     public Map<String, Object> forTemplates() {
         throw new IllegalStateException("Templates are not yet supported for authentication");
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbAuthdef [type=");
+        builder.append(type);
+        builder.append("]");
+        return builder.toString();
+    }
 }

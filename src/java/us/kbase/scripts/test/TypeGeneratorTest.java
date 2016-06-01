@@ -65,6 +65,15 @@ import us.kbase.mobu.util.TextUtils;
  * @author rsutormin
  */
 public class TypeGeneratorTest extends Assert {
+    
+    //TODO TESTING test client with python3.
+    // might be as simple as running the client test script with python3 vs
+    // python.
+    //TODO TESTING test python client with dynamic services
+    // probably best way is with a mock service wizard that returns a url to
+    // the running service
+    //TODO TESTING pep8 test? Not really sure about this.
+    
 	public static final String rootPackageName = "us.kbase";
     public static final String tempDirName = "temp_test";
     
@@ -722,13 +731,13 @@ public class TypeGeneratorTest extends Assert {
                 true, null, true, null, null, "service.psgi", false, true, 
                 null, true, null, null, false, false, null, null, null, false, 
                 null, false, null, false, null, null, newStyle, serverOutDir, 
-                null, true, null, null, null, null);
+                null, true, null, null, null, null, null);
         // Generate clients (always new style)
         RunCompileCommand.generate(testFile, null, true, null, 
                 true, null, false, null, null, null, false, true, 
                 null, false, null, null, false, false, null, null, null, false, 
                 null, false, null, false, null, null, true, serverOutDir, null, 
-                true, null, null, null, null);
+                true, null, null, null, null, null);
         return serverOutDir;
 	}
 

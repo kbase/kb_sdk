@@ -51,7 +51,6 @@ import us.kbase.workspace.SubAction;
 public abstract class CallbackServer extends JsonServerServlet {
     //TODO NJS_SDK move to common repo
     
-    //TODO identical (or close to it) to kb_sdk call back server.
     // should probably go in java_common or make a common repo for shared
     // NJSW & KB_SDK code, since they're tightly coupled
     private static final long serialVersionUID = 1L;
