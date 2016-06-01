@@ -26,11 +26,11 @@ public class NetUtils {
         List<String> ret = new ArrayList<String>();
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
             NetworkInterface intf = en.nextElement();
-            String networkName = intf.getName();
-            if (networkNameSet.contains(networkName)) {
+            if (!intf.isUp()) continue;
+            if (networkNameSet.contains(intf.getName()) || networkNameSet.contains(intf.getDisplayName())) {
                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
                     String ip = enumIpAddr.nextElement().getHostAddress();
-                    if (IPADDRESS_PATTERN.matcher(ip).matches())
+                    if (IPADDRESS_PATTERN.matcher(ip).matches()) 
                         ret.add(ip);
                 }
             }
