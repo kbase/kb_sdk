@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import us.kbase.common.service.Tuple2;
-import us.kbase.mobu.compiler.JavaFuncParam;
 
 /**
  * Class represents function definition in spec-file.
