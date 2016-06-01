@@ -57,9 +57,10 @@ public class ClientInstaller {
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         sdkConfig = new Properties();
         if (!sdkCfgFile.exists()) {
-            System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + 
-                    " will be initialized (with 'catalog_url' parameter pointing to AppDev environment)");
-            FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=https://appdev.kbase.us/services/catalog"));
+            System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
+            		"initialized (with 'catalog_url' parameter pointing to AppDev environment)");
+            FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
+            		"https://appdev.kbase.us/services/catalog"));
             TextUtils.checkIgnoreLine(new File(moduleDir, ".gitignore"), sdkCfgFile.getName());
             TextUtils.checkIgnoreLine(new File(moduleDir, ".dockerignore"), sdkCfgFile.getName());
         }
@@ -76,13 +77,12 @@ public class ClientInstaller {
         catalogUrl = new URL(catalogUrlText);
     }
     
-    public void install(String lang, boolean async, boolean sync, boolean dynamic, String tagVer, 
+    public int install(String lang, boolean async, boolean sync, boolean dynamic, String tagVer, 
             boolean verbose, String moduleName) throws Exception {
         FileProvider fp = null;
-        boolean isAsync = false;
-        boolean isDynamic = false;
         String url = null;
         String clientAsyncVer = null;
+        String dynservVer = null;
         String semanticVersion = null;
         String gitUrl = null;
         String gitCommitHash = null;
@@ -134,19 +134,17 @@ public class ClientInstaller {
             gitUrl = modVer.getGitUrl();
             gitCommitHash = modVer.getGitCommitHash();
             semanticVersion = modVer.getVersion();
-            if (modVer.getDynamicService() != null && modVer.getDynamicService() == 1L) {
-                isDynamic = true;
-                url = "https://kbase.us/services/service_wizard";
-            } else {
-                isAsync = true;
-                url = "https://kbase.us/services/njs_wrapper";
-                clientAsyncVer = tagVer == null ? "release" : tagVer;
+            if (!(dynamic || async || sync)) {
+                dynamic = modVer.getDynamicService() != null && modVer.getDynamicService() == 1L;
+                async = !dynamic;
             }
+            if (modVer.getCompilationReport() == null)
+                throw new IllegalStateException("Compilation report is not found for this version " +
+                		"of [" + moduleName + "] module.");
             List<SpecFile> specFiles = modVer.getCompilationReport().getSpecFiles();
             if (specFiles == null)
-                throw new IllegalStateException("Compilation report returned from catalog is out of date. [" + 
-                        moduleName + "] module should be reregistered again.");
-            isAsync = true;
+                throw new IllegalStateException("Compilation report returned from catalog is out " +
+                		"of date. [" + moduleName + "] module should be reregistered again.");
             final List<String> mainSpec = new ArrayList<String>();
             final Map<String, String> deps = new LinkedHashMap<String, String>();
             for (SpecFile spec : specFiles) {
@@ -165,6 +163,13 @@ public class ClientInstaller {
                 }
             };
         }
+        if (dynamic) {
+            url = "https://kbase.us/services/service_wizard";
+            dynservVer = tagVer == null ? "release" : tagVer;
+        } else if (async) {
+            url = "https://kbase.us/services/njs_wrapper";
+            clientAsyncVer = tagVer == null ? "release" : tagVer;
+        }
         final FileProvider fp2 = fp;
         IncludeProvider ip = new IncludeProvider() {
             @Override
@@ -182,7 +187,8 @@ public class ClientInstaller {
                     SpecParser p = new SpecParser(new StringReader(specText));
                     return p.SpecStatement(this);
                 } catch (ParseException e) {
-                    throw new KidlParseException("Error parsing spec-file [" + specFileName + "]: " + e.getMessage());
+                    throw new KidlParseException("Error parsing spec-file [" + specFileName + "]: " + 
+                            e.getMessage());
                 } catch (Exception e) {
                     throw new IllegalStateException("Unexpected error", e);
                 }
@@ -225,17 +231,21 @@ public class ClientInstaller {
                     clientAsyncVer, semanticVersion, gitUrl, gitCommitHash);
         } else {
             String perlClientName = null;
+            if (isPerl)
+                perlClientName = moduleName + "::" + moduleName + "Client";
             String pyClientName = null;
+            if (isPython)
+                pyClientName = moduleName + "." + moduleName + "Client";
             String rClientName = null;
+            if (isR)
+                rClientName = moduleName + "/" + moduleName + "Client";
             FileSaver output = new DiskFileSaver(libDir);
-            TemplateBasedGenerator.generate(services, url, false, null, 
-                    isPerl, perlClientName, false, null, 
-                    null, null, isPython, pyClientName, 
-                    false, null, null, isR, rClientName, 
-                    false, null, null, false, true, 
-                    ip, output, null, null, isAsync, clientAsyncVer,
-                    semanticVersion, gitUrl, gitCommitHash);
+            TemplateBasedGenerator.generate(services, url, false, null, isPerl, perlClientName, 
+                    false, null, null, null, isPython, pyClientName, false, null, null, isR, 
+                    rClientName, false, null, null, false, true, ip, output, null, null, 
+                    async, clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         }
+        return 0;
     }
     
     private static interface FileProvider {

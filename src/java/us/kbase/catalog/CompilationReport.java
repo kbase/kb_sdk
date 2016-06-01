@@ -2,6 +2,7 @@
 package us.kbase.catalog;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -19,13 +20,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
+    "module_name",
     "sdk_version",
     "sdk_git_commit",
     "impl_file_path",
-    "function_places"
+    "function_places",
+    "functions",
+    "spec_files"
 })
 public class CompilationReport {
 
+    @JsonProperty("module_name")
+    private java.lang.String moduleName;
     @JsonProperty("sdk_version")
     private java.lang.String sdkVersion;
     @JsonProperty("sdk_git_commit")
@@ -34,7 +40,26 @@ public class CompilationReport {
     private java.lang.String implFilePath;
     @JsonProperty("function_places")
     private Map<String, FunctionPlace> functionPlaces;
+    @JsonProperty("functions")
+    private Map<String, Function> functions;
+    @JsonProperty("spec_files")
+    private List<SpecFile> specFiles;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
+
+    @JsonProperty("module_name")
+    public java.lang.String getModuleName() {
+        return moduleName;
+    }
+
+    @JsonProperty("module_name")
+    public void setModuleName(java.lang.String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public CompilationReport withModuleName(java.lang.String moduleName) {
+        this.moduleName = moduleName;
+        return this;
+    }
 
     @JsonProperty("sdk_version")
     public java.lang.String getSdkVersion() {
@@ -96,6 +121,36 @@ public class CompilationReport {
         return this;
     }
 
+    @JsonProperty("functions")
+    public Map<String, Function> getFunctions() {
+        return functions;
+    }
+
+    @JsonProperty("functions")
+    public void setFunctions(Map<String, Function> functions) {
+        this.functions = functions;
+    }
+
+    public CompilationReport withFunctions(Map<String, Function> functions) {
+        this.functions = functions;
+        return this;
+    }
+
+    @JsonProperty("spec_files")
+    public List<SpecFile> getSpecFiles() {
+        return specFiles;
+    }
+
+    @JsonProperty("spec_files")
+    public void setSpecFiles(List<SpecFile> specFiles) {
+        this.specFiles = specFiles;
+    }
+
+    public CompilationReport withSpecFiles(List<SpecFile> specFiles) {
+        this.specFiles = specFiles;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -108,7 +163,7 @@ public class CompilationReport {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((("CompilationReport"+" [sdkVersion=")+ sdkVersion)+", sdkGitCommit=")+ sdkGitCommit)+", implFilePath=")+ implFilePath)+", functionPlaces=")+ functionPlaces)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((("CompilationReport"+" [moduleName=")+ moduleName)+", sdkVersion=")+ sdkVersion)+", sdkGitCommit=")+ sdkGitCommit)+", implFilePath=")+ implFilePath)+", functionPlaces=")+ functionPlaces)+", functions=")+ functions)+", specFiles=")+ specFiles)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

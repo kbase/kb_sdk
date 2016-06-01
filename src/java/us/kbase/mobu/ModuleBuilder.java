@@ -22,6 +22,7 @@ import com.beust.jcommander.Parameters;
 
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.renamer.ModuleRenamer;
 import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
@@ -40,10 +41,11 @@ public class ModuleBuilder {
     private static final String TEST_COMMAND     = "test";
     private static final String VERSION_COMMAND  = "version";
     private static final String RENAME_COMMAND   = "rename";
+    private static final String INSTALL_COMMAND   = "install";
     
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.4";
+    public static final String VERSION = "1.0.5";
     
     
     public static void main(String[] args) throws Exception {
@@ -82,6 +84,10 @@ public class ModuleBuilder {
         RenameCommandArgs renameArgs = new RenameCommandArgs();
         jc.addCommand(RENAME_COMMAND, renameArgs);
 
+        // add the 'install' command
+        InstallCommandArgs installArgs = new InstallCommandArgs();
+        jc.addCommand(INSTALL_COMMAND, installArgs);
+
     	// parse the arguments and gracefully catch any errors
     	try {
     		jc.parse(args);
@@ -119,6 +125,8 @@ public class ModuleBuilder {
 	        returnCode = runVersionCommand(versionArgs, jc);
 	    } else if (jc.getParsedCommand().equals(RENAME_COMMAND)) {
 	        returnCode = runRenameCommand(renameArgs, jc);
+	    } else if (jc.getParsedCommand().equals(INSTALL_COMMAND)) {
+	        returnCode = runInstallCommand(installArgs, jc);
 	    }
 	    
 	    if(returnCode!=0) {
@@ -364,6 +372,24 @@ public class ModuleBuilder {
             if (renameArgs.verbose)
                 e.printStackTrace();
             showError("Error while renaming module", e.getMessage());
+            return 1;
+        }
+    }
+
+    private static int runInstallCommand(InstallCommandArgs installArgs, JCommander jc) {
+        if (installArgs.moduleName == null || installArgs.moduleName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", 
+                    "One and only one module name should be provided");
+            return 1;
+        }
+        try {
+            return new ClientInstaller().install(installArgs.lang, installArgs.async,
+                    installArgs.sync, installArgs.dynamic, installArgs.tagVer, 
+                    installArgs.verbose, installArgs.moduleName.get(0));
+        } catch (Exception e) {
+            if (installArgs.verbose)
+                e.printStackTrace();
+            showError("Error while installing client", e.getMessage());
             return 1;
         }
     }

@@ -8,5 +8,5 @@ public class SpecFile {
     @JsonProperty("content")
     public String content;
     @JsonProperty("is_main")
-    public boolean isMain;
+    public long isMain;
 }
