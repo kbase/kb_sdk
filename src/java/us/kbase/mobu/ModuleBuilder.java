@@ -201,6 +201,9 @@ public class ModuleBuilder {
         	specFile = specFiles.get(0);
 		} catch (IOException | RuntimeException e) {
             showError("Error accessing input KIDL spec file", e.getMessage());
+            if (a.verbose) {
+                e.printStackTrace();
+            }
             return 1;
 		}
     	
@@ -271,14 +274,17 @@ public class ModuleBuilder {
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
                     a.makefile, a.clAsyncVer, a.dynservVer, semanticVersion,
                     gitUrl, gitCommitHash);
-		} catch (Throwable e) {
-			System.err.println("Error compiling KIDL specfication:");
-			System.err.println(e.getMessage());
-			return 1;
-		}
+        } catch (Throwable e) {
+            System.err.println("Error compiling KIDL specfication:");
+            System.err.println(e.getMessage());
+            if (a.verbose) {
+                e.printStackTrace();
+            }
+            return 1;
+        }
         return 0;
     }
-    
+
 	private static String getCmdOutput(File workDir, String... cmd) throws Exception {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -556,6 +562,10 @@ public class ModuleBuilder {
                 "clasyncver may not be specified if " +
                 "dynservver is specified.")
         String dynservVer = null;
+        
+        @Parameter(names={"-v", "--verbose"}, description="Print full stack " +
+                "trace on a compile failure")
+        boolean verbose = false;
 
         @Parameter(required=true, description="<KIDL spec file>")
         List <String> specFileNames;

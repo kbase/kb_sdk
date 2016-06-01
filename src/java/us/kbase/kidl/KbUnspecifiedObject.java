@@ -34,4 +34,14 @@ public class KbUnspecifiedObject extends KbBasicType {
 		ret.put("original-type", "kidl-" + getSpecName());
 		return ret;
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbUnspecifiedObject []");
+        return builder.toString();
+    }
 }

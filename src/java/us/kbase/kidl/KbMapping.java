@@ -67,4 +67,18 @@ public class KbMapping extends KbBasicType {
 	public String getSpecName() {
 	    return "mapping<" + keyType.getSpecName() + "," + valueType.getSpecName() + ">";
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbMapping [keyType=");
+        builder.append(keyType);
+        builder.append(", valueType=");
+        builder.append(valueType);
+        builder.append("]");
+        return builder.toString();
+    }
 }

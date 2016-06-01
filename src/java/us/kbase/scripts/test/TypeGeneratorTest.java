@@ -65,6 +65,15 @@ import us.kbase.mobu.util.TextUtils;
  * @author rsutormin
  */
 public class TypeGeneratorTest extends Assert {
+    
+    //TODO TESTING test client with python3.
+    // might be as simple as running the client test script with python3 vs
+    // python.
+    //TODO TESTING test python client with dynamic services
+    // probably best way is with a mock service wizard that returns a url to
+    // the running service
+    //TODO TESTING pep8 test? Not really sure about this.
+    
 	public static final String rootPackageName = "us.kbase";
     public static final String tempDirName = "temp_test";
     

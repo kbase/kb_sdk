@@ -21,7 +21,7 @@ public class KbTuple extends KbBasicType {
 	
 	public KbTuple(List<KbType> types) {
 		elementNames = new ArrayList<String>();
-		for (KbType type : types)
+		for (@SuppressWarnings("unused") KbType type : types)
 			elementNames.add("e_" + (elementNames.size() + 1));
 		elementNames = Collections.unmodifiableList(elementNames);
 		elementTypes = Collections.unmodifiableList(types);
@@ -150,4 +150,22 @@ public class KbTuple extends KbBasicType {
 	    }
 	    return "tuple<" + ret + ">";
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbTuple [elementNames=");
+        builder.append(elementNames);
+        builder.append(", elementTypes=");
+        builder.append(elementTypes);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", comment=");
+        builder.append(comment);
+        builder.append("]");
+        return builder.toString();
+    }
 }
