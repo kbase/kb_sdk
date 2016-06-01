@@ -288,18 +288,16 @@ public class ModuleTester {
     
     private boolean buildImage(File repoDir, String targetImageName, 
             File runDockerSh) throws Exception {
-	boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-	Process p;
-	if(isWindows) { // repoDir is sensitive to 8.3 format
-            p = Runtime.getRuntime().exec(new String[] {"bash", 
-                WinShortPath.getWinShortPath(runDockerSh.getCanonicalPath()), "build", "--rm", "-t", 
-                targetImageName, WinShortPath.getWinShortPath(repoDir.getCanonicalPath())});
-	}
-	else {
-            p = Runtime.getRuntime().exec(new String[] {"bash", 
-                runDockerSh.getCanonicalPath(), "build", "--rm", "-t", 
-                targetImageName, repoDir.getCanonicalPath()});
-	}
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        String scriptPath = runDockerSh.getCanonicalPath();
+        String repoPath = repoDir.getCanonicalPath();
+        if (isWindows) {
+            scriptPath = WinShortPath.getWinShortPath(scriptPath);
+            repoPath = WinShortPath.getWinShortPath(repoPath);
+        }
+        Process p = Runtime.getRuntime().exec(new String[] {"bash", 
+                scriptPath, "build", "--rm", "-t", 
+                targetImageName, repoPath});
         List<Thread> workers = new ArrayList<Thread>();
         InputStream[] inputStreams = new InputStream[] {p.getInputStream(), p.getErrorStream()};
         final String[] cntIdToDelete = {null};
