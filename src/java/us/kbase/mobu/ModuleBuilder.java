@@ -22,6 +22,7 @@ import com.beust.jcommander.Parameters;
 
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.renamer.ModuleRenamer;
 import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
@@ -40,10 +41,11 @@ public class ModuleBuilder {
     private static final String TEST_COMMAND     = "test";
     private static final String VERSION_COMMAND  = "version";
     private static final String RENAME_COMMAND   = "rename";
+    private static final String INSTALL_COMMAND   = "install";
     
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.4";
+    public static final String VERSION = "1.0.5";
     
     
     public static void main(String[] args) throws Exception {
@@ -82,6 +84,10 @@ public class ModuleBuilder {
         RenameCommandArgs renameArgs = new RenameCommandArgs();
         jc.addCommand(RENAME_COMMAND, renameArgs);
 
+        // add the 'install' command
+        InstallCommandArgs installArgs = new InstallCommandArgs();
+        jc.addCommand(INSTALL_COMMAND, installArgs);
+
     	// parse the arguments and gracefully catch any errors
     	try {
     		jc.parse(args);
@@ -119,6 +125,8 @@ public class ModuleBuilder {
 	        returnCode = runVersionCommand(versionArgs, jc);
 	    } else if (jc.getParsedCommand().equals(RENAME_COMMAND)) {
 	        returnCode = runRenameCommand(renameArgs, jc);
+	    } else if (jc.getParsedCommand().equals(INSTALL_COMMAND)) {
+	        returnCode = runInstallCommand(installArgs, jc);
 	    }
 	    
 	    if(returnCode!=0) {
@@ -368,6 +376,24 @@ public class ModuleBuilder {
         }
     }
 
+    private static int runInstallCommand(InstallCommandArgs installArgs, JCommander jc) {
+        if (installArgs.moduleName == null || installArgs.moduleName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", 
+                    "One and only one module name should be provided");
+            return 1;
+        }
+        try {
+            return new ClientInstaller().install(installArgs.lang, installArgs.async,
+                    installArgs.sync, installArgs.dynamic, installArgs.tagVer, 
+                    installArgs.verbose, installArgs.moduleName.get(0));
+        } catch (Exception e) {
+            if (installArgs.verbose)
+                e.printStackTrace();
+            showError("Error while installing client", e.getMessage());
+            return 1;
+        }
+    }
+
     @Parameters(commandDescription = "Validate a module or modules.")
     private static class ValidateCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
@@ -601,7 +627,35 @@ public class ModuleBuilder {
         List<String> newModuleName;
     }
 
-    
+    @Parameters(commandDescription = "Install a client for KBase module.")
+    private static class InstallCommandArgs {
+        @Parameter(names={"-l", "--language"}, description="Language of generated client code " +
+                "(default is one defined in kbase.yml)")
+        String lang;
+        
+        @Parameter(names={"-a", "--async"}, description="Force generation of asynchronous calls " +
+        		"(default is chosen based on information registered in catalog)")
+        boolean async = false;
+
+        @Parameter(names={"-s", "--sync"}, description="Force generation of synchronous calls" +
+        		"(default is chosen based on information registered in catalog)")
+        boolean sync = false;
+
+        @Parameter(names={"-d", "--dynamic"}, description="Force generation of dynamic service calls" +
+                "(default is chosen based on information registered in catalog)")
+        boolean dynamic = false;
+
+        @Parameter(names={"-t","--tag-or-ver"}, description="Tag or version " +
+                "(default is chosen based on information registered in catalog)")
+        String tagVer = null;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
+
+        @Parameter(required=true, description="<module name or path/URL to spec-file>")
+        List<String> moduleName;
+    }
+
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();
     	out.println("");
