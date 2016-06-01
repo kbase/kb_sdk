@@ -16,13 +16,14 @@ import us.kbase.common.service.Tuple2;
 /**
  * Class represents function definition in spec-file.
  */
-public class KbFuncdef implements KbModuleComp {
+public class KbFuncdef implements KbModuleDef {
 	private String name;
 	private boolean async;
 	private String authentication;
 	private String comment;
 	private List<KbParameter> parameters;
 	private List<KbParameter> returnType;
+	private KbAnnotations annotations;
 	private Map<?,?> data = null;
 	
 	private static int pyDocstringWidth = 70;
@@ -30,16 +31,20 @@ public class KbFuncdef implements KbModuleComp {
 	
 	public KbFuncdef() {}
 
-	public KbFuncdef(String name, String comment) {
-	    this(name, comment, false);
+	public KbFuncdef(final String name, final String comment)
+			throws KidlParseException {
+		this(name, comment, false);
 	}
 	
-	public KbFuncdef(String name, String comment, boolean async) {
+	public KbFuncdef(final String name, final String comment,
+			final boolean async)
+			throws KidlParseException {
 		this.name = name;
 		this.async = async;
 		this.comment = comment == null ? "" : comment;
 		parameters = new ArrayList<KbParameter>();
 		returnType = new ArrayList<KbParameter>();
+		annotations = new KbAnnotations().loadFromComment(this.comment, this);
 	}
 
 	public KbFuncdef loadFromMap(Map<?,?> data, String defaultAuth) throws KidlParseException {
@@ -49,6 +54,10 @@ public class KbFuncdef implements KbModuleComp {
 		comment = Utils.prop(data, "comment");
 		parameters = loadParameters(Utils.propList(data, "parameters"), false);
 		returnType = loadParameters(Utils.propList(data, "return_type"), true);
+		annotations = new KbAnnotations();
+		if (data.containsKey("annotations")) {
+			annotations.loadFromMap(Utils.propMap(data, "annotations"));
+		}
 		this.data = data;
 		return this;
 	}
@@ -101,6 +110,12 @@ public class KbFuncdef implements KbModuleComp {
 		return data;
 	}
 	
+
+	@Override
+	public KbAnnotations getAnnotations() {
+		return annotations;
+	}
+	
 	private List<Object> toJson(List<KbParameter> list) {
 		List<Object> ret = new ArrayList<Object>();
 		for (KbParameter param : list)
@@ -112,7 +127,7 @@ public class KbFuncdef implements KbModuleComp {
 	public Object toJson() {
 		Map<String, Object> ret = new TreeMap<String, Object>();
 		ret.put("!", "Bio::KBase::KIDL::KBT::Funcdef");
-		ret.put("annotations", new KbAnnotations().toJson(false));
+		ret.put("annotations", annotations.toJson(false));
 		ret.put("async", async ? "1" : "0");
 		ret.put("authentication", authentication);
 		ret.put("comment", comment);
@@ -378,26 +393,28 @@ public class KbFuncdef implements KbModuleComp {
     }
 
     /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("KbFuncdef [name=");
-        builder.append(name);
-        builder.append(", async=");
-        builder.append(async);
-        builder.append(", authentication=");
-        builder.append(authentication);
-        builder.append(", comment=");
-        builder.append(comment);
-        builder.append(", parameters=");
-        builder.append(parameters);
-        builder.append(", returnType=");
-        builder.append(returnType);
-        builder.append(", data=");
-        builder.append(data);
-        builder.append("]");
-        return builder.toString();
-    }
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbFuncdef [name=");
+		builder.append(name);
+		builder.append(", async=");
+		builder.append(async);
+		builder.append(", authentication=");
+		builder.append(authentication);
+		builder.append(", comment=");
+		builder.append(comment);
+		builder.append(", parameters=");
+		builder.append(parameters);
+		builder.append(", returnType=");
+		builder.append(returnType);
+		builder.append(", annotations=");
+		builder.append(annotations);
+		builder.append(", data=");
+		builder.append(data);
+		builder.append("]");
+		return builder.toString();
+	}
 }

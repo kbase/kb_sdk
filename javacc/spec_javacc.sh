@@ -1,2 +1,2 @@
 #!/bin/bash
-./javacc.sh -OUTPUT_DIRECTORY=../src/us/kbase/jkidl ../src/us/kbase/jkidl/SpecParser.jj
+./javacc.sh -OUTPUT_DIRECTORY=../src/java/us/kbase/jkidl ../src/java/us/kbase/jkidl/SpecParser.jj

@@ -487,7 +487,12 @@ KbFuncdef Funcdef(KbModule curModule, Map<String, KbModule> includes):
   }
   name = Identifier()
   "("
-  { ret = new KbFuncdef(name.toString(), comment, async); }
+  { try {
+	  	ret = new KbFuncdef(name.toString(), comment, async); 
+	} catch (KidlParseException ex) {
+		generateParseException(ex);
+	}
+  }
   args = OptNameParams(curModule, includes)
   { ret.getParameters().addAll(args); }
   ")"

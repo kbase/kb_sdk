@@ -15,7 +15,7 @@ import us.kbase.common.service.Tuple2;
  * Class represents type definition (or named type) in spec-file.
  * @author rsutormin
  */
-public class KbTypedef implements KbModuleComp, KbType {
+public class KbTypedef implements KbType, KbModuleDef {
 	private String name;
 	private String module;
 	private KbType aliasType;
@@ -52,13 +52,18 @@ public class KbTypedef implements KbModuleComp, KbType {
 		module = Utils.prop(data, "module");
 		comment = Utils.prop(data, "comment");
 		annotations = new KbAnnotations();
-		if (data.containsKey("annotations"))
+		if (data.containsKey("annotations")) {
 			annotations.loadFromMap(Utils.propMap(data, "annotations"));
+		}
 		aliasType = Utils.createTypeFromMap(Utils.propMap(data, "alias_type"), annotations);
 		this.data = data;
 		return this;
 	}
 	
+	/* (non-Javadoc)
+	 * @see us.kbase.kidl.KbModuleDef#getName()
+	 */
+	@Override
 	public String getName() {
 		return name;
 	}  
@@ -67,6 +72,10 @@ public class KbTypedef implements KbModuleComp, KbType {
 		return module;
 	}
 	
+	/* (non-Javadoc)
+	 * @see us.kbase.kidl.KbModuleDef#getComment()
+	 */
+	@Override
 	public String getComment() {
 		return comment;
 	}
@@ -75,6 +84,10 @@ public class KbTypedef implements KbModuleComp, KbType {
 		return aliasType;
 	}
 	
+	/* (non-Javadoc)
+	 * @see us.kbase.kidl.KbModuleDef#getData()
+	 */
+	@Override
 	public Map<?, ?> getData() {
 		return data;
 	}
@@ -101,26 +114,29 @@ public class KbTypedef implements KbModuleComp, KbType {
         return builder.toString();
     }
 	
-	public String getModMeth() {
-        return module + "." + name;
-    }
-	
 	@Override
 	public int hashCode() {
-		return getModMeth().hashCode();
+		return getSpecName().hashCode();
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 	    return obj != null &&
 	            (obj instanceof KbTypedef) &&
-	            getModMeth().equals(((KbTypedef)obj).getModMeth());
+	            getSpecName().equals(((KbTypedef)obj).getSpecName());
 	}
 	
+	/* (non-Javadoc)
+	 * @see us.kbase.kidl.KbModuleDef#getAnnotations()
+	 */
+	@Override
 	public KbAnnotations getAnnotations() {
 		return annotations;
 	}
 	
+	/* (non-Javadoc)
+	 * @see us.kbase.kidl.KbModuleDef#toJson()
+	 */
 	@Override
 	public Object toJson() {
 		Map<String, Object> ret = new TreeMap<String, Object>();
