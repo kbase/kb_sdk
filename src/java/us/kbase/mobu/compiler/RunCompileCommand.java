@@ -55,7 +55,7 @@ public class RunCompileCommand {
         final List<SpecFile> specFiles = new ArrayList<SpecFile>();
         SpecFile mainSpec = new SpecFile();
         mainSpec.fileName = specFile.getName();
-        mainSpec.isMain = true;
+        mainSpec.isMain = 1;
         mainSpec.content = FileUtils.readFileToString(specFile);
         specFiles.add(mainSpec);
         IncludeProvider ip = new IncludeProvider() {
@@ -76,7 +76,7 @@ public class RunCompileCommand {
                 try {
                     SpecFile spec = new SpecFile();
                     spec.fileName = specFile.getName();
-                    spec.isMain = false;
+                    spec.isMain = 0;
                     spec.content = FileUtils.readFileToString(specFile);
                     specFiles.add(spec);
                     SpecParser p = new SpecParser(new DataInputStream(new FileInputStream(specFile)));

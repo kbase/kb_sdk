@@ -13,7 +13,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * <p>Original spec-file type: SelectOneLocalFunction</p>
- * 
+ * <pre>
+ * release_tag = dev | beta | release, if it doesn't exist and git_commit_hash isn't set, we default to release
+ *               and will not return anything if the function is not released
+ * </pre>
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -14,8 +14,11 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.apache.commons.io.FileUtils;
 
 public class TextUtils {
 	public static String capitalize(String text) {
@@ -118,5 +121,16 @@ public class TextUtils {
         }
         br.close();
         return ret;
+    }
+    
+    public static void checkIgnoreLine(File f, String line) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        if (f.exists())
+            lines.addAll(FileUtils.readLines(f));
+        if (!new HashSet<String>(lines).contains(line)) {
+            System.out.println("Warning: file \"" + f.getName() + "\" doesn't contain \"" + line + "\" line, it will be added.");
+            lines.add(line);
+            FileUtils.writeLines(f, lines);
+        }
     }
 }
