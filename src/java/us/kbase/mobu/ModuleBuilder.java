@@ -576,7 +576,35 @@ public class ModuleBuilder {
         List<String> newModuleName;
     }
 
-    
+    @Parameters(commandDescription = "Install a client for KBase module.")
+    private static class InstallCommandArgs {
+        @Parameter(names={"-l", "--language"}, description="Language of generated client code " +
+                "(default is one defined in kbase.yml)")
+        String lang;
+        
+        @Parameter(names={"-a", "--async"}, description="Force generation of asynchronous calls " +
+        		"(default is chosen based on information registered in catalog)")
+        boolean async = false;
+
+        @Parameter(names={"-s", "--sync"}, description="Force generation of synchronous calls" +
+        		"(default is chosen based on information registered in catalog)")
+        boolean sync = false;
+
+        @Parameter(names={"-d", "--dynamic"}, description="Force generation of dynamic service calls" +
+                "(default is chosen based on information registered in catalog)")
+        boolean dynamic = false;
+
+        @Parameter(names={"-t","--tag-or-ver"}, description="Tag or version " +
+                "(default is chosen based on information registered in catalog)")
+        String tagVer = null;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
+
+        @Parameter(required=true, description="<module name or path/URL to spec-file>")
+        List<String> moduleName;
+    }
+
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();
     	out.println("");
