@@ -70,6 +70,7 @@ public class KbModule {
 		main.put("options", options);
 		main.put("service_name", serviceName);
 		ret.add(main);
+		// compatibility with Perl type compiler, obsolete
 		ret.add(new ArrayList<Object>());
 		Map<String, Object> thirdPart = new TreeMap<String, Object>();
 		for (Map.Entry<String, KbType> entry : nameToType.entrySet())
