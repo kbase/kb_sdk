@@ -35,13 +35,14 @@ import us.kbase.common.executionengine.ModuleMethod;
 import us.kbase.common.executionengine.ModuleRunVersion;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonServerServlet;
+import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
 import us.kbase.mobu.util.DirUtils;
-import us.kbase.mobu.util.NetUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
 import us.kbase.templates.TemplateFormatter;
+import us.kbase.tools.WinShortPath;
 
 public class ModuleTester {
     private File moduleDir;
@@ -203,6 +204,10 @@ public class ModuleTester {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = findFreePort();
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        if( System.getProperty("os.name").startsWith("Windows") ) {
+            JsonServerSyslog.setStaticUseSyslog(false);
+            JsonServerSyslog.setStaticMlogFile("callback.log");
+        }
         CallbackServerConfig cfg = new CallbackServerConfigBuilder(
                 new URL(endPoint), callbackUrl, tlDir.toPath(),
                 new LineLogger() {
@@ -234,23 +239,6 @@ public class ModuleTester {
             System.out.println("Shutting down callback server...");
             jettyServer.stop();
         }
-    }
-
-    public static String getCallbackUrl(int callbackPort) throws Exception {
-        List<String> hostIps = NetUtils.findNetworkAddresses("docker0", "vboxnet0");
-        String hostIp = null;
-        if (hostIps.isEmpty()) {
-            System.out.println("WARNING! No SDK host IP addresses was found. Subsequent local calls are not supported in test mode.");
-        } else {
-            hostIp = hostIps.get(0);
-            if (hostIps.size() > 1) {
-                System.out.println("WARNING! Several SDK host IP addresses are detected, first one is used: " + hostIp);
-            } else {
-                System.out.println("SDK host IP address is detected: " + hostIp);
-            }
-        }
-        String callbackUrl = hostIp == null ? "" : ("http://" + hostIp + ":" + callbackPort);
-        return callbackUrl;
     }
 
     private static int findFreePort() {
@@ -300,9 +288,16 @@ public class ModuleTester {
     
     private boolean buildImage(File repoDir, String targetImageName, 
             File runDockerSh) throws Exception {
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        String scriptPath = runDockerSh.getCanonicalPath();
+        String repoPath = repoDir.getCanonicalPath();
+        if (isWindows) {
+            scriptPath = WinShortPath.getWinShortPath(scriptPath);
+            repoPath = WinShortPath.getWinShortPath(repoPath);
+        }
         Process p = Runtime.getRuntime().exec(new String[] {"bash", 
-                runDockerSh.getCanonicalPath(), "build", "--rm", "-t", 
-                targetImageName, repoDir.getCanonicalPath()});
+                scriptPath, "build", "--rm", "-t", 
+                targetImageName, repoPath});
         List<Thread> workers = new ArrayList<Thread>();
         InputStream[] inputStreams = new InputStream[] {p.getInputStream(), p.getErrorStream()};
         final String[] cntIdToDelete = {null};
