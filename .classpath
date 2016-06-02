@@ -32,5 +32,7 @@
 	<classpathentry kind="lib" path="/jars/lib/jars/kbase/workspace/WorkspaceClient-0.4.1.jar"/>
 	<classpathentry kind="lib" path="/jars/lib/jars/joda/joda-time-2.2.jar"/>
 	<classpathentry kind="lib" path="/jars/lib/jars/google/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="/jars/lib/jars/apache_commons/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="/jars/lib/jars/j2html/j2html-0.7.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

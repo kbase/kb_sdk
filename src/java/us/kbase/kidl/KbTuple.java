@@ -14,6 +14,7 @@ import java.util.Map;
 public class KbTuple extends KbBasicType {
 	private List<String> elementNames = new ArrayList<String>();
 	private List<KbType> elementTypes = new ArrayList<KbType>();
+	// per Roman this is only needed for old type compiler compatibility
 	private String name = null;
 	private String comment = null;
 	
