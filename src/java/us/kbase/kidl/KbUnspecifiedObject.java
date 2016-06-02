@@ -1,9 +1,7 @@
 package us.kbase.kidl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents unspecified object in spec-file.
@@ -13,20 +11,17 @@ public class KbUnspecifiedObject extends KbBasicType {
 	public String getJavaStyleName() {
 		return "UObject";
 	}
-	
-    @Override
+
+	@Override
 	public String getSpecName() {
 		return "UnspecifiedObject";
 	}
-	
-	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::UnspecifiedObject");
-		ret.put("annotations", new HashMap<String, Object>());
-		return ret;
-	}
 
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
+	
 	@Override
 	public Object toJsonSchema(boolean inner) {
 		Map<String, Object> ret = new LinkedHashMap<String, Object>();
@@ -35,13 +30,13 @@ public class KbUnspecifiedObject extends KbBasicType {
 		return ret;
 	}
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("KbUnspecifiedObject []");
-        return builder.toString();
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbUnspecifiedObject []");
+		return builder.toString();
+	}
 }

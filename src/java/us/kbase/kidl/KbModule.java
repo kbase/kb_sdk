@@ -3,15 +3,17 @@ package us.kbase.kidl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
  * Class represents module in spec file. It consists of 3 blocks in parsing structure:
  * properties, type info, name to type map.
  */
-public class KbModule {
+public class KbModule implements KidlNode {
 	private String moduleName;
 	private String serviceName;
 	private String comment;
@@ -19,7 +21,6 @@ public class KbModule {
 	private List<KbModuleComp> moduleComponents;
 	private List<KbTypeInfo> typeInfoList;
 	private Map<String, KbType> nameToType;
-	private KbAnnotations annotations;
 	private String lastAuthTempMode = "none";
 	private List<?> data = null;
 	
@@ -38,7 +39,6 @@ public class KbModule {
 		nameToType.put("float", new KbScalar("float"));
 		nameToType.put("string", new KbScalar("string"));
 		nameToType.put("UnspecifiedObject", new KbUnspecifiedObject());
-		annotations = new KbAnnotations();
 	}
 	
 	public void addModuleComponent(KbModuleComp comp) {
@@ -55,30 +55,20 @@ public class KbModule {
 		}
 	}
 	
-	public Object toJson() {
-		List<Object> ret = new ArrayList<Object>();
-		Map<String, Object> main = new TreeMap<String, Object>();
-		main.put("!", "Bio::KBase::KIDL::KBT::DefineModule");
-		main.put("annotations", annotations.toJson(false));
-		if (comment != null)
-			main.put("comment", comment);
-		List<Object> comps = new ArrayList<Object>();
-		for (KbModuleComp comp : moduleComponents)
-			comps.add(comp.toJson());
-		main.put("module_components", comps);
-		main.put("module_name", moduleName);
-		main.put("options", options);
-		main.put("service_name", serviceName);
-		ret.add(main);
-		// compatibility with Perl type compiler, obsolete
-		ret.add(new ArrayList<Object>());
-		Map<String, Object> thirdPart = new TreeMap<String, Object>();
-		for (Map.Entry<String, KbType> entry : nameToType.entrySet())
-			thirdPart.put(entry.getKey(), entry.getValue().toJson());
-		ret.add(thirdPart);
-		return ret;
-	}
+	@Override
 	
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		final List<T> components = new LinkedList<T>();
+		for (final KbModuleComp c: moduleComponents) {
+			components.add(c.accept(visitor));
+		}
+		final Map<String, T> typeMap = new TreeMap<String, T>();
+		for (final Entry<String, KbType> entry: nameToType.entrySet()) {
+			typeMap.put(entry.getKey(), entry.getValue().accept(visitor));
+		}
+		return visitor.visit(this, components, typeMap);
+	}
+
 	public void loadFromList(List<?> data) throws KidlParseException {
 		this.data = data;
 		if (data.size() != 3)
@@ -206,8 +196,6 @@ public class KbModule {
         builder.append(typeInfoList);
         builder.append(", nameToType=");
         builder.append(nameToType);
-        builder.append(", annotations=");
-        builder.append(annotations);
         builder.append(", lastAuthTempMode=");
         builder.append(lastAuthTempMode);
         builder.append(", data=");

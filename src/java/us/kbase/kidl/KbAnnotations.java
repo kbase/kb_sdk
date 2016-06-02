@@ -28,8 +28,8 @@ public class KbAnnotations {
 	 * 2) loading from maps produced by toJson in this method.
 	 * Thus, toJson must produce output that loadFromMap can consume.
 	 * 
-	 * This class does not have toJsonSchema because only KbType classes need
-	 * toJsonSchema.
+	 * This class does not have toJsonSchema because only KbType and specific
+	 * annotation classes need toJsonSchema.
 	 */
 	
 	@SuppressWarnings("unchecked")

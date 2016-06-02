@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents tuple in spec-file.
@@ -71,8 +71,6 @@ public class KbTuple extends KbBasicType {
 	}
 	
 	public String getName() {
-		if (name == null)
-			throw new IllegalStateException("Property name was not set for tuple");
 		return name;
 	}
 	
@@ -81,22 +79,14 @@ public class KbTuple extends KbBasicType {
 	}
 	
 	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Tuple");
-		if (comment != null && comment.length() > 0)
-			ret.put("comment", comment);
-		ret.put("element_names", elementNames);
-		List<Object> elementTypeList = new ArrayList<Object>();
-		for (KbType type : elementTypes)
-			elementTypeList.add(type.toJson());
-		ret.put("element_types", elementTypeList);
-		ret.put("annotations", new HashMap<String, Object>());
-		if (name != null)
-			ret.put("name", name);
-		return ret;
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		final List<T> elementTypes = new LinkedList<T>();
+		for (final KbType t: this.elementTypes) {
+			elementTypes.add(t.accept(visitor));
+		}
+		return visitor.visit(this, elementTypes);
 	}
-
+	
 	@Override
 	public Object toJsonSchema(boolean inner) {
 		Map<String, Object> ret = new LinkedHashMap<String, Object>();

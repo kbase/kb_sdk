@@ -2,13 +2,12 @@ package us.kbase.kidl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Class represents structure in spec-file.
@@ -98,37 +97,14 @@ public class KbStruct extends KbBasicType {
 	}
 	
 	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Struct");
-		if (annotations == null) {
-			Map<String, Object> ann = new HashMap<String, Object>();
-			ann.put("searchable_ws_subset", new HashMap<String, Object>());
-			ann.put("metadata", new HashMap<String, Object>());
-			ret.put("annotations", ann);
-		} else {
-			Map<String, Object> ann = new HashMap<String, Object>();
-			if(annotations.getSearchable()==null) {
-				ann.put("searchable_ws_subset", new HashMap<String, Object>());
-			}
-			if(annotations.getWsMetadata()==null) {
-				ann.put("metadata", new HashMap<String, Object>());
-			}
-			ret.put("annotations", ann);
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		final List<T> fields = new LinkedList<T>();
+		for (final KbStructItem f: items) {
+			fields.add(f.accept(visitor));
 		}
-		if (comment != null && comment.length() > 0)
-			ret.put("comment", comment);
-		List<Object> itemList = new ArrayList<Object>();
-		for (KbStructItem item : items)
-			itemList.add(item.toJson());
-		ret.put("items", itemList);
-		if (module != null)
-			ret.put("module", module);
-		if (name != null)
-			ret.put("name", name);
-		return ret;
+		return visitor.visit(this, fields);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object toJsonSchema(boolean inner) {

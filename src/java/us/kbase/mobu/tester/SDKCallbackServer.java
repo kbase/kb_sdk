@@ -44,7 +44,7 @@ public class SDKCallbackServer extends CallbackServer {
     }
 
     @JsonServerMethod(rpc = "CallbackServer.set_provenance")
-    public List<ProvenanceAction> getProvenance(ProvenanceAction pa)
+    public List<ProvenanceAction> setProvenance(ProvenanceAction pa)
             throws IOException, JsonClientException {
         resetProvenanceAndMethods(pa);
         return new LinkedList<ProvenanceAction>(Arrays.asList(pa));
