@@ -14,6 +14,7 @@ import java.util.TreeMap;
  * Class represents structure in spec-file.
  */
 public class KbStruct extends KbBasicType {
+
 	private String name;
 	private KbAnnotations annotations;
 	private List<KbStructItem> items;
@@ -158,5 +159,25 @@ public class KbStruct extends KbBasicType {
 	@Override
 	public String getSpecName() {
 	    return "structure";
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbStruct [name=");
+		builder.append(name);
+		builder.append(", annotations=");
+		builder.append(annotations);
+		builder.append(", items=");
+		builder.append(items);
+		builder.append(", comment=");
+		builder.append(comment);
+		builder.append(", module=");
+		builder.append(module);
+		builder.append("]");
+		return builder.toString();
 	}
 }

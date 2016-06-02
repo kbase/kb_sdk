@@ -3,6 +3,7 @@ package us.kbase.templates;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
@@ -42,6 +43,10 @@ public class TemplateFormatter {
         } catch (Exception ex) {
             throw new IllegalStateException("Problems with template evaluation (" + templateName + ")", ex);
         }
+    }
+    
+    public static InputStream getResource(final String resource) {
+        return TemplateFormatter.class.getResourceAsStream(resource);
     }
     
     public static class VelocityEscaper {

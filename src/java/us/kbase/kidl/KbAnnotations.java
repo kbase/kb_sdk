@@ -142,4 +142,26 @@ public class KbAnnotations {
 		ret.put("unknown_annotations", unknown);
 		return ret;
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbAnnotations [optional=");
+        builder.append(optional);
+        builder.append(", idReference=");
+        builder.append(idReference);
+        builder.append(", searchableWsSubset=");
+        builder.append(searchableWsSubset);
+        builder.append(", wsMetadata=");
+        builder.append(wsMetadata);
+        builder.append(", range=");
+        builder.append(range);
+        builder.append(", unknown=");
+        builder.append(unknown);
+        builder.append("]");
+        return builder.toString();
+    }
 }

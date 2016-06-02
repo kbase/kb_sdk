@@ -43,8 +43,10 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         if (Files.notExists(runSubJobsSh)) {
             final boolean isMac = System.getProperty("os.name").toLowerCase()
                     .contains("mac");
+            final boolean isWin = System.getProperty("os.name").toLowerCase()
+                    .contains("win");
             final String dockerRunCmd = config.getWorkDir().toAbsolutePath() +
-                    "/run_docker.sh run " + (isMac ? "" : "--user $(id -u) ") +
+                    "/run_docker.sh run " + (isMac || isWin ? "" : "--user $(id -u) ") +
                     "-v " + config.getWorkDir().resolve(SUBJOBSDIR)
                         .toAbsolutePath() + 
                     "/$1/" + WORKDIR + ":/kb/module/work -v " +

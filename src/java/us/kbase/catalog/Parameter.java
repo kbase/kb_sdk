@@ -2,7 +2,6 @@
 package us.kbase.catalog;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -13,33 +12,51 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * <p>Original spec-file type: DefineRolesParams</p>
+ * <p>Original spec-file type: Parameter</p>
  * 
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "role_infos"
+    "type",
+    "comment"
 })
-public class DefineRolesParams {
+public class Parameter {
 
-    @JsonProperty("role_infos")
-    private List<RoleInfo> roleInfos;
+    @JsonProperty("type")
+    private String type;
+    @JsonProperty("comment")
+    private String comment;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("role_infos")
-    public List<RoleInfo> getRoleInfos() {
-        return roleInfos;
+    @JsonProperty("type")
+    public String getType() {
+        return type;
     }
 
-    @JsonProperty("role_infos")
-    public void setRoleInfos(List<RoleInfo> roleInfos) {
-        this.roleInfos = roleInfos;
+    @JsonProperty("type")
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public DefineRolesParams withRoleInfos(List<RoleInfo> roleInfos) {
-        this.roleInfos = roleInfos;
+    public Parameter withType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Parameter withComment(String comment) {
+        this.comment = comment;
         return this;
     }
 
@@ -55,7 +72,7 @@ public class DefineRolesParams {
 
     @Override
     public String toString() {
-        return ((((("DefineRolesParams"+" [roleInfos=")+ roleInfos)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("Parameter"+" [type=")+ type)+", comment=")+ comment)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

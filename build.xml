@@ -84,6 +84,7 @@ commit=${git.commit}</echo>
       <fileset dir="${src}">
         <patternset>
           <include name="**/*.properties"/>
+          <include name="**/*.py"/>
         </patternset>
       </fileset>
     </copy>

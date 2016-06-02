@@ -2,6 +2,7 @@
 package us.kbase.catalog;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -33,19 +34,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class LocalFunctionInfo {
 
     @JsonProperty("module_name")
-    private String moduleName;
+    private java.lang.String moduleName;
     @JsonProperty("function_id")
-    private String functionId;
+    private java.lang.String functionId;
     @JsonProperty("git_commit_hash")
-    private String gitCommitHash;
+    private java.lang.String gitCommitHash;
     @JsonProperty("version")
-    private String version;
+    private java.lang.String version;
     @JsonProperty("release_tag")
-    private String releaseTag;
+    private List<String> releaseTag;
     @JsonProperty("name")
-    private String name;
+    private java.lang.String name;
     @JsonProperty("short_description")
-    private String shortDescription;
+    private java.lang.String shortDescription;
     /**
      * <p>Original spec-file type: LocalFunctionTags</p>
      * 
@@ -53,109 +54,109 @@ public class LocalFunctionInfo {
      */
     @JsonProperty("tags")
     private LocalFunctionTags tags;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("module_name")
-    public String getModuleName() {
+    public java.lang.String getModuleName() {
         return moduleName;
     }
 
     @JsonProperty("module_name")
-    public void setModuleName(String moduleName) {
+    public void setModuleName(java.lang.String moduleName) {
         this.moduleName = moduleName;
     }
 
-    public LocalFunctionInfo withModuleName(String moduleName) {
+    public LocalFunctionInfo withModuleName(java.lang.String moduleName) {
         this.moduleName = moduleName;
         return this;
     }
 
     @JsonProperty("function_id")
-    public String getFunctionId() {
+    public java.lang.String getFunctionId() {
         return functionId;
     }
 
     @JsonProperty("function_id")
-    public void setFunctionId(String functionId) {
+    public void setFunctionId(java.lang.String functionId) {
         this.functionId = functionId;
     }
 
-    public LocalFunctionInfo withFunctionId(String functionId) {
+    public LocalFunctionInfo withFunctionId(java.lang.String functionId) {
         this.functionId = functionId;
         return this;
     }
 
     @JsonProperty("git_commit_hash")
-    public String getGitCommitHash() {
+    public java.lang.String getGitCommitHash() {
         return gitCommitHash;
     }
 
     @JsonProperty("git_commit_hash")
-    public void setGitCommitHash(String gitCommitHash) {
+    public void setGitCommitHash(java.lang.String gitCommitHash) {
         this.gitCommitHash = gitCommitHash;
     }
 
-    public LocalFunctionInfo withGitCommitHash(String gitCommitHash) {
+    public LocalFunctionInfo withGitCommitHash(java.lang.String gitCommitHash) {
         this.gitCommitHash = gitCommitHash;
         return this;
     }
 
     @JsonProperty("version")
-    public String getVersion() {
+    public java.lang.String getVersion() {
         return version;
     }
 
     @JsonProperty("version")
-    public void setVersion(String version) {
+    public void setVersion(java.lang.String version) {
         this.version = version;
     }
 
-    public LocalFunctionInfo withVersion(String version) {
+    public LocalFunctionInfo withVersion(java.lang.String version) {
         this.version = version;
         return this;
     }
 
     @JsonProperty("release_tag")
-    public String getReleaseTag() {
+    public List<String> getReleaseTag() {
         return releaseTag;
     }
 
     @JsonProperty("release_tag")
-    public void setReleaseTag(String releaseTag) {
+    public void setReleaseTag(List<String> releaseTag) {
         this.releaseTag = releaseTag;
     }
 
-    public LocalFunctionInfo withReleaseTag(String releaseTag) {
+    public LocalFunctionInfo withReleaseTag(List<String> releaseTag) {
         this.releaseTag = releaseTag;
         return this;
     }
 
     @JsonProperty("name")
-    public String getName() {
+    public java.lang.String getName() {
         return name;
     }
 
     @JsonProperty("name")
-    public void setName(String name) {
+    public void setName(java.lang.String name) {
         this.name = name;
     }
 
-    public LocalFunctionInfo withName(String name) {
+    public LocalFunctionInfo withName(java.lang.String name) {
         this.name = name;
         return this;
     }
 
     @JsonProperty("short_description")
-    public String getShortDescription() {
+    public java.lang.String getShortDescription() {
         return shortDescription;
     }
 
     @JsonProperty("short_description")
-    public void setShortDescription(String shortDescription) {
+    public void setShortDescription(java.lang.String shortDescription) {
         this.shortDescription = shortDescription;
     }
 
-    public LocalFunctionInfo withShortDescription(String shortDescription) {
+    public LocalFunctionInfo withShortDescription(java.lang.String shortDescription) {
         this.shortDescription = shortDescription;
         return this;
     }
@@ -186,17 +187,17 @@ public class LocalFunctionInfo {
     }
 
     @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
+    public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
     }
 
     @JsonAnySetter
-    public void setAdditionalProperties(String name, Object value) {
+    public void setAdditionalProperties(java.lang.String name, Object value) {
         this.additionalProperties.put(name, value);
     }
 
     @Override
-    public String toString() {
+    public java.lang.String toString() {
         return ((((((((((((((((((("LocalFunctionInfo"+" [moduleName=")+ moduleName)+", functionId=")+ functionId)+", gitCommitHash=")+ gitCommitHash)+", version=")+ version)+", releaseTag=")+ releaseTag)+", name=")+ name)+", shortDescription=")+ shortDescription)+", tags=")+ tags)+", additionalProperties=")+ additionalProperties)+"]");
     }
 

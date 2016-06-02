@@ -127,4 +127,24 @@ public class KbScalar extends KbBasicType {
 		}
 		return ret;
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbScalar [scalarType=");
+        builder.append(scalarType);
+        builder.append(", javaStyleType=");
+        builder.append(javaStyleType);
+        builder.append(", jsonStyleType=");
+        builder.append(jsonStyleType);
+        builder.append(", idReference=");
+        builder.append(idReference);
+        builder.append(", range=");
+        builder.append(range);
+        builder.append("]");
+        return builder.toString();
+    }
 }

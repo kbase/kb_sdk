@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import us.kbase.common.service.Tuple2;
-import us.kbase.mobu.compiler.JavaFuncParam;
 
 /**
  * Class represents function definition in spec-file.
@@ -376,5 +375,29 @@ public class KbFuncdef implements KbModuleComp {
         } else if (type instanceof KbScalar) {
             sb.append(((KbScalar)type).getJavaStyleName());
         }
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbFuncdef [name=");
+        builder.append(name);
+        builder.append(", async=");
+        builder.append(async);
+        builder.append(", authentication=");
+        builder.append(authentication);
+        builder.append(", comment=");
+        builder.append(comment);
+        builder.append(", parameters=");
+        builder.append(parameters);
+        builder.append(", returnType=");
+        builder.append(returnType);
+        builder.append(", data=");
+        builder.append(data);
+        builder.append("]");
+        return builder.toString();
     }
 }

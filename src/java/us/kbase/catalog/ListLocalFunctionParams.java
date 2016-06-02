@@ -16,8 +16,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * <p>Original spec-file type: ListLocalFunctionParams</p>
  * <pre>
  * Allows various ways to filter.
- * Release tag = dev/beta/release
- * module_names = only include modules in the list
+ * Release tag = dev/beta/release, default is release
+ * module_names = only include modules in the list; if empty or not
+ *                provided then include everything
  * </pre>
  * 
  */
