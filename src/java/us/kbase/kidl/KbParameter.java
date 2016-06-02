@@ -2,7 +2,6 @@ package us.kbase.kidl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Input or output part of KbFuncdef.
@@ -48,15 +47,6 @@ public class KbParameter implements KidlNode {
 		return visitor.visit(this, type.accept(visitor));
 	}
 	
-	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		if (name != null)
-			ret.put("name", name);
-		ret.put("type", type.toJson());
-		return ret;
-	}
-
 	public Map<String, Object> forTemplates(String altName) {
 		Map<String, Object> ret = new LinkedHashMap<String, Object>();
 		String name = this.name != null ? this.name : altName;

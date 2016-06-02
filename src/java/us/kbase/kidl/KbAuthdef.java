@@ -20,11 +20,6 @@ public class KbAuthdef implements KbModuleComp {
 	}
 
 	@Override
-	public Object toJson() {
-		return "auth_default" + type;
-	}
-
-	@Override
 	public Map<String, Object> forTemplates() {
 		throw new IllegalStateException("Templates are not yet supported for authentication");
 	}

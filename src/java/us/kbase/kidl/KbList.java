@@ -1,9 +1,7 @@
 package us.kbase.kidl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents list in spec-file.
@@ -29,15 +27,6 @@ public class KbList extends KbBasicType {
 	@Override
 	public String getJavaStyleName() {
 		return "List";
-	}
-	
-	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::List");
-		ret.put("annotations", new HashMap<String, Object>());
-		ret.put("element_type", elementType.toJson());
-		return ret;
 	}
 	
 	@Override

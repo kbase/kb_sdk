@@ -1,6 +1,7 @@
 package us.kbase.kidl;
 
 import java.util.List;
+import java.util.Map;
 
 //TODO unit tests with test visitor
 
@@ -14,7 +15,8 @@ public interface KidlVisitor<T> {
 	
 	public T visit(KbMapping map, T keyType, T valueType);
 	
-	public T visit(KbModule module, List<T> components);
+	public T visit(KbModule module, List<T> components,
+			Map<String, T> typeMap);
 	
 	public T visit(KbParameter param, T type);
 	

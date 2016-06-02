@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import us.kbase.common.service.Tuple2;
 
@@ -114,27 +113,6 @@ public class KbFuncdef implements KbModuleDef {
 	@Override
 	public KbAnnotations getAnnotations() {
 		return annotations;
-	}
-	
-	private List<Object> toJson(List<KbParameter> list) {
-		List<Object> ret = new ArrayList<Object>();
-		for (KbParameter param : list)
-			ret.add(param.toJson());
-		return ret;
-	}
-	
-	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Funcdef");
-		ret.put("annotations", annotations.toJson(false));
-		ret.put("async", async ? "1" : "0");
-		ret.put("authentication", authentication);
-		ret.put("comment", comment);
-		ret.put("name", name);
-		ret.put("parameters", toJson(parameters));
-		ret.put("return_type", toJson(returnType));
-		return ret;
 	}
 	
 	@Override

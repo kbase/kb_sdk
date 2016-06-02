@@ -25,6 +25,7 @@ import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbType;
 import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.JSONableVisitor;
 import us.kbase.kidl.KidlParseException;
 
 /**
@@ -69,7 +70,7 @@ public class SpecParser implements SpecParserConstants {
                         modList = new ArrayList<Object>();
                         ret.put(module.getServiceName(), modList);
                 }
-                modList.add(module.toJson());
+                modList.add(module.accept(new JSONableVisitor()));
         }
         return ret;
     }

@@ -1,9 +1,7 @@
 package us.kbase.kidl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents scalar in spec-file.
@@ -101,16 +99,6 @@ public class KbScalar extends KbBasicType {
 	@Override
 	public <T> T accept(final KidlVisitor<T> visitor) {
 		return visitor.visit(this);
-	}
-	
-	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Scalar");
-		//if (scalarType == Type.stringType)
-		ret.put("annotations", new HashMap<String, Object>());
-		ret.put("scalar_type", getSpecName());
-		return ret;
 	}
 	
 	@SuppressWarnings("unchecked")

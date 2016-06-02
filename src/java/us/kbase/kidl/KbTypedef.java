@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import us.kbase.common.service.Tuple2;
 
@@ -139,21 +138,6 @@ public class KbTypedef implements KbType, KbModuleDef {
 		return visitor.visit(this, aliasType.accept(visitor));
 	}
 	
-	/* (non-Javadoc)
-	 * @see us.kbase.kidl.KbModuleDef#toJson()
-	 */
-	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Typedef");
-		ret.put("alias_type", aliasType.toJson());
-		ret.put("annotations", annotations.toJson(true));
-		ret.put("comment", comment);
-		ret.put("module", module);
-		ret.put("name", name);
-		return ret;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object toJsonSchema(boolean inner) {

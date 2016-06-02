@@ -1,9 +1,7 @@
 package us.kbase.kidl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents mapping in spec-file.
@@ -45,16 +43,6 @@ public class KbMapping extends KbBasicType {
 	}
 	
 	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Mapping");
-		ret.put("key_type", keyType.toJson());
-		ret.put("value_type", valueType.toJson());
-		ret.put("annotations", new HashMap<String, Object>());
-		return ret;
-	}
-	
-	@Override
 	public Object toJsonSchema(boolean inner) {
 		Map<String, Object> ret = new LinkedHashMap<String, Object>();
 		ret.put("type", "object");
@@ -74,17 +62,17 @@ public class KbMapping extends KbBasicType {
 	    return "mapping<" + keyType.getSpecName() + "," + valueType.getSpecName() + ">";
 	}
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("KbMapping [keyType=");
-        builder.append(keyType);
-        builder.append(", valueType=");
-        builder.append(valueType);
-        builder.append("]");
-        return builder.toString();
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbMapping [keyType=");
+		builder.append(keyType);
+		builder.append(", valueType=");
+		builder.append(valueType);
+		builder.append("]");
+		return builder.toString();
+	}
 }
