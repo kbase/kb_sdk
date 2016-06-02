@@ -19,11 +19,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"ht:e:u:p:a:",["help","tests=","endpoint=","user=","password=","asyncchecktime="])
     except getopt.GetoptError:
-        print 'Please use "test_client.py -h" or "test_client.py --help" for help'
+        print('Please use "test_client.py -h" or "test_client.py --help" for help')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print 'test_client.py --tests <json_file> --endpoint <url> [--user <kbase_account> --password <password> [--asyncchecktime <ms>]]'
+            print('test_client.py --tests <json_file> --endpoint <url> [--user <kbase_account> --password <password> [--asyncchecktime <ms>]]')
             sys.exit()
         elif opt in ("-t", "--tests"):
             tests_filepath = arg
