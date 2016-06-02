@@ -462,7 +462,7 @@ public abstract class CallbackServer extends JsonServerServlet {
     public static URL getCallbackUrl(int callbackPort)
             throws SocketException {
         final List<String> hostIps = NetUtils.findNetworkAddresses(
-                "docker0", "vboxnet0");
+                "docker0", "vboxnet0", "VirtualBox Host-Only Ethernet Adapter");
         final String hostIp;
         if (hostIps.isEmpty()) {
             return null;
