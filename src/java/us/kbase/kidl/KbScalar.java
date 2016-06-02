@@ -99,6 +99,11 @@ public class KbScalar extends KbBasicType {
 	}
 	
 	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
+	
+	@Override
 	public Object toJson() {
 		Map<String, Object> ret = new TreeMap<String, Object>();
 		ret.put("!", "Bio::KBase::KIDL::KBT::Scalar");

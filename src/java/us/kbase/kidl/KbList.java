@@ -39,6 +39,11 @@ public class KbList extends KbBasicType {
 		ret.put("element_type", elementType.toJson());
 		return ret;
 	}
+	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		return visitor.visit(this, elementType.accept(visitor));
+	}
 
 	@Override
 	public Object toJsonSchema(boolean inner) {

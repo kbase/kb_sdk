@@ -37,7 +37,13 @@ public class KbMapping extends KbBasicType {
 	public String getJavaStyleName() {
 		return "Map";
 	}
-		
+	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		return visitor.visit(this, keyType.accept(visitor),
+				valueType.accept(visitor));
+	}
+	
 	@Override
 	public Object toJson() {
 		Map<String, Object> ret = new TreeMap<String, Object>();

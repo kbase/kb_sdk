@@ -3,6 +3,7 @@ package us.kbase.kidl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,7 +12,7 @@ import java.util.TreeMap;
  * Class represents module in spec file. It consists of 3 blocks in parsing structure:
  * properties, type info, name to type map.
  */
-public class KbModule {
+public class KbModule implements KidlNode {
 	private String moduleName;
 	private String serviceName;
 	private String comment;
@@ -55,6 +56,17 @@ public class KbModule {
 		}
 	}
 	
+	@Override
+	
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		final List<T> components = new LinkedList<T>();
+		for (final KbModuleComp c: moduleComponents) {
+			components.add(c.accept(visitor));
+		}
+		return visitor.visit(this, components);
+	}
+
+	@Override
 	public Object toJson() {
 		List<Object> ret = new ArrayList<Object>();
 		Map<String, Object> main = new TreeMap<String, Object>();

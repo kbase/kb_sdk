@@ -66,7 +66,7 @@ public class KbTypedef implements KbType, KbModuleDef {
 	@Override
 	public String getName() {
 		return name;
-	}  
+	}
 	
 	public String getModule() {
 		return module;
@@ -93,26 +93,26 @@ public class KbTypedef implements KbType, KbModuleDef {
 	}
 	
 	/* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("KbTypedef [name=");
-        builder.append(name);
-        builder.append(", module=");
-        builder.append(module);
-        builder.append(", aliasType=");
-        builder.append(aliasType);
-        builder.append(", comment=");
-        builder.append(comment);
-        builder.append(", data=");
-        builder.append(data);
-        builder.append(", annotations=");
-        builder.append(annotations);
-        builder.append("]");
-        return builder.toString();
-    }
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbTypedef [name=");
+		builder.append(name);
+		builder.append(", module=");
+		builder.append(module);
+		builder.append(", aliasType=");
+		builder.append(aliasType);
+		builder.append(", comment=");
+		builder.append(comment);
+		builder.append(", data=");
+		builder.append(data);
+		builder.append(", annotations=");
+		builder.append(annotations);
+		builder.append("]");
+		return builder.toString();
+	}
 	
 	@Override
 	public int hashCode() {
@@ -121,9 +121,9 @@ public class KbTypedef implements KbType, KbModuleDef {
 	
 	@Override
 	public boolean equals(Object obj) {
-	    return obj != null &&
-	            (obj instanceof KbTypedef) &&
-	            getSpecName().equals(((KbTypedef)obj).getSpecName());
+		return obj != null &&
+				(obj instanceof KbTypedef) &&
+				getSpecName().equals(((KbTypedef)obj).getSpecName());
 	}
 	
 	/* (non-Javadoc)
@@ -132,6 +132,11 @@ public class KbTypedef implements KbType, KbModuleDef {
 	@Override
 	public KbAnnotations getAnnotations() {
 		return annotations;
+	}
+	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		return visitor.visit(this, aliasType.accept(visitor));
 	}
 	
 	/* (non-Javadoc)
@@ -167,30 +172,30 @@ public class KbTypedef implements KbType, KbModuleDef {
 	public void afterCreation() {
 		// Default implementation - just do nothing
 	}
-	
-    @Override
-    public Map<String, Object> forTemplates() {
-        Map<String, Object> ret = new LinkedHashMap<String, Object>();
-        ret.put("name", getName());
-        ret.put("comment", getComment());
-        ret.put("english", getTypeInEnglish(getAliasType()));
-        return ret;
-    }
-    
-    private static String getTypeInEnglish(KbType type) {
-        Set<String> allKeys = new HashSet<String>();
-        List<String> additional = new ArrayList<>();
-        LinkedList<Tuple2<String, KbType>> subQueue = new LinkedList<Tuple2<String, KbType>>();
-        StringBuilder ret = new StringBuilder(Utils.getEnglishTypeDescr(type, subQueue, allKeys, additional));
-        if (additional.size() > 0)
-            ret.append(":\n");
-        for (String add : additional)
-            ret.append(add).append("\n");
-        return ret.toString();
-    }
-    
-    @Override
-    public String getSpecName() {
-        return module + "." + name;
-    }
+
+	@Override
+	public Map<String, Object> forTemplates() {
+		Map<String, Object> ret = new LinkedHashMap<String, Object>();
+		ret.put("name", getName());
+		ret.put("comment", getComment());
+		ret.put("english", getTypeInEnglish(getAliasType()));
+		return ret;
+	}
+
+	private static String getTypeInEnglish(KbType type) {
+		Set<String> allKeys = new HashSet<String>();
+		List<String> additional = new ArrayList<>();
+		LinkedList<Tuple2<String, KbType>> subQueue = new LinkedList<Tuple2<String, KbType>>();
+		StringBuilder ret = new StringBuilder(Utils.getEnglishTypeDescr(type, subQueue, allKeys, additional));
+		if (additional.size() > 0)
+			ret.append(":\n");
+		for (String add : additional)
+			ret.append(add).append("\n");
+		return ret.toString();
+	}
+
+	@Override
+	public String getSpecName() {
+		return module + "." + name;
+	}
 }

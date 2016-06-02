@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -78,6 +79,15 @@ public class KbTuple extends KbBasicType {
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		final List<T> elementTypes = new LinkedList<T>();
+		for (final KbType t: this.elementTypes) {
+			elementTypes.add(t.accept(visitor));
+		}
+		return visitor.visit(this, elementTypes);
 	}
 	
 	@Override

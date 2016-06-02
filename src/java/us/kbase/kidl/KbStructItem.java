@@ -7,7 +7,7 @@ import java.util.TreeMap;
 /**
  * Class represents structure item in spec-file.
  */
-public class KbStructItem {
+public class KbStructItem implements KidlNode {
 	private String name;
 	private boolean nullable;
 	private KbType itemType;
@@ -50,6 +50,12 @@ public class KbStructItem {
 		return optional;
 	}
 	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		return visitor.visit(this, itemType.accept(visitor));
+	}
+	
+	@Override
 	public Object toJson() {
 		Map<String, Object> ret = new TreeMap<String, Object>();
 		ret.put("!", "Bio::KBase::KIDL::KBT::StructItem");

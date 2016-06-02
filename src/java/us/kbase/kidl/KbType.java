@@ -5,12 +5,7 @@ package us.kbase.kidl;
  * or KbTypedef (named type). 
  * @author rsutormin
  */
-public interface KbType {
-	/**
-	 * Method creates structure to save parsing structure of type in JSON.
-	 * @param oui defines details which is necessary in order to reproduce behavior of original perl parser.
-	 */
-	public Object toJson();
+public interface KbType extends KidlNode {
 	/**
 	 * Method creates structure to save parsing structure of type in JSON schema.
 	 * @param inner is important for typedefs, defines if this typedef of top level or not.

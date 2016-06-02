@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,6 +96,15 @@ public class KbStruct extends KbBasicType {
 	
 	public void setModule(String module) {
 		this.module = module;
+	}
+	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor) {
+		final List<T> fields = new LinkedList<T>();
+		for (final KbStructItem f: items) {
+			fields.add(f.accept(visitor));
+		}
+		return visitor.visit(this, fields);
 	}
 	
 	@Override
