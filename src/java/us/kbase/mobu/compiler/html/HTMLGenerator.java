@@ -1,4 +1,4 @@
-package us.kbase.mobu.compiler;
+package us.kbase.mobu.compiler.html;
 
 import static j2html.TagCreator.body;
 import static j2html.TagCreator.document;
