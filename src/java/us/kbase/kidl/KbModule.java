@@ -56,7 +56,6 @@ public class KbModule implements KidlNode {
 	}
 	
 	@Override
-	
 	public <T> T accept(final KidlVisitor<T> visitor) {
 		final List<T> components = new LinkedList<T>();
 		for (final KbModuleComp c: moduleComponents) {
@@ -85,7 +84,8 @@ public class KbModule implements KidlNode {
 		for (Object item : compList) {
 			if (!Map.class.isInstance(item)) {
 				if (item instanceof String) {
-					defaultAuth = (String)item;
+					defaultAuth = ((String)item).replace("auth_default", "");
+					moduleComponents.add(new KbAuthdef(defaultAuth));
 				} else {
 					throw new KidlParseException("List item is not compatible with type " +
 							"[" + Map.class.getName() + "], it has type: " + item.getClass().getName());
@@ -150,57 +150,59 @@ public class KbModule implements KidlNode {
 	public List<?> getData() {
 		return data;
 	}
-	
+
 	public Map<String, Object> forTemplates() {
-	    Map<String, Object> ret = new LinkedHashMap<String, Object>();
-        ret.put("module_name", moduleName);
-        ret.put("module_doc", Utils.removeStarsInComment(comment));
-        List<Object> methods = new ArrayList<Object>();
-        List<Object> types = new ArrayList<Object>();
-        boolean anyAsync = false;
-        for (KbModuleComp comp : moduleComponents)
-            if (comp instanceof KbFuncdef) {
-                Map<String, Object> map = comp.forTemplates();
-                if (map.get("async") != null && map.get("async").toString().equals("true"))
-                    anyAsync = true;
-                methods.add(map);
-            } else if (comp instanceof KbTypedef) {
-                types.add(comp.forTemplates());
-            } else {
-                System.out.println("Module component: " + comp);
-            }
-        ret.put("methods", methods);
-        ret.put("types", types);
-        if (anyAsync)
-            ret.put("any_async", anyAsync);
-	    return ret;
+		Map<String, Object> ret = new LinkedHashMap<String, Object>();
+		ret.put("module_name", moduleName);
+		ret.put("module_doc", Utils.removeStarsInComment(comment));
+		List<Object> methods = new ArrayList<Object>();
+		List<Object> types = new ArrayList<Object>();
+		boolean anyAsync = false;
+		for (KbModuleComp comp : moduleComponents)
+			if (comp instanceof KbFuncdef) {
+				Map<String, Object> map = comp.forTemplates();
+				if (map.get("async") != null && map.get("async").toString().equals("true"))
+					anyAsync = true;
+				methods.add(map);
+			} else if (comp instanceof KbTypedef) {
+				types.add(comp.forTemplates());
+			} else if (comp instanceof KbAuthdef) {
+				//do nothing
+			} else {
+				System.out.println("Module component: " + comp);
+			}
+		ret.put("methods", methods);
+		ret.put("types", types);
+		if (anyAsync)
+			ret.put("any_async", anyAsync);
+		return ret;
 	}
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("KbModule [moduleName=");
-        builder.append(moduleName);
-        builder.append(", serviceName=");
-        builder.append(serviceName);
-        builder.append(", comment=");
-        builder.append(comment);
-        builder.append(", options=");
-        builder.append(options);
-        builder.append(", moduleComponents=");
-        builder.append(moduleComponents);
-        builder.append(", typeInfoList=");
-        builder.append(typeInfoList);
-        builder.append(", nameToType=");
-        builder.append(nameToType);
-        builder.append(", lastAuthTempMode=");
-        builder.append(lastAuthTempMode);
-        builder.append(", data=");
-        builder.append(data);
-        builder.append("]");
-        return builder.toString();
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbModule [moduleName=");
+		builder.append(moduleName);
+		builder.append(", serviceName=");
+		builder.append(serviceName);
+		builder.append(", comment=");
+		builder.append(comment);
+		builder.append(", options=");
+		builder.append(options);
+		builder.append(", moduleComponents=");
+		builder.append(moduleComponents);
+		builder.append(", typeInfoList=");
+		builder.append(typeInfoList);
+		builder.append(", nameToType=");
+		builder.append(nameToType);
+		builder.append(", lastAuthTempMode=");
+		builder.append(lastAuthTempMode);
+		builder.append(", data=");
+		builder.append(data);
+		builder.append("]");
+		return builder.toString();
+	}
 }
