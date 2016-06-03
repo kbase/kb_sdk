@@ -48,9 +48,13 @@ public class ModuleTester {
     private File moduleDir;
     protected Map<String,Object> kbaseYmlConfig;
     private Map<String, Object> moduleContext;
-    
+
     public ModuleTester() throws Exception {
-        moduleDir = DirUtils.findModuleDir();
+        this(null);
+    }
+    
+    public ModuleTester(File dir) throws Exception {
+        moduleDir = dir == null ? DirUtils.findModuleDir() : DirUtils.findModuleDir(dir);
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
         @SuppressWarnings("unchecked")
         Map<String,Object> config = (Map<String, Object>)new Yaml().load(kbaseYml);
@@ -75,7 +79,7 @@ public class ModuleTester {
         }
     }
     
-    public void runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods) throws Exception {
+    public int runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods) throws Exception {
         if (skipValidation) {
             System.out.println("Validation step is skipped");
         } else {
@@ -116,7 +120,7 @@ public class ModuleTester {
         if (!testCfg.exists()) {
             TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, testCfg);
             System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
-            return;
+            return 1;
         }
         Properties props = new Properties();
         InputStream is = new FileInputStream(new File(tlDir, "test.cfg"));
@@ -186,7 +190,7 @@ public class ModuleTester {
         System.out.println("Build Docker image");
         boolean ok = buildImage(moduleDir, imageName, runDockerSh);
         if (!ok)
-            return;
+            return 1;
         if (oldImageId != null) {
             String newImageId = findImageIdByName(tlDir, imageName);
             if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
@@ -233,8 +237,9 @@ public class ModuleTester {
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(),
-                    callbackUrl.toExternalForm()).exec(tlDir);
+            int exitCode = ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(),
+                    callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
+            return exitCode;
         } finally {
             System.out.println("Shutting down callback server...");
             jettyServer.stop();
