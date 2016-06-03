@@ -97,10 +97,10 @@ public class KbStruct extends KbBasicType {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
 		final List<T> fields = new LinkedList<T>();
 		for (final KbStructItem f: items) {
-			fields.add(f.accept(visitor));
+			fields.add(f.accept(visitor, this));
 		}
 		return visitor.visit(this, fields);
 	}

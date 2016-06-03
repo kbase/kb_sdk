@@ -116,14 +116,14 @@ public class KbFuncdef implements KbModuleDef {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
 		final List<T> params = new LinkedList<T>();
 		final List<T> returns = new LinkedList<T>();
 		for (final KbParameter p: parameters) {
-			params.add(p.accept(visitor));
+			params.add(p.accept(visitor, this));
 		}
 		for (final KbParameter p: returnType) {
-			returns.add(p.accept(visitor));
+			returns.add(p.accept(visitor, this));
 		}
 		return visitor.visit(this, params, returns);
 	}

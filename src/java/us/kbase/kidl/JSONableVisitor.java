@@ -152,7 +152,8 @@ public class JSONableVisitor implements KidlVisitor<Object> {
 	}
 
 	@Override
-	public Object visit(final KbTypedef typedef, final Object aliasType) {
+	public Object visit(final KbTypedef typedef, final KidlNode parent,
+			final Object aliasType) {
 		final Map<String, Object> ret = new TreeMap<String, Object>();
 		ret.put("!", "Bio::KBase::KIDL::KBT::Typedef");
 		ret.put("alias_type", aliasType);

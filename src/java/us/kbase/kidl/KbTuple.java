@@ -80,10 +80,10 @@ public class KbTuple extends KbBasicType {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
 		final List<T> elementTypes = new LinkedList<T>();
 		for (final KbType t: this.elementTypes) {
-			elementTypes.add(t.accept(visitor));
+			elementTypes.add(t.accept(visitor, this));
 		}
 		return visitor.visit(this, elementTypes);
 	}

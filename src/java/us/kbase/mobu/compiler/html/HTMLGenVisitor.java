@@ -1,5 +1,6 @@
 package us.kbase.mobu.compiler.html;
 
+import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.br;
 import static j2html.TagCreator.span;
@@ -23,6 +24,7 @@ import us.kbase.kidl.KbStructItem;
 import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.KidlNode;
 import us.kbase.kidl.KidlVisitor;
 
 public class HTMLGenVisitor implements KidlVisitor<Tag> {
@@ -32,10 +34,12 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	
 	private static final String CLS_NAME = "name";
 	private static final String CLS_KEYWORD = "keyword";
+	private static final String CLS_PRIMITIVE = "primitive";
 	private static final String CLS_MODULE = "module";
 	private static final String CLS_COMMENT = "comment";
 	private static final String CLS_TAB = "tab";
 	private static final String CLS_SPACE = "space";
+	private static final String CLS_PARAM = "parameter";
 	private static final String CLS_PARAMS = "parameters";
 	private static final String CLS_RETURNS = "returns";
 	
@@ -68,43 +72,46 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	@Override
-	public Tag visit(KbFuncdef func, List<Tag> params, List<Tag> returns) {
+	public Tag visit(KbFuncdef funcdef, List<Tag> params, List<Tag> returns) {
 		final List<Tag> contents = new LinkedList<Tag>();
 		contents.addAll(Arrays.asList(
 				TAB,
 				span().withClass(CLS_KEYWORD).withText(FUNCDEF),
 				SPACE,
-				span().withClass(CLS_NAME).withText(func.getName()),
+				span().withClass(CLS_NAME).withText(funcdef.getName()),
 				PAREN_OPEN,
-				makeList(params, CLS_PARAMS),
+				makeCommaSepList(params, CLS_PARAMS),
 				PAREN_CLOSE,
 				SPACE,
 				span().withClass(CLS_KEYWORD).withText(RETURNS),
 				PAREN_OPEN,
-				makeList(returns, CLS_RETURNS),
+				makeCommaSepList(returns, CLS_RETURNS),
 				PAREN_CLOSE
 		));
 		
-		if (func.getAuthentication() != null) {
+		if (funcdef.getAuthentication() != null) {
 			contents.addAll(Arrays.asList(
 					SPACE,
 					span().withClass(CLS_KEYWORD).withText(AUTH),
 					SPACE,
 					span().withClass(CLS_KEYWORD).withText(
-							func.getAuthentication())
+							funcdef.getAuthentication())
 			));
 		}
 		contents.add(SEMICOLON);
-		return span().withClass(CLS_FUNCDEF).with(contents);
+		return span().withClass(CLS_FUNCDEF)
+				.withId(FUNCDEF + funcdef.getName()).with(contents);
 	}
 
-	private Tag makeList(final List<Tag> list, final String cls) {
+	private Tag makeCommaSepList(final List<Tag> list, final String cls) {
 		final LinkedList<Tag> r = new LinkedList<Tag>();
 		for (final Tag t: list) {
 			r.add(t);
 			r.add(span().withText(","));
+			r.add(SPACE);
 		}
 		if (!list.isEmpty()) {
+			r.removeLast();
 			r.removeLast();
 		}
 		
@@ -114,13 +121,13 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	@Override
 	public Tag visit(KbList list, Tag elementType) {
 		// TODO Auto-generated method stub
-		return null;
+		return span().withText("list");
 	}
 
 	@Override
 	public Tag visit(KbMapping map, Tag keyType, Tag valueType) {
 		// TODO Auto-generated method stub
-		return null;
+		return span().withText("map");
 	}
 
 	@Override
@@ -146,48 +153,70 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 					BLANK_LINE)
 				.with(processed)
 				.with(
-					div().withText("}"),
-					SEMICOLON);
+					span().withText("}"), SEMICOLON);
 	}
 
 	@Override
 	public Tag visit(KbParameter param, Tag type) {
-		return span().withText("param");
+		final List<Tag> p = new LinkedList<Tag>();
+		p.add(type);
+		if (param.getName() != null) {
+			p.add(SPACE);
+			p.add(span().withClass(CLS_NAME).withText(param.getName()));
+			
+		}
+		return span().withClass(CLS_PARAM).with(p);
 	}
 
 	@Override
 	public Tag visit(KbScalar scalar) {
-		// TODO Auto-generated method stub
-		return null;
+		return span().withClass(CLS_PRIMITIVE).withText(scalar.getSpecName());
 	}
 
 	@Override
 	public Tag visit(KbStruct struct, List<Tag> fields) {
 		// TODO Auto-generated method stub
-		return null;
+		return span().withText("struct");
 	}
 
 	@Override
 	public Tag visit(KbStructItem field, Tag type) {
 		// TODO Auto-generated method stub
-		return null;
+		return span().withText("structitem");
 	}
 
 	@Override
 	public Tag visit(KbTuple tuple, List<Tag> elementTypes) {
+		
 		// TODO Auto-generated method stub
-		return null;
+		return span().withText("tuple");
 	}
 
 	@Override
-	public Tag visit(KbTypedef typedef, Tag aliasType) {
-		return div().withText("typedef");
+	public Tag visit(KbTypedef typedef, KidlNode parent, Tag aliasType) {
+		if (parent instanceof KbParameter || parent instanceof KbTypedef) {
+			return span().withClass(CLS_NAME).with(
+					a()
+						.withHref("#" + TYPEDEF + typedef.getName())
+						.withText(typedef.getName())
+					);
+		}
+		return span().withClass(CLS_TYPEDEF)
+				.withId(TYPEDEF + typedef.getName())
+				.with(
+					TAB,
+					span().withClass(CLS_KEYWORD).withText(TYPEDEF),
+					SPACE,
+					aliasType,
+					SPACE,
+					span().withClass(CLS_NAME).withText(typedef.getName()),
+					SEMICOLON
+				);
 	}
 
 	@Override
 	public Tag visit(KbUnspecifiedObject obj) {
-		// TODO Auto-generated method stub
-		return null;
+		return span().withClass(CLS_PRIMITIVE).withText(obj.getSpecName());
 	}
 
 }

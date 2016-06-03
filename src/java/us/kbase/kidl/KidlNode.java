@@ -7,6 +7,6 @@ public interface KidlNode {
 	 * @param visitor the visitor
 	 * @return the result returned from the visitor.
 	 */
-	public <T> T accept(KidlVisitor<T> visitor);
+	public <T> T accept(KidlVisitor<T> visitor, KidlNode parent);
 
 }

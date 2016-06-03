@@ -7,9 +7,9 @@ import java.util.Map;
 
 public interface KidlVisitor<T> {
 
-	public T visit(KbAuthdef auth);
+	public T visit(KbAuthdef authdef);
 	
-	public T visit(KbFuncdef func, List<T> params, List<T> returns);
+	public T visit(KbFuncdef funcdef, List<T> params, List<T> returns);
 	
 	public T visit(KbList list, T elementType);
 	
@@ -28,7 +28,7 @@ public interface KidlVisitor<T> {
 	
 	public T visit(KbTuple tuple, List<T> elementTypes);
 	
-	public T visit(KbTypedef typedef, T aliasType);
+	public T visit(KbTypedef typedef, KidlNode parent, T aliasType);
 	
 	public T visit(KbUnspecifiedObject obj);
 }

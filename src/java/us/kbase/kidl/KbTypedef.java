@@ -134,8 +134,8 @@ public class KbTypedef implements KbType, KbModuleDef {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
-		return visitor.visit(this, aliasType.accept(visitor));
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
+		return visitor.visit(this, parent, aliasType.accept(visitor, this));
 	}
 	
 	@SuppressWarnings("unchecked")
