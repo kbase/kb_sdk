@@ -30,6 +30,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import us.kbase.kidl.KbAuthdef;
 import us.kbase.kidl.KbBasicType;
 import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbList;
@@ -221,6 +222,8 @@ public class JavaTypeGenerator {
 							tupleTypes.add(returns.size());
 						}
 						funcs.add(new JavaFunc(moduleName, func, funcJavaName, params, returns, retMultiType));
+					} else if (comp instanceof KbAuthdef) {
+						//skip
 					} else {
 						findBasic((KbTypedef)comp, module.getModuleName(), nonPrimitiveTypes, tupleTypes);
 					}
