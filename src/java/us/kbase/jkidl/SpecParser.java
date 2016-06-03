@@ -25,6 +25,7 @@ import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbType;
 import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.JSONableVisitor;
 import us.kbase.kidl.KidlParseException;
 
 /**
@@ -69,7 +70,7 @@ public class SpecParser implements SpecParserConstants {
                         modList = new ArrayList<Object>();
                         ret.put(module.getServiceName(), modList);
                 }
-                modList.add(module.toJson());
+                modList.add(module.accept(new JSONableVisitor()));
         }
         return ret;
     }
@@ -520,7 +521,11 @@ async = true;
 comment = getLastComment(first);
     name = Identifier();
     jj_consume_token(T_round_open_bracket);
-ret = new KbFuncdef(name.toString(), comment, async);
+try {
+                ret = new KbFuncdef(name.toString(), comment, async);
+        } catch (KidlParseException ex) {
+                generateParseException(ex);
+        }
     args = OptNameParams(curModule, includes);
 ret.getParameters().addAll(args);
     jj_consume_token(T_round_close_bracket);
@@ -788,7 +793,6 @@ name = nameToken.toString();
     throw generateParseException();
   }
 
-  @SuppressWarnings("serial")
   static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(int kind) {

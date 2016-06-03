@@ -1,5 +1,9 @@
 package us.kbase.kidl.test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +33,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import us.kbase.common.service.UObject;
+import us.kbase.jkidl.StaticIncludeProvider;
+import us.kbase.kidl.KbAnnotations;
 import us.kbase.kidl.KbModule;
+import us.kbase.kidl.KbModuleDef;
 import us.kbase.kidl.KbModuleComp;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KbStruct;
@@ -94,6 +102,121 @@ public class KidlTest {
 				System.out.println(origL + new String(gap) + sep + newL);
 			}
 		}
+	}
+	
+	@Test
+	public void testDeprecation() throws Exception {
+		String spec = 	"module t1 {\n" +
+						"	/* @deprecated bar" +
+							"*/" +
+						"	typedef int foo;\n" +
+						"	typedef int foo2;\n" +
+						"};";
+		checkDeprecation(spec, "bar", true, null);
+		
+		spec = 	"module t1 {\n" +
+				"	/* @deprecated\n" +
+				"		sometext\n" +
+				"" +
+				" " +
+				"	*/" +
+				"	typedef int foo;\n" +
+				"	typedef int foo2;\n" +
+				"};";
+		checkDeprecation(spec, null, true, null);
+		
+		spec = 	"module t1 {\n" +
+				"	/* @deprecated baz\n" +
+				"		@wooble wibble" +
+				" " +
+				"" +
+				"	*/" +
+				"	funcdef whee() returns();\n" +
+				"	/* foo bar\n" +
+				" " +
+				"" +
+				"	*/" +
+				"	funcdef whee2() returns();\n" +
+				"};";
+		Map<String, Object> unknown = new HashMap<String, Object>();
+		unknown.put("wooble", Arrays.asList("wibble"));
+		checkDeprecation(spec, "baz", true, unknown);
+		
+		spec = 	"module t1 {\n" +
+				"	/* @deprecated bar baz" +
+					"*/" +
+				"	typedef int foo;\n" +
+				"};";
+		failDeprecation(spec,
+				"Error at line 2, column 53: deprecation annotations may have at most one argument");
+	}
+
+	private void failDeprecation(String spec, String exp) throws Exception {
+		try {
+			checkDeprecation(spec, "foo", true, null);
+			fail("compiled bad spec");
+		} catch (KidlParseException kpe) {
+			assertThat("incorrect exception msg", kpe.getLocalizedMessage(),
+					is(exp));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void checkDeprecation(String spec, String deptarg, boolean isdep,
+			Map<String, Object> unknown)
+			throws Exception {
+		Map<String, Map<String, String>> schemas =
+				new HashMap<String, Map<String, String>>();
+		Map<?, ?> parsed = KidlParser.parseSpecInt(new StringReader(spec),
+				schemas, new StaticIncludeProvider());
+		final UObject modComps = new UObject(parsed)
+			.asMap().get("t1")
+			.asList().get(0)
+			.asList().get(0)
+			.asMap().get("module_components");
+		Map<String, UObject> annotations = modComps
+			.asList().get(0)
+			.asMap().get("annotations").asMap();
+		assertThat("incorrect deprecation",
+				annotations.containsKey("deprecated"), is(true));
+		if (deptarg != null) {
+			assertThat("incorrect deprecation target",
+					annotations.get("deprecated").asClassInstance(String.class),
+					is(deptarg));
+		} else {
+			assertThat("incorrect deprecation target",
+					annotations.get("deprecated").isNull(), is(true));
+		}
+		if (unknown != null) {
+			Map<String, Object> uk = annotations.get("unknown_annotations")
+					.asClassInstance(Map.class);
+			assertThat("incorrect unknown annotations", uk, is(unknown));
+		}
+		Map<String, UObject> stdtarget = modComps
+				.asList().get(1)
+				.asMap().get("annotations").asMap();
+		assertThat("incorrect deprection", stdtarget.containsKey("deprecation"),
+				is(false));
+		List<KbService> reparsed = KidlParser.parseSpec(parsed);
+		KbAnnotations ann = getAnnotations(reparsed, 0);
+		assertThat("deprecation incorrect", ann.isDeprecated(), is(isdep));
+		assertThat("deprecation target incorrect",
+				ann.getDeprecationReplacement(), is(deptarg));
+		if (unknown != null) {
+			assertThat("incorrect unknown annotations",
+					ann.getUnknown(), is(unknown));
+		}
+		ann = getAnnotations(reparsed, 1);
+		assertThat("deprecation incorrect", ann.isDeprecated(), is(false));
+		assertThat("deprecation target incorrect",
+				ann.getDeprecationReplacement(), is((String)null));
+	}
+
+	private KbAnnotations getAnnotations(List<KbService> reparsed,
+			int compnum) {
+		final KbModuleComp td = reparsed.get(0).getModules().get(0)
+				.getModuleComponents().get(compnum);
+		return ((KbModuleDef)td).getAnnotations();
 	}
 	
 	@Test

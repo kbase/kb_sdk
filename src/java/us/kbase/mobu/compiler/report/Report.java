@@ -1,5 +1,6 @@
 package us.kbase.mobu.compiler.report;
 
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,8 +14,8 @@ public class Report {
     public String sdkGitCommit;
     @JsonProperty("impl_file_path")
     public String implFilePath;
-    @JsonProperty("kidl_specs")
-    public Map<String, String> kidlSpecs;
+    @JsonProperty("spec_files")
+    public List<SpecFile> specFiles;
     @JsonProperty("function_places")
     public Map<String, FunctionPlace> functionPlaces;
     @JsonProperty("functions")

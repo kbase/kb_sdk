@@ -8,10 +8,6 @@
   <!-- property name="BIN_TARGET" location="../../bin" / -->
   <!-- property name="BIN_LIB_TARGET" location="dist"/ -->
 
-
-  <property name="TESTCFG" location="test/test.cfg"/>
-
-
   <!-- set global properties for this build -->
   <property name="src"	location="src/java"/>
   <property name="dist" location="dist"/>
@@ -21,7 +17,6 @@
 
   <property name="test.dir" location="temp_test_files"/>
   <property name="test.script.dir" location="test_scripts"/>
-  <property name="test.config"  value="${test.script.dir}/test.cfg"/>
   <property name="test.script"  value="test_module_builder.sh"/>
 
   <property name="ee.dir"  value="${test.script.dir}/ee_mock_service"/>
@@ -89,6 +84,7 @@ commit=${git.commit}</echo>
       <fileset dir="${src}">
         <patternset>
           <include name="**/*.properties"/>
+          <include name="**/*.py"/>
         </patternset>
       </fileset>
     </copy>
@@ -146,6 +142,8 @@ commit=${git.commit}</echo>
       <include name="apache_commons/http/httpcore-4.3.jar"/>
       <include name="apache_commons/http/httpmime-4.3.1.jar"/>
       <include name="apache_commons/commons-logging-1.1.1.jar"/>
+      <include name="joda/joda-time-2.2.jar"/>
+      <include name="google/guava-18.0.jar"/>
       <include name="${commonjar}"/>
     </fileset>
     <!--fileset dir=".">

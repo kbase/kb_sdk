@@ -13,51 +13,53 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * <p>Original spec-file type: UserRole</p>
- * 
+ * <p>Original spec-file type: IOTags</p>
+ * <pre>
+ * Local Function Listing Support
+ * </pre>
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "name",
-    "privileges"
+    "file_types",
+    "kb_types"
 })
-public class UserRole {
+public class IOTags {
 
-    @JsonProperty("name")
-    private java.lang.String name;
-    @JsonProperty("privileges")
-    private List<String> privileges;
+    @JsonProperty("file_types")
+    private List<String> fileTypes;
+    @JsonProperty("kb_types")
+    private List<String> kbTypes;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
-    @JsonProperty("name")
-    public java.lang.String getName() {
-        return name;
+    @JsonProperty("file_types")
+    public List<String> getFileTypes() {
+        return fileTypes;
     }
 
-    @JsonProperty("name")
-    public void setName(java.lang.String name) {
-        this.name = name;
+    @JsonProperty("file_types")
+    public void setFileTypes(List<String> fileTypes) {
+        this.fileTypes = fileTypes;
     }
 
-    public UserRole withName(java.lang.String name) {
-        this.name = name;
+    public IOTags withFileTypes(List<String> fileTypes) {
+        this.fileTypes = fileTypes;
         return this;
     }
 
-    @JsonProperty("privileges")
-    public List<String> getPrivileges() {
-        return privileges;
+    @JsonProperty("kb_types")
+    public List<String> getKbTypes() {
+        return kbTypes;
     }
 
-    @JsonProperty("privileges")
-    public void setPrivileges(List<String> privileges) {
-        this.privileges = privileges;
+    @JsonProperty("kb_types")
+    public void setKbTypes(List<String> kbTypes) {
+        this.kbTypes = kbTypes;
     }
 
-    public UserRole withPrivileges(List<String> privileges) {
-        this.privileges = privileges;
+    public IOTags withKbTypes(List<String> kbTypes) {
+        this.kbTypes = kbTypes;
         return this;
     }
 
@@ -73,7 +75,7 @@ public class UserRole {
 
     @Override
     public java.lang.String toString() {
-        return ((((((("UserRole"+" [name=")+ name)+", privileges=")+ privileges)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("IOTags"+" [fileTypes=")+ fileTypes)+", kbTypes=")+ kbTypes)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

@@ -1,7 +1,7 @@
 package us.kbase.mobu.compiler.test;
 
 import java.io.StringReader;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +9,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import us.kbase.common.service.UObject;
 import us.kbase.kidl.KbModule;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
@@ -17,6 +16,7 @@ import us.kbase.mobu.compiler.report.CompilationReporter;
 import us.kbase.mobu.compiler.report.Function;
 import us.kbase.mobu.compiler.report.FunctionPlace;
 import us.kbase.mobu.compiler.report.Report;
+import us.kbase.mobu.compiler.report.SpecFile;
 
 public class CompileReporterTest {
     
@@ -40,11 +40,11 @@ public class CompileReporterTest {
                 "    funcdef " + methodName + " (int, string, list<string>, mapping<string, float>) \n" +
                 "        returns (UnspecifiedObject, MyType);\n" +
                 "};";
-        Map<String, String> kidlSpecs = new LinkedHashMap<String, String>();
+        List<SpecFile> specs = new ArrayList<SpecFile>();
         List<KbService> services = KidlParser.parseSpec(KidlParser.parseSpecInt(new StringReader(kidlSpec), 
                 null, null));
         KbModule module = services.get(0).getModules().get(0);
-        Report rpt = CompilationReporter.createReport(kidlSpecs, "", "", moduleName, module, "/kb/dev_forgetter", 
+        Report rpt = CompilationReporter.createReport(specs, "", "", moduleName, module, "/kb/dev_forgetter", 
                 "#", server);
         //System.out.println(UObject.transformObjectToString(rpt));
         Map<String, FunctionPlace> pos = rpt.functionPlaces;

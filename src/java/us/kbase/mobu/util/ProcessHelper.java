@@ -38,17 +38,19 @@ public class ProcessHelper {
     }
 
     public static ProcessHelper exec(CommandHolder cmd, File workDir, File input, File output, File error, boolean waitFor) throws IOException {
-        BufferedReader br = input == null ? null : new BufferedReader(new FileReader(input));
-        PrintWriter pw = output == null ? null : new PrintWriter(output);
-        PrintWriter epw = error == null ? null : new PrintWriter(error);
-        ProcessHelper ret = exec(cmd, workDir, br, pw, epw, waitFor);
-        if (br != null)
-            br.close();
-        if (pw != null)
-            pw.close();
-        if (epw != null)
-            epw.close();
-        return ret;
+        try ( // these SWs shouldn't be necessary, but there you go
+            @SuppressWarnings("resource")
+            final BufferedReader br = input == null ? null :
+                new BufferedReader(new FileReader(input));
+            @SuppressWarnings("resource")
+            final PrintWriter pw = output == null ? null :
+                new PrintWriter(output);
+            @SuppressWarnings("resource")
+            final PrintWriter epw = error == null ? null :
+                new PrintWriter(error)
+        ) {
+            return exec(cmd, workDir, br, pw, epw, waitFor);
+        }
     }
 
     public static ProcessHelper exec(String cmd, File workDir, BufferedReader input, PrintWriter output,

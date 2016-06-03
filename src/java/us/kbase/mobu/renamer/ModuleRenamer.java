@@ -182,10 +182,10 @@ public class ModuleRenamer {
         Map<String, String> prevCode = PrevCodeParser.parsePrevCode(origImplFile, commentPrefix, methodNames, withClassHeader);
         for (String key : prevCode.keySet()) {
             String origValue = prevCode.get(key);
-            String newValue = replaceAll(origValue, "\\'(" + oldModuleName + ")\\'", 
-                    newModuleName);
-            newValue = replaceAll(newValue, "\\\"(" + oldModuleName + ")\\\"", 
-                    newModuleName);
+            String newValue = replaceAll(origValue, "'" + oldModuleName + "'", 
+                    "'" + newModuleName + "'");
+            newValue = replaceAll(newValue, "\"" + oldModuleName + "\"", 
+                    "\"" + newModuleName + "\"");
             if (!newValue.equals(origValue))
                 prevCode.put(key, newValue);
         }
@@ -216,7 +216,7 @@ public class ModuleRenamer {
                     false, perlClientName, genPerlServer, perlServerName, perlImplName, perlPsgiName, 
                     false, pythonClientName, genPythonServer, pythonServerName, pythonImplName, 
                     false, rClientName, genRServer, rServerName, rImplName, false, true, ip, 
-                    srcOut, null, null, false, null, null, 
+                    srcOut, null, null, false, null, null, null, 
                     null, null, prevCode);
         }
         for (String key : generatedFiles.keySet()) {
@@ -265,26 +265,26 @@ public class ModuleRenamer {
             if (f.getName().endsWith("java")) {
                 String oldCap = TextUtils.capitalize(oldModuleName);
                 String newCap = TextUtils.capitalize(newModuleName);
-                newContent = replaceAll(newContent, "(import " + oldCap.toLowerCase() + ")", 
+                newContent = replaceAll(newContent, "import " + oldCap.toLowerCase(), 
                         "import " + newCap.toLowerCase());
-                newContent = replaceAll(newContent, "(" + oldCap + "Client)", 
+                newContent = replaceAll(newContent, oldCap + "Client", 
                         newCap + "Client");
-                newContent = replaceAll(newContent, "(" + oldCap + "Server)", 
+                newContent = replaceAll(newContent, oldCap + "Server", 
                         newCap + "Server");
-                newContent = replaceAll(newContent, "(test_" + oldCap + "_)", "test_" + newCap + "_");
-                newContent = replaceAll(newContent, "(\"" + oldModuleName + "\")", "\"" + newModuleName + "\"");
+                newContent = replaceAll(newContent, "test_" + oldCap + "_", "test_" + newCap + "_");
+                newContent = replaceAll(newContent, "\"" + oldModuleName + "\"", "\"" + newModuleName + "\"");
             } else {
-                newContent = replaceAll(newContent, "(" + oldModuleName + "Client)", 
+                newContent = replaceAll(newContent, oldModuleName + "Client", 
                         newModuleName + "Client");
-                newContent = replaceAll(newContent, "(" + oldModuleName + "Impl)", 
+                newContent = replaceAll(newContent, oldModuleName + "Impl", 
                         newModuleName + "Impl");
-                newContent = replaceAll(newContent, "(" + oldModuleName + "Server)", 
+                newContent = replaceAll(newContent, oldModuleName + "Server", 
                         newModuleName + "Server");
-                newContent = replaceAll(newContent, "(" + oldModuleName + ")", 
+                newContent = replaceAll(newContent, oldModuleName, 
                         newModuleName);
-                newContent = replaceAll(newContent, "(" + oldModuleName.toLowerCase() + ")", 
+                newContent = replaceAll(newContent, oldModuleName.toLowerCase(), 
                         newModuleName.toLowerCase());
-                newContent = replaceAll(newContent, "(test_" + oldModuleName + "_)", 
+                newContent = replaceAll(newContent, "test_" + oldModuleName + "_", 
                         "test_" + newModuleName + "_");
             }
             if (!newContent.equals(origContent)) 
@@ -295,7 +295,7 @@ public class ModuleRenamer {
         if (tlDir.exists()) {
             for (File f : FileUtils.listFiles(tlDir, new String[] {"sh"}, false)) {
                 String origContent = TextUtils.readFileText(f);
-                String newContent = replaceAll(origContent, "(" + oldModuleName.toLowerCase() + ")", 
+                String newContent = replaceAll(origContent, oldModuleName.toLowerCase(), 
                         newModuleName.toLowerCase());
                 if (!newContent.equals(origContent)) 
                     changes.add(new ChangeEvent(f, origContent, newContent));
@@ -311,7 +311,7 @@ public class ModuleRenamer {
     
     public static String replace(String text, String pattern, String changeTo,
             String error, boolean required) {
-        Pattern p1 = Pattern.compile(".*" + pattern + "(\\W.*)?", Pattern.DOTALL);
+        Pattern p1 = Pattern.compile(".*?" + pattern + "(\\W.*)?", Pattern.DOTALL);
         Matcher m1 = p1.matcher(text);
         if (m1.matches()) {
             int start = m1.start(1);
@@ -324,14 +324,40 @@ public class ModuleRenamer {
         return text;
     }
 
-    public static String replaceAll(String text, String pattern, String changeTo) {
-        while (true) {
-            String text2 = replace(text, pattern, changeTo, null, false);
-            if (text2.equals(text))
+    public static String replaceAll(String text, String oldPart, String changeTo) {
+        StringBuilder ret = new StringBuilder();
+        while (text.length() > 0) {
+            int start = 0;
+            int end = -1;
+            while (true) {
+                start = text.indexOf(oldPart, start);
+                if (start < 0)
+                    break;
+                end = start + oldPart.length();
+                if ((start > 0 && isIdChar(text.charAt(start - 1))) ||
+                        (end + 1 < text.length() && isIdChar(text.charAt(end)))) {
+                    start++;
+                } else {
+                    break;
+                }
+            }
+            if (start >= 0) {
+                if (start > 0)
+                    ret.append(text.substring(0, start));
+                ret.append(changeTo);
+                if (end >= text.length()) 
+                    break;
+                text = text.substring(end);
+            } else {
+                ret.append(text);
                 break;
-            text = text2;
+            }
         }
-        return text;
+        return ret.toString();
+    }
+    
+    private static boolean isIdChar(char ch) {
+        return Character.isLetterOrDigit(ch) || ch == '_';
     }
     
     public void applyChanges(List<ChangeEvent> changes) throws Exception {
