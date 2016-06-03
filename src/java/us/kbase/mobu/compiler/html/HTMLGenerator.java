@@ -47,8 +47,8 @@ public class HTMLGenerator {
 	
 	public static void main(String[] args) throws Exception {
 		String specfile = args[0];
-//		specfile = "/home/crusherofheads/localgit/workspace_deluxe/workspace.sp?ec";
-		specfile = "/home/crusherofheads/localgit/user_and_job_state/userandjobstate.spec";
+		specfile = "/home/crusherofheads/localgit/workspace_deluxe/workspace.spec";
+//		specfile = "/home/crusherofheads/localgit/user_and_job_state/userandjobstate.spec";
 		Reader specReader = new FileReader(specfile);
 		List<KbService> services = KidlParser.parseSpec(
 				KidlParser.parseSpecInt(specReader, 

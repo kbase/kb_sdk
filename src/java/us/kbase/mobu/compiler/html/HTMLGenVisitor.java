@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
 import us.kbase.kidl.KbAuthdef;
 import us.kbase.kidl.KbFuncdef;
@@ -40,6 +41,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final String CLS_PARAM = "parameter";
 	private static final String CLS_PARAMS = "parameters";
 	private static final String CLS_RETURNS = "returns";
+	private static final String CLS_DEPRECATED = "deprecated";
 	
 	private static final String CLS_AUTHDEF = "authdef";
 	private static final String CLS_TYPEDEF = "typedef";
@@ -55,6 +57,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final Tag SPACE = span().withClass(CLS_SPACE);
 	private static final Tag TAB = span().withClass(CLS_TAB);
 	private static final Tag SEMICOLON = span().withText(";");
+	private static final Tag COMMA = span().withText(",");
 	private static final Tag PAREN_OPEN = span().withText("(");
 	private static final Tag PAREN_CLOSE = span().withText(")");
 	//j2html takes care of translation
@@ -72,14 +75,30 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 				);
 	}
 
+	//TODO HTML memoize methods and links to methods from deprecated methods & issue warning at end if bad link
 	@Override
 	public Tag visit(KbFuncdef funcdef, List<Tag> params, List<Tag> returns) {
+		ContainerTag fd = span().withClass(CLS_NAME)
+				.withText(funcdef.getName());
+		if (funcdef.getAnnotations().isDeprecated()) {
+			fd.withClass(CLS_DEPRECATED);
+			final String dep = funcdef.getAnnotations()
+					.getDeprecationReplacement();
+			if (dep != null) {
+				final String[] modMeth = dep.split("\\.");
+				if (modMeth.length >= 2) { // ignore bad links for now
+					fd = a().withHref("#" + FUNCDEF + modMeth[1]).with(fd);
+				} else {
+					fd = a().withHref("#" + FUNCDEF + modMeth[0]).with(fd);
+				}
+			}
+		}
 		final List<Tag> contents = new LinkedList<Tag>();
 		contents.addAll(Arrays.asList(
 				TAB,
 				span().withClass(CLS_KEYWORD).withText(FUNCDEF),
 				SPACE,
-				span().withClass(CLS_NAME).withText(funcdef.getName()),
+				fd,
 				PAREN_OPEN,
 				makeCommaSepList(params, CLS_PARAMS),
 				PAREN_CLOSE,
@@ -108,7 +127,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		final LinkedList<Tag> r = new LinkedList<Tag>();
 		for (final Tag t: list) {
 			r.add(t);
-			r.add(span().withText(","));
+			r.add(COMMA);
 			r.add(SPACE);
 		}
 		if (!list.isEmpty()) {
@@ -123,16 +142,14 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	public Tag visit(KbList list, Tag elementType) {
 		return span().with(
 				span().withClass(CLS_PRIMITIVE).withText("list"),
-				LT,
-				elementType,
-				GT
-				);
+				LT, elementType, GT);
 	}
 
 	@Override
 	public Tag visit(KbMapping map, Tag keyType, Tag valueType) {
-		// TODO Auto-generated method stub
-		return span().withText("map");
+		return span().with(
+				span().withClass(CLS_PRIMITIVE).withText("mapping"),
+				LT, keyType, COMMA, SPACE, valueType, GT);
 	}
 
 	@Override
@@ -199,22 +216,38 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	@Override
 	public Tag visit(KbTypedef typedef, KidlNode parent, Tag aliasType) {
 		if (!(parent instanceof KbModule)) {
-			return span().withClass(CLS_NAME).with(
+			final ContainerTag n = span().withClass(CLS_NAME).with(
 					a()
 						.withHref("#" + TYPEDEF + typedef.getName())
 						.withText(typedef.getName())
 					);
+			if (typedef.getAnnotations().isDeprecated()) {
+				n.withClass(CLS_DEPRECATED);
+			}
+			return n;
+		}
+		ContainerTag td = span().withClass(CLS_NAME)
+				.withText(typedef.getName());
+		if (typedef.getAnnotations().isDeprecated()) {
+			td.withClass(CLS_DEPRECATED);
+			final String dep = typedef.getAnnotations()
+					.getDeprecationReplacement();
+			if (dep != null) {
+				final String[] modMeth = dep.split("\\.");
+				//TODO HTML link across modules when imports work
+				if (modMeth.length >= 2) { // ignore bad links for now
+					td = a().withHref("#" + TYPEDEF + modMeth[1]).with(td);
+				} else {
+					td = a().withHref("#" + TYPEDEF + modMeth[0]).with(td);
+				}
+			}
 		}
 		return span().withClass(CLS_TYPEDEF)
 				.withId(TYPEDEF + typedef.getName())
 				.with(
 					TAB,
 					span().withClass(CLS_KEYWORD).withText(TYPEDEF),
-					SPACE,
-					aliasType,
-					SPACE,
-					span().withClass(CLS_NAME).withText(typedef.getName()),
-					SEMICOLON
+					SPACE, aliasType, SPACE, td, SEMICOLON
 				);
 	}
 
