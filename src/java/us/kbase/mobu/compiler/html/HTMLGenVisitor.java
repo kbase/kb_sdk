@@ -208,9 +208,35 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	@Override
 	public Tag visit(KbTuple tuple, List<Tag> elementTypes) {
-		
-		// TODO Auto-generated method stub
-		return span().withText("tuple");
+		return span().with(
+				span().withClass(CLS_PRIMITIVE).withText("tuple"), LT)
+			.with(tupleList(tuple, elementTypes))
+			.with(GT);
+	}
+
+	private List<Tag> tupleList(KbTuple tuple, List<Tag> elementTypes) {
+		if (tuple.getElementNames().size() != elementTypes.size()) {
+			throw new IllegalStateException(
+					"A programming error occured. Some tuple entries are " +
+					"missing names.");
+		}
+		final LinkedList<Tag> ret = new LinkedList<Tag>();
+		for (int i = 0; i < elementTypes.size(); i++) {
+			ret.add(elementTypes.get(i));
+			//actually never null, set to e_{i}, but might change in future?
+			if (tuple.getElementNames().get(i) != null) {
+				ret.add(SPACE);
+				ret.add(span().withClass(CLS_NAME)
+						.withText(tuple.getElementNames().get(i)));
+			}
+			ret.add(COMMA);
+			ret.add(SPACE);
+		}
+		if (!ret.isEmpty()) {
+			ret.removeLast();
+			ret.removeLast();
+		}
+		return ret;
 	}
 
 	@Override
