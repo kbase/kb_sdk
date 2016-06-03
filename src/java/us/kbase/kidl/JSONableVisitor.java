@@ -14,6 +14,8 @@ public class JSONableVisitor implements KidlVisitor<Object> {
 
 	@Override
 	public Object visit(final KbAuthdef auth) {
+		//presumably this is yet another holdover from the old typecompiler
+		//that makes no sense
 		return "auth_default" + auth.getType();
 	}
 
