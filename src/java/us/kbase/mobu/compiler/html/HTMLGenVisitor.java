@@ -4,7 +4,6 @@ import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.br;
 import static j2html.TagCreator.span;
-import static j2html.TagCreator.pre;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -29,7 +28,6 @@ import us.kbase.kidl.KidlVisitor;
 
 public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
-	//TODO HTML move to html sub package
 	//TODO HTML add comment markers back to comments, highlight annotations
 	
 	private static final String CLS_NAME = "name";
@@ -59,6 +57,9 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final Tag SEMICOLON = span().withText(";");
 	private static final Tag PAREN_OPEN = span().withText("(");
 	private static final Tag PAREN_CLOSE = span().withText(")");
+	//j2html takes care of translation
+	private static final Tag LT = span().withText("<");
+	private static final Tag GT = span().withText(">");
 
 	@Override
 	public Tag visit(KbAuthdef auth) {
@@ -120,8 +121,12 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	@Override
 	public Tag visit(KbList list, Tag elementType) {
-		// TODO Auto-generated method stub
-		return span().withText("list");
+		return span().with(
+				span().withClass(CLS_PRIMITIVE).withText("list"),
+				LT,
+				elementType,
+				GT
+				);
 	}
 
 	@Override
@@ -142,8 +147,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		processed.removeLast();
 		return div().withClass(CLS_MODULE)
 				.with(
-					div().withClass(CLS_COMMENT).with(
-							pre().withText(module.getComment())),
+					div().withClass(CLS_COMMENT).withText(module.getComment()),
 					span().withClass(CLS_KEYWORD).withText(MODULE),
 					SPACE,
 					span().withClass(CLS_NAME).withText(
@@ -194,7 +198,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	@Override
 	public Tag visit(KbTypedef typedef, KidlNode parent, Tag aliasType) {
-		if (parent instanceof KbParameter || parent instanceof KbTypedef) {
+		if (!(parent instanceof KbModule)) {
 			return span().withClass(CLS_NAME).with(
 					a()
 						.withHref("#" + TYPEDEF + typedef.getName())
