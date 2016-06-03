@@ -204,11 +204,13 @@ public class TypeGeneratorTest extends Assert {
         portNum = findFreePort();
 		parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, portNum, true);
 		serverOutDir = preparePerlAndPyServerCode(testNum, workDir, false);
-		runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, serverOutDir, false, portNum);
+		runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, serverOutDir, false, portNum, false);
         portNum = findFreePort();
         parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, portNum, true);
         serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
-        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, serverOutDir, true, portNum);
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, serverOutDir, true, portNum, false);
+        portNum = findFreePort();
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, serverOutDir, true, portNum, true);
         portNum = findFreePort();
 		parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, portNum, true);
 		runJavaServerTest(testNum, true, testPackage, libDir, binDir, parsingData, serverOutDir, portNum);
@@ -382,7 +384,16 @@ public class TypeGeneratorTest extends Assert {
                     ));
             TextUtils.writeFileLines(lines, new File(workDir, "run_" + moduleName + "_async_job.sh"));
 	        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, 
-	                parsingData, serverOutDir, true, jobServicePort, true, null);
+	                parsingData, serverOutDir, true, jobServicePort, true, null, false);
+            //////////////////////////////////////// Python 3 server ///////////////////////////////////////////
+            lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+            lines.addAll(Arrays.asList(
+                    "cd \"" + serverOutDir.getAbsolutePath() + "\"",
+                    "python3 " + findPythonServerScript(serverOutDir).getName() + " $1 $2 $3 > py_cli.out 2> py_cli.err"
+                    ));
+            TextUtils.writeFileLines(lines, new File(workDir, "run_" + moduleName + "_async_job.sh"));
+            runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, 
+                    parsingData, serverOutDir, true, jobServicePort, true, null, true);
             //////////////////////////////////////// Java server ///////////////////////////////////////////
             lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
@@ -439,7 +450,9 @@ public class TypeGeneratorTest extends Assert {
         runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
                 serverOutDir, true, findFreePort());
         runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
-                serverOutDir, true, findFreePort());
+                serverOutDir, true, findFreePort(), false);
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort(), true);
         runJavaServerTest(testNum, true, testPackage, libDir,
                 binDir, parsingData, serverOutDir, findFreePort());
     }
@@ -487,7 +500,9 @@ public class TypeGeneratorTest extends Assert {
         runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
                 serverOutDir, true, findFreePort(), null, perlSrvManualCorr);
         runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
-                serverOutDir, true, findFreePort(), null, pySrvManualCorr);
+                serverOutDir, true, findFreePort(), null, pySrvManualCorr, false);
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort(), null, pySrvManualCorr, true);
         runJavaServerTest(testNum, true, testPackage, libDir, binDir, parsingData, serverOutDir, portNum);
     }
 
@@ -505,7 +520,9 @@ public class TypeGeneratorTest extends Assert {
         runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
                 serverOutDir, true, findFreePort());
         runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
-                serverOutDir, true, findFreePort());
+                serverOutDir, true, findFreePort(), false);
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort(), true);
         runJavaServerTest(testNum, true, testPackage, libDir,
                 binDir, parsingData, serverOutDir, findFreePort());
     }
@@ -562,10 +579,13 @@ public class TypeGeneratorTest extends Assert {
             if (needPythonServer) {
 		        runPythonServerTest(testNum, needClientServer, workDir,
 		                testPackage, libDir, binDir, parsingData, serverOldDir, 
-		                false, findFreePort());
+		                false, findFreePort(), false);
 		        runPythonServerTest(testNum, needClientServer, workDir,
 		                testPackage, libDir, binDir, parsingData, serverOutDir, 
-		                true, findFreePort());
+		                true, findFreePort(), false);
+                runPythonServerTest(testNum, needClientServer, workDir,
+                        testPackage, libDir, binDir, parsingData, serverOutDir, 
+                        true, findFreePort(), true);
 		    }
 		    if (needJavaServer)
 		        runJavaServerTest(testNum, needClientServer, testPackage, libDir,
@@ -578,22 +598,24 @@ public class TypeGeneratorTest extends Assert {
 	protected static void runPythonServerTest(int testNum,
 	        boolean needClientServer, File workDir, String testPackage,
 	        File libDir, File binDir, JavaData parsingData, File serverOutDir,
-	        boolean newStyle, int portNum) throws IOException, Exception {
+	        boolean newStyle, int portNum, boolean ver3) throws IOException, Exception {
 	    runPythonServerTest(testNum, needClientServer, workDir, testPackage, libDir, 
-	            binDir, parsingData, serverOutDir, newStyle, portNum, null, null);
+	            binDir, parsingData, serverOutDir, newStyle, portNum, null, null, ver3);
 	}
 
 	protected static void runPythonServerTest(int testNum,
 			boolean needClientServer, File workDir, String testPackage,
 			File libDir, File binDir, JavaData parsingData, File serverOutDir,
 			boolean newStyle, int portNum, Boolean noServer,
-			Map<String, String> serverManualCorrections) throws IOException, Exception {
-		String serverType = (newStyle ? "New" : "Old") + " python";
+			Map<String, String> serverManualCorrections, boolean ver3) 
+			        throws IOException, Exception {
+        String pyCmdSuff = ver3 ? "3" : "";
+		String serverType = (newStyle ? "New" : "Old") + " python" + pyCmdSuff;
 		File pidFile = new File(serverOutDir, "pid.txt");
 		pythonServerCorrection(serverOutDir, parsingData, serverManualCorrections);
 		try {
             File serverFile = findPythonServerScript(serverOutDir);
-            File uwsgiFile = new File(serverOutDir, "start_py_server.sh");
+            File uwsgiFile = new File(serverOutDir, "start_py_server" + pyCmdSuff + ".sh");
             List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             //JavaTypeGenerator.checkEnvVars(lines, "PYTHONPATH");
             lines.addAll(Arrays.asList(
@@ -604,9 +626,12 @@ public class TypeGeneratorTest extends Assert {
                     "fi"
                     ));
 		    if (noServer == null || !noServer) {
+		        if (ver3)
+		            lines.add("export PYTHONPATH=");
 		        lines.addAll(Arrays.asList(
-		                "python " + serverFile.getName() + " --host localhost --port " + portNum + 
-		                " >py_server.out 2>py_server.err & pid=$!",
+		                "python" + pyCmdSuff + " " + serverFile.getName() + " --host localhost" +
+		                " --port " + portNum + " >py_server" + pyCmdSuff + ".out" +
+		                " 2>py_server" + pyCmdSuff + ".err & pid=$!",
 		                "echo $pid > " + pidFile.getName()
 		                ));
 		        TextUtils.writeFileLines(lines, uwsgiFile);
@@ -913,7 +938,9 @@ public class TypeGeneratorTest extends Assert {
 	        System.out.println("- Perl client -> " + serverType + " server");
 	        runPerlClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
 	        System.out.println("- Python client -> " + serverType + " server");
-            runPythonClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
+            runPythonClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir, false);
+            System.out.println("- Python3 client -> " + serverType + " server");
+            runPythonClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir, true);
             System.out.println("- JavaScript client -> " + serverType + " server");
             runJsClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
 	    }
@@ -1038,7 +1065,7 @@ public class TypeGeneratorTest extends Assert {
     }
 
     private static void runPythonClientTest(int testNum, String testPackage, JavaData parsingData, 
-            int portNum, boolean needClientServer, File outDir) throws Exception {
+            int portNum, boolean needClientServer, File outDir, boolean ver3) throws Exception {
         if (!needClientServer)
             return;
         long time = System.currentTimeMillis();
@@ -1048,8 +1075,10 @@ public class TypeGeneratorTest extends Assert {
         prepareClientTestConfigFile(parsingData, resourceName, configFile);
         shellFile = new File(outDir, "test_python_client.sh");
         List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+        String pyName = "Python" + (ver3 ? "3" : "");
+        String pyCmd = pyName.toLowerCase();
         lines.addAll(Arrays.asList(
-                "python ../../../test_scripts/python/test_client.py -t " + configFile.getName() + 
+                pyCmd + " ../../../test_scripts/python/test_client.py -t " + configFile.getName() + 
                 " -e http://localhost:" + portNum + "/ -u " + System.getProperty("test.user") +
                 " -p \"" + System.getProperty("test.pwd") + "\"" +
                 (System.getProperty("KB_JOB_CHECK_WAIT_TIME") == null ? "" :
@@ -1062,12 +1091,12 @@ public class TypeGeneratorTest extends Assert {
             if (exitCode != 0) {
                 String out = ph.getSavedOutput();
                 if (!out.isEmpty())
-                    System.out.println("Python client output:\n" + out);
+                    System.out.println(pyName + " client output:\n" + out);
                 String err = ph.getSavedErrors();
                 if (!err.isEmpty())
-                    System.err.println("Python client errors:\n" + err);
+                    System.err.println(pyName + " client errors:\n" + err);
             }
-            Assert.assertEquals("Python client exit code should be 0", 0, exitCode);
+            Assert.assertEquals(pyName + " client exit code should be 0", 0, exitCode);
         }
         if (debugClientTimes)
             System.out.println("  (time=" + (System.currentTimeMillis() - time) + " ms)");
