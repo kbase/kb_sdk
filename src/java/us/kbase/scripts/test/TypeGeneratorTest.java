@@ -913,7 +913,9 @@ public class TypeGeneratorTest extends Assert {
 	        System.out.println("- Perl client -> " + serverType + " server");
 	        runPerlClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
 	        System.out.println("- Python client -> " + serverType + " server");
-            runPythonClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
+            runPythonClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir, false);
+            System.out.println("- Python3 client -> " + serverType + " server");
+            runPythonClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir, true);
             System.out.println("- JavaScript client -> " + serverType + " server");
             runJsClientTest(testNum, testPackage, parsingData, portNum, needClientServer, outDir);
 	    }
@@ -1038,7 +1040,7 @@ public class TypeGeneratorTest extends Assert {
     }
 
     private static void runPythonClientTest(int testNum, String testPackage, JavaData parsingData, 
-            int portNum, boolean needClientServer, File outDir) throws Exception {
+            int portNum, boolean needClientServer, File outDir, boolean ver3) throws Exception {
         if (!needClientServer)
             return;
         long time = System.currentTimeMillis();
@@ -1048,8 +1050,12 @@ public class TypeGeneratorTest extends Assert {
         prepareClientTestConfigFile(parsingData, resourceName, configFile);
         shellFile = new File(outDir, "test_python_client.sh");
         List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+        String pyName = "Python" + (ver3 ? "3" : "");
+        String pyCmd = pyName.toLowerCase();
+        if (ver3)
+            lines.add("export PYTHONPATH=");
         lines.addAll(Arrays.asList(
-                "python ../../../test_scripts/python/test_client.py -t " + configFile.getName() + 
+                pyCmd + " ../../../test_scripts/python/test_client.py -t " + configFile.getName() + 
                 " -e http://localhost:" + portNum + "/ -u " + System.getProperty("test.user") +
                 " -p \"" + System.getProperty("test.pwd") + "\"" +
                 (System.getProperty("KB_JOB_CHECK_WAIT_TIME") == null ? "" :
@@ -1062,12 +1068,12 @@ public class TypeGeneratorTest extends Assert {
             if (exitCode != 0) {
                 String out = ph.getSavedOutput();
                 if (!out.isEmpty())
-                    System.out.println("Python client output:\n" + out);
+                    System.out.println(pyName + " client output:\n" + out);
                 String err = ph.getSavedErrors();
                 if (!err.isEmpty())
-                    System.err.println("Python client errors:\n" + err);
+                    System.err.println(pyName + " client errors:\n" + err);
             }
-            Assert.assertEquals("Python client exit code should be 0", 0, exitCode);
+            Assert.assertEquals(pyName + " client exit code should be 0", 0, exitCode);
         }
         if (debugClientTimes)
             System.out.println("  (time=" + (System.currentTimeMillis() - time) + " ms)");
