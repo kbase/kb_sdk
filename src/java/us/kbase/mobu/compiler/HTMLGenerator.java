@@ -1,5 +1,12 @@
 package us.kbase.mobu.compiler;
 
+import static j2html.TagCreator.body;
+import static j2html.TagCreator.document;
+import static j2html.TagCreator.head;
+import static j2html.TagCreator.html;
+import static j2html.TagCreator.link;
+import static j2html.TagCreator.title;
+
 import j2html.tags.Tag;
 
 import java.io.FileReader;
@@ -23,9 +30,17 @@ public class HTMLGenerator {
 	//TODO HTML jars: j2HTML licence & push
 	//TODO HTML of included files
 	public void generate(final KbModule mod) throws Exception {
-		System.out.println(mod.getModuleComponents().get(0));
 		Tag t = mod.accept(new HTMLGenVisitor());
-		Files.write(Paths.get("temp_htmlgen.html"), Arrays.asList(t.render()),
+		Tag page = html().with(
+				head().with(
+						title(mod.getModuleName()),
+						link().withRel("stylesheet").withHref("temp_css.css")
+				),
+				body().with(t)
+				);
+				
+		Files.write(Paths.get("temp_htmlgen.html"),
+				Arrays.asList(document().render(), page.render()),
 				StandardCharsets.UTF_8);
 		
 	}
