@@ -60,6 +60,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final Tag COMMA = span().withText(",");
 	private static final Tag PAREN_OPEN = span().withText("(");
 	private static final Tag PAREN_CLOSE = span().withText(")");
+	private static final Tag BRKT_OPEN = span().withText("{");
+	private static final Tag BRKT_CLOSE = span().withText("}");
 	//j2html takes care of translation
 	private static final Tag LT = span().withText("<");
 	private static final Tag GT = span().withText(">");
@@ -170,11 +172,10 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 					span().withClass(CLS_NAME).withText(
 							module.getModuleName()),
 					SPACE,
-					span().withText("{"),
+					BRKT_OPEN,
 					BLANK_LINE)
 				.with(processed)
-				.with(
-					span().withText("}"), SEMICOLON);
+				.with(BRKT_CLOSE, SEMICOLON);
 	}
 
 	@Override
@@ -196,14 +197,27 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	@Override
 	public Tag visit(KbStruct struct, List<Tag> fields) {
-		// TODO Auto-generated method stub
-		return span().withText("struct");
+		final List<Tag> f = new LinkedList<Tag>();
+		for (final Tag t: fields) {
+			f.add(div().with(t));
+		}
+		return span().with(
+				span().withClass(CLS_PRIMITIVE).withText("structure"),
+				SPACE, BRKT_OPEN
+				)
+				.with(f)
+				.with(TAB, BRKT_CLOSE);
 	}
 
 	@Override
 	public Tag visit(KbStructItem field, Tag type) {
-		// TODO Auto-generated method stub
-		return span().withText("structitem");
+		return span().with(
+				TAB, TAB,
+				type,
+				SPACE,
+				span().withClass(CLS_NAME).withText(field.getName()),
+				SEMICOLON
+				);
 	}
 
 	@Override

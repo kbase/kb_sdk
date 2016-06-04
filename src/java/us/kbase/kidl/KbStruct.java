@@ -14,6 +14,7 @@ import java.util.Set;
  */
 public class KbStruct extends KbBasicType {
 
+	// per roman this is only needed for compatibility with the old typecomp
 	private String name;
 	private KbAnnotations annotations;
 	private List<KbStructItem> items;
