@@ -29,8 +29,6 @@ import us.kbase.kidl.KidlVisitor;
 
 public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
-	//TODO HTML add comment markers back to comments, highlight annotations
-	
 	private static final String CLS_NAME = "name";
 	private static final String CLS_KEYWORD = "keyword";
 	private static final String CLS_PRIMITIVE = "primitive";

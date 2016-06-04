@@ -39,7 +39,8 @@ public class HTMLGenerator {
 				),
 				body().with(t)
 				);
-				
+		
+		//TODO HTML typedef & funcdef indexes
 		Files.write(Paths.get("temp_htmlgen.html"),
 				Arrays.asList(document().render(), page.render()),
 				StandardCharsets.UTF_8);
