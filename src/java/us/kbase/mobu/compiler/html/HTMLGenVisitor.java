@@ -42,6 +42,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final String CLS_PARAMS = "parameters";
 	private static final String CLS_RETURNS = "returns";
 	private static final String CLS_DEPRECATED = "deprecated";
+	private static final String CLS_ANNOTATION = "annotation";
 	
 	private static final String CLS_AUTHDEF = "authdef";
 	private static final String CLS_TYPEDEF = "typedef";
@@ -58,6 +59,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final Tag TAB = span().withClass(CLS_TAB);
 	private static final Tag SEMICOLON = span().withText(";");
 	private static final Tag COMMA = span().withText(",");
+	private static final Tag COMMENT_INNER = span().withText("*");
 	private static final Tag PAREN_OPEN = span().withText("(");
 	private static final Tag PAREN_CLOSE = span().withText(")");
 	private static final Tag BRKT_OPEN = span().withText("{");
@@ -67,7 +69,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final Tag GT = span().withText(">");
 
 	@Override
-	public Tag visit(KbAuthdef auth) {
+	public Tag visit(final KbAuthdef auth) {
 		return span().withClass(CLS_AUTHDEF).with(
 				TAB,
 				span().withClass(CLS_KEYWORD).withText(AUTH),
@@ -78,8 +80,10 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	//TODO HTML memoize methods and links to methods from deprecated methods & issue warning at end if bad link
+	//TODO HTML memoize types and links to types (dep & cross spec links) & issue warning at end if bad link
 	@Override
-	public Tag visit(KbFuncdef funcdef, List<Tag> params, List<Tag> returns) {
+	public Tag visit(final KbFuncdef funcdef, final List<Tag> params,
+			final List<Tag> returns) {
 		ContainerTag fd = span().withClass(CLS_NAME)
 				.withText(funcdef.getName());
 		if (funcdef.getAnnotations().isDeprecated()) {
@@ -97,10 +101,12 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		}
 		final List<Tag> contents = new LinkedList<Tag>();
 		contents.addAll(Arrays.asList(
+				div().withClass(CLS_COMMENT).with(
+						processComment(funcdef.getComment(), true)),
 				TAB,
 				span().withClass(CLS_KEYWORD).withText(FUNCDEF),
 				SPACE,
-				fd,
+				fd.withId(FUNCDEF + funcdef.getName()),
 				PAREN_OPEN,
 				makeCommaSepList(params, CLS_PARAMS),
 				PAREN_CLOSE,
@@ -121,8 +127,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			));
 		}
 		contents.add(SEMICOLON);
-		return span().withClass(CLS_FUNCDEF)
-				.withId(FUNCDEF + funcdef.getName()).with(contents);
+		return span().withClass(CLS_FUNCDEF).with(contents);
 	}
 
 	private Tag makeCommaSepList(final List<Tag> list, final String cls) {
@@ -141,22 +146,23 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	@Override
-	public Tag visit(KbList list, Tag elementType) {
+	public Tag visit(final KbList list, final Tag elementType) {
 		return span().with(
 				span().withClass(CLS_PRIMITIVE).withText("list"),
 				LT, elementType, GT);
 	}
 
 	@Override
-	public Tag visit(KbMapping map, Tag keyType, Tag valueType) {
+	public Tag visit(final KbMapping map, final Tag keyType,
+			final Tag valueType) {
 		return span().with(
 				span().withClass(CLS_PRIMITIVE).withText("mapping"),
 				LT, keyType, COMMA, SPACE, valueType, GT);
 	}
 
 	@Override
-	public Tag visit(KbModule module, List<Tag> components,
-			Map<String, Tag> typeMap) {
+	public Tag visit(final KbModule module, final List<Tag> components,
+			final Map<String, Tag> typeMap) {
 		final LinkedList<Tag> processed = new LinkedList<Tag>();
 		processed.add(BLANK_LINE);
 		for (final Tag c: components) {
@@ -166,7 +172,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		processed.removeLast();
 		return div().withClass(CLS_MODULE)
 				.with(
-					div().withClass(CLS_COMMENT).withText(module.getComment()),
+					div().withClass(CLS_COMMENT).with(
+							processComment(module.getComment(), false)),
 					span().withClass(CLS_KEYWORD).withText(MODULE),
 					SPACE,
 					span().withClass(CLS_NAME).withText(
@@ -178,8 +185,69 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 				.with(BRKT_CLOSE, SEMICOLON);
 	}
 
+	private List<Tag> processComment(final String comment, final boolean tab) {
+		if (comment == null || comment.trim().isEmpty()) {
+			return new LinkedList<Tag>();
+		}
+		final List<String> lines = Arrays.asList(comment.split("\\r?\\n"));
+		if (lines.isEmpty()) {
+			return new LinkedList<Tag>();
+		}
+		final List<Tag> ret = new LinkedList<Tag>();
+		if (tab) {
+			ret.add(div().with(TAB, span().withText("/*")));
+		} else {
+			ret.add(div().withText("/*"));
+		}
+		for (final String l: lines) {
+			final ContainerTag tagline = processWhiteSpace(l);
+			final String t = l.trim();
+			if (t.startsWith("@")) {
+				final String[] a = t.split("\\s", 2);
+				tagline.with(span().withClass(CLS_ANNOTATION).withText(a[0]));
+				if (a.length == 2) {
+					tagline.with(SPACE, span().withText(a[1]));
+				}
+			} else {
+				tagline.withText(t);
+			}
+			if (tab) {
+				ret.add(div().with(TAB, SPACE, COMMENT_INNER, SPACE, tagline));
+			} else {
+				ret.add(div().with(SPACE, COMMENT_INNER, SPACE, tagline));
+			}
+		}
+		
+		if (tab) {
+			ret.add(div().with(TAB, SPACE, span().withText("*/")));
+		} else {
+			ret.add(div().with(SPACE, span().withText("*/")));
+		}
+		return ret;
+	}
+	
+	// there's got to be a better way to do this
+	private ContainerTag processWhiteSpace(final String l) {
+		final List<Tag> ws = new LinkedList<Tag>();
+		for (int offset = 0; offset < l.length(); ) {
+			final int codepoint = l.codePointAt(offset);
+			final String c = new String(new int[] {codepoint}, 0, 1);
+			if (!Character.isWhitespace(codepoint) ||
+					c.equals("\n") || c.equals("\r")) {
+				break;
+			}
+			if (c.equals("\t")) {
+				ws.add(TAB);
+			} else {
+				ws.add(SPACE); // anything else? don't think so
+			}
+			offset += Character.charCount(codepoint);
+		}
+		return span().with(ws);
+	}
+
 	@Override
-	public Tag visit(KbParameter param, Tag type) {
+	public Tag visit(final KbParameter param, final Tag type) {
 		final List<Tag> p = new LinkedList<Tag>();
 		p.add(type);
 		if (param.getName() != null) {
@@ -191,12 +259,12 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	@Override
-	public Tag visit(KbScalar scalar) {
+	public Tag visit(final KbScalar scalar) {
 		return span().withClass(CLS_PRIMITIVE).withText(scalar.getSpecName());
 	}
 
 	@Override
-	public Tag visit(KbStruct struct, List<Tag> fields) {
+	public Tag visit(final KbStruct struct, final List<Tag> fields) {
 		final List<Tag> f = new LinkedList<Tag>();
 		for (final Tag t: fields) {
 			f.add(div().with(t));
@@ -210,7 +278,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	@Override
-	public Tag visit(KbStructItem field, Tag type) {
+	public Tag visit(final KbStructItem field, final Tag type) {
 		return span().with(
 				TAB, TAB,
 				type,
@@ -221,14 +289,15 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	@Override
-	public Tag visit(KbTuple tuple, List<Tag> elementTypes) {
+	public Tag visit(final KbTuple tuple, final List<Tag> elementTypes) {
 		return span().with(
 				span().withClass(CLS_PRIMITIVE).withText("tuple"), LT)
 			.with(tupleList(tuple, elementTypes))
 			.with(GT);
 	}
 
-	private List<Tag> tupleList(KbTuple tuple, List<Tag> elementTypes) {
+	private List<Tag> tupleList(final KbTuple tuple,
+			final List<Tag> elementTypes) {
 		if (tuple.getElementNames().size() != elementTypes.size()) {
 			throw new IllegalStateException(
 					"A programming error occured. Some tuple entries are " +
@@ -254,10 +323,12 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	@Override
-	public Tag visit(KbTypedef typedef, KidlNode parent, Tag aliasType) {
+	public Tag visit(final KbTypedef typedef, final KidlNode parent,
+			final Tag aliasType) {
 		if (!(parent instanceof KbModule)) {
 			final ContainerTag n = span().withClass(CLS_NAME).with(
 					a()
+					//TODO HTML link across modules when imports work
 						.withHref("#" + TYPEDEF + typedef.getName())
 						.withText(typedef.getName())
 					);
@@ -283,16 +354,18 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			}
 		}
 		return span().withClass(CLS_TYPEDEF)
-				.withId(TYPEDEF + typedef.getName())
 				.with(
+					div().withClass(CLS_COMMENT).with(
+							processComment(typedef.getComment(), true)),
 					TAB,
 					span().withClass(CLS_KEYWORD).withText(TYPEDEF),
-					SPACE, aliasType, SPACE, td, SEMICOLON
+					SPACE, aliasType, SPACE,
+					td.withId(TYPEDEF + typedef.getName()), SEMICOLON
 				);
 	}
 
 	@Override
-	public Tag visit(KbUnspecifiedObject obj) {
+	public Tag visit(final KbUnspecifiedObject obj) {
 		return span().withClass(CLS_PRIMITIVE).withText(obj.getSpecName());
 	}
 

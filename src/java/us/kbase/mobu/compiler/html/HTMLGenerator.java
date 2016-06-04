@@ -26,6 +26,7 @@ public class HTMLGenerator {
 	public HTMLGenerator() {}
 	
 	
+	//TODO HTML figure out what's going on with comment whitespace & fix
 	//TODO HTML fix exceptions for this method
 	//TODO HTML jars: j2HTML licence & push
 	//TODO HTML of included files
