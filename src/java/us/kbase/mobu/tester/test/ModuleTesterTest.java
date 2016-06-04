@@ -22,7 +22,7 @@ import us.kbase.mobu.tester.ModuleTester;
 public class ModuleTesterTest {
 
 	private static final String SIMPLE_MODULE_NAME = "ASimpleModule_for_unit_testing";
-	private static final boolean cleanupAfterTests = false;
+	private static final boolean cleanupAfterTests = true;
 	
 	private static List<String> createdModuleNames = new ArrayList<String>();
 	private static String user;
