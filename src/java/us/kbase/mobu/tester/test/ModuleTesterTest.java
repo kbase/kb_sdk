@@ -13,7 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import us.kbase.mobu.ModuleBuilder;
@@ -23,7 +22,7 @@ import us.kbase.mobu.tester.ModuleTester;
 public class ModuleTesterTest {
 
 	private static final String SIMPLE_MODULE_NAME = "ASimpleModule_for_unit_testing";
-	private static final boolean cleanupAfterTests = true;
+	private static final boolean cleanupAfterTests = false;
 	
 	private static List<String> createdModuleNames = new ArrayList<String>();
 	private static String user;
@@ -88,17 +87,10 @@ public class ModuleTesterTest {
 		String lang = "perl";
 		String moduleName = SIMPLE_MODULE_NAME + "Perl";
 		init(lang, moduleName);
-		File implFile = new File(moduleName + "/lib/" + moduleName + "/" + moduleName + "Impl.pm");
-		String implText = FileUtils.readFileToString(implFile);
-		implText = implText.replace("    #BEGIN filter_contigs", 
-		        "    #BEGIN filter_contigs\n" +
-		        "    die \"Special error\";");
-		FileUtils.writeStringToFile(implFile, implText);
 		int exitCode = runTestsInDocker(moduleName);
 		Assert.assertEquals(0, exitCode);
 	}
 
-	@Ignore
 	@Test
 	public void testPerlModuleError() throws Exception {
 	    System.out.println("Test [testPerlModuleError]");

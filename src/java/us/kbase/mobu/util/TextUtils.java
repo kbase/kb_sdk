@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -60,8 +61,12 @@ public class TextUtils {
 	}
 	
 	public static List<String> readStreamLines(InputStream is, boolean closeAfter) throws IOException {
-		List<String> ret = new ArrayList<String>();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		return readReaderLines(new InputStreamReader(is), closeAfter);
+	}
+	
+	public static List<String> readReaderLines(Reader r, boolean closeAfter) throws IOException {
+	    BufferedReader br = new BufferedReader(r);
+        List<String> ret = new ArrayList<String>();
 		while (true) {
 			String l = br.readLine();
 			if (l == null)
