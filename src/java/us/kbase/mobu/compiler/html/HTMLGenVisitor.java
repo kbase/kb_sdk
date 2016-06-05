@@ -47,6 +47,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final String CLS_RETURNS = "returns";
 	private static final String CLS_DEPRECATED = "deprecated";
 	private static final String CLS_ANNOTATION = "annotation";
+	private static final String CLS_INCLUDE = "include";
 	
 	private static final String CLS_AUTHDEF = "authdef";
 	private static final String CLS_TYPEDEF = "typedef";
@@ -57,6 +58,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final String TYPEDEF = "typedef";
 	private static final String FUNCDEF = "funcdef";
 	private static final String RETURNS = "returns";
+	private static final String INCLUDE = "#include";
 	
 	private static final Tag BLANK_LINE = br();
 	private static final Tag SPACE = span().withClass(CLS_SPACE);
@@ -74,6 +76,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	private final String moduleName;
 	
+	private final SortedSet<String> refsmodules = new TreeSet<String>();
 	private final SortedSet<String> hastypes = new TreeSet<String>();
 	private final Set<KbTypedef> deptypes = new HashSet<KbTypedef>();
 	private final SortedSet<String> hasfuncs = new TreeSet<String>();
@@ -379,6 +382,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			linkname = typedef.getName();
 		} else {
 			linkname = typedef.getModule() + "." + typedef.getName();
+			refsmodules.add(typedef.getModule());
 		}
 		final ContainerTag n = span().withClass(CLS_NAME).with(
 				makeTypedefAnchor(typedef.getModule(), typedef.getName())
@@ -411,6 +415,21 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	@Override
 	public Tag visit(final KbUnspecifiedObject obj) {
 		return span().withClass(CLS_PRIMITIVE).withText(obj.getSpecName());
+	}
+
+	public List<Tag> renderIncludes() {
+		final List<Tag> includes = new LinkedList<Tag>();
+		for (final String module: refsmodules) {
+			includes.add(div().withClass(CLS_INCLUDE).with(
+					span().withClass(CLS_KEYWORD).withText(INCLUDE),
+					SPACE,
+					LT,
+					span().withClass(CLS_NAME).with(
+							a().withHref("./" + module + DOT_HTML)
+							.withText(module)),
+					GT));
+		}
+		return includes;
 	}
 
 }

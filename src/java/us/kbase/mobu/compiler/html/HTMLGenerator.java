@@ -89,10 +89,9 @@ public class HTMLGenerator {
 						title(res.mod.getModuleName()),
 						link().withRel("stylesheet").withHref("temp_css.css")
 				),
-				body().with(res.html)
+				body().with(res.visitor.renderIncludes()).with(res.html)
 				);
 		
-		//TODO HTML generate include lines
 		//TODO HTML typedef & funcdef indexes
 		try (final Writer w = saver.openWriter(
 				res.mod.getModuleName() + HTMLGenVisitor.DOT_HTML)) {
