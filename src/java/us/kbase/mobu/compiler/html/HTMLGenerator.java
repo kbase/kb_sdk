@@ -13,10 +13,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
 
 import us.kbase.jkidl.FileIncludeProvider;
 import us.kbase.jkidl.IncludeProvider;
@@ -30,13 +33,14 @@ import us.kbase.mobu.util.FileSaver;
 
 public class HTMLGenerator {
 
+	private final static String CSS = "KIDLspec.css";
+	
 	public HTMLGenerator() {}
 	
 	//TODO HTML TEST test with spec A imports B which imports C but A doesn't use types from B that link to C
 	//TODO HTML TEST test with spec with <script> tags to ensure they don't execute
 	//TODO HTML javadoc
 	//TODO HTML WARN how handle warnings? Logger makes most sense
-	//TODO HTML include CSS file
 	//TODO HTML LOWPRIO figure out what's going on with comment whitespace & fix
 	//TODO HTML jars: j2HTML licence & push
 	//TODO HTML TEST test with and without default auth
@@ -79,6 +83,16 @@ public class HTMLGenerator {
 			
 			writeHTML(saver, r);
 		}
+		writeCSS(saver);
+	}
+
+	private void writeCSS(FileSaver saver) throws IOException {
+		try (final InputStream is =
+				HTMLGenerator.class.getResourceAsStream(CSS);
+			final Writer w = saver.openWriter(CSS)) {
+			IOUtils.copy(is, w);
+		}
+		
 	}
 
 	private void writeHTML(
@@ -87,7 +101,7 @@ public class HTMLGenerator {
 		Tag page = html().with(
 				head().with(
 						title(res.mod.getModuleName()),
-						link().withRel("stylesheet").withHref("temp_css.css")
+						link().withRel("stylesheet").withHref(CSS)
 				),
 				body().with(res.visitor.renderIncludes()).with(res.html)
 				);
