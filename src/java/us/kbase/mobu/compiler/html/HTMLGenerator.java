@@ -62,16 +62,15 @@ public class HTMLGenerator {
 		for (final KbModule m: root.values()) {
 			main = m;
 		}
-//		final KbModule main = KidlParser.parseSpec(
-//				KidlParser.parseSpecInt(spec, null, memo))
-//				.get(0).getModules().get(0);
 		final Map<String, Res> modules = new HashMap<String, Res>();
-		final HTMLGenVisitor visitor = new HTMLGenVisitor();
+		final HTMLGenVisitor visitor =
+				new HTMLGenVisitor(main.getModuleName());
 		modules.put(main.getModuleName(), new Res(main, visitor,
 				main.accept(visitor)));
 		for (final KbModule m: memo.getParsed().values()) {
-			modules.put(m.getModuleName(), new Res(m, visitor,
-					m.accept(visitor)));
+			final HTMLGenVisitor v =
+					new HTMLGenVisitor(m.getModuleName());
+			modules.put(m.getModuleName(), new Res(m, v, m.accept(v)));
 		}
 		//TODO HTML check for bad links
 		for (final Res r: modules.values()) {
@@ -94,7 +93,7 @@ public class HTMLGenerator {
 		//TODO HTML generate include lines
 		//TODO HTML typedef & funcdef indexes
 		try (final Writer w = saver.openWriter(
-				res.mod.getModuleName() + ".html")) {
+				res.mod.getModuleName() + HTMLGenVisitor.DOT_HTML)) {
 			w.write(document().render());
 			w.write(page.render());
 		}
@@ -102,13 +101,13 @@ public class HTMLGenerator {
 	
 	public static void main(String[] args) throws Exception {
 		String specfile = args[0];
-//		specfile = "/home/crusherofheads/localgit/jgi_types/KBaseFile.spec";
-		specfile = "/home/crusherofheads/localgit/workspace_deluxe/workspace.spec";
+		specfile = "/home/crusherofheads/localgit/jgi_types/KBaseFile.spec";
+//		specfile = "/home/crusherofheads/localgit/workspace_deluxe/workspace.spec";
 //		specfile = "/home/crusherofheads/localgit/user_and_job_state/userandjobstate.spec";
 		new HTMLGenerator().generate(new FileReader(specfile),
 				new FileIncludeProvider(
-						new File(".")),
-//						new File("/home/crusherofheads/localgit/jgi_types")),
+//						new File(".")),
+						new File("/home/crusherofheads/localgit/jgi_types")),
 				new DiskFileSaver(new File("temp_html")));
 	}
 	

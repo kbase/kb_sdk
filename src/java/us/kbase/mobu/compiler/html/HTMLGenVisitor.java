@@ -6,9 +6,12 @@ import static j2html.TagCreator.br;
 import static j2html.TagCreator.span;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
@@ -29,6 +32,8 @@ import us.kbase.kidl.KidlVisitor;
 
 public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
+	public static final String DOT_HTML = ".html";
+	
 	private static final String CLS_NAME = "name";
 	private static final String CLS_KEYWORD = "keyword";
 	private static final String CLS_PRIMITIVE = "primitive";
@@ -66,6 +71,20 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final Tag LT = span().withText("<");
 	private static final Tag GT = span().withText(">");
 
+	private final String moduleName;
+	
+	private final Map<String, Set<String>> seentypes =
+			new HashMap<String, Set<String>>();
+	
+	public HTMLGenVisitor(final String moduleName) {
+		if (moduleName == null || moduleName.isEmpty()) {
+			throw new NullPointerException(
+					"moduleName cannot be null or empty");
+		}
+		this.moduleName = moduleName;
+	}
+	
+	
 	@Override
 	public Tag visit(final KbAuthdef auth) {
 		return span().withClass(CLS_AUTHDEF).with(
@@ -325,17 +344,9 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	@Override
 	public Tag visit(final KbTypedef typedef, final KidlNode parent,
 			final Tag aliasType) {
+		rememberSeenType(typedef);		
 		if (!(parent instanceof KbModule)) {
-			final ContainerTag n = span().withClass(CLS_NAME).with(
-					a()
-					//TODO HTML link across modules when imports work
-						.withHref("#" + TYPEDEF + typedef.getName())
-						.withText(typedef.getName())
-					);
-			if (typedef.getAnnotations().isDeprecated()) {
-				n.withClass(CLS_DEPRECATED);
-			}
-			return n;
+			return makeTypeDefLink(typedef);
 		}
 		ContainerTag td = span().withClass(CLS_NAME)
 				.withText(typedef.getName());
@@ -363,6 +374,35 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 					td.withId(TYPEDEF + typedef.getName()), SEMICOLON
 				);
 	}
+
+	private ContainerTag makeTypeDefLink(final KbTypedef typedef) {
+		final String linkpref;
+		final String linkname;
+		if (typedef.getModule().equals(moduleName)) {
+			linkpref = "";
+			linkname = typedef.getName();
+		} else {
+			linkpref = "./" + typedef.getModule() + DOT_HTML;
+			linkname = typedef.getModule() + "." + typedef.getName();
+		}
+		final ContainerTag n = span().withClass(CLS_NAME).with(
+				a()
+					.withHref(linkpref + "#" + TYPEDEF + typedef.getName())
+					.withText(linkname)
+				);
+		if (typedef.getAnnotations().isDeprecated()) {
+			n.withClass(CLS_DEPRECATED);
+		}
+		return n;
+	}
+
+	private void rememberSeenType(final KbTypedef typedef) {
+		if (!seentypes.containsKey(typedef.getModule())) {
+			seentypes.put(typedef.getModule(), new HashSet<String>());
+		}
+		seentypes.get(typedef.getModule()).add(typedef.getName());
+	}
+
 
 	@Override
 	public Tag visit(final KbUnspecifiedObject obj) {
