@@ -31,19 +31,30 @@ import us.kbase.kidl.KidlParseException;
 import us.kbase.mobu.util.DiskFileSaver;
 import us.kbase.mobu.util.FileSaver;
 
+/** Generates HTML versions of a KIDL spec file and any included spec files.
+ * @author gaprice@lbl.gov
+ *
+ */
 public class HTMLGenerator {
 
 	private final static String CSS = "KIDLspec.css";
 	
+	/* might need to add params later, but for now none needed */
 	public HTMLGenerator() {}
 	
 	//TODO HTML TEST test with spec A imports B which imports C but A doesn't use types from B that link to C
 	//TODO HTML TEST test with spec with <script> tags to ensure they don't execute
-	//TODO HTML javadoc
 	//TODO HTML WARN how handle warnings? Logger makes most sense
 	//TODO HTML LOWPRIO figure out what's going on with comment whitespace & fix
-	//TODO HTML jars: j2HTML licence & push
 	//TODO HTML TEST test with and without default auth
+	
+	/** Generate HTML files.
+	 * @param spec a reader for the specification from which to generate HTML.
+	 * @param includes a provider for included specifications.
+	 * @param saver a place to save the generated HTML and CSS.
+	 * @throws KidlParseException if the KIDL cannot be parsed
+	 * @throws IOException if an IOException occurs.
+	 */
 	public void generate(
 			final Reader spec,
 			final IncludeProvider includes,
@@ -80,7 +91,6 @@ public class HTMLGenerator {
 		}
 		//TODO HTML WARN for bad links in dep types and methods
 		for (final Res r: modules.values()) {
-			
 			writeHTML(saver, r);
 		}
 		writeCSS(saver);
@@ -95,18 +105,16 @@ public class HTMLGenerator {
 		
 	}
 
-	private void writeHTML(
-			final FileSaver saver,
-			final Res res) throws IOException {
-		final Tag body = body().with(res.visitor.buildIncludes())
-				.with(res.html)
-				.with(res.visitor.buildIndexes());
+	private void writeHTML(final FileSaver saver, final Res res)
+			throws IOException {
 		final Tag page = html().with(
 				head().with(
 						title(res.mod.getModuleName()),
 						link().withRel("stylesheet").withHref(CSS)
 				),
-				body().with(body)
+				body().with(res.visitor.buildIncludes())
+						.with(res.html)
+						.with(res.visitor.buildIndexes())
 				);
 		
 		try (final Writer w = saver.openWriter(
@@ -114,18 +122,6 @@ public class HTMLGenerator {
 			w.write(document().render());
 			w.write(page.render());
 		}
-	}
-	
-	public static void main(String[] args) throws Exception {
-		String specfile = args[0];
-		specfile = "/home/crusherofheads/localgit/jgi_types/KBaseFile.spec";
-//		specfile = "/home/crusherofheads/localgit/workspace_deluxe/workspace.spec";
-//		specfile = "/home/crusherofheads/localgit/user_and_job_state/userandjobstate.spec";
-		new HTMLGenerator().generate(new FileReader(specfile),
-				new FileIncludeProvider(
-//						new File(".")),
-						new File("/home/crusherofheads/localgit/jgi_types")),
-				new DiskFileSaver(new File("temp_html")));
 	}
 	
 	private static class Res {
@@ -137,5 +133,17 @@ public class HTMLGenerator {
 			this.visitor = visitor;
 			this.html = html;
 		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		String specfile = args[0];
+//		specfile = "/home/crusherofheads/localgit/jgi_types/KBaseFile.spec";
+		specfile = "/home/crusherofheads/localgit/workspace_deluxe/workspace.spec";
+//		specfile = "/home/crusherofheads/localgit/user_and_job_state/userandjobstate.spec";
+		new HTMLGenerator().generate(new FileReader(specfile),
+				new FileIncludeProvider(
+						new File(".")),
+//						new File("/home/crusherofheads/localgit/jgi_types")),
+				new DiskFileSaver(new File("temp_html")));
 	}
 }
