@@ -98,15 +98,17 @@ public class HTMLGenerator {
 	private void writeHTML(
 			final FileSaver saver,
 			final Res res) throws IOException {
-		Tag page = html().with(
+		final Tag body = body().with(res.visitor.buildIncludes())
+				.with(res.html)
+				.with(res.visitor.buildIndexes());
+		final Tag page = html().with(
 				head().with(
 						title(res.mod.getModuleName()),
 						link().withRel("stylesheet").withHref(CSS)
 				),
-				body().with(res.visitor.renderIncludes()).with(res.html)
+				body().with(body)
 				);
 		
-		//TODO HTML typedef & funcdef indexes
 		try (final Writer w = saver.openWriter(
 				res.mod.getModuleName() + HTMLGenVisitor.DOT_HTML)) {
 			w.write(document().render());

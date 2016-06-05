@@ -3,15 +3,16 @@ package us.kbase.mobu.compiler.html;
 import static j2html.TagCreator.a;
 import static j2html.TagCreator.div;
 import static j2html.TagCreator.br;
+import static j2html.TagCreator.h2;
 import static j2html.TagCreator.span;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import j2html.tags.ContainerTag;
@@ -48,6 +49,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	private static final String CLS_DEPRECATED = "deprecated";
 	private static final String CLS_ANNOTATION = "annotation";
 	private static final String CLS_INCLUDE = "include";
+	private static final String CLS_INDEX = "index";
 	
 	private static final String CLS_AUTHDEF = "authdef";
 	private static final String CLS_TYPEDEF = "typedef";
@@ -76,11 +78,20 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	private final String moduleName;
 	
-	private final SortedSet<String> refsmodules = new TreeSet<String>();
-	private final SortedSet<String> hastypes = new TreeSet<String>();
-	private final Set<KbTypedef> deptypes = new HashSet<KbTypedef>();
-	private final SortedSet<String> hasfuncs = new TreeSet<String>();
-	private final Set<KbFuncdef> depfuncs = new HashSet<KbFuncdef>();
+	private final Comparator<String> comp = new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			return o1.compareToIgnoreCase(o2);
+		}
+	};
+	
+	private final Set<String> refsmodules = new TreeSet<String>(comp);
+	private final Set<String> hastypes = new TreeSet<String>(comp);
+	private final Map<String, KbTypedef> deptypes =
+			new HashMap<String, KbTypedef>();
+	private final Set<String> hasfuncs = new TreeSet<String>(comp);
+	private final Map<String, KbFuncdef> depfuncs =
+			new HashMap<String, KbFuncdef>();
 	
 	public HTMLGenVisitor(final String moduleName) {
 		if (moduleName == null || moduleName.isEmpty()) {
@@ -109,11 +120,11 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		ContainerTag fd = span().withClass(CLS_NAME)
 				.withText(funcdef.getName());
 		if (funcdef.getAnnotations().isDeprecated()) {
+			depfuncs.put(funcdef.getName(), funcdef);
 			fd.withClass(CLS_DEPRECATED);
 			final String dep = funcdef.getAnnotations()
 					.getDeprecationReplacement();
 			if (dep != null) {
-				depfuncs.add(funcdef);
 				final String[] modMeth = dep.split("\\.");
 				//should only deprecate to a method in the same service
 				//right?
@@ -357,11 +368,11 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		ContainerTag td = span().withClass(CLS_NAME)
 				.withText(typedef.getName());
 		if (typedef.getAnnotations().isDeprecated()) {
+			deptypes.put(typedef.getName(), typedef);
 			td.withClass(CLS_DEPRECATED);
 			final String dep = typedef.getAnnotations()
 					.getDeprecationReplacement();
 			if (dep != null) {
-				deptypes.add(typedef);
 				td = makeTypedefAnchor(dep.split("\\.")).with(td);
 			}
 		}
@@ -417,7 +428,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		return span().withClass(CLS_PRIMITIVE).withText(obj.getSpecName());
 	}
 
-	public List<Tag> renderIncludes() {
+	public List<Tag> buildIncludes() {
 		final List<Tag> includes = new LinkedList<Tag>();
 		for (final String module: refsmodules) {
 			includes.add(div().withClass(CLS_INCLUDE).with(
@@ -430,6 +441,33 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 					GT));
 		}
 		return includes;
+	}
+
+	public Tag buildIndexes() {
+		final ContainerTag indexes = div().withClass(CLS_INDEX);
+		if (!hasfuncs.isEmpty()) {
+			indexes.with(h2().withText("Function Index"));
+			for (final String f: hasfuncs) {
+				final ContainerTag fd = span().withClass(CLS_NAME).with(
+						a().withHref("#" + FUNCDEF + f).withText(f));
+				if (depfuncs.containsKey(f)) {
+					fd.withClass(CLS_DEPRECATED);
+				}
+				indexes.with(div().with(TAB, fd));
+			}
+		}
+		if (!hastypes.isEmpty()) {
+			indexes.with(h2().withText("Type Index"));
+			for (final String t: hastypes) {
+				final ContainerTag td = span().withClass(CLS_NAME).with(
+						a().withHref("#" + TYPEDEF + t).withText(t));
+				if (deptypes.containsKey(t)) {
+					td.withClass(CLS_DEPRECATED);
+				}
+				indexes.with(div().with(TAB, td));
+			}
+		}
+		return indexes;
 	}
 
 }
