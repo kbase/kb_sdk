@@ -129,9 +129,11 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 				//should only deprecate to a method in the same service
 				//right?
 				if (modMeth.length >= 2) {
-					fd = a().withHref("#" + FUNCDEF + modMeth[1]).with(fd);
+					fd = a().withHref("#" + FUNCDEF + moduleName + "." +
+							modMeth[1]).with(fd);
 				} else {
-					fd = a().withHref("#" + FUNCDEF + modMeth[0]).with(fd);
+					fd = a().withHref("#" + FUNCDEF + moduleName + "." +
+							modMeth[0]).with(fd);
 				}
 			}
 		}
@@ -142,7 +144,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 				TAB,
 				span().withClass(CLS_KEYWORD).withText(FUNCDEF),
 				SPACE,
-				fd.withId(FUNCDEF + funcdef.getName()),
+				fd.withId(FUNCDEF + moduleName + "." + funcdef.getName()),
 				PAREN_OPEN,
 				makeCommaSepList(params, CLS_PARAMS),
 				PAREN_CLOSE,
@@ -383,7 +385,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 					TAB,
 					span().withClass(CLS_KEYWORD).withText(TYPEDEF),
 					SPACE, aliasType, SPACE,
-					td.withId(TYPEDEF + typedef.getName()), SEMICOLON
+					td.withId(TYPEDEF + moduleName + "." + typedef.getName()),
+					SEMICOLON
 				);
 	}
 
@@ -413,14 +416,16 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 	
 	private ContainerTag makeTypedefAnchor(
-			final String moduleName, final String name) {
+			String moduleName, final String name) {
 		final String linkpref;
 		if (moduleName == null || this.moduleName.equals(moduleName)) {
 			linkpref = "";
+			moduleName = this.moduleName;
 		} else {
 			linkpref = "./" + moduleName + DOT_HTML;
 		}
-		return a().withHref(linkpref + "#" + TYPEDEF + name);
+		return a().withHref(linkpref + "#" + TYPEDEF + moduleName + "." +
+				name);
 	}
 
 	@Override
@@ -449,7 +454,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			indexes.with(h2().withText("Function Index"));
 			for (final String f: hasfuncs) {
 				final ContainerTag fd = span().withClass(CLS_NAME).with(
-						a().withHref("#" + FUNCDEF + f).withText(f));
+						a().withHref("#" + FUNCDEF + moduleName + "." + f)
+						.withText(f));
 				if (depfuncs.containsKey(f)) {
 					fd.withClass(CLS_DEPRECATED);
 				}
@@ -460,7 +466,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			indexes.with(h2().withText("Type Index"));
 			for (final String t: hastypes) {
 				final ContainerTag td = span().withClass(CLS_NAME).with(
-						a().withHref("#" + TYPEDEF + t).withText(t));
+						a().withHref("#" + TYPEDEF + moduleName + "." + t)
+						.withText(t));
 				if (deptypes.containsKey(t)) {
 					td.withClass(CLS_DEPRECATED);
 				}
