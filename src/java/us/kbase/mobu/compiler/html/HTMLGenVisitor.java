@@ -6,12 +6,13 @@ import static j2html.TagCreator.br;
 import static j2html.TagCreator.span;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.Tag;
@@ -73,8 +74,10 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 
 	private final String moduleName;
 	
-	private final Map<String, Set<String>> seentypes =
-			new HashMap<String, Set<String>>();
+	private final SortedSet<String> hastypes = new TreeSet<String>();
+	private final Set<KbTypedef> deptypes = new HashSet<KbTypedef>();
+	private final SortedSet<String> hasfuncs = new TreeSet<String>();
+	private final Set<KbFuncdef> depfuncs = new HashSet<KbFuncdef>();
 	
 	public HTMLGenVisitor(final String moduleName) {
 		if (moduleName == null || moduleName.isEmpty()) {
@@ -96,13 +99,10 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 				);
 	}
 
-	//TODO HTML test with spec A imports B which imports C but A doesn't use types from B that link to C
-	//TODO HTML test with spec with <script> tags to ensure they don't execute
-	//TODO HTML memoize methods and links to methods from deprecated methods & issue warning at end if bad link
-	//TODO HTML memoize types and links to types (dep & cross spec links) & issue warning at end if bad link
 	@Override
 	public Tag visit(final KbFuncdef funcdef, final List<Tag> params,
 			final List<Tag> returns) {
+		hasfuncs.add(funcdef.getName());
 		ContainerTag fd = span().withClass(CLS_NAME)
 				.withText(funcdef.getName());
 		if (funcdef.getAnnotations().isDeprecated()) {
@@ -110,8 +110,11 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			final String dep = funcdef.getAnnotations()
 					.getDeprecationReplacement();
 			if (dep != null) {
+				depfuncs.add(funcdef);
 				final String[] modMeth = dep.split("\\.");
-				if (modMeth.length >= 2) { // ignore bad links for now
+				//should only deprecate to a method in the same service
+				//right?
+				if (modMeth.length >= 2) {
 					fd = a().withHref("#" + FUNCDEF + modMeth[1]).with(fd);
 				} else {
 					fd = a().withHref("#" + FUNCDEF + modMeth[0]).with(fd);
@@ -344,10 +347,10 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	@Override
 	public Tag visit(final KbTypedef typedef, final KidlNode parent,
 			final Tag aliasType) {
-		rememberSeenType(typedef);		
 		if (!(parent instanceof KbModule)) {
 			return makeTypeDefLink(typedef);
 		}
+		hastypes.add(typedef.getName());
 		ContainerTag td = span().withClass(CLS_NAME)
 				.withText(typedef.getName());
 		if (typedef.getAnnotations().isDeprecated()) {
@@ -355,13 +358,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 			final String dep = typedef.getAnnotations()
 					.getDeprecationReplacement();
 			if (dep != null) {
-				final String[] modMeth = dep.split("\\.");
-				//TODO HTML link across modules when imports work
-				if (modMeth.length >= 2) { // ignore bad links for now
-					td = a().withHref("#" + TYPEDEF + modMeth[1]).with(td);
-				} else {
-					td = a().withHref("#" + TYPEDEF + modMeth[0]).with(td);
-				}
+				deptypes.add(typedef);
+				td = makeTypedefAnchor(dep.split("\\.")).with(td);
 			}
 		}
 		return span().withClass(CLS_TYPEDEF)
@@ -376,33 +374,39 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	}
 
 	private ContainerTag makeTypeDefLink(final KbTypedef typedef) {
-		final String linkpref;
 		final String linkname;
 		if (typedef.getModule().equals(moduleName)) {
-			linkpref = "";
 			linkname = typedef.getName();
 		} else {
-			linkpref = "./" + typedef.getModule() + DOT_HTML;
 			linkname = typedef.getModule() + "." + typedef.getName();
 		}
 		final ContainerTag n = span().withClass(CLS_NAME).with(
-				a()
-					.withHref(linkpref + "#" + TYPEDEF + typedef.getName())
-					.withText(linkname)
-				);
+				makeTypedefAnchor(typedef.getModule(), typedef.getName())
+				.withText(linkname));
 		if (typedef.getAnnotations().isDeprecated()) {
 			n.withClass(CLS_DEPRECATED);
 		}
 		return n;
 	}
-
-	private void rememberSeenType(final KbTypedef typedef) {
-		if (!seentypes.containsKey(typedef.getModule())) {
-			seentypes.put(typedef.getModule(), new HashSet<String>());
+	
+	private ContainerTag makeTypedefAnchor(final String[] modMeth) {
+		//TODO HTML WARN if modMeth.length != 1 or 2
+		if (modMeth.length >= 2) {
+			return makeTypedefAnchor(modMeth[0], modMeth[1]);
 		}
-		seentypes.get(typedef.getModule()).add(typedef.getName());
+		return makeTypedefAnchor(null, modMeth[0]);
 	}
-
+	
+	private ContainerTag makeTypedefAnchor(
+			final String moduleName, final String name) {
+		final String linkpref;
+		if (moduleName == null || this.moduleName.equals(moduleName)) {
+			linkpref = "";
+		} else {
+			linkpref = "./" + moduleName + DOT_HTML;
+		}
+		return a().withHref(linkpref + "#" + TYPEDEF + name);
+	}
 
 	@Override
 	public Tag visit(final KbUnspecifiedObject obj) {

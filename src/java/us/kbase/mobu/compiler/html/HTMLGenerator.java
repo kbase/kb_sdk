@@ -32,12 +32,14 @@ public class HTMLGenerator {
 
 	public HTMLGenerator() {}
 	
+	//TODO HTML TEST test with spec A imports B which imports C but A doesn't use types from B that link to C
+	//TODO HTML TEST test with spec with <script> tags to ensure they don't execute
 	//TODO HTML javadoc
-	//TODO HTML how handle warnings for bad links? Logger makes most sense
+	//TODO HTML WARN how handle warnings? Logger makes most sense
 	//TODO HTML include CSS file
-	//TODO HTML figure out what's going on with comment whitespace & fix
+	//TODO HTML LOWPRIO figure out what's going on with comment whitespace & fix
 	//TODO HTML jars: j2HTML licence & push
-	//TODO HTML test with and without default auth
+	//TODO HTML TEST test with and without default auth
 	public void generate(
 			final Reader spec,
 			final IncludeProvider includes,
@@ -72,7 +74,7 @@ public class HTMLGenerator {
 					new HTMLGenVisitor(m.getModuleName());
 			modules.put(m.getModuleName(), new Res(m, v, m.accept(v)));
 		}
-		//TODO HTML check for bad links
+		//TODO HTML WARN for bad links in dep types and methods
 		for (final Res r: modules.values()) {
 			
 			writeHTML(saver, r);
