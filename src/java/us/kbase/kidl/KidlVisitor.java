@@ -5,6 +5,12 @@ import java.util.Map;
 
 //TODO unit tests with test visitor
 
+/** An interface implementing the visitor portion of the Visitor design
+ * pattern for a KIDL parsed structure.
+ * @author gaprice@lbl.gov
+ *
+ * @param <T> The type of data this visitor will process.
+ */
 public interface KidlVisitor<T> {
 
 	public T visit(KbAuthdef authdef);

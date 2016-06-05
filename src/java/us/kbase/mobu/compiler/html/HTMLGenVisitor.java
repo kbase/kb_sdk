@@ -77,6 +77,8 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 				);
 	}
 
+	//TODO HTML test with spec A imports B which imports C but A doesn't use types from B that link to C
+	//TODO HTML test with spec with <script> tags to ensure they don't execute
 	//TODO HTML memoize methods and links to methods from deprecated methods & issue warning at end if bad link
 	//TODO HTML memoize types and links to types (dep & cross spec links) & issue warning at end if bad link
 	@Override
