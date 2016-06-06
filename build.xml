@@ -86,6 +86,8 @@ commit=${git.commit}</echo>
           <include name="**/*.properties"/>
           <include name="**/*.py"/>
           <include name="**/*.css"/>
+          <include name="**/*.spec"/>
+          <include name="**/*.html"/>
         </patternset>
       </fileset>
     </copy>

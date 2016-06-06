@@ -70,10 +70,10 @@ public class HTMLGenerator {
 		} catch (ParseException e) {
 			throw new KidlParseException(e.getMessage(), e);
 		}
-		if (root.size() > 1) {
+		if (root.isEmpty() || root.size() > 1) {
 			throw new IllegalStateException("A programming error occured. " +
-					"There should only be one entry in the parsed structure " +
-					"map");
+					"There should only exactly one entry in the parsed " +
+					"structure map");
 		}
 		KbModule main = null;
 		for (final KbModule m: root.values()) {
