@@ -86,6 +86,11 @@ public class HTMLGenTest {
 	}
 	
 	@Test
+	public void testWhitespace() throws Exception {
+		test();
+	}
+	
+	@Test
 	public void testBadSpec() throws Exception {
 		try {
 			test();
