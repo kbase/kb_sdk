@@ -74,6 +74,11 @@ public class HTMLGenTest {
 	public void testAuth() throws Exception {
 		test();
 	}
+	
+	@Test
+	public void testLinks() throws Exception {
+		test();
+	}
 
 	private void test() throws Exception {
 		final Exception e = new Exception();
