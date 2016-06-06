@@ -95,7 +95,7 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 	
 	public HTMLGenVisitor(final String moduleName) {
 		if (moduleName == null || moduleName.isEmpty()) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"moduleName cannot be null or empty");
 		}
 		this.moduleName = moduleName;

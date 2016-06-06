@@ -38,6 +38,7 @@ import us.kbase.jkidl.ParseException;
 import us.kbase.jkidl.SpecParser;
 import us.kbase.kidl.KbModule;
 import us.kbase.kidl.KidlParseException;
+import us.kbase.mobu.compiler.html.HTMLGenVisitor;
 import us.kbase.mobu.compiler.html.HTMLGenerator;
 import us.kbase.mobu.util.FileSaver;
 
@@ -121,6 +122,24 @@ public class HTMLGenTest {
 		} catch (KidlParseException k) {
 			assertThat("Wrong exception message", k.getLocalizedMessage(),
 					is("There should be exactly one module in the spec"));
+		}
+	}
+	
+	@Test
+	public void testHTMLVisitorConstructor() throws Exception {
+		try {
+			new HTMLGenVisitor(null);
+			fail("constructed bad html visitor");
+		} catch (IllegalArgumentException e) {
+			assertThat("Incorrect exception message", e.getLocalizedMessage(),
+					is("moduleName cannot be null or empty"));
+		}
+		try {
+			new HTMLGenVisitor("");
+			fail("constructed bad html visitor");
+		} catch (IllegalArgumentException e) {
+			assertThat("Incorrect exception message", e.getLocalizedMessage(),
+					is("moduleName cannot be null or empty"));
 		}
 	}
 
