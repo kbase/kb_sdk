@@ -1,5 +1,9 @@
 package us.kbase.mobu.compiler.test.html;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,12 +16,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import name.fraser.neil.plaintext.diff_match_patch;
+import name.fraser.neil.plaintext.diff_match_patch.Diff;
+import name.fraser.neil.plaintext.diff_match_patch.Operation;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -31,11 +41,17 @@ import us.kbase.mobu.util.FileSaver;
 
 public class HTMLGenTest {
 
-	private static List<String> HTML_FILES; 
+	private static List<String> HTML_FILES;
+	private static String CSS = "KIDLspec.css";
+	private static String CSS_FILE;
 	
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		HTML_FILES = listFiles();
+		try (final InputStream is = HTMLGenTest.class.getResourceAsStream(
+				CSS)) {
+			CSS_FILE  = IOUtils.toString(is); 
+		}
 	}
 	
 	@Test
@@ -57,42 +73,32 @@ public class HTMLGenTest {
 			new HTMLGenerator().generate(new InputStreamReader(is),
 					new TestIncludeProvider(), saver);
 		}
-		System.out.println(HTML_FILES);
+		
+		checkFile(CSS, CSS_FILE, saver);
 	}
 	
-	private static List<String> listFiles() throws Exception {
-
-		//this is totally stupid.
-		final List<String> files = new LinkedList<String>();
-		final File jarFile = new File(HTMLGenTest.class.getProtectionDomain()
-				.getCodeSource().getLocation().getPath());
-		if(jarFile.isFile()) {  // Run with JAR file
-			String path = HTMLGenTest.class.getCanonicalName();
-			path = path.replace(".", "/");
-			path = Paths.get(path).getParent().toString();
-			try (final JarFile jar = new JarFile(jarFile)) {
-				// returns every fucking file in the jar
-				final Enumeration<JarEntry> entries = jar.entries();
-				while(entries.hasMoreElements()) {
-					final String name = entries.nextElement().getName();
-					if (name.startsWith(path) && name.endsWith(".html")) {
-						final Path p = Paths.get(name);
-						files.add(p.getFileName().toString());
-					}
-				}
-			}
-		} else { // Run outside jar
-			final URL url = HTMLGenTest.class.getResource(".");
-			final File dir = new File(url.toURI());
-			for (final File nextFile : dir.listFiles()) {
-				if (nextFile.toString().endsWith(".html")) {
-					files.add(nextFile.toPath().getFileName().toString());
-				}
+	private void checkFile(final String filename, final String expectedFile,
+			final TestFileSaver saver) {
+		if (!saver.files.containsKey(filename)) {
+			fail(String.format(
+					"Expected creation of file %s but does not exist",
+					filename));
+		}
+		final String gotFile = saver.files.get(filename).toString();
+		final List<Diff> res = new diff_match_patch().diff_main(
+				expectedFile, gotFile);
+		final Iterator<Diff> iter = res.iterator();
+		while (iter.hasNext()) {
+			final Diff d = iter.next();
+			if (d.operation.equals(Operation.EQUAL)) {
+				iter.remove();
 			}
 		}
-		return files;
+		assertThat("found differences between expected and generated version of file " +
+				filename, res, is((List<Diff>) new LinkedList<Diff>()));
+		
 	}
-	
+
 	private static class TestIncludeProvider implements IncludeProvider {
 
 		@Override
@@ -132,5 +138,38 @@ public class HTMLGenTest {
 		public File getAsFileOrNull(String path) throws IOException {
 			throw new IllegalStateException("unimplemented");
 		}
+	}
+	
+	private static List<String> listFiles() throws Exception {
+
+		//this is totally stupid.
+		final List<String> files = new LinkedList<String>();
+		final File jarFile = new File(HTMLGenTest.class.getProtectionDomain()
+				.getCodeSource().getLocation().getPath());
+		if(jarFile.isFile()) {  // Run with JAR file
+			String path = HTMLGenTest.class.getCanonicalName();
+			path = path.replace(".", "/");
+			path = Paths.get(path).getParent().toString();
+			try (final JarFile jar = new JarFile(jarFile)) {
+				// returns every fucking file in the jar
+				final Enumeration<JarEntry> entries = jar.entries();
+				while(entries.hasMoreElements()) {
+					final String name = entries.nextElement().getName();
+					if (name.startsWith(path) && name.endsWith(".html")) {
+						final Path p = Paths.get(name);
+						files.add(p.getFileName().toString());
+					}
+				}
+			}
+		} else { // Run outside jar
+			final URL url = HTMLGenTest.class.getResource(".");
+			final File dir = new File(url.toURI());
+			for (final File nextFile : dir.listFiles()) {
+				if (nextFile.toString().endsWith(".html")) {
+					files.add(nextFile.toPath().getFileName().toString());
+				}
+			}
+		}
+		return files;
 	}
 }
