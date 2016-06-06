@@ -6,7 +6,8 @@
 /* 
 Test importing modules:
 1) imports should be sorted
-2) imports that are unused don't show up in the list in html
+2) imports that are unused don't show up in the list in html, even if they're
+   used in an imported spec
 3) imports that are unused should still get a html file
 */
 module Imports {
