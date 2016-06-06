@@ -1,9 +1,8 @@
 /bin
 /temp
 /dist
-/temp_test
 /eclipse-classes/
 /sdkbase/ssl
-
-/temp_test_callback/
 /classes/
+/temp_*
+/ASimpleModule*

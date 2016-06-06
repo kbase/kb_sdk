@@ -280,8 +280,8 @@ public class ModuleBuilder {
                     a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
                     a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
-                    a.makefile, a.clAsyncVer, a.dynservVer, semanticVersion,
-                    gitUrl, gitCommitHash);
+                    a.makefile, a.clAsyncVer, a.dynservVer, a.html,
+                    semanticVersion, gitUrl, gitCommitHash);
         } catch (Throwable e) {
             System.err.println("Error compiling KIDL specfication:");
             System.err.println(e.getMessage());
@@ -588,6 +588,10 @@ public class ModuleBuilder {
                 "clasyncver may not be specified if " +
                 "dynservver is specified.")
         String dynservVer = null;
+        
+        @Parameter(names="--html", description="Generate HTML version(s) of " +
+               "the input spec file(s)")
+        boolean html = false;
         
         @Parameter(names={"-v", "--verbose"}, description="Print full stack " +
                 "trace on a compile failure")

@@ -26,7 +26,7 @@ public class KbAuthdef implements KbModuleComp {
 
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
 		return visitor.visit(this);
 	}
 

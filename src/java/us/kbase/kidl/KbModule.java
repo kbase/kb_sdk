@@ -55,15 +55,20 @@ public class KbModule implements KidlNode {
 		}
 	}
 	
-	@Override
 	public <T> T accept(final KidlVisitor<T> visitor) {
+		return accept(visitor, null);
+	}
+	
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
 		final List<T> components = new LinkedList<T>();
 		for (final KbModuleComp c: moduleComponents) {
-			components.add(c.accept(visitor));
+			components.add(c.accept(visitor, this));
 		}
 		final Map<String, T> typeMap = new TreeMap<String, T>();
 		for (final Entry<String, KbType> entry: nameToType.entrySet()) {
-			typeMap.put(entry.getKey(), entry.getValue().accept(visitor));
+			typeMap.put(entry.getKey(),
+					entry.getValue().accept(visitor, this));
 		}
 		return visitor.visit(this, components, typeMap);
 	}

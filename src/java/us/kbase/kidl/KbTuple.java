@@ -14,6 +14,7 @@ import java.util.Map;
 public class KbTuple extends KbBasicType {
 	private List<String> elementNames = new ArrayList<String>();
 	private List<KbType> elementTypes = new ArrayList<KbType>();
+	// per Roman this is only needed for old type compiler compatibility
 	private String name = null;
 	private String comment = null;
 	
@@ -79,10 +80,10 @@ public class KbTuple extends KbBasicType {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
 		final List<T> elementTypes = new LinkedList<T>();
 		for (final KbType t: this.elementTypes) {
-			elementTypes.add(t.accept(visitor));
+			elementTypes.add(t.accept(visitor, this));
 		}
 		return visitor.visit(this, elementTypes);
 	}

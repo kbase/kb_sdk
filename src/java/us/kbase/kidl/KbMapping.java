@@ -37,9 +37,9 @@ public class KbMapping extends KbBasicType {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
-		return visitor.visit(this, keyType.accept(visitor),
-				valueType.accept(visitor));
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
+		return visitor.visit(this, keyType.accept(visitor, this),
+				valueType.accept(visitor, this));
 	}
 	
 	@Override

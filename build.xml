@@ -85,6 +85,9 @@ commit=${git.commit}</echo>
         <patternset>
           <include name="**/*.properties"/>
           <include name="**/*.py"/>
+          <include name="**/*.css"/>
+          <include name="**/*.spec"/>
+          <include name="**/*.html"/>
         </patternset>
       </fileset>
     </copy>
@@ -130,10 +133,12 @@ commit=${git.commit}</echo>
       <include name="servlet/servlet-api-2.5.jar"/>
       <include name="syslog4j/syslog4j-0.9.46.jar"/>
       <include name="apache_commons/commons-lang-2.4.jar"/>
+      <include name="apache_commons/commons-lang3-3.1.jar"/>
       <include name="apache_commons/velocity-1.7.jar"/>
       <include name="apache_commons/commons-collections-3.2.1.jar"/>
       <include name="jcommander/jcommander-1.48.jar"/>
       <include name="snakeyaml/snakeyaml-1.11.jar"/>
+      <include name="j2html/j2html-0.7.jar"/>
       <include name="kbase/workspace/WorkspaceClient-0.4.1.jar"/>
       <include name="kbase/shock/shock-client-0.0.8.jar"/>
       <include name="kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>

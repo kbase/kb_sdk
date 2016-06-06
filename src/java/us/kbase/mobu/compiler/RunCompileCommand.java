@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 
+import us.kbase.jkidl.FileIncludeProvider;
 import us.kbase.jkidl.IncludeProvider;
 import us.kbase.jkidl.ParseException;
 import us.kbase.jkidl.SpecParser;
@@ -22,6 +23,7 @@ import us.kbase.kidl.KbModule;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParseException;
 import us.kbase.kidl.KidlParser;
+import us.kbase.mobu.compiler.html.HTMLGenerator;
 import us.kbase.mobu.compiler.report.CompilationReporter;
 import us.kbase.mobu.compiler.report.SpecFile;
 import us.kbase.mobu.util.DiskFileSaver;
@@ -41,7 +43,8 @@ public class RunCompileCommand {
             String rClientName, boolean rServerSide, String rServerName, 
             String rImplName, boolean newStyle, File outDir, String jsonSchemaPath, 
             boolean createMakefile, String clientAsyncVer, String dynserv,
-            String semanticVersion, String gitUrl, String gitCommitHash)
+            boolean html, String semanticVersion, String gitUrl,
+            String gitCommitHash)
             throws Exception {
     	
         FileSaver javaSrcDir = null;
@@ -89,6 +92,12 @@ public class RunCompileCommand {
             }
         };
         FileSaver output = new DiskFileSaver(outDir);
+        if (html) {
+            try (final FileReader r = new FileReader(specFile)) {
+                new HTMLGenerator().generate(r, new FileIncludeProvider(dir),
+                        output);
+            }
+        }
         if (withJavaBuildXml && new File(outDir, "build.xml").exists()) {
             System.err.println("Warning: build.xml file already exists, generation is skipped for it");
             withJavaBuildXml = false;

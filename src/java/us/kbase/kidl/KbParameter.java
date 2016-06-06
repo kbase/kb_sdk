@@ -43,8 +43,8 @@ public class KbParameter implements KidlNode {
 	}
 	
 	@Override
-	public <T> T accept(final KidlVisitor<T> visitor) {
-		return visitor.visit(this, type.accept(visitor));
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
+		return visitor.visit(this, type.accept(visitor, this));
 	}
 	
 	public Map<String, Object> forTemplates(String altName) {
