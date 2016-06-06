@@ -23,6 +23,9 @@ module links {
 	/* @deprecated new */
 	typedef string old;
 	
+	/* @deprecated */
+	typedef int notarg;
+	
 	/* test linking to deprecated type */
 	typedef old dep;
 	
