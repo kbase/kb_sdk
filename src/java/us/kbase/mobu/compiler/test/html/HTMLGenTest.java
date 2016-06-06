@@ -16,10 +16,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -62,6 +64,11 @@ public class HTMLGenTest {
 	public void testImports() throws Exception {
 		test();
 	}
+	
+	@Test
+	public void testScriptTag() throws Exception {
+		test();
+	}
 
 	private void test() throws Exception {
 		final Exception e = new Exception();
@@ -90,6 +97,8 @@ public class HTMLGenTest {
 				checkFile(f.replace(testName, ""), expectedFile, saver);
 			}
 		}
+		assertThat("Extra files were generated", saver.files.keySet(),
+				is((Set<String>) new HashSet<String>()));
 	}
 	
 	private void checkFile(final String filename, final String expectedFile,
@@ -100,6 +109,7 @@ public class HTMLGenTest {
 					filename));
 		}
 		final String gotFile = saver.files.get(filename).toString();
+		saver.files.remove(filename);
 		final List<Diff> res = new diff_match_patch().diff_main(
 				expectedFile, gotFile);
 		final Iterator<Diff> iter = res.iterator();

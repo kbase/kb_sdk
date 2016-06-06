@@ -42,7 +42,6 @@ public class HTMLGenerator {
 	/* might need to add params later, but for now none needed */
 	public HTMLGenerator() {}
 	
-	//TODO HTML TEST test with spec A imports B which imports C but A doesn't use types from B that link to C
 	//TODO HTML TEST test with spec with <script> tags to ensure they don't execute
 	//TODO HTML WARN how handle warnings? Logger makes most sense
 	//TODO HTML LOWPRIO figure out what's going on with comment whitespace & fix
