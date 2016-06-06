@@ -84,6 +84,40 @@ public class HTMLGenTest {
 	public void testTypesAndFuncs() throws Exception {
 		test();
 	}
+	
+	@Test
+	public void testBadSpec() throws Exception {
+		try {
+			test();
+			fail("tested bad spec");
+		} catch (KidlParseException k) {
+			assertThat("Wrong exception message", k.getLocalizedMessage(),
+					is("Encountered \" \"}\" \"} \"\" at line 6, column " +
+							"1.\nWas expecting:\n    \";\" ...\n    "));
+		}
+	}
+	
+	@Test
+	public void testEmptySpec() throws Exception {
+		try {
+			test();
+			fail("tested bad spec");
+		} catch (KidlParseException k) {
+			assertThat("Wrong exception message", k.getLocalizedMessage(),
+					is("There should be exactly one module in the spec"));
+		}
+	}
+	
+	@Test
+	public void testMultiModuleSpec() throws Exception {
+		try {
+			test();
+			fail("tested bad spec");
+		} catch (KidlParseException k) {
+			assertThat("Wrong exception message", k.getLocalizedMessage(),
+					is("There should be exactly one module in the spec"));
+		}
+	}
 
 	private void test() throws Exception {
 		final Exception e = new Exception();

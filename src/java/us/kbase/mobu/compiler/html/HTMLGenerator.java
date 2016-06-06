@@ -68,9 +68,8 @@ public class HTMLGenerator {
 			throw new KidlParseException(e.getMessage(), e);
 		}
 		if (root.isEmpty() || root.size() > 1) {
-			throw new IllegalStateException("A programming error occured. " +
-					"There should only exactly one entry in the parsed " +
-					"structure map");
+			throw new KidlParseException(
+					"There should be exactly one module in the spec");
 		}
 		KbModule main = null;
 		for (final KbModule m: root.values()) {
