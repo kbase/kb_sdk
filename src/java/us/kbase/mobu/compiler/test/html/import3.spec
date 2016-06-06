@@ -1,4 +1,4 @@
-module Import1 {
+module Import3 {
 
 	typedef string type1;
 };
