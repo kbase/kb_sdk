@@ -301,6 +301,10 @@ public class HTMLGenVisitor implements KidlVisitor<Tag> {
 		return span().withClass(CLS_PRIMITIVE).withText(scalar.getSpecName());
 	}
 
+	//TODO HTML if nested structures ever compile this needs to be smarter about indents
+	// easy enough to just keep track of depth and insert the correct # of tabs
+	// another options is to just have the structure def on one line if the
+	// parent isn't a kbmodule
 	@Override
 	public Tag visit(final KbStruct struct, final List<Tag> fields) {
 		final List<Tag> f = new LinkedList<Tag>();
