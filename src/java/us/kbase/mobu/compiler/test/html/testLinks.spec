@@ -14,11 +14,17 @@ module links {
 	/* @deprecated new */
 	funcdef old() returns();
 	
+	/* @deprecated */
+	funcdef notarget() returns();
+	
 	typedef string newest;
 	/* @deprecated links.newest */
 	typedef string new;
 	/* @deprecated new */
 	typedef string old;
+	
+	/* test linking to deprecated type */
+	typedef old dep;
 	
 	typedef string foo;
 	typedef foo bar;
