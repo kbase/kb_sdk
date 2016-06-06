@@ -42,10 +42,8 @@ public class HTMLGenerator {
 	/* might need to add params later, but for now none needed */
 	public HTMLGenerator() {}
 	
-	//TODO HTML TEST test with spec with <script> tags to ensure they don't execute
 	//TODO HTML WARN how handle warnings? Logger makes most sense
 	//TODO HTML LOWPRIO figure out what's going on with comment whitespace & fix
-	//TODO HTML TEST test with and without default auth
 	
 	/** Generate HTML files.
 	 * @param spec a reader for the specification from which to generate HTML.

@@ -69,6 +69,11 @@ public class HTMLGenTest {
 	public void testScriptTag() throws Exception {
 		test();
 	}
+	
+	@Test
+	public void testAuth() throws Exception {
+		test();
+	}
 
 	private void test() throws Exception {
 		final Exception e = new Exception();
