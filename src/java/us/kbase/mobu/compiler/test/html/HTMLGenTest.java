@@ -48,10 +48,14 @@ public class HTMLGenTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		HTML_FILES = listFiles();
-		try (final InputStream is = HTMLGenTest.class.getResourceAsStream(
-				CSS)) {
-			CSS_FILE  = IOUtils.toString(is); 
-		}
+		CSS_FILE = getFile(CSS);
+	}
+	
+	public static String getFile(final String filename) throws Exception {
+	try (final InputStream is = HTMLGenTest.class.getResourceAsStream(
+			filename)) {
+		return IOUtils.toString(is); 
+	}
 	}
 	
 	@Test
@@ -60,7 +64,6 @@ public class HTMLGenTest {
 	}
 
 	private void test() throws Exception {
-		// TODO Auto-generated method stub
 		final Exception e = new Exception();
 		e.fillInStackTrace();
 		final String testMethod = e.getStackTrace()[1].getMethodName();
@@ -75,6 +78,18 @@ public class HTMLGenTest {
 		}
 		
 		checkFile(CSS, CSS_FILE, saver);
+		checkFiles(testMethod, saver);
+	}
+	
+	private void checkFiles(final String testName, final TestFileSaver saver)
+			throws Exception {
+		
+		for (final String f: HTML_FILES) {
+			if (f.startsWith(testName)) {
+				final String expectedFile = getFile(f);
+				checkFile(f.replace(testName, ""), expectedFile, saver);
+			}
+		}
 	}
 	
 	private void checkFile(final String filename, final String expectedFile,
