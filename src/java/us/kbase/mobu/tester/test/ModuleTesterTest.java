@@ -70,6 +70,10 @@ public class ModuleTesterTest {
 
 	private int runTestsInDocker(String moduleName) throws Exception {
 	    File moduleDir = new File(moduleName);
+	    return runTestsInDocker(moduleDir, user, pwd);
+	}
+	
+	public static int runTestsInDocker(File moduleDir, String user, String pwd) throws Exception {
 	    File testCfgFile = new File(moduleDir, "test_local/test.cfg");
 	    String testCfgText = FileUtils.readFileToString(testCfgFile);
 	    testCfgText = testCfgText.replace("test_user=", "test_user=" + user);
