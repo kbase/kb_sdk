@@ -502,6 +502,46 @@ public class TypeGeneratorTest extends Assert {
         File binDir = new File(workDir, "bin");
         JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
         File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
+        JavaModule module = parsingData.getModules().get(0);
+        File javaServerImpl = new File(workDir, "src/" + testPackage.replace('.', '/') + "/" + 
+                module.getModulePackage() +"/" + getServerClassName(module) + ".java");
+        checkFileForKeyword(javaServerImpl, "BEGIN_STATUS", true);
+        File perlServerImpl = new File(serverOutDir, module.getOriginal().getModuleName() + "Impl.pm");
+        checkFileForKeyword(perlServerImpl, "BEGIN_STATUS", true);
+        File pythonServerImpl = new File(serverOutDir, module.getOriginal().getModuleName() + "Impl.py");
+        checkFileForKeyword(pythonServerImpl, "BEGIN_STATUS", true);
+        runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort());
+        runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
+                serverOutDir, true, findFreePort());
+        runJavaServerTest(testNum, true, testPackage, libDir,
+                binDir, parsingData, serverOutDir, findFreePort());
+    }
+
+    private static void checkFileForKeyword(File f, String keyword, boolean occure) throws Exception {
+        String text = FileUtils.readFileToString(f);
+        Assert.assertEquals(occure, text.contains(keyword));
+    }
+    
+    @Test
+    public void testNoStatus() throws Exception {
+        int testNum = 20;
+        File workDir = prepareWorkDir(testNum);
+        System.out.println();
+        System.out.println("Test " + testNum + " (testNoStatus) is starting in directory: " + workDir.getName());
+        String testPackage = rootPackageName + ".test" + testNum;
+        File libDir = new File(workDir, "lib");
+        File binDir = new File(workDir, "bin");
+        JavaData parsingData = prepareJavaCode(testNum, workDir, testPackage, libDir, binDir, null, true);
+        File serverOutDir = preparePerlAndPyServerCode(testNum, workDir, true);
+        JavaModule module = parsingData.getModules().get(0);
+        File javaServerImpl = new File(workDir, "src/" + testPackage.replace('.', '/') + "/" + 
+                module.getModulePackage() +"/" + getServerClassName(module) + ".java");
+        checkFileForKeyword(javaServerImpl, "BEGIN_STATUS", false);
+        File perlServerImpl = new File(serverOutDir, module.getOriginal().getModuleName() + "Impl.pm");
+        checkFileForKeyword(perlServerImpl, "BEGIN_STATUS", false);
+        File pythonServerImpl = new File(serverOutDir, module.getOriginal().getModuleName() + "Impl.py");
+        checkFileForKeyword(pythonServerImpl, "BEGIN_STATUS", false);
         runPerlServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
                 serverOutDir, true, findFreePort());
         runPythonServerTest(testNum, true, workDir, testPackage, libDir, binDir, parsingData, 
