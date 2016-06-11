@@ -385,7 +385,7 @@ public class ModuleBuilder {
         try {
             return new ClientInstaller().install(installArgs.lang, installArgs.async,
                     installArgs.sync, installArgs.dynamic, installArgs.tagVer, 
-                    installArgs.verbose, installArgs.moduleName.get(0));
+                    installArgs.verbose, installArgs.moduleName.get(0), null);
         } catch (Exception e) {
             if (installArgs.verbose)
                 e.printStackTrace();

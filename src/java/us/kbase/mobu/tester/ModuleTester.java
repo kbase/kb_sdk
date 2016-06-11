@@ -175,29 +175,8 @@ public class ModuleTester {
         ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(tlDir);
         String moduleName = (String)kbaseYmlConfig.get("module-name");
         String imageName = "test/" + moduleName.toLowerCase() + ":latest";
-        System.out.println();
-        System.out.println("Delete old Docker containers");
-        List<String> lines = exec(tlDir, "bash", "run_docker.sh", "ps", "-a");
-        for (String line : lines) {
-            String[] parts = splitByWhiteSpaces(line);
-            if (parts[1].equals(imageName)) {
-                String cntId = parts[0];
-                ProcessHelper.cmd("bash", "run_docker.sh", "rm", "-v", "-f", cntId).exec(tlDir);
-            }
-        }
-        String oldImageId = findImageIdByName(tlDir, imageName);    
-        System.out.println();
-        System.out.println("Build Docker image");
-        boolean ok = buildImage(moduleDir, imageName, runDockerSh);
-        if (!ok)
+        if (!buildNewDockerImageWithCleanup(moduleDir, tlDir, runDockerSh, imageName))
             return 1;
-        if (oldImageId != null) {
-            String newImageId = findImageIdByName(tlDir, imageName);
-            if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
-                System.out.println("Delete old Docker image");
-                ProcessHelper.cmd("bash", "run_docker.sh", "rmi", oldImageId).exec(tlDir);
-            }
-        }
         File subjobsDir = new File(tlDir, "subjobs");
         if (subjobsDir.exists())
             TextUtils.deleteRecursively(subjobsDir);
@@ -237,7 +216,7 @@ public class ModuleTester {
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            int exitCode = ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(),
+            int exitCode = ProcessHelper.cmd("bash", getFilePath(runTestsSh),
                     callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
             return exitCode;
         } finally {
@@ -246,6 +225,35 @@ public class ModuleTester {
         }
     }
 
+    public static boolean buildNewDockerImageWithCleanup(File moduleDir, File tlDir,
+            File runDockerSh, String imageName) throws Exception {
+        System.out.println();
+        System.out.println("Delete old Docker containers");
+        String runDockerPath = getFilePath(runDockerSh);
+        List<String> lines = exec(tlDir, "bash", getFilePath(runDockerSh), "ps", "-a");
+        for (String line : lines) {
+            String[] parts = splitByWhiteSpaces(line);
+            if (parts[1].equals(imageName)) {
+                String cntId = parts[0];
+                ProcessHelper.cmd("bash", runDockerPath, "rm", "-v", "-f", cntId).exec(tlDir);
+            }
+        }
+        String oldImageId = findImageIdByName(tlDir, imageName, runDockerSh);    
+        System.out.println();
+        System.out.println("Build Docker image");
+        boolean ok = buildImage(moduleDir, imageName, runDockerSh);
+        if (!ok)
+            return false;
+        if (oldImageId != null) {
+            String newImageId = findImageIdByName(tlDir, imageName, runDockerSh);
+            if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
+                System.out.println("Delete old Docker image");
+                ProcessHelper.cmd("bash", runDockerPath, "rmi", oldImageId).exec(tlDir);
+            }
+        }
+        return true;
+    }
+    
     private static int findFreePort() {
         try (ServerSocket socket = new ServerSocket(0)) {
             return socket.getLocalPort();
@@ -253,11 +261,11 @@ public class ModuleTester {
         throw new IllegalStateException("Can not find available port in system");
     }
     
-    public String findImageIdByName(File tlDir, String imageName)
-            throws Exception {
+    public static String findImageIdByName(File tlDir, String imageName,
+            File runDockerSh) throws Exception {
         List<String> lines;
         String ret = null;
-        lines = exec(tlDir, "bash", "run_docker.sh", "images");
+        lines = exec(tlDir, "bash", getFilePath(runDockerSh), "images");
         for (String line : lines) {
             String[] parts = splitByWhiteSpaces(line);
             String name = parts[0] + ":" + parts[1];
@@ -269,7 +277,7 @@ public class ModuleTester {
         return ret;
     }
 
-    public String[] splitByWhiteSpaces(String line) {
+    public static String[] splitByWhiteSpaces(String line) {
         String[] parts = line.split("\\s+");
         return parts;
     }
@@ -291,15 +299,10 @@ public class ModuleTester {
         return ret;
     }
     
-    private boolean buildImage(File repoDir, String targetImageName, 
+    public static boolean buildImage(File repoDir, String targetImageName, 
             File runDockerSh) throws Exception {
-        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-        String scriptPath = runDockerSh.getCanonicalPath();
-        String repoPath = repoDir.getCanonicalPath();
-        if (isWindows) {
-            scriptPath = WinShortPath.getWinShortPath(scriptPath);
-            repoPath = WinShortPath.getWinShortPath(repoPath);
-        }
+        String scriptPath = getFilePath(runDockerSh);
+        String repoPath = getFilePath(repoDir);
         Process p = Runtime.getRuntime().exec(new String[] {"bash", 
                 scriptPath, "build", "--rm", "-t", 
                 targetImageName, repoPath});
@@ -356,7 +359,7 @@ public class ModuleTester {
                 if (cntIdToDelete[0] != null) {
                     System.out.println("Cleaning up building container: " + cntIdToDelete[0]);
                     Thread.sleep(1000);
-                    ProcessHelper.cmd("bash", runDockerSh.getCanonicalPath(), 
+                    ProcessHelper.cmd("bash", scriptPath, 
                             "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
                 }
             } catch (Exception ex) {
@@ -366,4 +369,11 @@ public class ModuleTester {
         return exitCode == 0;
     }
 
+    public static String getFilePath(File f) throws Exception {
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        String ret = f.getCanonicalPath();
+        if (isWindows)
+            ret = WinShortPath.getWinShortPath(ret);
+        return ret;
+    }
 }
