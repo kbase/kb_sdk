@@ -58,6 +58,7 @@ bin: jars-submodule-init
 submodule-init:
 	git submodule init
 	git submodule update
+	cp submodules_hacks/AuthConstants.pm submodules/auth/Bio-KBase-Auth/lib/Bio/KBase/
 
 jars-submodule-init:
 	git submodule update --init submodules/jars
@@ -82,8 +83,9 @@ deploy-scripts:
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib
 
 sdkbase:
+	- docker rmi -f kbase/deplbase:latest
 	cd sdkbase && ./makeconfig
-	docker build -t kbase/kbase:sdkbase.latest sdkbase
+	docker build --no-cache -t kbase/kbase:sdkbase.latest sdkbase
 
 test: submodule-init
 	@# todo: remove perl typecomp tests and add it as a separate target

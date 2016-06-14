@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -19,7 +22,10 @@ import com.beust.jcommander.Parameters;
 
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.renamer.ModuleRenamer;
 import us.kbase.mobu.tester.ModuleTester;
+import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
 
 public class ModuleBuilder {
@@ -32,11 +38,12 @@ public class ModuleBuilder {
     private static final String COMPILE_COMMAND  = "compile";
     private static final String HELP_COMMAND     = "help";
     private static final String TEST_COMMAND     = "test";
-    private static final String VERSION_COMMAND     = "version";
+    private static final String VERSION_COMMAND  = "version";
+    private static final String RENAME_COMMAND   = "rename";
     
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.0.4";
     
     
     public static void main(String[] args) throws Exception {
@@ -70,6 +77,10 @@ public class ModuleBuilder {
         // add the 'version' command
         VersionCommandArgs versionArgs = new VersionCommandArgs();
         jc.addCommand(VERSION_COMMAND, versionArgs);
+
+        // add the 'rename' command
+        RenameCommandArgs renameArgs = new RenameCommandArgs();
+        jc.addCommand(RENAME_COMMAND, renameArgs);
 
     	// parse the arguments and gracefully catch any errors
     	try {
@@ -106,6 +117,8 @@ public class ModuleBuilder {
             returnCode = runTestCommand(testArgs,jc);
 	    } else if (jc.getParsedCommand().equals(VERSION_COMMAND)) {
 	        returnCode = runVersionCommand(versionArgs, jc);
+	    } else if (jc.getParsedCommand().equals(RENAME_COMMAND)) {
+	        returnCode = runRenameCommand(renameArgs, jc);
 	    }
 	    
 	    if(returnCode!=0) {
@@ -162,6 +175,8 @@ public class ModuleBuilder {
 			initer.initialize(initArgs.example);
 		}
 		catch (Exception e) {
+            if (initArgs.verbose)
+                e.printStackTrace();
 			showError("Error while initializing module", e.getMessage());
 			return 1;
 		}
@@ -210,6 +225,36 @@ public class ModuleBuilder {
             }
         }
         
+        // Step 4: info collection for status method
+        File moduleDir = specFile.getAbsoluteFile().getParentFile();
+        String semanticVersion = null;
+        try {
+            File kbaseYmlFile = new File(moduleDir, "kbase.yml");
+            if (kbaseYmlFile.exists()) {
+                String kbaseYml = TextUtils.readFileText(kbaseYmlFile);
+                @SuppressWarnings("unchecked")
+                Map<String,Object> kbaseYmlConfig = (Map<String, Object>)new Yaml().load(kbaseYml);
+                semanticVersion = (String)kbaseYmlConfig.get("module-version");
+            }
+        } catch (Exception ex) {
+            System.out.println("WARNING! Couldn't collect semantic version: " + ex.getMessage());
+        }
+        if (semanticVersion == null)
+            semanticVersion = "0.0.1";
+        String gitUrl = "";
+        String gitCommitHash = "";
+        if (new File(moduleDir, ".git").exists()) {
+            try {
+                gitUrl = getCmdOutput(moduleDir, "git", "config", "--get", "remote.origin.url");
+            } catch (Exception ex) {
+                System.out.println("WARNING! Couldn't collect git URL: " + ex.getMessage());
+            }
+            try {
+                gitCommitHash = getCmdOutput(moduleDir, "git", "rev-parse", "HEAD");
+            } catch (Exception ex) {
+                System.out.println("WARNING! Couldn't collect git commit hash: " + ex.getMessage());
+            }
+        }
         try {
 			RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
 			        a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
@@ -218,8 +263,8 @@ public class ModuleBuilder {
 			        a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
 			        a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
-                    a.makefile, a.clAsyncVer);
-		} catch (Exception e) {
+                    a.makefile, a.clAsyncVer, semanticVersion, gitUrl, gitCommitHash);
+		} catch (Throwable e) {
 			System.err.println("Error compiling KIDL specfication:");
 			System.err.println(e.getMessage());
 			return 1;
@@ -227,6 +272,13 @@ public class ModuleBuilder {
         return 0;
     }
     
+	private static String getCmdOutput(File workDir, String... cmd) throws Exception {
+	    StringWriter sw = new StringWriter();
+	    PrintWriter pw = new PrintWriter(sw);
+	    ProcessHelper.cmd(cmd).exec(workDir, null, pw);
+	    return sw.toString().trim();
+	}
+	
     static List<File> convertToFiles(List<String> filenames) throws IOException {
     	List <File> files = new ArrayList<File>(filenames.size());
     	for(String filename: filenames) {
@@ -258,6 +310,8 @@ public class ModuleBuilder {
             tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
         }
         catch (Exception e) {
+            if (testArgs.verbose)
+                e.printStackTrace();
             showError("Error while testing module", e.getMessage());
             return 1;
         }
@@ -285,7 +339,22 @@ public class ModuleBuilder {
         printVersion();
         return 0;
     }
-    
+
+    private static int runRenameCommand(RenameCommandArgs renameArgs, JCommander jc) {
+        if (renameArgs.newModuleName == null || renameArgs.newModuleName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", "One and only one module name should be provided");
+            return 1;
+        }
+        try {
+            return new ModuleRenamer().rename(renameArgs.newModuleName.get(0));
+        } catch (Exception e) {
+            if (renameArgs.verbose)
+                e.printStackTrace();
+            showError("Error while renaming module", e.getMessage());
+            return 1;
+        }
+    }
+
     @Parameters(commandDescription = "Validate a module or modules.")
     private static class ValidateCommandArgs {
     	@Parameter(names={"-v","--verbose"}, description="Show verbose output")
@@ -489,13 +558,24 @@ public class ModuleBuilder {
         @Parameter(names={"-a","--allow_sync_method"}, description="Allow synchonous methods " +
                 "(advanced option, part of validation settings, default value is false)")
         boolean allowSyncMethods = false;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
     }
     
     @Parameters(commandDescription = "Print current version of kb-sdk.")
     private static class VersionCommandArgs {
     }
     
-    
+    @Parameters(commandDescription = "Rename a module name.")
+    private static class RenameCommandArgs {
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
+
+        @Parameter(required=true, description="<new module name>")
+        List<String> newModuleName;
+    }
+
     
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();

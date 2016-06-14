@@ -21,4 +21,6 @@ public interface KbType {
 	 * Method is invoked from parser after type is built and it's time to check internal integrity.
 	 */
 	public void afterCreation();
+	
+	public String getSpecName();
 }

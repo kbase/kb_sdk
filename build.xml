@@ -8,10 +8,6 @@
   <!-- property name="BIN_TARGET" location="../../bin" / -->
   <!-- property name="BIN_LIB_TARGET" location="dist"/ -->
 
-
-  <property name="TESTCFG" location="test/test.cfg"/>
-
-
   <!-- set global properties for this build -->
   <property name="src"	location="src/java"/>
   <property name="dist" location="dist"/>
@@ -21,7 +17,6 @@
 
   <property name="test.dir" location="temp_test_files"/>
   <property name="test.script.dir" location="test_scripts"/>
-  <property name="test.config"  value="${test.script.dir}/test.cfg"/>
   <property name="test.script"  value="test_module_builder.sh"/>
 
   <property name="ee.dir"  value="${test.script.dir}/ee_mock_service"/>
@@ -138,7 +133,7 @@ commit=${git.commit}</echo>
       <include name="apache_commons/commons-collections-3.2.1.jar"/>
       <include name="jcommander/jcommander-1.48.jar"/>
       <include name="snakeyaml/snakeyaml-1.11.jar"/>
-      <include name="kbase/workspace/WorkspaceClient-0.2.0.jar"/>
+      <include name="kbase/workspace/WorkspaceClient-0.4.1.jar"/>
       <include name="kbase/shock/shock-client-0.0.8.jar"/>
       <include name="kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>
       <include name="kbase/handle/HandleServiceClient-141020-5eda76e.jar"/>
@@ -146,6 +141,8 @@ commit=${git.commit}</echo>
       <include name="apache_commons/http/httpcore-4.3.jar"/>
       <include name="apache_commons/http/httpmime-4.3.1.jar"/>
       <include name="apache_commons/commons-logging-1.1.1.jar"/>
+      <include name="joda/joda-time-2.2.jar"/>
+      <include name="google/guava-18.0.jar"/>
       <include name="${commonjar}"/>
     </fileset>
     <!--fileset dir=".">
@@ -169,24 +166,18 @@ commit=${git.commit}</echo>
 
     <!-- Create main shell script-->
     <echo file="${bin.local}/${module_builder.sh.file}">#!/bin/bash
-export JAVA_HOME=${env.JAVA_HOME}
-export PATH=$JAVA_HOME/bin:$PATH
-$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
+java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${bin.local}/${module_builder.sh.file}" perm="a+x"/>
     <!-- Create old main shell script-->
     <echo file="${bin.local}/${module_builder.sh.old.file}">#!/bin/bash
-export JAVA_HOME=${env.JAVA_HOME}
-export PATH=$JAVA_HOME/bin:$PATH
-$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
+java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.mobu.ModuleBuilder $@
     </echo>
     <chmod file="${bin.local}/${module_builder.sh.old.file}" perm="a+x"/>
     <echo>Successfully built: ${bin.local}/${module_builder.sh.file}</echo>
     <!-- Create ws-tools shell script-->
     <echo file="${bin.local}/${ws_tools.sh.file}">#!/bin/bash
-export JAVA_HOME=${env.JAVA_HOME}
-export PATH=$JAVA_HOME/bin:$PATH
-$JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.WorkspaceTools $@
+java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.WorkspaceTools $@
     </echo>
     <chmod file="${bin.local}/${ws_tools.sh.file}" perm="a+x"/>
 

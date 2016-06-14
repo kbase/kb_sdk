@@ -17,7 +17,7 @@ Data objects are stored in an object database.  Individual Narratives have "work
 The KBase workspace is documented here:<br>
 https://kbase.us/services/ws/docs/
 
-Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and not guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
+Workspaces have names and numerical IDs that are used to access them.  Workspace names are user-defined, mutable, and are guaranteed to be unique, whereas workspace IDs are system assigned upon instantiation, immutable, and guaranteed to be unique.  Data objects also have names and numerical IDs that are used to access them, with the same rules as workspace names/IDs.
 
 Data object reference syntax is described here:<br>
 https://kbase.us/services/ws/docs/fundamentals.html#addressing-workspaces-and-objects
@@ -67,6 +67,7 @@ Since IDs are system assigned, it is preferrable to use names in code when creat
 - [ContigSet](#contig-set)
 - [FeatureSet](#feature-set)
 - [GenomeSet](#genome-set)
+- [Feature](#feature)
 - [Genome](#genome)
 - [DomainLibrary](#domain-library)
 - [DomainModelSet](#domain-model-set)
@@ -101,7 +102,6 @@ https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.SingleEndLibrar
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.SingleEndLibrary
 
 - [data structure](#single-end-library-ds)
-- [setup](#single-end-library-setup)
 - [obtaining](#single-end-library-obtaining)
 - [using](#single-end-library-using)
 - [storing](#single-end-library-storing)
@@ -196,60 +196,6 @@ optional:
     		remote_sha1: 'sha1_hash_of_contents'
     	      }
     }
-```
-
-##### <A NAME="single-end-library-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly SingleEndLibrary type definitions.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from requests_toolbelt import MultipartEncoder
-from Bio import SeqIO
-from biokbase.workspace.client import Workspace as workspaceService
-from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### <A NAME="single-end-library-obtaining"></A>obtaining
@@ -403,7 +349,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-			})
+			})[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
         
@@ -445,13 +391,13 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```
 [\[back to data type list\]](#data-type-list)
  
+ 
 
 ### <A NAME="paired-end-library"></A>PairedEndLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseFile.PairedEndLibrary<br>
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseAssembly.PairedEndLibrary
 
 - [data structure](#paired-end-library-ds)
-- [setup](#paired-end-library-setup)
 - [obtaining](#paired-end-library-obtaining)
 - [using](#paired-end-library-using)
 - [storing](#paired-end-library-storing)
@@ -578,58 +524,6 @@ optional:
        interleaved: <0/1>,						# flag to indicate mate pairs interleaved in lib1, 0=FALSE, 1=TRUE
        read_orientation_outward: <0/1>,					# flag to indicate read orientation, 0=FALSE, 1=TRUE
     }
-```
-
-##### <A NAME="paired-end-library-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.  This will work for both KBaseFile and KBaseAssembly PairedEndLibrary type definitions.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### <A NAME="paired-end-library-obtaining"></A>obtaining
@@ -851,7 +745,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-			})
+			})[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
         
@@ -894,11 +788,11 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 [\[back to data type list\]](#data-type-list)
 
 
+
 ### <A NAME="contig-set"></A>ContigSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.ContigSet
 
 - [data structure](#contig-set-ds)
-- [setup](#contig-set-setup)
 - [obtaining](#contig-set-obtaining)
 - [using](#contig-set-using)
 - [storing](#contig-set-storing)
@@ -945,58 +839,6 @@ optional:
                   ...
                ]
     }
-```
-
-##### <A NAME="contig-set-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### <A NAME="contig-set-obtaining"></A>obtaining
@@ -1074,18 +916,18 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
 
+
 ### <A NAME="feature-set"></A>FeatureSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseCollections.FeatureSet
 
 - [data structure](#feature-set-ds)
-- [setup](#feature-set-setup)
 - [obtaining](#feature-set-obtaining)
 - [using](#feature-set-using)
 - [storing](#feature-set-storing)
@@ -1105,61 +947,6 @@ optional:
       		}
     }
       
-```
-
-##### <A NAME="feature-set-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### <A NAME="feature-set-obtaining"></A>obtaining
@@ -1240,7 +1027,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1248,11 +1035,10 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 
 
 
-#### <A NAME="genome-set"></A>GenomeSet
+### <A NAME="genome-set"></A>GenomeSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseSearch.GenomeSet
 
 - [data structure](#genome-set-ds)
-- [setup](#genome-set-setup)
 - [obtaining](#genome-set-obtaining)
 - [using](#genome-set-using)
 - [storing](#genome-set-storing)
@@ -1279,61 +1065,6 @@ Note: either *ref* or *data* is defined for an element, but not both.
                     ‘genome_name_2’: ...
                   }
     }
-```
-
-##### <A NAME="genome-set-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### obtaining
@@ -1406,7 +1137,156 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
+        #return new_obj_info[0]  # obj_ID
+        return new_obj_info[1]  # obj_NAME
+```
+[\[back to data type list\]](#data-type-list)
+
+
+
+### <A NAME="feature"></A>Feature
+https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
+
+- [data structure](#feature-ds)
+- [obtaining](#feature-obtaining)
+- [using](#feature-using)
+- [storing](#feature-storing)
+
+The feature object stores protein coding genes (aka CDS), RNA coding genes, regulatory regions, CRISPR and CRISPR-spaces, and any other region of a genome that corresponds to activity.  Typically these features are stored within Genome objects, but they may be extracted and stored as separate objects in certain circumstances (such as from Reference Data Search).
+
+##### <A NAME="feature-ds"></A>data structure
+
+```
+        {  ## KBaseGenome.Feature
+		      id: 'feature_kbase_id',         # e.g. "kb|g.26833.CDS.3983"
+		      location: [tuple<'Contig_id', <int_beg_pos>, 'strand', <len>>], # e.g. [["kb|g.26833.c.0",3820423,"+",2109]]
+		      type: 'feature_type',           # e.g. 'CDS'
+		      function: 'func',               # usually assigned from SEED
+		      md5: 'md5_chksum',              # of DNA sequence?
+		      protein_translation: 'aa_seq',  # IN CAPS
+		      dna_sequence: 'dna_seq',        # in lower case.  Following gene direction
+		      protein_translation_length: <aa_len>,  # int
+		      dna_sequence_length: <dna_len>,        # int
+		      publications: [tuple<int, string, string, string, string, string, string>],
+		      subsystems: ['SEED_subsystem_1', ...],
+		      protein_families: [ { id: 'prot_family_id',
+		      			    subject_db: 'prot_family_db',
+		      			    release_version: 'prot_family_db_version',
+		      			    subject_description: 'prot_family_desc',
+		      			    query_begin: <feature_match_beg>,
+		      			    query_end: <feature_match_end>,
+		      			    subject_begin: <prot_family_match_beg>,
+		      			    subject_end: <prot_family_match_end>,
+		      			    score: <float_score>,
+		      			    evalue: <float_evalue>
+		      			  },
+		      			  ...
+		      	                ],
+		      aliases: ['alias_1', 'alias_2', ...],      # e.g. ["P0AG24","spoT","EG10966","NP_418107.1","P0AG24","ABE-0011935","b3650","2.7.6.5","3.1.7.2","SPOT_ECOLI","GO:0005515"]
+		      orthologs: [tuple<string, float>],
+		      annotations: [tuple<string, string, float>],
+		      subsystem_data: [tuple<string, string, string>],
+		      regulon_data: [tuple<string, list<Feature_id>, list<Feature_id>],
+		      atomic_regulons: [tuple<string, int>],
+		      coexpressed_fids: [tuple<Feature_id, float>],
+		      co_occuring_fids: [tuple<Feature_id, float>],
+		      quality: { truncated_begin: <0/1>,     # 0=FALSE, 1=TRUE
+		      		 truncated_end: <0/1>,       # 0=FALSE, 1=TRUE
+		      		 existence_confidence: <float_conf>,
+		      		 frameshifted: <0/1>,
+		      		 selenoprotein: <0/1>,
+		      		 pyrrolysylprotein: <0/1>,
+		      		 overlap_rules: ['overlap_rule_1', ...],
+		      		 existence_priority: <float_priority>,
+		      		 hit_count: <float_hit_count>,
+		      		 weighted_hit_count: <weighted_hits>
+		      	       },
+		      feature_creation_event: { id: 'analysis_event_id',
+						tool_name: 'analysis_tool_name',
+						execution_time: <float_time>,
+						parameters: [ 'param1', 'param2', ... ],
+						hostname: 'exec_host'
+					      },
+        	    }
+```
+
+##### <A NAME="genome-obtaining"></A>obtaining
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
+
+```python
+        featureRef = params['workspace_name']+'/'+params['feature_name']
+        self.log(console, 'getting feature object: '+featureRef)
+        feature = ws.get_objects([{'ref':featureRef}])[0]['data']
+```
+
+##### <A NAME="feature-using"></A>using
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for manipulating the data object.
+
+```python
+        # Write feature DNA sequence and protein sequence
+        #
+    	protein_fasta_file_location = os.path.join(self.scratch, params['feature_name']+".fasta")
+    	dna_fasta_file_location = os.path.join(self.scratch, params['feature_name]'+".fna")
+    	self.log(console, 'writing protein fasta file: '+protein_fasta_file_location)
+    	self.log(console, 'writing dna fasta file: '+dna_fasta_file_location)
+            
+    	if feature['type'] == 'CDS':
+    	    protein_record = SeqRecord(Seq(feature['protein_translation']), \
+					id=feature['id'], \
+					description='['+feature['genome_id']+'] '+feature['type']+":"+feature['function'])
+    	if feature['type'] == 'CDS':
+    	    dna_record = SeqRecord(Seq(feature['dna_sequence']), \
+					id=feature['id'], \
+					description='['+feature['genome_id']+'] '+feature['type']+":"+feature['function'])
+    	SeqIO.write([protein_record], protein_fasta_file_location, "fasta")
+    	SeqIO.write([dna_record], dna_fasta_file_location, "fasta")
+    	
+```
+
+##### <A NAME="feature-storing"></A>storing
+The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for storing the data object.
+
+```python
+        self.log(console, 'storing feature object: '+params['workspace_name']+'/'+params['output_feature_name'])
+
+        feature_data = { "aliases":["P0AG24","spoT","EG10966","NP_418107.1","P0AG24","ABE-0011935"],
+					"dna_sequence":"ttg...taa",
+					"dna_sequence_length":2109,
+					"function":"GTP pyrophosphokinase (EC 2.7.6.5), (p)ppGpp synthetase II / Guanosine-3',5'-bis(diphosphate) 3'-pyrophosphohydrolase (EC 3.1.7.2)",
+					"id":"kb|g.26833.CDS.3983",
+					"location":[["kb|g.26833.c.0",3820423,"+",2109]],
+					"md5":"f94417311ccd06512cc8ecfa521bbbe6",
+					"protein_translation":"MYL...NRN",
+					"protein_translation_length":702,
+					"subsystem_data":[["Stringent Response, (p)ppGpp metabolism","1","GTP pyrophosphokinase (EC 2.7.6.5), (p)ppGpp synthetase II"],["Stringent Response, (p)ppGpp metabolism","1","Guanosine-3',5'-bis(diphosphate) 3'-pyrophosphohydrolase (EC 3.1.7.2)"]],
+					"subsystems":["Stringent Response, (p)ppGpp metabolism"],
+					"type":"CDS"
+			}
+        
+        # load the method provenance from the context object
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference, service, and method
+    	provenance[0]['input_ws_objects'] = []
+    	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
+    	# OR e.g.
+    	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genomeSet_name'])
+    	provenance[0]['service'] = 'MyModule'
+    	provenance[0]['method'] = 'MyMethod'
+        
+        # save object in workspace
+        new_obj_info = ws.save_objects({
+							'workspace': params['workspace_name'],
+							'objects':[{
+									'type': 'KBaseGenome.Feature',
+									'data': feature_data,
+									'name': params['output_feature_name'],
+									'meta': {},
+									'provenance': provenance
+								}]
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -1418,11 +1298,9 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGenomes.Genome
 
 - [data structure](#genome-ds)
-- [setup](#genome-setup)
 - [obtaining](#genome-obtaining)
 - [using](#genome-using)
 - [storing](#genome-storing)
-- 
 
 The Genome object stores genomes.  There is an API that will replace direct access to the Genome structure, but for the time being, have at it!
 
@@ -1552,61 +1430,6 @@ optional:
     }
 ```
 
-##### <A NAME="genome-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
-```
-
 ##### <A NAME="genome-obtaining"></A>obtaining
 The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for retrieving the data object.
 
@@ -1622,15 +1445,15 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 ```python
         # Write translated feature sequences (CDS only) of genome fasta files
         #
-	fasta_file_location = os.path.join(self.scratch, params['genome_name']+".fasta")
-	self.log(console, 'writing fasta file: '+fasta_file_location)
+    	fasta_file_location = os.path.join(self.scratch, params['genome_name']+".fasta")
+    	self.log(console, 'writing fasta file: '+fasta_file_location)
             
     	records = []
     	for feature in genome['features']:
     	    if feature['type'] == 'CDS':
     	        record = SeqRecord(Seq(feature['protein_translation']), \
 					id=feature['id'], \
-					description=feature['type']+"."+feature['function'])
+					description='['+feature['genome_id']+'] '+feature['type']+":"+feature['function'])
 		records.append(record)
     	SeqIO.write(records, fasta_file_location, "fasta")
 ```
@@ -1675,16 +1498,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 		 }
         
         # load the method provenance from the context object
-        provenance = [{}]
-        if 'provenance' in ctx:
+    	provenance = [{}]
+    	if 'provenance' in ctx:
             provenance = ctx['provenance']
-        # add additional info to provenance here, in this case the input data object reference, service, and method
-        provenance[0]['input_ws_objects'] = []
-	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['contigset_name'])
-	# OR e.g.
-	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
-        provenance[0]['service'] = 'MyModule'
-        provenance[0]['method'] = 'MyMethod'
+    	# add additional info to provenance here, in this case the input data object reference, service, and method
+    	provenance[0]['input_ws_objects'] = []
+    	provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['contigset_name'])
+    	# OR e.g.
+    	#provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['genome_name'])
+    	provenance[0]['service'] = 'MyModule'
+    	provenance[0]['method'] = 'MyMethod'
         
         # save object in workspace
         new_obj_info = ws.save_objects({
@@ -1696,18 +1519,18 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
 [\[back to data type list\]](#data-type-list)
 
 
+
 #### <A NAME="domain-library"></A>DomainLibrary
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainLibrary
 
 - [data structure](#domain-library-ds)
-- [setup](#domain-library-setup)
 - [obtaining](#domain-library-obtaining)
 - [using](#domain-library-using)
 - [storing](#domain-library-storing)
@@ -1748,32 +1571,6 @@ the workspace KBasePublicGeneDomains.
 				...
                }
     }
-```
-
-##### <A NAME="domain-library-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-    from biokbase.workspace.client import Workspace as workspaceService
-
-    def getContext(self):
-        return self.__class__.ctx
-        
-    def __init__(self, config):
-        ctx = self.getContext()
-        self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
 ```
 
 ##### <A NAME="domain-library-obtaining"></A>obtaining
@@ -1861,16 +1658,16 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				'name': params['output_domain_library_name'],
 				'meta': {},
 				'provenance': provenance
-				} ] })
+				} ] })[0]
 ```
 [\[back to data type list\]](#data-type-list)
+
 
 
 #### <A NAME="domain-model-set"></A>DomainModelSet
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainModelSet
 
 - [data structure](#domain-model-set-ds)
-- [setup](#domain-model-set-setup)
 - [obtaining](#domain-model-set-obtaining)
 - [using](#domain-model-set-using)
 - [storing](#domain-model-set-storing)
@@ -1897,32 +1694,6 @@ the workspace KBasePublicGeneDomains.
 										 ...
                                        }
     }
-```
-
-##### <A NAME="domain-model-set-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-    from biokbase.workspace.client import Workspace as workspaceService
-
-    def getContext(self):
-        return self.__class__.ctx
-        
-    def __init__(self, config):
-        ctx = self.getContext()
-        self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
 ```
 
 ##### <A NAME="domain-model-set-obtaining"></A>obtaining
@@ -1998,7 +1769,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				'name': params['output_domain_model_set_name'],
 				'meta': {},
 				'provenance': provenance
-				} ] })
+				} ] })[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -2008,7 +1779,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseGeneFamilies.DomainAnnotation
 
 - [data structure](#domain-annotation-ds)
-- [setup](#domain-annotation-setup)
 - [obtaining](#domain-annotation-obtaining)
 - [using](#domain-annotation-using)
 - [storing](#domain-annotation-storing)
@@ -2053,32 +1823,6 @@ in a genome with one or more domain databases (e.g., Pfam or COGs)
                                      ...
                                    }
     }
-```
-
-##### <A NAME="domain-annotation-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-    from biokbase.workspace.client import Workspace as workspaceService
-
-    def getContext(self):
-        return self.__class__.ctx
-        
-    def __init__(self, config):
-        ctx = self.getContext()
-        self.workspaceURL = config['workspace-url']
-        self.ws = workspaceService(self.workspaceURL, token=ctx['token'])
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
 ```
 
 ##### <A NAME="domain-annotation-obtaining"></A>obtaining
@@ -2192,7 +1936,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 				'name': params['output_domain_annotation_name'],
 				'meta': {},
 				'provenance': provenance
-				} ] })
+				} ] })[0]
 ```
 [\[back to data type list\]](#data-type-list)
 
@@ -2202,7 +1946,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.MSA
 
 - [data structure](#msa-ds)
-- [setup](#msa-setup)
 - [obtaining](#msa-obtaining)
 - [using](#msa-using)
 - [storing](#msa-storing)
@@ -2255,61 +1998,6 @@ optional:
   parent_msa_ref: 'ws_msa_ref'                  # reference to parental alignment object to which 
                                                 # this object adds some new aligned sequences 
 }
-```
-
-##### <A NAME="msa-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### <A NAME="msa-obtaining"></A>obtaining
@@ -2383,7 +2071,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```
@@ -2395,7 +2083,6 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 https://narrative.kbase.us/functional-site/#/spec/type/KBaseTrees.Tree
 
 - [data structure](#tree-ds)
-- [setup](#tree-setup)
 - [obtaining](#tree-obtaining)
 - [using](#tree-using)
 - [storing](#tree-storing)
@@ -2443,62 +2130,6 @@ optional:
 	   },
   leaf_list: [‘node_id_1’, ‘node_id_2’, ...]
 }
-```
-
-##### <A NAME="tree-setup"></A>setup
-The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.py file) for preparing to work with the data object.
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from Bio import Phylo
-from biokbase.workspace.client import Workspace as workspaceService
-        
-class <ModuleName>:
-
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
 ```
 
 ##### <A NAME="tree-obtaining"></A>obtaining
@@ -2600,7 +2231,7 @@ The following is a python snippet (e.g. for use in the SDK \<module_name\>Impl.p
 									'meta': {},
 									'provenance': provenance
 								}]
-                        })
+                        })[0]
         #return new_obj_info[0]  # obj_ID
         return new_obj_info[1]  # obj_NAME
 ```

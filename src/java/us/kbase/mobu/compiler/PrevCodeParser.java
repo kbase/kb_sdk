@@ -3,6 +3,7 @@ package us.kbase.mobu.compiler;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,10 +16,13 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import us.kbase.mobu.util.TextUtils;
+
 public class PrevCodeParser {
     public static final String HEADER = "HEADER";
     public static final String CLSHEADER = "CLASS_HEADER";
     public static final String CONSTRUCTOR = "CONSTRUCTOR";
+    public static final String STATUS = "STATUS";
     public static final String METHOD = "METHOD_";
     
     public static HashMap<String, String> parsePrevCode(File implFile, String commentPrefix,
@@ -30,6 +34,8 @@ public class PrevCodeParser {
                 "BEGIN_CLASS_HEADER\n(.*\n)?[ \t]*" + commentPrefix + "END_CLASS_HEADER\n.*", Pattern.DOTALL);
         Pattern PAT_CONSTRUCTOR = Pattern.compile(".*" + commentPrefix + "BEGIN_CONSTRUCTOR\n(.*\n)?[ \t]*" + 
                 commentPrefix + "END_CONSTRUCTOR\n.*", Pattern.DOTALL);
+        Pattern PAT_STATUS = Pattern.compile(".*" + commentPrefix + "BEGIN_STATUS\n(.*\n)?[ \t]*" + 
+                commentPrefix + "END_STATUS\n.*", Pattern.DOTALL);
         HashMap<String, String> code = new HashMap<String, String>();
         if (implFile == null || !implFile.exists()) {
             code.put(HEADER, "");
@@ -41,11 +47,17 @@ public class PrevCodeParser {
         String backupExtension = ".bak-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
         File backup = new File(implFile.getAbsoluteFile() + backupExtension);
         FileUtils.copyFile(implFile, backup);
-        String oldserver = IOUtils.toString(new FileReader(implFile));
+        List<String> fileLines = TextUtils.readFileLines(implFile);
+        // Getting rid of windows end-of-line chars (\r\n -> \n)
+        StringWriter sw = new StringWriter();
+        TextUtils.writeFileLines(fileLines, sw);
+        sw.close();
+        String oldserver = sw.toString();
         checkMatch(code, PAT_HEADER, oldserver, HEADER, "header", true, implFile);
         if (withClassHeader)
             checkMatch(code, PAT_CLASS_HEADER, oldserver, CLSHEADER, "class header", true, implFile);
         checkMatch(code, PAT_CONSTRUCTOR, oldserver, CONSTRUCTOR, "constructor", true, implFile);
+        checkMatch(code, PAT_STATUS, oldserver, STATUS, "method status", false, implFile);
         for (String funcName : funcs) {
             Pattern p = Pattern.compile(MessageFormat.format(".*" + commentPrefix + "BEGIN {0}\n(.*\n)?[ \t]*" + 
                     commentPrefix + "END {0}\n.*", funcName), Pattern.DOTALL);

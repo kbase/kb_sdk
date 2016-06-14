@@ -109,6 +109,8 @@ public class ModuleInitializer {
 		moduleContext.put("language", this.language);
 		moduleContext.put("module_root_path", Paths.get(this.moduleName).toAbsolutePath());
 		moduleContext.put("example", example);
+        moduleContext.put("os_name", System.getProperty("os.name"));
+
 
 		Map<String, Path> templateFiles = new HashMap<String, Path>();
 		templateFiles.put("module_typespec", Paths.get(this.moduleName, specFile));
@@ -133,6 +135,7 @@ public class ModuleInitializer {
         templateFiles.put("module_test_cfg", Paths.get(this.moduleName, "test_local", "test.cfg"));
         templateFiles.put("module_run_tests", Paths.get(this.moduleName, "test_local", "run_tests.sh"));
         templateFiles.put("module_run_bash", Paths.get(this.moduleName, "test_local", "run_bash.sh"));
+        templateFiles.put("module_run_docker", Paths.get(this.moduleName, "test_local", "run_docker.sh"));
 		
 		switch (language) {
 		case "java":
