@@ -78,7 +78,7 @@ public class ClientInstaller {
     }
     
     public int install(String lang, boolean async, boolean sync, boolean dynamic, String tagVer, 
-            boolean verbose, String moduleName) throws Exception {
+            boolean verbose, String moduleName, String libDirName) throws Exception {
         FileProvider fp = null;
         String url = null;
         String clientAsyncVer = null;
@@ -221,14 +221,14 @@ public class ClientInstaller {
                 }
             }
         }
-        File libDir = new File(moduleDir, "lib");
+        File libDir = new File(moduleDir, libDirName == null ? "lib" : libDirName);
         if (isJava) {
             FileSaver javaSrcDir = new DiskFileSaver(new File(libDir, "src"));
             String javaPackageParent = ".";
             JavaTypeGenerator.processSpec(services, javaSrcDir, 
                     javaPackageParent, false, null, null, 
                     url == null ? null : new URL(url), null, null,
-                    clientAsyncVer, semanticVersion, gitUrl, gitCommitHash);
+                    clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         } else {
             String perlClientName = null;
             if (isPerl)

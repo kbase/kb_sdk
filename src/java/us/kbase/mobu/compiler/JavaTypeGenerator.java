@@ -161,25 +161,27 @@ public class JavaTypeGenerator {
 	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
 	        FileSaver buildXml, FileSaver makefile) throws Exception {
 	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
-	            buildXml, makefile, null, null, null, null, null);
+	            buildXml, makefile, null, null, null, null, null, null);
 	}
 
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-	        FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
+	        FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, String clientDynservVersion, 
 	        String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {        
 	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
-	            buildXml, makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, null);
+	            buildXml, makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, gitUrl, 
+	            gitCommitHash, null);
 	}
 
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
-			String semanticVersion, String gitUrl, String gitCommitHash,
+			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, 
+			String clientDynservVersion, String semanticVersion, String gitUrl, String gitCommitHash,
 			Map<String, String> originalCode) throws Exception {		
 		JavaData data = prepareDataStructures(services);
 		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
-		        makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, originalCode);
+		        makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, gitUrl, 
+		        gitCommitHash, originalCode);
 		return data;
 	}
 
@@ -202,13 +204,17 @@ public class JavaTypeGenerator {
 						String funcJavaName = TextUtils.inCamelCase(func.getName());
 						List<JavaFuncParam> params = new ArrayList<JavaFuncParam>();
 						for (KbParameter param : func.getParameters()) {
-							JavaType type = findBasic(param.getType(), module.getModuleName(), nonPrimitiveTypes, tupleTypes);
-							params.add(new JavaFuncParam(param, TextUtils.inCamelCase(param.getName()), type));
+							JavaType type = findBasic(param.getType(), module.getModuleName(), 
+							        nonPrimitiveTypes, tupleTypes);
+							params.add(new JavaFuncParam(param, 
+							        TextUtils.inCamelCase(param.getName()), type));
 						}
 						List<JavaFuncParam> returns = new ArrayList<JavaFuncParam>();
 						for (KbParameter param : func.getReturnType()) {
-							JavaType type = findBasic(param.getType(), module.getModuleName(), nonPrimitiveTypes, tupleTypes);
-							returns.add(new JavaFuncParam(param, param.getName() == null ? null : TextUtils.inCamelCase(param.getName()), type));
+							JavaType type = findBasic(param.getType(), module.getModuleName(), 
+							        nonPrimitiveTypes, tupleTypes);
+							returns.add(new JavaFuncParam(param, param.getName() == null ? null : 
+							    TextUtils.inCamelCase(param.getName()), type));
 						}
 						JavaType retMultiType = null;
 						if (returns.size() > 1) {
@@ -238,13 +244,14 @@ public class JavaTypeGenerator {
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
 			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
-			String semanticVersion, String gitUrl, String gitCommitHash,
-			Map<String, String> originalCode) throws Exception {
+			String clientDynservVersion, String semanticVersion, String gitUrl, 
+			String gitCommitHash, Map<String, String> originalCode) throws Exception {
 	    if (packageParent.equals("."))  // Special value meaning top level package.
 	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
-		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion);
+		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion, 
+		        clientDynservVersion);
 		if (createServers)
 			generateServerClass(data, srcOutDir, packageParent, semanticVersion, gitUrl, 
 			        gitCommitHash, originalCode);
@@ -256,10 +263,12 @@ public class JavaTypeGenerator {
 		}
 	}
 
-	private static void generatePojos(JavaData data, FileSaver srcOutDir, String packageParent) throws Exception {
+	private static void generatePojos(JavaData data, FileSaver srcOutDir, 
+	        String packageParent) throws Exception {
         InMemorySchemaStore ss = new InMemorySchemaStore();
 		for (JavaType type : data.getTypes()) {
-		    URI id = new URI("file:/" + type.getModuleName() + "/" + type.getJavaClassName() + ".json");
+		    URI id = new URI("file:/" + type.getModuleName() + "/" + type.getJavaClassName() + 
+		            ".json");
 			Set<Integer> tupleTypes = data.getTupleTypes();
 			ByteArrayOutputStream jsonFile = new ByteArrayOutputStream();
 			writeJsonSchema(jsonFile, packageParent, type, tupleTypes);
@@ -422,7 +431,7 @@ public class JavaTypeGenerator {
 	}
 
 	private static void generateClientClass(JavaData data, FileSaver srcOutDir,
-			String packageParent, URL url, String asyncVersion) throws Exception {
+			String packageParent, URL url, String asyncVersion, String dynservVersion) throws Exception {
         if (asyncVersion != null) {
             if (Pattern.compile("[^a-zA-Z0-9]").matcher(asyncVersion).find())
                 throw new IllegalStateException("Unsupported non-alfanumeric characters in client " +
@@ -443,6 +452,12 @@ public class JavaTypeGenerator {
 				}
 			}
             boolean anyAsync = asyncVersion != null || anyAsync(module);
+            String serviceVersion = null;
+            if (asyncVersion != null) {
+                serviceVersion = asyncVersion;
+            } else if (dynservVersion != null) {
+                serviceVersion = dynservVersion;
+            }
 			List<String> classLines = new ArrayList<String>();
 			String urlClass = model.ref("java.net.URL");
 			String tokenClass = model.ref("us.kbase.auth.AuthToken");
@@ -453,25 +468,32 @@ public class JavaTypeGenerator {
 					));
 			if (anyAsync) {
 			    classLines.add("    private long asyncJobCheckTimeMs = 5000;");
-			    classLines.add("    private String asyncVersion = " + 
-			            (asyncVersion == null ? "null" : ("\"" + asyncVersion + "\"")) + ";");
 			}
-			if (url != null) {
-				classLines.addAll(Arrays.asList(
-					"    private static URL DEFAULT_URL = null;",
-					"    static {",
-					"        try {",
-					"            DEFAULT_URL = new URL(\"" + url + "\");",
-					"        } catch (" + model.ref("java.net.MalformedURLException") + " mue) {",
-					"            throw new RuntimeException(\"Compile error in client - bad url compiled\");",
-					"        }",
-					"    }",
-					"",
-					"    /** Constructs a client with the default url and no user credentials.*/",
-					"    public " + clientClassName + "() {",
-					"       caller = new " + callerClass + "(DEFAULT_URL);",
-					"    }"
-					));
+            classLines.add("    private String serviceVersion = " + 
+                    (serviceVersion == null ? "null" : ("\"" + serviceVersion + "\"")) + ";");
+            if (url != null) {
+                classLines.addAll(Arrays.asList(
+                        "    private static URL DEFAULT_URL = null;",
+                        "    static {",
+                        "        try {",
+                        "            DEFAULT_URL = new URL(\"" + url + "\");",
+                        "        } catch (" + model.ref("java.net.MalformedURLException") + " mue) {",
+                        "            throw new RuntimeException(\"Compile error in client - bad url compiled\");",
+                        "        }",
+                        "    }",
+                        "",
+                        "    /** Constructs a client with the default url and no user credentials.*/",
+                        "    public " + clientClassName + "() {",
+                        "       caller = new " + callerClass + "(DEFAULT_URL);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
+                        "    }"
+                        ));
 			}
 			classLines.addAll(Arrays.asList(
 					"",
@@ -480,9 +502,16 @@ public class JavaTypeGenerator {
 					"     * @param url the URL of the service.",
 					"     */",
 					"    public " + clientClassName + "(" + urlClass + " url) {",
-					"        caller = new " + callerClass + "(url);",
-					"    }"
-					));
+					"        caller = new " + callerClass + "(url);"
+                    ));
+            if (dynservVersion != null) {
+                classLines.add(
+                        "        caller.setDynamic(true);"
+                        );
+            }
+            classLines.addAll(Arrays.asList(
+                    "    }"
+                    ));
 			if (anyAuth) {
 				classLines.addAll(Arrays.asList(
 						"    /** Constructs a client with a custom URL.",
@@ -496,7 +525,14 @@ public class JavaTypeGenerator {
 								model.ref("us.kbase.auth.AuthToken") + " token) throws " + 
 								model.ref(utilPackage + ".UnauthorizedException") + ", " +
 								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(url, token);",
+						"        caller = new " + callerClass + "(url, token);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
 						"    }",
 						"",
 						"    /** Constructs a client with a custom URL.",
@@ -511,7 +547,14 @@ public class JavaTypeGenerator {
 								" url, String user, String password) throws " + 
 								model.ref(utilPackage + ".UnauthorizedException") + ", " +
 								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(url, user, password);",
+						"        caller = new " + callerClass + "(url, user, password);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
 						"    }"
 						));
 				if (url != null) {
@@ -526,7 +569,14 @@ public class JavaTypeGenerator {
 						"    public " + clientClassName + "(" + tokenClass + " token) throws " + 
 								model.ref(utilPackage + ".UnauthorizedException") + ", " +
 								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(DEFAULT_URL, token);",
+						"        caller = new " + callerClass + "(DEFAULT_URL, token);"
+	                        ));
+	                if (dynservVersion != null) {
+	                    classLines.add(
+	                            "        caller.setDynamic(true);"
+	                            );
+	                }
+	                classLines.addAll(Arrays.asList(
 						"    }",
 						"",
 						"    /** Constructs a client with the default URL.",
@@ -539,7 +589,14 @@ public class JavaTypeGenerator {
 						"    public " + clientClassName + "(String user, String password) throws " + 
 								model.ref(utilPackage + ".UnauthorizedException") + ", " +
 								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(DEFAULT_URL, user, password);",
+						"        caller = new " + callerClass + "(DEFAULT_URL, user, password);"
+	                        ));
+	                if (dynservVersion != null) {
+	                    classLines.add(
+	                            "        caller.setDynamic(true);"
+	                            );
+	                }
+	                classLines.addAll(Arrays.asList(
 						"    }"
 						));
 				}
@@ -635,7 +692,7 @@ public class JavaTypeGenerator {
 					"        caller.setFileForNextRpcResponse(f);",
 					"    }"
 					));
-			if (anyAsync) {
+			if (anyAsync || asyncVersion != null) {
 			    classLines.addAll(Arrays.asList(
 			            "",
 			            "    public long getAsyncJobCheckTimeMs() {",
@@ -646,17 +703,17 @@ public class JavaTypeGenerator {
                         "        this.asyncJobCheckTimeMs = newValue;",
                         "    }"
 			            ));
-			    classLines.addAll(Arrays.asList(
-			            "",
-			            "    public String getAsyncVersion() {",
-			            "        return this.asyncVersion;",
-			            "    }",
-			            "",
-			            "    public void setAsyncVersion(String newValue) {",
-			            "        this.asyncVersion = newValue;",
-			            "    }"
-			            ));
 			}
+            classLines.addAll(Arrays.asList(
+                    "",
+                    "    public String getServiceVersion() {",
+                    "        return this.serviceVersion;",
+                    "    }",
+                    "",
+                    "    public void setServiceVersion(String newValue) {",
+                    "        this.serviceVersion = newValue;",
+                    "    }"
+                    ));
 			if (anyAsync || asyncVersion != null) {
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
@@ -708,10 +765,10 @@ public class JavaTypeGenerator {
 			        classLines.add("    protected String _" + func.getJavaName() + "Submit(" + funcParams + ") " + exceptions+ " {");
 			        if (asyncVersion != null) {
 	                    classLines.addAll(Arrays.asList(
-	                            "        if (asyncVersion != null) {",
+	                            "        if (this.serviceVersion != null) {",
 	                            "            if (" + contextField + " == null || " + contextField + ".length == 0 || " + contextField + "[0] == null)",
 	                            "                " + contextField + " = new " + contextType + "[] {new " + contextType + "()};",
-	                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", asyncVersion);",
+	                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", this.serviceVersion);",
 	                            "        }"
 	                            ));
 			        }
@@ -767,14 +824,14 @@ public class JavaTypeGenerator {
 			                String trFull = typeReferenceClass + "<Object>";
 			                classLines.addAll(Arrays.asList(
 			                        "        " + trFull + " retType = new " + trFull + "() {};",
-			                        "        caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ");",
+			                        "        caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ", this.serviceVersion);",
 			                        "    }"
 			                        ));
 			            } else {
 			                String trFull = typeReferenceClass + "<" + listClass + "<" + retTypeName + ">>";
 			                classLines.addAll(Arrays.asList(
 			                        "        " + trFull + " retType = new " + trFull + "() {};",
-			                        "        " + listClass + "<" + retTypeName + "> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ");",
+			                        "        " + listClass + "<" + retTypeName + "> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ", this.serviceVersion);",
 			                        "        return res.get(0);",
 			                        "    }"
 			                        ));
@@ -783,7 +840,7 @@ public class JavaTypeGenerator {
 			            String trFull = typeReferenceClass + "<" + retTypeName + ">";
 			            classLines.addAll(Arrays.asList(
 			                    "        " + trFull + " retType = new " + trFull + "() {};",
-			                    "        " + retTypeName + " res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ");",
+			                    "        " + retTypeName + " res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ", this.serviceVersion);",
 			                    "        return res;",
 			                    "    }"
 			                    ));					
@@ -1140,6 +1197,10 @@ public class JavaTypeGenerator {
 		    jars.add(checkLib(libOutDir, "ini4j-0.5.2"));
 		    jars.add(checkLib(libOutDir, "syslog4j-0.9.46"));
 		    jars.add(checkLib(libOutDir, "jna-3.4.0"));
+		    jars.add(checkLib(libOutDir, "joda-time-2.2"));
+            jars.add(checkLib(libOutDir, "logback-core-1.1.2"));
+            jars.add(checkLib(libOutDir, "logback-classic-1.1.2"));
+            jars.add(checkLib(libOutDir, "slf4j-api-1.7.7"));
 		}
 		return jars;
 	}

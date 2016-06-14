@@ -210,7 +210,7 @@ public class ModuleRenamer {
         };
         if (language.equalsIgnoreCase("java")) {
             JavaTypeGenerator.processSpec(newParsing, srcOut, ".", true, null, null, null, null, null,
-                    null, null, null, null, prevCode);
+                    null, null, null, null, null, prevCode);
         } else {
             TemplateBasedGenerator.generate(newParsing, null, false, null, 
                     false, perlClientName, genPerlServer, perlServerName, perlImplName, perlPsgiName, 
