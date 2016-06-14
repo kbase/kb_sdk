@@ -21,7 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import us.kbase.auth.AuthService;
-import us.kbase.auth.AuthToken;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.tester.ModuleTester;

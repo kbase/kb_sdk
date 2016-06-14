@@ -228,7 +228,7 @@ public class ClientInstaller {
             JavaTypeGenerator.processSpec(services, javaSrcDir, 
                     javaPackageParent, false, null, null, 
                     url == null ? null : new URL(url), null, null,
-                    clientAsyncVer, semanticVersion, gitUrl, gitCommitHash);
+                    clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         } else {
             String perlClientName = null;
             if (isPerl)

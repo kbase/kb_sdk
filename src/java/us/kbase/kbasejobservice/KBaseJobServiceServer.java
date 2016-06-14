@@ -14,7 +14,6 @@ import us.kbase.common.service.JsonServerSyslog;
 
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,12 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import us.kbase.common.service.UObject;
-import us.kbase.common.utils.UTCDateFormat;
 import us.kbase.mobu.util.ProcessHelper;
 
 //END_HEADER
@@ -230,7 +230,8 @@ public class KBaseJobServiceServer extends JsonServerServlet {
                     if (context.getCallStack() == null)
                         context.setCallStack(new ArrayList<MethodCall>());
                     context.getCallStack().add(new MethodCall().withJobId(jobId).withMethod(job.getMethod())
-                            .withTime(new UTCDateFormat().formatDate(new Date())));
+                            .withTime(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZoneUTC()
+                                    .print(new DateTime())));
                     File jobDir = new File(tempDir, "job_" + jobId);
                     if (!jobDir.exists())
                         jobDir.mkdirs();

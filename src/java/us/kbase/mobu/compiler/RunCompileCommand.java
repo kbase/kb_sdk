@@ -42,7 +42,7 @@ public class RunCompileCommand {
             boolean withJavaBuildXml, String javaGwtPackage, boolean rClientSide, 
             String rClientName, boolean rServerSide, String rServerName, 
             String rImplName, boolean newStyle, File outDir, String jsonSchemaPath, 
-            boolean createMakefile, String clientAsyncVer, String dynserv,
+            boolean createMakefile, String clientAsyncVer, String dynservVer,
             boolean html, String semanticVersion, String gitUrl,
             String gitCommitHash)
             throws Exception {
@@ -153,7 +153,7 @@ public class RunCompileCommand {
             javaParsingData = JavaTypeGenerator.processSpec(services, javaSrcDir, 
                     javaPackageParent, javaServerSide, javaLibDir, javaGwtPackage, 
                     url == null ? null : new URL(url), javaBuildXml, javaMakefile,
-                    clientAsyncVer, semanticVersion, gitUrl, gitCommitHash);
+                    clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         }
         TemplateBasedGenerator.generate(services, url, jsClientSide, jsClientName, 
                 perlClientSide, perlClientName, perlServerSide, perlServerName, 
@@ -161,7 +161,7 @@ public class RunCompileCommand {
                 pyServerSide, pyServerName, pyImplName, rClientSide, rClientName, 
                 rServerSide, rServerName, rImplName, perlEnableRetries, newStyle, 
                 ip, output, perlMakefile, pyMakefile, newStyle, clientAsyncVer,
-                dynserv, semanticVersion, gitUrl, gitCommitHash);
+                dynservVer, semanticVersion, gitUrl, gitCommitHash);
         String reportFile = System.getenv("KB_SDK_COMPILE_REPORT_FILE");
         if (reportFile == null || reportFile.isEmpty())
             reportFile = System.getProperty("KB_SDK_COMPILE_REPORT_FILE");
