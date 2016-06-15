@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -18,6 +17,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import us.kbase.auth.AuthService;
@@ -27,6 +27,7 @@ import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.scripts.test.TypeGeneratorTest;
 
+@Ignore
 public class DynamicServiceTest {
 
     private static final String SIMPLE_MODULE_NAME = "TestDynamic";
