@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -107,14 +106,6 @@ public class DynamicServiceTest {
             fw.close();
         }
         String endPoint = "https://ci.kbase.us/services";
-        File configPropsFile = new File(workDir, "config.properties");
-        PrintWriter pw = new PrintWriter(configPropsFile);
-        try {
-            pw.println("[global]");
-            pw.println("kbase_endpoint = " + endPoint);
-        } finally {
-            pw.close();
-        }
         File runDockerSh = new File(tlDir, "run_docker.sh");
         ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(tlDir);
         String imageName = "test/" + moduleName.toLowerCase() + ":latest";
@@ -129,7 +120,7 @@ public class DynamicServiceTest {
         System.currentTimeMillis();
         ProcessHelper.cmd("bash", runDockerPath, "run", "-d", "-p", port + ":5000",
                 "--dns", "8.8.8.8", "-v", workDirPath + ":/kb/module/work", 
-                "--name", containerName, imageName).exec(tlDir);
+                "--name", containerName, "-e", "KBASE_ENDPOINT=" + endPoint, imageName).exec(tlDir);
         return containerName;
     }
 
@@ -184,7 +175,6 @@ public class DynamicServiceTest {
                     break;
                 } catch (Exception ex) {
                     error = ex;
-                    ex.printStackTrace();
                 }
                 Thread.sleep(100);
             }

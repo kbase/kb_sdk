@@ -187,31 +187,37 @@ public class ModuleTester {
         ///////////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = findFreePort();
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
-        if( System.getProperty("os.name").startsWith("Windows") ) {
-            JsonServerSyslog.setStaticUseSyslog(false);
-            JsonServerSyslog.setStaticMlogFile("callback.log");
+        Server jettyServer = null;
+        if (callbackUrl == null) {
+            if( System.getProperty("os.name").startsWith("Windows") ) {
+                JsonServerSyslog.setStaticUseSyslog(false);
+                JsonServerSyslog.setStaticMlogFile("callback.log");
+            }
+            CallbackServerConfig cfg = new CallbackServerConfigBuilder(
+                    new URL(endPoint), callbackUrl, tlDir.toPath(),
+                    new LineLogger() {
+                        @Override
+                        public void logNextLine(String line, boolean isError) {
+                            //do nothing, SDK callback server doesn't use a logger
+                        }
+                    }).build();
+            ModuleRunVersion runver = new ModuleRunVersion(
+                    new URL("https://fakefakefakefakefake.com"),
+                    new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+            JsonServerServlet catalogSrv = new SDKCallbackServer(
+                    new AuthToken(token), cfg, runver, new ArrayList<UObject>(),
+                    new ArrayList<String>());
+            jettyServer = new Server(callbackPort);
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.setContextPath("/");
+            jettyServer.setHandler(context);
+            context.addServlet(new ServletHolder(catalogSrv),"/*");
+            jettyServer.start();
+        } else {
+            System.out.println("WARNING: No callback URL was recieved " +
+                    "by the job runner. Local callbacks are disabled.");
         }
-        CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-                new URL(endPoint), callbackUrl, tlDir.toPath(),
-                new LineLogger() {
-                    @Override
-                    public void logNextLine(String line, boolean isError) {
-                        //do nothing, SDK callback server doesn't use a logger
-                    }
-                }).build();
-        ModuleRunVersion runver = new ModuleRunVersion(
-                new URL("https://fakefakefakefakefake.com"),
-                new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
-                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
-        JsonServerServlet catalogSrv = new SDKCallbackServer(
-                new AuthToken(token), cfg, runver, new ArrayList<UObject>(),
-                new ArrayList<String>());
-        Server jettyServer = new Server(callbackPort);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        jettyServer.setHandler(context);
-        context.addServlet(new ServletHolder(catalogSrv),"/*");
-        jettyServer.start();
         ///////////////////////////////////////////////////////////////////////////////////////////////
         try {
             System.out.println();
@@ -220,8 +226,10 @@ public class ModuleTester {
                     callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
             return exitCode;
         } finally {
-            System.out.println("Shutting down callback server...");
-            jettyServer.stop();
+            if (jettyServer != null) {
+                System.out.println("Shutting down callback server...");
+                jettyServer.stop();
+            }
         }
     }
 
