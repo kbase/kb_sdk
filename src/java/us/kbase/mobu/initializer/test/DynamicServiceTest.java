@@ -40,7 +40,7 @@ import us.kbase.scripts.test.TypeGeneratorTest;
 public class DynamicServiceTest {
 
     private static final String SIMPLE_MODULE_NAME = "TestDynamic";
-    private static final boolean cleanupAfterTests = false;
+    private static final boolean cleanupAfterTests = true;
     
     private static List<String> createdModuleNames = new ArrayList<String>();
     private static String user;
