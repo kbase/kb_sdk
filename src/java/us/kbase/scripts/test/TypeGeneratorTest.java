@@ -1421,7 +1421,7 @@ public class TypeGeneratorTest extends Assert {
         libUrls.add(libFile.toURI().toURL());
 	}
 	
-	private static boolean isCasperJsInstalled() {
+	public static boolean isCasperJsInstalled() {
 	    if (isCasperJsInstalled != null)
 	        return isCasperJsInstalled;
 	    try {

@@ -126,6 +126,7 @@ public class ClientInstaller {
                     }
                 };
             }
+            moduleName = null;
         } else {
             CatalogClient client = new CatalogClient(catalogUrl);
             ModuleVersion modVer = client.getModuleVersion(
@@ -196,6 +197,10 @@ public class ClientInstaller {
         };
         List<KbService> services = KidlParser.parseSpec(KidlParser.parseSpecInt(
                 new StringReader(fp.loadMainSpec()), null, ip));
+        if (moduleName == null)
+            for (KbService srv : services)
+                for (KbModule md : srv.getModules())
+                    moduleName = md.getModuleName();
         if (lang == null)
             lang = language;
         lang = lang.toLowerCase();
@@ -203,6 +208,7 @@ public class ClientInstaller {
         boolean isPython = false;
         boolean isJava = false;
         boolean isR = false;
+        boolean isJS = false;
         String[] perlNames = {"perl", ".pl", "pl"};
         if (Arrays.asList(perlNames).contains(lang)) {
             isPerl = true;
@@ -216,8 +222,14 @@ public class ClientInstaller {
                     isJava = true;
                 } else {
                     String[] rNames = {"r", ".r"};
-                    if (Arrays.asList(rNames).contains(lang))
+                    if (Arrays.asList(rNames).contains(lang)) {
                         isR = true;
+                    } else {
+                        String[] jsNames = {"js", ".js", "javascript"};
+                        if (Arrays.asList(jsNames).contains(lang)) {
+                            isJS = true;
+                        }
+                    }
                 }
             }
         }
@@ -239,8 +251,11 @@ public class ClientInstaller {
             String rClientName = null;
             if (isR)
                 rClientName = moduleName + "/" + moduleName + "Client";
+            String jsClientName = null;
+            if (isJS)
+                jsClientName = moduleName + "/" + moduleName + "Client";
             FileSaver output = new DiskFileSaver(libDir);
-            TemplateBasedGenerator.generate(services, url, false, null, isPerl, perlClientName, 
+            TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl, perlClientName, 
                     false, null, null, null, isPython, pyClientName, false, null, null, isR, 
                     rClientName, false, null, null, false, true, ip, output, null, null, 
                     async, clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
