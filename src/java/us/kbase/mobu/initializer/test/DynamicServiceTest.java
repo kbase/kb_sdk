@@ -336,6 +336,60 @@ public class DynamicServiceTest {
         testDynamicClients(moduleDir, port, contName);
     }
 
+    @Test
+    public void testJavaDynamicService() throws Exception {
+        System.out.println("Test [testJavaDynamicService]");
+        String lang = "java";
+        String moduleName = SIMPLE_MODULE_NAME + "Java";
+        File moduleDir = new File(moduleName);
+        String implInit = "" +
+                "//BEGIN_HEADER\n" +
+                "//END_HEADER\n" +
+                "\n" +
+                "    //BEGIN_CLASS_HEADER\n" +
+                "    //END_CLASS_HEADER\n" +
+                "\n" +
+                "        //BEGIN_CONSTRUCTOR\n" +
+                "        //END_CONSTRUCTOR\n" +
+                "\n" +
+                "        //BEGIN run_test\n" +
+                "        returnVal = input;\n" +
+                "        //END run_test\n";
+        File implFile = new File(moduleDir, "lib/src/" + moduleName.toLowerCase() + "/" + 
+                moduleName + "Server.java");
+        init(lang, moduleName, implFile, implInit);
+        int port = TypeGeneratorTest.findFreePort();
+        String contName = runServerInDocker(moduleDir, user, pwd, port);
+        testDynamicClients(moduleDir, port, contName);
+    }
+
+    @Test
+    public void testPythonDynamicService() throws Exception {
+        System.out.println("Test [testPythonDynamicService]");
+        String lang = "python";
+        String moduleName = SIMPLE_MODULE_NAME + "Python";
+        File moduleDir = new File(moduleName);
+        String implInit = "" +
+                "#BEGIN_HEADER\n" +
+                "#END_HEADER\n" +
+                "\n" +
+                "    #BEGIN_CLASS_HEADER\n" +
+                "    #END_CLASS_HEADER\n" +
+                "\n" +
+                "        #BEGIN_CONSTRUCTOR\n" +
+                "        #END_CONSTRUCTOR\n" +
+                "\n" +
+                "        #BEGIN run_test\n" +
+                "        returnVal = input\n" +
+                "        #END run_test\n";
+        File implFile = new File(moduleDir, "lib/" + moduleName + "/" + 
+                moduleName + "Impl.py");
+        init(lang, moduleName, implFile, implInit);
+        int port = TypeGeneratorTest.findFreePort();
+        String contName = runServerInDocker(moduleDir, user, pwd, port);
+        testDynamicClients(moduleDir, port, contName);
+    }
+
     public static class ServiceWizardMock extends JsonServerServlet {
         private static final long serialVersionUID = 1L;
         
