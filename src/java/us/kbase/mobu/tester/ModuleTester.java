@@ -134,11 +134,12 @@ public class ModuleTester {
         if (user == null || user.trim().isEmpty()) {
             throw new IllegalStateException("Error: KBase account credentials are not set in test_local/test.cfg");
         }
-        if (password == null || password.isEmpty()) {
+        if (password == null || password.trim().isEmpty()) {
             System.out.println("You haven't preset your password in test_local/test.cfg file. Please enter it now.");
             password = new String(System.console().readPassword("Password: "));
         }
-        String token = AuthService.login(user, password).getTokenString();
+        String token = AuthService.login(user.trim(), password.trim())
+                .getTokenString();
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
