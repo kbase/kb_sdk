@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,8 +88,7 @@ public class ClientInstaller {
         String gitCommitHash = null;
         if (moduleName.contains("/") || moduleName.contains("\\")) {
             // This is the case for local spec-file processing (defined by file path or URL)
-            try {
-                Paths.get(moduleName);  // throws an exception if it's not file path
+            if (isLocalFile(moduleName)) {
                 final File specFile = new File(moduleName);
                 final File dir = specFile.getParentFile();
                 fp = new FileProvider() {
@@ -102,7 +101,7 @@ public class ClientInstaller {
                         return FileUtils.readFileToString(new File(dir, specFileName));
                     }
                 };
-            } catch (InvalidPathException |  NullPointerException ex) {
+            } else if (isUrl(moduleName)) {
                 final URL specUrl = new URL(moduleName);
                 final URL parUrl = specUrl.toURI().resolve(".").toURL();
                 fp = new FileProvider() {
@@ -125,6 +124,9 @@ public class ClientInstaller {
                         }
                     }
                 };
+            } else {
+                throw new IllegalStateException("Path " + moduleName + " is not recognized as " +
+                		"existing local file or URL");
             }
             moduleName = null;
         } else {
@@ -261,6 +263,25 @@ public class ClientInstaller {
                     async, clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         }
         return 0;
+    }
+    
+    private static boolean isUrl(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
+    }
+    
+    private static boolean isLocalFile(String path) {
+        try {
+            File f = new File(path);
+            return f.exists() && f.isFile();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
     
     private static interface FileProvider {

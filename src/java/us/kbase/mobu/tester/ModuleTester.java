@@ -189,7 +189,7 @@ public class ModuleTester {
         int callbackPort = findFreePort();
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
         Server jettyServer = null;
-        if (callbackUrl == null) {
+        if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
                 JsonServerSyslog.setStaticUseSyslog(false);
                 JsonServerSyslog.setStaticMlogFile("callback.log");
