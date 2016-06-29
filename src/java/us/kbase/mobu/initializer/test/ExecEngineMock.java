@@ -3,6 +3,7 @@ package us.kbase.mobu.initializer.test;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JacksonTupleModule;
@@ -191,9 +192,7 @@ public class ExecEngineMock extends JsonServerServlet {
         for (String jobId : new ArrayList<String>(jobToModule.keySet())) {
             String moduleName = jobToModule.get(jobId);
             Thread t = jobToWorker.get(jobId);
-            System.out.print("Waiting for job [" + jobId + "] (module " + moduleName + ")... ");
             t.join();
-            System.out.println("Done");
             jobToModule.remove(jobId);
             jobToResults.remove(jobId);
             jobToWorkDir.remove(jobId);
@@ -263,14 +262,18 @@ public class ExecEngineMock extends JsonServerServlet {
             @Override
             public void run() {
                 try {
-                    ProcessHelper.cmd("bash", runDockerPath, "run", "-i", "-t", "-v", 
+                    ProcessHelper.cmd("bash", runDockerPath, "run", "-v", 
                             jobDir.getCanonicalPath() + ":/kb/module/work", "--name", containerName, 
-                            "-e", "KBASE_ENDPOINT=" + kbaseEndpoint, dockerImage, "async").exec(jobDir);
-                    if (!outputFile.exists())
+                            "-e", "KBASE_ENDPOINT=" + kbaseEndpoint, dockerImage, "async").exec(jobDir, 
+                                    null, (PrintWriter)null, null);
+                    if (!outputFile.exists()) {
+                        ProcessHelper.cmd("bash", runDockerPath, "logs", containerName).exec(jobDir);
                         throw new IllegalStateException("Output file wasn't created");
+                    }
                     FinishJobParams result = UObject.getMapper().readValue(outputFile, FinishJobParams.class);
                     finishJob(jobId, result, new AuthToken(token));
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     FinishJobParams result = new FinishJobParams().withError(new JsonRpcError().withCode(-1L)
                             .withName("JSONRPCError").withMessage("Job service side error: " + ex.getMessage()));
                     try {
@@ -279,8 +282,7 @@ public class ExecEngineMock extends JsonServerServlet {
                 } finally {
                     try {
                         ProcessHelper.cmd("bash", runDockerPath, "rm", "-v", "-f", 
-                                containerName).exec(jobDir);
-                        System.out.println("Docker container [" + containerName + "] was removed");
+                                containerName).exec(jobDir, null, (PrintWriter)null, null);
                     } catch (Exception ex) {
                         System.out.println("Error deleting container [" + containerName + "]: " + ex.getMessage());
                     }

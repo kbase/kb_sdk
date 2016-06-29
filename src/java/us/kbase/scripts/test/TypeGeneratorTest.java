@@ -112,6 +112,10 @@ public class TypeGeneratorTest extends Assert {
 			String value = props.getProperty(prop);
 			System.setProperty(prop, value);
 		}
+        suppressJettyLogging();
+	}
+
+    public static void suppressJettyLogging() {
         Log.setLog(new Logger() {
             @Override
             public void warn(String arg0, Object arg1, Object arg2) {}
@@ -144,7 +148,7 @@ public class TypeGeneratorTest extends Assert {
             @Override
             public void debug(String arg0) {}
         });
-	}
+    }
 	
 	@Before
 	public void beforeCleanup() {

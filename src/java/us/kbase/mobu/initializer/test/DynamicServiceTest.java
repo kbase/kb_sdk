@@ -67,7 +67,7 @@ public class DynamicServiceTest extends DockerClientServerTester {
     }
 
     private static void testDynamicClients(File moduleDir, int port, 
-            String contName) throws Exception {
+            String contName, String serverType) throws Exception {
         try {
             FileUtils.writeStringToFile(new File(moduleDir, "sdk.cfg"), 
                     "catalog_url=http://kbase.us");
@@ -78,8 +78,8 @@ public class DynamicServiceTest extends DockerClientServerTester {
             }
             serviceWizard.fwdUrl = "http://" + dockerAddress + ":" + port;
             String clientEndpointUrl = "http://localhost:" + serviceWizardPort;
-            testClients(moduleDir, clientEndpointUrl, false, true);
-            testStatus(moduleDir, clientEndpointUrl, false, true);
+            testClients(moduleDir, clientEndpointUrl, false, true, serverType);
+            testStatus(moduleDir, clientEndpointUrl, false, true, serverType);
         } finally {
             String runDockerPath = ModuleTester.getFilePath(new File(
                     new File(moduleDir, "test_local"), "run_docker.sh"));
@@ -98,7 +98,7 @@ public class DynamicServiceTest extends DockerClientServerTester {
         File moduleDir = initPerl(SIMPLE_MODULE_NAME + "Perl");
         int port = TypeGeneratorTest.findFreePort();
         String contName = runServerInDocker(moduleDir, port);
-        testDynamicClients(moduleDir, port, contName);
+        testDynamicClients(moduleDir, port, contName, "Perl");
     }
 
     @Test
@@ -107,7 +107,7 @@ public class DynamicServiceTest extends DockerClientServerTester {
         File moduleDir = initJava(SIMPLE_MODULE_NAME + "Java");
         int port = TypeGeneratorTest.findFreePort();
         String contName = runServerInDocker(moduleDir, port);
-        testDynamicClients(moduleDir, port, contName);
+        testDynamicClients(moduleDir, port, contName, "Java");
     }
 
     @Test
@@ -116,7 +116,7 @@ public class DynamicServiceTest extends DockerClientServerTester {
         File moduleDir = initPython(SIMPLE_MODULE_NAME + "Python");
         int port = TypeGeneratorTest.findFreePort();
         String contName = runServerInDocker(moduleDir, port);
-        testDynamicClients(moduleDir, port, contName);
+        testDynamicClients(moduleDir, port, contName, "Python");
     }
 
     public static class ServiceWizardMock extends JsonServerServlet {

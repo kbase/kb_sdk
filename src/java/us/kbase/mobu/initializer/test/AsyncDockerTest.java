@@ -38,13 +38,13 @@ public class AsyncDockerTest extends DockerClientServerTester {
             execEngineJettyServer.stop();
     }
     
-    private static void testAsyncClients(File moduleDir) throws Exception {
+    private static void testAsyncClients(File moduleDir, String serverType) throws Exception {
         try {
             String dockerImage = prepareDockerImage(moduleDir, user, pwd);
             execEngine.withModule(moduleDir.getName(), dockerImage, moduleDir);
             String clientEndpointUrl = "http://localhost:" + execEnginePort;
-            testClients(moduleDir, clientEndpointUrl, true, false);
-            testStatus(moduleDir, clientEndpointUrl, true, false);
+            testClients(moduleDir, clientEndpointUrl, true, false, serverType);
+            testStatus(moduleDir, clientEndpointUrl, true, false, serverType);
         } finally {
             execEngine.waitAndCleanAllJobs();
         }
@@ -54,20 +54,20 @@ public class AsyncDockerTest extends DockerClientServerTester {
     public void testPerlAsyncService() throws Exception {
         System.out.println("Test [testPerlAsyncService]");
         File moduleDir = initPerl(SIMPLE_MODULE_NAME + "Perl");
-        testAsyncClients(moduleDir);
+        testAsyncClients(moduleDir, "Perl");
     }
 
     @Test
     public void testJavaAsyncService() throws Exception {
         System.out.println("Test [testJavaAsyncService]");
         File moduleDir = initJava(SIMPLE_MODULE_NAME + "Java");
-        testAsyncClients(moduleDir);
+        testAsyncClients(moduleDir, "Java");
     }
 
     @Test
     public void testPythonAsyncService() throws Exception {
         System.out.println("Test [testPythonAsyncService]");
         File moduleDir = initPython(SIMPLE_MODULE_NAME + "Python");
-        testAsyncClients(moduleDir);
+        testAsyncClients(moduleDir, "Python");
     }
 }

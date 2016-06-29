@@ -32,7 +32,7 @@ import us.kbase.scripts.test.TypeGeneratorTest;
 
 public class DockerClientServerTester {
 
-    protected static final boolean cleanupAfterTests = true;
+    protected static final boolean cleanupAfterTests = false;
 
     protected static List<String> createdModuleNames = new ArrayList<String>();
     protected static String user;
@@ -46,6 +46,7 @@ public class DockerClientServerTester {
         is.close();
         user = props.getProperty("test.user");
         pwd = props.getProperty("test.pwd");
+        TypeGeneratorTest.suppressJettyLogging();
     }
     
     @AfterClass
@@ -181,11 +182,12 @@ public class DockerClientServerTester {
     }
     
     protected static void testClients(File moduleDir, String clientEndpointUrl,
-            boolean async, boolean dynamic) throws Exception { 
+            boolean async, boolean dynamic, String serverType) throws Exception { 
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
         String token = AuthService.login(user, pwd).getTokenString();
         // Java client
+        System.out.println("Java client -> " + serverType + " server");
         ClientInstaller clInst = new ClientInstaller(moduleDir);
         clInst.install("java", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
@@ -216,7 +218,8 @@ public class DockerClientServerTester {
         String input = "Super-string";
         Object obj = null;
         Exception error = null;
-        for (int i = 0; i < 10; i++) {
+        int javaAttempts = dynamic ? 10 : 1;
+        for (int i = 0; i < javaAttempts; i++) {
             try {
                 obj = method.invoke(client, input, null);
                 error = null;
@@ -245,6 +248,7 @@ public class DockerClientServerTester {
         UObject.getMapper().writeValue(configFile, config);
         File lib2 = new File(moduleDir, "lib2");
         // Python client
+        System.out.println("Python client -> " + serverType + " server");
         clInst.install("python", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
         File shellFile = new File(moduleDir, "test_python_client.sh");
@@ -268,6 +272,7 @@ public class DockerClientServerTester {
             Assert.assertEquals("Python client exit code should be 0", 0, exitCode);
         }
         // Perl client
+        System.out.println("Perl client -> " + serverType + " server");
         Map<String, Object> config2 = new LinkedHashMap<String, Object>(config);
         config2.put("package", moduleName + "::" + moduleName + "Client");
         File configFilePerl = new File(moduleDir, "tests_perl.json");
@@ -301,6 +306,7 @@ public class DockerClientServerTester {
             System.err.println("- JavaScript client tests are skipped");
             return;
         }
+        System.out.println("JavaScript client -> " + serverType + " server");
         clInst.install("javascript", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
         shellFile = new File(moduleDir, "test_js_client.sh");
@@ -329,10 +335,12 @@ public class DockerClientServerTester {
     }
 
     protected static void testStatus(File moduleDir, String clientEndpointUrl,
-            boolean async, boolean dynamic) throws Exception {
+            boolean async, boolean dynamic, String serverType) throws Exception {
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
+        String token = AuthService.login(user, pwd).getTokenString();
         // Java client
+        System.out.println("Java client (status) -> " + serverType + " server");
         ClientInstaller clInst = new ClientInstaller(moduleDir);
         clInst.install("java", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
@@ -352,16 +360,26 @@ public class DockerClientServerTester {
         URLClassLoader urlcl = URLClassLoader.newInstance(cpUrls.toArray(
                 new URL[cpUrls.size()]));
         String clientClassName = moduleName.toLowerCase() + "." + moduleName + "Client";
-        Class<?> clientClass = urlcl.loadClass(clientClassName);
-        Object client = clientClass.getConstructor(URL.class)
-                .newInstance(new URL(clientEndpointUrl));
+        Object client;
+        if (async) {
+            Class<?> clientClass = urlcl.loadClass(clientClassName);
+            client = clientClass.getConstructor(URL.class, AuthToken.class)
+                    .newInstance(new URL(clientEndpointUrl), new AuthToken(token));
+            clientClass.getMethod("setIsInsecureHttpConnectionAllowed", Boolean.TYPE).invoke(client, true);
+
+        } else {
+            Class<?> clientClass = urlcl.loadClass(clientClassName);
+            client = clientClass.getConstructor(URL.class)
+                    .newInstance(new URL(clientEndpointUrl));
+        }
         Method method = null;
         for (Method m : client.getClass().getMethods())
             if (m.getName().equals("status"))
                 method = m;
         Object obj = null;
         Exception error = null;
-        for (int i = 0; i < 10; i++) {
+        int javaAttempts = dynamic ? 10 : 1;
+        for (int i = 0; i < javaAttempts; i++) {
             try {
                 obj = method.invoke(client, (Object)null);
                 error = null;
@@ -384,16 +402,17 @@ public class DockerClientServerTester {
         File errorFile = new File(moduleDir, "status_error.json");
         File lib2 = new File(moduleDir, "lib2");
         // Python
+        System.out.println("Python client (status) -> " + serverType + " server");
         clInst.install("python", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
-        File shellFile = new File(moduleDir, "test_python_client.sh");
-        List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-        lines.add("python " + new File("test_scripts/python/run_client.py").getAbsolutePath() + 
-                " -e " + clientEndpointUrl + " -g " + pcg + " -c " + cls + " -m " + mtd + 
-                " -i " + inputFile.getAbsolutePath() + " -o " + outputFile.getAbsolutePath() + 
-                " -r " + errorFile.getAbsolutePath());
-        TextUtils.writeFileLines(lines, shellFile);
         {
+            File shellFile = new File(moduleDir, "test_python_client.sh");
+            List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+            lines.add("python " + new File("test_scripts/python/run_client.py").getAbsolutePath() + 
+                    " -e " + clientEndpointUrl + " -g " + pcg + " -c " + cls + " -m " + mtd + 
+                    " -i " + inputFile.getAbsolutePath() + " -o " + outputFile.getAbsolutePath() + 
+                    " -r " + errorFile.getAbsolutePath() + (async ? (" -u " + user + " -p " + pwd) : ""));
+            TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     new File(lib2, moduleName).getCanonicalFile(), null, true, true);
             int exitCode = ph.getExitCode();
@@ -406,25 +425,66 @@ public class DockerClientServerTester {
                     System.err.println("Python client runner errors:\n" + err);
                 Assert.assertEquals("Python client runner exit code should be 0", 0, exitCode);
             } else {
-                if (outputFile.exists()) {
-                    checkStatusResponse(outputFile);
-                } else {
-                    String msg = errorFile.exists() ? FileUtils.readFileToString(errorFile) :
-                        "Unknown error (error file wasn't created)";
-                    throw new IllegalStateException(msg);
-                }
+                checkStatusResponse(outputFile, errorFile);
             }
         }
-        
+        // Perl client
+        if (outputFile.exists())
+            outputFile.delete();
+        if (errorFile.exists())
+            errorFile.delete();
+        System.out.println("Perl client (status) -> " + serverType + " server");
+        clInst.install("perl", async, false, dynamic, "dev", false, 
+                specFile.getCanonicalPath(), "lib2");
+        {
+            File shellFile = new File(moduleDir, "test_perl_client.sh");
+            List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+            lines.addAll(Arrays.asList(
+                    "perl " + new File("test_scripts/perl/run-client.pl").getAbsolutePath() + 
+                    " -package " + moduleName + "::" + moduleName + "Client" + 
+                    " -method " + mtd + " -input " + inputFile.getAbsolutePath() + 
+                    " -output " + outputFile.getAbsolutePath() + 
+                    " -error " + errorFile.getAbsolutePath() +
+                    " -endpoint " + clientEndpointUrl +
+                    (async ? (" -user " + user + " -password " + pwd) : "")
+                    ));
+            TextUtils.writeFileLines(lines, shellFile);
+            ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
+                    lib2.getCanonicalFile(), null, true, true);
+            int exitCode = ph.getExitCode();
+            if (exitCode != 0) {
+                String out = ph.getSavedOutput();  //outSw.toString();
+                if (!out.isEmpty())
+                    System.out.println("Perl client runner output:\n" + out);
+                String err = ph.getSavedErrors();  //errSw.toString();
+                if (!err.isEmpty())
+                    System.err.println("Perl client runner errors:\n" + err);
+                Assert.assertEquals("Perl client runner exit code should be 0", 0, exitCode);
+            } else {
+                checkStatusResponse(outputFile, errorFile);
+            }
+        }
+
     }
 
-    protected static void checkStatusResponse(File f) throws Exception {
-        checkStatusResponse(UObject.getMapper().readValue(f, Object.class));
+    protected static void checkStatusResponse(File output, File error) throws Exception {
+        if (!output.exists()) {
+            String msg = error.exists() ? FileUtils.readFileToString(error) :
+                "Unknown error (error file wasn't created)";
+            throw new IllegalStateException(msg);
+        }
+        checkStatusResponse(UObject.getMapper().readValue(output, Object.class));
     }
 
     protected static void checkStatusResponse(Object obj) throws Exception {
         Assert.assertNotNull(obj);
         String errMsg = "Unexpected response: " + UObject.transformObjectToString(obj);
+        if (obj instanceof List) {
+            @SuppressWarnings("rawtypes")
+            List<?> list = (List)obj;
+            Assert.assertEquals(errMsg, 1, list.size());
+            obj = list.get(0);
+        }
         Assert.assertTrue(obj instanceof Map);
         @SuppressWarnings("unchecked")
         Map<String, String> map = (Map<String, String>)obj;

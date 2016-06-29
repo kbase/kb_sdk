@@ -866,7 +866,7 @@ public class JavaTypeGenerator {
                     String typeReferenceClass = model.ref("com.fasterxml.jackson.core.type.TypeReference");
                     String trFull1 = typeReferenceClass + "<" + listClass + "<String>>";
                     String jobStateType = model.ref(utilPackage + ".JobState");
-                    String innerRetType = mapType;
+                    String innerRetType = listClass + "<" + mapType + ">";
 			        String trFull2 = typeReferenceClass + "<" + listClass + "<" + jobStateType + "<" + innerRetType + ">>>";
 			        classLines.addAll(Arrays.asList(
 			                "    public " + mapType + " status(" + funcParams + ") " + exceptions+ " {",
@@ -876,11 +876,11 @@ public class JavaTypeGenerator {
                             "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", this.serviceVersion);",
                             "        }",
                             "        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();",
-                            "        " + trFull1 + " retType = new " + trFull1 + "() {};",
-                            "        " + listClass + "<String> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "._" + 
-                                    "status_submit" + "\", args, retType, true, true, " + contextField + ");",
-                            "        String jobId = res.get(0);",
-			                "        " + trFull2 + " retType = new " + trFull2 + "() {};",
+                            "        " + trFull1 + " retType1 = new " + trFull1 + "() {};",
+                            "        " + listClass + "<String> res1 = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "._" + 
+                                    "status_submit" + "\", args, retType1, true, true, " + contextField + ");",
+                            "        String jobId = res1.get(0);",
+			                "        " + trFull2 + " retType2 = new " + trFull2 + "() {};",
 			                "        while (true) {",
 			                "            if (Thread.currentThread().isInterrupted())",
 			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
@@ -889,9 +889,9 @@ public class JavaTypeGenerator {
 			                "            } catch(Exception ex) {",
 			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
 			                "            }",
-			                "            " + jobStateType + "<" + innerRetType + "> res = _checkJob(jobId, retType);",
-			                "            if (res.getFinished() != 0L)",
-			                "                return res.getResult().get(0);",
+			                "            " + jobStateType + "<" + innerRetType + "> res2 = _checkJob(jobId, retType2);",
+			                "            if (res2.getFinished() != 0L)",
+			                "                return res2.getResult().get(0);",
 			                "        }",
 			                "    }"
 			                ));
