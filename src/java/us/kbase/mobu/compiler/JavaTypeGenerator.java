@@ -733,7 +733,11 @@ public class JavaTypeGenerator {
                         "    }"
                         ));
 			}
+			boolean isStatusInKidl = false;
+            String listClass = model.ref("java.util.List");
 			for (JavaFunc func : module.getFuncs()) {
+                if (func.getOriginal().getName().equals("status"))
+                    isStatusInKidl = true;
                 JavaType retType = null;
                 if (func.getRetMultyType() == null) {
                     if (func.getReturns().size() > 0) {
@@ -753,7 +757,6 @@ public class JavaTypeGenerator {
                 appendWithComma(funcParams, contextType).append("... ").append(contextField);
                 appendWithComma(funcParamNames, contextField);
                 String retTypeName = retType == null ? "void" : getJType(retType, packageParent, model);
-                String listClass = model.ref("java.util.List");
                 String arrayListClass = model.ref("java.util.ArrayList");
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
@@ -845,6 +848,65 @@ public class JavaTypeGenerator {
 			                    "    }"
 			                    ));					
 			        }
+			    }
+			}
+			if (!isStatusInKidl) {
+                classLines.add("");
+			    String mapType = model.ref("java.util.Map") + "<String, Object>";
+                String contextType = model.ref(utilPackage + ".RpcContext");
+                String contextField = "jsonRpcContext";
+                StringBuilder funcParams = new StringBuilder();
+                StringBuilder funcParamNames = new StringBuilder();
+                appendWithComma(funcParams, contextType).append("... ").append(contextField);
+                appendWithComma(funcParamNames, contextField);
+                String arrayListClass = model.ref("java.util.ArrayList");
+                String exceptions = "throws " + model.ref("java.io.IOException") 
+                        + ", " + model.ref(utilPackage + ".JsonClientException");
+			    if (asyncVersion != null) {
+                    String typeReferenceClass = model.ref("com.fasterxml.jackson.core.type.TypeReference");
+                    String trFull1 = typeReferenceClass + "<" + listClass + "<String>>";
+                    String jobStateType = model.ref(utilPackage + ".JobState");
+                    String innerRetType = listClass + "<" + mapType + ">";
+			        String trFull2 = typeReferenceClass + "<" + listClass + "<" + jobStateType + "<" + innerRetType + ">>>";
+			        classLines.addAll(Arrays.asList(
+			                "    public " + mapType + " status(" + funcParams + ") " + exceptions+ " {",
+                            "        if (this.serviceVersion != null) {",
+                            "            if (" + contextField + " == null || " + contextField + ".length == 0 || " + contextField + "[0] == null)",
+                            "                " + contextField + " = new " + contextType + "[] {new " + contextType + "()};",
+                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", this.serviceVersion);",
+                            "        }",
+                            "        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();",
+                            "        " + trFull1 + " retType1 = new " + trFull1 + "() {};",
+                            "        " + listClass + "<String> res1 = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "._" + 
+                                    "status_submit" + "\", args, retType1, true, true, " + contextField + ");",
+                            "        String jobId = res1.get(0);",
+			                "        " + trFull2 + " retType2 = new " + trFull2 + "() {};",
+			                "        while (true) {",
+			                "            if (Thread.currentThread().isInterrupted())",
+			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
+			                "            try { ",
+			                "                Thread.sleep(this.asyncJobCheckTimeMs);",
+			                "            } catch(Exception ex) {",
+			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
+			                "            }",
+			                "            " + jobStateType + "<" + innerRetType + "> res2 = _checkJob(jobId, retType2);",
+			                "            if (res2.getFinished() != 0L)",
+			                "                return res2.getResult().get(0);",
+			                "        }",
+			                "    }"
+			                ));
+			    } else {
+                    String typeReferenceClass = model.ref("com.fasterxml.jackson.core.type.TypeReference");
+                    String trFull = typeReferenceClass + "<" + listClass + "<" + mapType + ">>";
+                    classLines.addAll(Arrays.asList(
+                            "    public " + mapType + " status(" + funcParams + ") " + exceptions+ " {",
+                            "        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();",
+                            "        " + trFull + " retType = new " + trFull + "() {};",
+                            "        " + listClass + "<" + mapType + "> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." +
+                                    "status\", args, retType, true, false, " + contextField + ", this.serviceVersion);",
+                            "        return res.get(0);",
+                            "    }"
+                            ));
 			    }
 			}
 			classLines.add("}");
