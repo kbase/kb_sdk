@@ -32,7 +32,7 @@ import us.kbase.scripts.test.TypeGeneratorTest;
 
 public class DockerClientServerTester {
 
-    protected static final boolean cleanupAfterTests = false;
+    protected static final boolean cleanupAfterTests = true;
 
     protected static List<String> createdModuleNames = new ArrayList<String>();
     protected static String user;
@@ -464,7 +464,46 @@ public class DockerClientServerTester {
                 checkStatusResponse(outputFile, errorFile);
             }
         }
-
+        // JavaScript
+        if (!TypeGeneratorTest.isCasperJsInstalled()) {
+            System.err.println("- JavaScript client tests are skipped");
+            return;
+        }
+        if (outputFile.exists())
+            outputFile.delete();
+        if (errorFile.exists())
+            errorFile.delete();
+        System.out.println("JavaScript client (status) -> " + serverType + " server");
+        clInst.install("javascript", async, false, dynamic, "dev", false, 
+                specFile.getCanonicalPath(), "lib2");
+        {
+            File shellFile = new File(moduleDir, "test_js_client.sh");
+            List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+            lines.addAll(Arrays.asList(
+                    "phantomjs " + new File("test_scripts/js/run-client.js").getAbsolutePath() +
+                            " --jq=" + new File("test_scripts/js/jquery-1.10.2.min.js").getAbsolutePath() +
+                            " --input=" + inputFile.getAbsolutePath() + 
+                            " --output=" + outputFile.getAbsolutePath() + 
+                            " --error=" + errorFile.getAbsolutePath() + 
+                            " --package=" + pcg + " --class=" + cls + " --method=" + mtd +
+                            " --endpoint=" + clientEndpointUrl +  (async ? (" --token=\"" + token + "\"") : "")
+                    ));
+            TextUtils.writeFileLines(lines, shellFile);
+            ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
+                    new File(lib2, moduleName), null, true, true);
+            int exitCode = ph.getExitCode();
+            if (exitCode != 0) {
+                String out = ph.getSavedOutput();
+                if (!out.isEmpty())
+                    System.out.println("JavaScript client runner output:\n" + out);
+                String err = ph.getSavedErrors();
+                if (!err.isEmpty())
+                    System.err.println("JavaScript client runner errors:\n" + err);
+                Assert.assertEquals("JavaScript client runner exit code should be 0", 0, exitCode);
+            } else {
+                checkStatusResponse(outputFile, errorFile);
+            }
+        }
     }
 
     protected static void checkStatusResponse(File output, File error) throws Exception {
