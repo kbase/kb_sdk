@@ -839,6 +839,20 @@ public class KidlTest {
                         "    int returns;\n" +
                         "  } test1;\n};",
                         "RETURNS"
+                },
+                { "" +
+                        "module Test {\n" +
+                        "    typedef int type1;\n" +
+                        "    typedef int type1;\n" +
+                        "};",
+                        "Type type1 was already declared"
+                },
+                { "" +
+                        "module Test {\n" +
+                        "    funcdef func1 () returns ();\n" +
+                        "    funcdef func1 () returns ();\n" +
+                        "};",
+                        "Function func1 was already declared"
                 }
         };
         for (int testNum = 0; testNum < specAndResult2.length; testNum++) {
