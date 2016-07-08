@@ -298,7 +298,11 @@ KbModule Module(Map<String, KbModule> includes):
     {
       if (!(comp instanceof KbAuthdef))
           lastComment.set(null);
-      ret.addModuleComponent(comp);
+      try {
+          ret.addModuleComponent(comp);
+      } catch (KidlParseException ex) {
+          generateParseException(ex);
+      }
     }  )*
   "}"
   ";"  { return ret; }

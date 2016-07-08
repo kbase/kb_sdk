@@ -21,6 +21,7 @@ public class KbModule implements KidlNode {
 	private List<KbModuleComp> moduleComponents;
 	private List<KbTypeInfo> typeInfoList;
 	private Map<String, KbType> nameToType;
+    private Map<String, KbFuncdef> nameToFuncdef;
 	private String lastAuthTempMode = "none";
 	private List<?> data = null;
 	
@@ -39,18 +40,26 @@ public class KbModule implements KidlNode {
 		nameToType.put("float", new KbScalar("float"));
 		nameToType.put("string", new KbScalar("string"));
 		nameToType.put("UnspecifiedObject", new KbUnspecifiedObject());
+        this.nameToFuncdef = new LinkedHashMap<String, KbFuncdef>();
 	}
 	
-	public void addModuleComponent(KbModuleComp comp) {
+	public void addModuleComponent(KbModuleComp comp) throws KidlParseException {
 		moduleComponents.add(comp);
 		if (comp instanceof KbAuthdef) {
 			lastAuthTempMode = ((KbAuthdef)comp).getType();
 		} else if (comp instanceof KbTypedef) {
 			KbTypedef typeDef = (KbTypedef)comp;
+			if (nameToType.containsKey(typeDef.getName()))
+			    throw new KidlParseException("Type " + typeDef.getName() + 
+			            " was already declared");
 			nameToType.put(typeDef.getName(), typeDef);
-		} else if (lastAuthTempMode != null) {
-			KbFuncdef func = (KbFuncdef)comp;
-			if (func.getAuthentication() == null)
+		} else {
+            KbFuncdef func = (KbFuncdef)comp;
+            if (nameToFuncdef.containsKey(func.getName()))
+                throw new KidlParseException("Function " + func.getName() + 
+                        " was already declared");
+            nameToFuncdef.put(func.getName(), func);
+		    if (lastAuthTempMode != null && func.getAuthentication() == null)
 				func.setAuthentication(lastAuthTempMode);
 		}
 	}
@@ -86,6 +95,7 @@ public class KbModule implements KidlNode {
 		moduleComponents = new ArrayList<KbModuleComp>();
 		List<?> compList = Utils.propList(props, "module_components");
 		String defaultAuth = null;
+        nameToFuncdef = new LinkedHashMap<String, KbFuncdef>();
 		for (Object item : compList) {
 			if (!Map.class.isInstance(item)) {
 				if (item instanceof String) {
@@ -102,7 +112,9 @@ public class KbModule implements KidlNode {
 				if (compType.equals("Typedef")) {
 					moduleComponents.add(new KbTypedef().loadFromMap(compProps));
 				} else if (compType.equals("Funcdef")) {
-					moduleComponents.add(new KbFuncdef().loadFromMap(compProps, defaultAuth));
+				    KbFuncdef func = new KbFuncdef().loadFromMap(compProps, defaultAuth);
+					moduleComponents.add(func);
+					nameToFuncdef.put(func.getName(), func);
 				} else {
 					throw new KidlParseException("Unknown module component type: " + compType);
 				}

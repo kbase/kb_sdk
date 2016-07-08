@@ -255,7 +255,11 @@ ret = new KbModule(srvToken == null ? null : srvToken.toString(), nameToken.toSt
       jj_consume_token(T_semicolon);
 if (!(comp instanceof KbAuthdef))
           lastComment.set(null);
-      ret.addModuleComponent(comp);
+      try {
+          ret.addModuleComponent(comp);
+      } catch (KidlParseException ex) {
+          generateParseException(ex);
+      }
     }
     jj_consume_token(T_figure_close_bracket);
     jj_consume_token(T_semicolon);
@@ -635,6 +639,13 @@ name = nameToken.toString();
     finally { jj_save(1, xla); }
   }
 
+  private boolean jj_3_2()
+ {
+    if (jj_3R_7()) return true;
+    if (jj_scan_token(T_dot)) return true;
+    return false;
+  }
+
   private boolean jj_3_1()
  {
     if (jj_3R_7()) return true;
@@ -659,13 +670,6 @@ name = nameToken.toString();
     }
     }
     }
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_7()) return true;
-    if (jj_scan_token(T_dot)) return true;
     return false;
   }
 
@@ -793,6 +797,7 @@ name = nameToken.toString();
     throw generateParseException();
   }
 
+  @SuppressWarnings("serial")
   static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(int kind) {
