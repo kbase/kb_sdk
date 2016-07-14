@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from wsgiref.simple_server import make_server
 import sys
 import json
