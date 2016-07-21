@@ -24,6 +24,7 @@ import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.renamer.ModuleRenamer;
+import us.kbase.mobu.runner.ModuleRunner;
 import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
@@ -41,8 +42,11 @@ public class ModuleBuilder {
     private static final String TEST_COMMAND     = "test";
     private static final String VERSION_COMMAND  = "version";
     private static final String RENAME_COMMAND   = "rename";
-    private static final String INSTALL_COMMAND   = "install";
+    private static final String INSTALL_COMMAND  = "install";
+    private static final String RUN_COMMAND      = "run";
+    //private static final String SUBMIT_COMMAND   = "submit";
     
+    public static final String GLOBAL_SDK_CFG_ENV_VAR = "KB_SDK_CONFIG";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
     public static final String VERSION = "1.0.5";
@@ -87,6 +91,10 @@ public class ModuleBuilder {
         // add the 'install' command
         InstallCommandArgs installArgs = new InstallCommandArgs();
         jc.addCommand(INSTALL_COMMAND, installArgs);
+        
+        // add the 'run' command
+        RunCommandArgs runArgs = new RunCommandArgs();
+        jc.addCommand(RUN_COMMAND, runArgs);
 
     	// parse the arguments and gracefully catch any errors
     	try {
@@ -127,6 +135,8 @@ public class ModuleBuilder {
 	        returnCode = runRenameCommand(renameArgs, jc);
 	    } else if (jc.getParsedCommand().equals(INSTALL_COMMAND)) {
 	        returnCode = runInstallCommand(installArgs, jc);
+	    } else if (jc.getParsedCommand().equals(RUN_COMMAND)) {
+	        returnCode = runRunCommand(runArgs, jc);
 	    }
 	    
 	    if(returnCode!=0) {
@@ -388,6 +398,27 @@ public class ModuleBuilder {
                     installArgs.verbose, installArgs.moduleName.get(0), null);
         } catch (Exception e) {
             if (installArgs.verbose)
+                e.printStackTrace();
+            showError("Error while installing client", e.getMessage());
+            return 1;
+        }
+    }
+
+    private static int runRunCommand(RunCommandArgs runArgs, JCommander jc) {
+        if (runArgs.methodName == null || runArgs.methodName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", 
+                    "One and only one method name should be provided");
+            return 1;
+        }
+        try {
+            if (runArgs.inputFile == null && runArgs.inputJson == null && !runArgs.stdin)
+                throw new IllegalStateException("No one input method is used " +
+                		"(should be one of '-i', '-j' or '-s')");
+            return new ModuleRunner().run(runArgs.methodName.get(0), runArgs.inputFile, 
+                    runArgs.stdin, runArgs.inputJson, runArgs.output, runArgs.tagVer, 
+                    runArgs.verbose, runArgs.keepTempFiles);
+        } catch (Exception e) {
+            if (runArgs.verbose)
                 e.printStackTrace();
             showError("Error while installing client", e.getMessage());
             return 1;
@@ -658,6 +689,41 @@ public class ModuleBuilder {
 
         @Parameter(required=true, description="<module name or path/URL to spec-file>")
         List<String> moduleName;
+    }
+
+    @Parameters(commandDescription = "Run a method of registered KBase module locally.")
+    private static class RunCommandArgs {
+        @Parameter(names={"-i", "--input"}, description="Input JSON file " +
+        		"(optional, if not set -s or -j should be used)")
+        File inputFile = null;
+
+        @Parameter(names={"-s","--stdin"}, description="Flag for reading input data from STDIN " +
+        		"(default is false, used if neither -i or -j is set)")
+        boolean stdin = false;
+
+        @Parameter(names={"-j","--json"}, description="Input JSON string " +
+        		"(optional, if not set -s or -i should be used)")
+        String inputJson = null;
+
+        @Parameter(names={"-o", "--output"}, description="Output JSON file " +
+        		"(optional, if not set output will be printed to STDOUT)")
+        File output = null;
+
+        @Parameter(names={"-t","--tag-or-ver"}, description="Tag or version " +
+                "(default is chosen based on information registered in catalog)")
+        String tagVer = null;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error " +
+        		"stack traces")
+        boolean verbose = false;
+
+        @Parameter(names={"-k","--keep-tmp"}, description="Keep temporary files/folders at the " +
+        		"end (default value is false)")
+        boolean keepTempFiles = false;
+
+        @Parameter(required=true, description="<fully qualified method name " +
+        		"(with SDK module prefix followed by '.')>")
+        List<String> methodName;
     }
 
     private static void showBriefHelp(JCommander jc, PrintStream out) {

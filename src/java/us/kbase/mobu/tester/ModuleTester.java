@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +36,7 @@ import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServe
 import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
+import us.kbase.common.utils.NetUtils;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
@@ -186,7 +186,7 @@ public class ModuleTester {
             TextUtils.deleteRecursively(scratchDir);
         scratchDir.mkdir();
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        int callbackPort = findFreePort();
+        int callbackPort = NetUtils.findFreePort();
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
         Server jettyServer = null;
         if (callbackUrl != null) {
@@ -223,7 +223,7 @@ public class ModuleTester {
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            int exitCode = ProcessHelper.cmd("bash", getFilePath(runTestsSh),
+            int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runTestsSh),
                     callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
             return exitCode;
         } finally {
@@ -238,8 +238,8 @@ public class ModuleTester {
             File runDockerSh, String imageName) throws Exception {
         System.out.println();
         System.out.println("Delete old Docker containers");
-        String runDockerPath = getFilePath(runDockerSh);
-        List<String> lines = exec(tlDir, "bash", getFilePath(runDockerSh), "ps", "-a");
+        String runDockerPath = DirUtils.getFilePath(runDockerSh);
+        List<String> lines = exec(tlDir, "bash", DirUtils.getFilePath(runDockerSh), "ps", "-a");
         for (String line : lines) {
             String[] parts = splitByWhiteSpaces(line);
             if (parts[1].equals(imageName)) {
@@ -263,18 +263,11 @@ public class ModuleTester {
         return true;
     }
     
-    private static int findFreePort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {}
-        throw new IllegalStateException("Can not find available port in system");
-    }
-    
     public static String findImageIdByName(File tlDir, String imageName,
             File runDockerSh) throws Exception {
         List<String> lines;
         String ret = null;
-        lines = exec(tlDir, "bash", getFilePath(runDockerSh), "images");
+        lines = exec(tlDir, "bash", DirUtils.getFilePath(runDockerSh), "images");
         for (String line : lines) {
             String[] parts = splitByWhiteSpaces(line);
             String name = parts[0] + ":" + parts[1];
@@ -310,8 +303,8 @@ public class ModuleTester {
     
     public static boolean buildImage(File repoDir, String targetImageName, 
             File runDockerSh) throws Exception {
-        String scriptPath = getFilePath(runDockerSh);
-        String repoPath = getFilePath(repoDir);
+        String scriptPath = DirUtils.getFilePath(runDockerSh);
+        String repoPath = DirUtils.getFilePath(repoDir);
         Process p = Runtime.getRuntime().exec(new String[] {"bash", 
                 scriptPath, "build", "--rm", "-t", 
                 targetImageName, repoPath});
@@ -376,13 +369,5 @@ public class ModuleTester {
             }
         }
         return exitCode == 0;
-    }
-
-    public static String getFilePath(File f) throws Exception {
-        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-        String ret = f.getCanonicalPath();
-        if (isWindows)
-            ret = WinShortPath.getWinShortPath(ret);
-        return ret;
     }
 }

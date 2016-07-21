@@ -16,7 +16,7 @@ import org.junit.Test;
 import us.kbase.common.service.JsonClientException;
 import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.JsonServerServlet;
-import us.kbase.mobu.tester.ModuleTester;
+import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.scripts.test.TypeGeneratorTest;
 
@@ -55,8 +55,8 @@ public class DynamicServiceTest extends DockerClientServerTester {
         File runDockerSh = new File(tlDir, "run_docker.sh");
         System.out.println();
         System.out.println("Starting up dynamic service...");
-        String runDockerPath = ModuleTester.getFilePath(runDockerSh);
-        String workDirPath = ModuleTester.getFilePath(workDir);
+        String runDockerPath = DirUtils.getFilePath(runDockerSh);
+        String workDirPath = DirUtils.getFilePath(workDir);
         String containerName = "test_" + moduleName.toLowerCase() + "_" + 
                 System.currentTimeMillis();
         String endPoint = "https://ci.kbase.us/services";
@@ -81,7 +81,7 @@ public class DynamicServiceTest extends DockerClientServerTester {
             testClients(moduleDir, clientEndpointUrl, false, true, serverType);
             testStatus(moduleDir, clientEndpointUrl, false, true, serverType);
         } finally {
-            String runDockerPath = ModuleTester.getFilePath(new File(
+            String runDockerPath = DirUtils.getFilePath(new File(
                     new File(moduleDir, "test_local"), "run_docker.sh"));
             ProcessHelper.cmd("bash", runDockerPath, "logs", 
                     contName).exec(moduleDir);
