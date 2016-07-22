@@ -10,6 +10,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -34,6 +36,7 @@ import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
 import us.kbase.common.utils.NetUtils;
+import us.kbase.kbasejobservice.FinishJobParams;
 import us.kbase.mobu.ModuleBuilder;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.util.DirUtils;
@@ -88,7 +91,7 @@ public class ModuleRunner {
         if (user == null || user.trim().isEmpty()) {
             System.out.println("You haven't preset your user/password in " + sdkCfgPath + ". " +
             		"Please enter it now.");
-            user = new String(System.console().readPassword("User: "));
+            user = new String(System.console().readLine("User: "));
             password = new String(System.console().readPassword("Password: "));
         } else {
             if (password == null || password.trim().isEmpty()) {
@@ -131,8 +134,8 @@ public class ModuleRunner {
             FileUtils.writeLines(runLocalSh, Arrays.asList(
                     "#!/bin/bash",
                     "sdir=\"$(cd \"$(dirname \"$(readlink -f \"$0\")\")\" && pwd)\"",
-                    "$sdir/run_docker.sh run -i -t -v $sdir/workdir:/kb/module/work " +
-                    "-e \"SDK_CALLBACK_URL=$1\" $2 async"));
+                    "$sdir/run_docker.sh run -v $sdir/workdir:/kb/module/work " +
+                    "-e \"SDK_CALLBACK_URL=$1\" --name $2 $3 async"));
             ProcessHelper.cmd("chmod", "+x", runLocalSh.getCanonicalPath()).exec(runDir);
         }
         if (!runDockerSh.exists()) {
@@ -183,7 +186,14 @@ public class ModuleRunner {
         jsonString = jsonString.trim();
         if (!jsonString.startsWith("["))
             jsonString = "[" + jsonString + "]";  // Wrapping one argument by array
-        FileUtils.writeStringToFile(new File(workDir, "input.json"), jsonString);
+        if (verbose)
+            System.out.println("Input parameters: " + jsonString);
+        Map<String, Object> rpc = new LinkedHashMap<String, Object>();
+        rpc.put("version", "1.1");
+        rpc.put("method", methodName);
+        rpc.put("params", UObject.getMapper().readValue(jsonString, Object.class));
+        rpc.put("context", new LinkedHashMap<String, Object>());
+        UObject.getMapper().writeValue(new File(workDir, "input.json"), rpc);
         ////////////////////////////////// Starting callback service //////////////////////////////
         int callbackPort = NetUtils.findFreePort();
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
@@ -220,22 +230,51 @@ public class ModuleRunner {
                     "by the job runner. Local callbacks are disabled.");
         }
         ////////////////////////////////// Running Docker /////////////////////////////////////////
+        final String containerName = "local_" + moduleName.toLowerCase() + "_" + 
+                System.currentTimeMillis();
         try {
             System.out.println();
             int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runLocalSh),
-                    callbackUrl.toExternalForm(), dockerImage).exec(runDir).getExitCode();
+                    callbackUrl.toExternalForm(), containerName, dockerImage)
+                    .exec(runDir).getExitCode();
             File outputTmpFile = new File(workDir, "output.json");
             if (!outputTmpFile.exists())
                 throw new IllegalStateException("Output JSON file was not found");
-            if (output != null) {
-                FileUtils.copyFile(outputTmpFile, output);
-            } else {
+            FinishJobParams outObj = UObject.getMapper().readValue(outputTmpFile, 
+                    FinishJobParams.class);
+            if (outObj.getError() != null || outObj.getResult() == null) {
                 System.out.println();
-                System.out.println("Output returned by the method:");
-                System.out.println(FileUtils.readFileToString(outputTmpFile));
+                if (outObj.getError() == null) {
+                    System.err.println("Unknown error (no information)");
+                } else {
+                    System.err.println("Error: " + outObj.getError().getMessage());
+                    if (verbose && outObj.getError().getError() != null) {
+                        System.err.println("Error details: \n" + outObj.getError().getError());
+                    }
+                }
+                System.out.println();
+            } else {
+                String outputJson = UObject.getMapper().writeValueAsString(outObj.getResult());
+                if (output != null) {
+                    FileUtils.writeStringToFile(output, outputJson);
+                    System.out.println("Output is saved to file: " + output.getCanonicalPath());
+                } else {
+                    System.out.println();
+                    System.out.println("Output returned by the method:");
+                    System.out.println(outputJson);
+                    System.out.println();
+                }
             }
             return exitCode;
         } finally {
+            try {
+                System.out.println("Deleteing docker container...");
+                ProcessHelper.cmd("bash", DirUtils.getFilePath(runDockerSh), "rm", "-v", "-f",
+                        containerName).exec(runDir);
+            } catch (Exception ex) {
+                System.out.println("Error deleting container [" + containerName + "]: " + 
+                        ex.getMessage());
+            }
             if (jettyServer != null) {
                 System.out.println("Shutting down callback server...");
                 jettyServer.stop();

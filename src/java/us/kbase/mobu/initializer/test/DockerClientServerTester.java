@@ -281,11 +281,13 @@ public class DockerClientServerTester {
                 specFile.getCanonicalPath(), "lib2");
         shellFile = new File(moduleDir, "test_perl_client.sh");
         lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-        lines.addAll(Arrays.asList(
-                "perl " + new File("test_scripts/perl/test-client.pl").getAbsolutePath() + 
+        String pathToSdk = new File(".").getCanonicalPath();
+        lines.add("export PERL5LIB=" + pathToSdk + "/lib/:" +
+                pathToSdk + "/submodules/auth/Bio-KBase-Auth/lib:$PERL5LIB");
+        lines.add("perl " + new File("test_scripts/perl/test-client.pl").getAbsolutePath() + 
                 " -tests " + configFilePerl.getAbsolutePath() + " -user " + user + 
                 " -password " + pwd + " -endpoint " + clientEndpointUrl
-                ));
+                );
         TextUtils.writeFileLines(lines, shellFile);
         {
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
