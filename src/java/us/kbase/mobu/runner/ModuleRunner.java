@@ -11,8 +11,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -20,6 +23,8 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
@@ -49,26 +54,28 @@ public class ModuleRunner {
     private String user;
     private String password;
     
-    public ModuleRunner() throws Exception {
-        String sdkCfgPath = System.getenv(ModuleBuilder.GLOBAL_SDK_CFG_ENV_VAR);
-        boolean isCfgGlobal = sdkCfgPath != null && !sdkCfgPath.isEmpty();
-        if (!isCfgGlobal)
-            sdkCfgPath = "sdk.cfg";
-        File sdkCfgFile = new File(sdkCfgPath);
+    public ModuleRunner(String sdkHome) throws Exception {
+        if (sdkHome == null) {
+            sdkHome = System.getenv(ModuleBuilder.GLOBAL_SDK_HOME_ENV_VAR);
+            if (sdkHome == null)
+                throw new IllegalStateException("Path to kb-sdk home folder should be set either" +
+                		" in command line (-h) or in " + ModuleBuilder.GLOBAL_SDK_HOME_ENV_VAR + 
+                		" system environment variable");
+        }
+        File sdkHomeDir = new File(sdkHome);
+        if (!sdkHomeDir.exists())
+            throw new IllegalStateException("Directory " + sdkHome + " doesn't exist");
+        File sdkCfgFile = new File(sdkHomeDir, "sdk.cfg");
+        String sdkCfgPath = sdkCfgFile.getCanonicalPath();
         if (!sdkCfgFile.exists()) {
-            if (isCfgGlobal) {
-                throw new IllegalStateException("Global sdk.cfg path defined in " + 
-                        ModuleBuilder.GLOBAL_SDK_CFG_ENV_VAR + " is not found");
-            } else {
-                System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
-                        "initialized (with 'kbase_endpoint'/'catalog_url' pointing to AppDev " +
-                        "environment, user and password will be prompted every time if not set)");
-                FileUtils.writeLines(sdkCfgFile, Arrays.asList(
-                        "kbase_endpoint=https://appdev.kbase.us/services",
-                        "catalog_url=https://appdev.kbase.us/services/catalog",
-                        "user=",
-                        "password="));
-            }
+            System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
+                    "initialized (with 'kbase_endpoint'/'catalog_url' pointing to AppDev " +
+                    "environment, user and password will be prompted every time if not set)");
+            FileUtils.writeLines(sdkCfgFile, Arrays.asList(
+                    "kbase_endpoint=https://appdev.kbase.us/services",
+                    "catalog_url=https://appdev.kbase.us/services/catalog",
+                    "user=",
+                    "password="));
         }
         Properties sdkConfig = new Properties();
         try (InputStream is = new FileInputStream(sdkCfgFile)) {
@@ -85,7 +92,7 @@ public class ModuleRunner {
                     sdkCfgFile);
         }
         catalogUrl = new URL(catalogUrlText);
-        runDir = new File("run_local");
+        runDir = new File(sdkHomeDir, "run_local");
         user = sdkConfig.getProperty("user");
         password = sdkConfig.getProperty("password");
         if (user == null || user.trim().isEmpty()) {
@@ -112,18 +119,19 @@ public class ModuleRunner {
     }
     
     public int run(String methodName, File inputFile, boolean stdin, String inputJson, 
-            File output, String tagVer, boolean verbose, boolean keepTempFiles) throws Exception {
+            File output, String tagVer, boolean verbose, boolean keepTempFiles,
+            String provRefs, String mountPoints) throws Exception {
         AuthToken auth = AuthService.login(user, password).getToken();
         ////////////////////////////////// Loading image name /////////////////////////////////////
         CatalogClient client = new CatalogClient(catalogUrl);
         String moduleName = methodName.split(Pattern.quote("."))[0];
-        ModuleVersion modVer = client.getModuleVersion(
+        ModuleVersion mv = client.getModuleVersion(
                 new SelectModuleVersion().withModuleName(moduleName).withVersion(tagVer)
                 .withIncludeCompilationReport(1L));
-        if (modVer.getDataVersion() != null)
+        if (mv.getDataVersion() != null)
             throw new IllegalStateException("Reference data is required for module " + moduleName +
             		". This feature is not supported for local calls.");
-        String dockerImage = modVer.getDockerImgName();
+        String dockerImage = mv.getDockerImgName();
         System.out.println("Docker image name recieved from Catalog: " + dockerImage);
         ////////////////////////////////// Standard files in run_local ////////////////////////////
         if (!runDir.exists())
@@ -134,8 +142,12 @@ public class ModuleRunner {
             FileUtils.writeLines(runLocalSh, Arrays.asList(
                     "#!/bin/bash",
                     "sdir=\"$(cd \"$(dirname \"$(readlink -f \"$0\")\")\" && pwd)\"",
-                    "$sdir/run_docker.sh run -v $sdir/workdir:/kb/module/work " +
-                    "-e \"SDK_CALLBACK_URL=$1\" --name $2 $3 async"));
+                    "callback_url=$1",
+                    "cnt_id=$2",
+                    "docker_image=$3",
+                    "mount_points=$4",
+                    "$sdir/run_docker.sh run -v $sdir/workdir:/kb/module/work $mount_points " +
+                    "-e \"SDK_CALLBACK_URL=$callback_url\" --name $cnt_id $docker_image async"));
             ProcessHelper.cmd("chmod", "+x", runLocalSh.getCanonicalPath()).exec(runDir);
         }
         if (!runDockerSh.exists()) {
@@ -145,6 +157,21 @@ public class ModuleRunner {
             ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(runDir);
         }
         ////////////////////////////////// Temporary files ////////////////////////////////////////
+        StringBuilder mountPointsDocker = new StringBuilder();
+        if (mountPoints != null) {
+            for (String part : mountPoints.split(Pattern.quote(","))) {
+                String[] fromTo = part.split(Pattern.quote(":"));
+                if (fromTo.length != 2)
+                    throw new IllegalStateException("Unexpected mount point format: " + part);
+                String from = new File(fromTo[0]).getCanonicalPath();
+                String to = fromTo[1];
+                if (!to.startsWith("/"))
+                    to = "/kb/module/work/" + to;
+                if (mountPointsDocker.length() > 0)
+                    mountPointsDocker.append(" ");
+                mountPointsDocker.append("-v ").append(from).append(":").append(to);
+            }
+        }
         File workDir = new File(runDir, "workdir");
         if (workDir.exists())
             FileUtils.deleteDirectory(workDir);
@@ -191,7 +218,9 @@ public class ModuleRunner {
         Map<String, Object> rpc = new LinkedHashMap<String, Object>();
         rpc.put("version", "1.1");
         rpc.put("method", methodName);
-        rpc.put("params", UObject.getMapper().readValue(jsonString, Object.class));
+        List<UObject> params = UObject.getMapper().readValue(jsonString, 
+                new TypeReference<List<UObject>>() {});
+        rpc.put("params", params);
         rpc.put("context", new LinkedHashMap<String, Object>());
         UObject.getMapper().writeValue(new File(workDir, "input.json"), rpc);
         ////////////////////////////////// Starting callback service //////////////////////////////
@@ -211,13 +240,19 @@ public class ModuleRunner {
                             //do nothing, SDK callback server doesn't use a logger
                         }
                     }).build();
-            ModuleRunVersion runver = new ModuleRunVersion(
-                    new URL("https://fakefakefakefakefake.com"),
-                    new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+            Set<String> releaseTags = new TreeSet<String>(mv.getReleaseTags());
+            System.out.println("Release tags: " + releaseTags);
+            String requestedRelease = null;
+            final ModuleRunVersion runver = new ModuleRunVersion(
+                    new URL(mv.getGitUrl()), new ModuleMethod(methodName),
+                    mv.getGitCommitHash(), mv.getVersion(),
+                    requestedRelease);
+            List<String> inputWsObjects = new ArrayList<String>();
+            if (provRefs != null) {
+                inputWsObjects.addAll(Arrays.asList(provRefs.split(Pattern.quote(","))));
+            }
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    auth, cfg, runver, new ArrayList<UObject>(),
-                    new ArrayList<String>());
+                    auth, cfg, runver, params, inputWsObjects);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
@@ -235,8 +270,8 @@ public class ModuleRunner {
         try {
             System.out.println();
             int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runLocalSh),
-                    callbackUrl.toExternalForm(), containerName, dockerImage)
-                    .exec(runDir).getExitCode();
+                    callbackUrl.toExternalForm(), containerName, dockerImage, 
+                    mountPointsDocker.toString()).exec(runDir).getExitCode();
             File outputTmpFile = new File(workDir, "output.json");
             if (!outputTmpFile.exists())
                 throw new IllegalStateException("Output JSON file was not found");

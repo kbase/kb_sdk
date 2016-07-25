@@ -46,10 +46,10 @@ public class ModuleBuilder {
     private static final String RUN_COMMAND      = "run";
     //private static final String SUBMIT_COMMAND   = "submit";
     
-    public static final String GLOBAL_SDK_CFG_ENV_VAR = "KB_SDK_CONFIG";
+    public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.5";
+    public static final String VERSION = "1.0.6";
     
     
     public static void main(String[] args) throws Exception {
@@ -414,9 +414,10 @@ public class ModuleBuilder {
             if (runArgs.inputFile == null && runArgs.inputJson == null && !runArgs.stdin)
                 throw new IllegalStateException("No one input method is used " +
                 		"(should be one of '-i', '-j' or '-s')");
-            return new ModuleRunner().run(runArgs.methodName.get(0), runArgs.inputFile, 
-                    runArgs.stdin, runArgs.inputJson, runArgs.output, runArgs.tagVer, 
-                    runArgs.verbose, runArgs.keepTempFiles);
+            return new ModuleRunner(runArgs.sdkHome).run(runArgs.methodName.get(0), 
+                    runArgs.inputFile, runArgs.stdin, runArgs.inputJson, runArgs.output, 
+                    runArgs.tagVer, runArgs.verbose, runArgs.keepTempFiles, runArgs.provRefs, 
+                    runArgs.mountPoints);
         } catch (Exception e) {
             if (runArgs.verbose)
                 e.printStackTrace();
@@ -720,6 +721,22 @@ public class ModuleBuilder {
         @Parameter(names={"-k","--keep-tmp"}, description="Keep temporary files/folders at the " +
         		"end (default value is false)")
         boolean keepTempFiles = false;
+        
+        @Parameter(names={"-h","--sdk-home"}, description="Home folder of kb-sdk where sdk.cfg " +
+        		"file and run_local folder are expected to be found or created if absent " +
+                "(default path is loaded from 'KB_SDK_HOME' system environment variable)")
+        String sdkHome = null;
+
+        @Parameter(names={"-r","--prov-refs"}, description="Optional comma-separated list of " +
+        		"references workspace objects that will be refered from provenance")
+        String provRefs = null;
+
+        @Parameter(names={"-m","--mount-points"}, description="Optional comma-separated list of " +
+        		"mount point pairs for docker container (this parameter contains of local folder and inner folder separated by " +
+        		"':', local folder points to place in local file system, inner folder appears" +
+        		"inside docker container, if inner path is not absolute it's treated as relative " +
+        		"to /kb/module/work folder)")
+        String mountPoints = null;
 
         @Parameter(required=true, description="<fully qualified method name " +
         		"(with SDK module prefix followed by '.')>")
