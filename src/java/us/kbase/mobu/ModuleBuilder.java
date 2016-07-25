@@ -732,10 +732,12 @@ public class ModuleBuilder {
         String provRefs = null;
 
         @Parameter(names={"-m","--mount-points"}, description="Optional comma-separated list of " +
-        		"mount point pairs for docker container (this parameter contains of local folder and inner folder separated by " +
-        		"':', local folder points to place in local file system, inner folder appears" +
-        		"inside docker container, if inner path is not absolute it's treated as relative " +
-        		"to /kb/module/work folder)")
+        		"mount point pairs for docker container (this parameter contains of local folder" +
+        		" and inner folder separated by ':', local folder points to place in local file " +
+        		"system, inner folder appears inside docker container, if inner path is not " +
+        		"absolute it's treated as relative to /kb/module/work folder; if some mount " +
+        		"point path doesn't have ':' and inner part then it appears as " +
+        		"/kb/module/work/tmp inside docker)")
         String mountPoints = null;
 
         @Parameter(required=true, description="<fully qualified method name " +

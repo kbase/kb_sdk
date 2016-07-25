@@ -161,10 +161,21 @@ public class ModuleRunner {
         if (mountPoints != null) {
             for (String part : mountPoints.split(Pattern.quote(","))) {
                 String[] fromTo = part.split(Pattern.quote(":"));
-                if (fromTo.length != 2)
-                    throw new IllegalStateException("Unexpected mount point format: " + part);
-                String from = new File(fromTo[0]).getCanonicalPath();
-                String to = fromTo[1];
+                String to;
+                if (fromTo.length != 2) {
+                    if (fromTo.length == 1) {
+                        to = "tmp";
+                    } else {
+                        throw new IllegalStateException("Unexpected mount point format: " + part);
+                    }
+                } else {
+                    to = fromTo[1];
+                }
+                File fromDir = new File(fromTo[0]);
+                if ((!fromDir.exists()) || (!fromDir.isDirectory()))
+                    throw new IllegalStateException("Mount point directory doesn't exist: " +
+                            fromDir);
+                String from = fromDir.getCanonicalPath();
                 if (!to.startsWith("/"))
                     to = "/kb/module/work/" + to;
                 if (mountPointsDocker.length() > 0)
