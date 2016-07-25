@@ -64,7 +64,7 @@ public class ModuleRunner {
         }
         File sdkHomeDir = new File(sdkHome);
         if (!sdkHomeDir.exists())
-            throw new IllegalStateException("Directory " + sdkHome + " doesn't exist");
+            sdkHomeDir.mkdirs();
         File sdkCfgFile = new File(sdkHomeDir, "sdk.cfg");
         String sdkCfgPath = sdkCfgFile.getCanonicalPath();
         if (!sdkCfgFile.exists()) {
@@ -230,7 +230,8 @@ public class ModuleRunner {
         if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
                 JsonServerSyslog.setStaticUseSyslog(false);
-                JsonServerSyslog.setStaticMlogFile("callback.log");
+                JsonServerSyslog.setStaticMlogFile(
+                        new File(workDir, "callback.log").getCanonicalPath());
             }
             CallbackServerConfig cfg = new CallbackServerConfigBuilder(
                     new URL(kbaseEndpoint), callbackUrl, runDir.toPath(),
