@@ -201,7 +201,7 @@ public class DockerClientServerTester {
         File specFile = new File(moduleDir, moduleName + ".spec");
         String token = AuthService.login(user, pwd).getTokenString();
         // Java client
-        System.out.println("Java client -> " + serverType + " server");
+        System.out.print("Java client -> " + serverType + " server ");
         ClientInstaller clInst = new ClientInstaller(moduleDir);
         clInst.install("java", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
@@ -233,9 +233,12 @@ public class DockerClientServerTester {
         Object obj = null;
         Exception error = null;
         int javaAttempts = dynamic ? 10 : 1;
+        long time = -1;
         for (int i = 0; i < javaAttempts; i++) {
             try {
+                long startTime = System.currentTimeMillis();
                 obj = method.invoke(client, input, null);
+                time = System.currentTimeMillis() - startTime;
                 error = null;
                 break;
             } catch (Exception ex) {
@@ -243,6 +246,7 @@ public class DockerClientServerTester {
             }
             Thread.sleep(100);
         }
+        System.out.println("(" + time + " ms)");
         if (error != null)
             throw error;
         Assert.assertNotNull(obj);
@@ -262,7 +266,7 @@ public class DockerClientServerTester {
         UObject.getMapper().writeValue(configFile, config);
         File lib2 = new File(moduleDir, "lib2");
         // Python client
-        System.out.println("Python client -> " + serverType + " server");
+        System.out.print("Python client -> " + serverType + " server ");
         clInst.install("python", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
         File shellFile = new File(moduleDir, "test_python_client.sh");
@@ -272,8 +276,10 @@ public class DockerClientServerTester {
                 " -e " + clientEndpointUrl);
         TextUtils.writeFileLines(lines, shellFile);
         {
+            long startTime = System.currentTimeMillis();
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     new File(lib2, moduleName).getCanonicalFile(), null, true, true);
+            System.out.println("(" + (System.currentTimeMillis() - startTime) + " ms)");
             int exitCode = ph.getExitCode();
             if (exitCode != 0) {
                 String out = ph.getSavedOutput();
@@ -286,7 +292,7 @@ public class DockerClientServerTester {
             Assert.assertEquals("Python client exit code should be 0", 0, exitCode);
         }
         // Perl client
-        System.out.println("Perl client -> " + serverType + " server");
+        System.out.print("Perl client -> " + serverType + " server ");
         Map<String, Object> config2 = new LinkedHashMap<String, Object>(config);
         config2.put("package", moduleName + "::" + moduleName + "Client");
         File configFilePerl = new File(moduleDir, "tests_perl.json");
@@ -304,8 +310,10 @@ public class DockerClientServerTester {
                 );
         TextUtils.writeFileLines(lines, shellFile);
         {
+            long startTime = System.currentTimeMillis();
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     lib2.getCanonicalFile(), null, true, true);
+            System.out.println("(" + (System.currentTimeMillis() - startTime) + " ms)");
             int exitCode = ph.getExitCode();
             if (exitCode != 0) {
                 String out = ph.getSavedOutput();  //outSw.toString();
@@ -322,7 +330,7 @@ public class DockerClientServerTester {
             System.err.println("- JavaScript client tests are skipped");
             return;
         }
-        System.out.println("JavaScript client -> " + serverType + " server");
+        System.out.print("JavaScript client -> " + serverType + " server ");
         clInst.install("javascript", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
         shellFile = new File(moduleDir, "test_js_client.sh");
@@ -335,8 +343,10 @@ public class DockerClientServerTester {
                 ));
         TextUtils.writeFileLines(lines, shellFile);
         {
+            long startTime = System.currentTimeMillis();
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     new File(lib2, moduleName), null, true, true);
+            System.out.println("(" + (System.currentTimeMillis() - startTime) + " ms)");
             int exitCode = ph.getExitCode();
             if (exitCode != 0) {
                 String out = ph.getSavedOutput();
