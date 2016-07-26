@@ -199,7 +199,11 @@ public class ModuleTester {
                     new LineLogger() {
                         @Override
                         public void logNextLine(String line, boolean isError) {
-                            //do nothing, SDK callback server doesn't use a logger
+                            if (isError) {
+                                System.err.println(line);
+                            } else {
+                                System.out.println(line);
+                            }
                         }
                     }).build();
             ModuleRunVersion runver = new ModuleRunVersion(
@@ -224,7 +228,8 @@ public class ModuleTester {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
             int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runTestsSh),
-                    callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
+                    callbackUrl == null ? "http://fakecallbackurl" : 
+                        callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
             return exitCode;
         } finally {
             if (jettyServer != null) {
