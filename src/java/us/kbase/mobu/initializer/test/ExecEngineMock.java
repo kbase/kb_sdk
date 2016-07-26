@@ -36,7 +36,7 @@ import us.kbase.kbasejobservice.JsonRpcError;
 import us.kbase.kbasejobservice.MethodCall;
 import us.kbase.kbasejobservice.RpcContext;
 import us.kbase.kbasejobservice.RunJobParams;
-import us.kbase.mobu.tester.ModuleTester;
+import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
 
 //END_HEADER
@@ -257,7 +257,7 @@ public class ExecEngineMock extends JsonServerServlet {
         final String containerName = "test_" + moduleName.toLowerCase() + "_" + 
                 System.currentTimeMillis();
         File runDockerSh = new File(testLocalDir, "run_docker.sh");
-        final String runDockerPath = ModuleTester.getFilePath(runDockerSh);
+        final String runDockerPath = DirUtils.getFilePath(runDockerSh);
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {

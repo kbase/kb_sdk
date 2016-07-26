@@ -85,7 +85,21 @@ public class DockerClientServerTester {
         if (implFile != null && implInitText != null)
             FileUtils.writeStringToFile(implFile, implInitText);
         File moduleDir = new File(moduleName);
-        ProcessHelper.cmd("make").exec(moduleDir);
+        // Making <kb_sdk>/bin/kb-sdk executable
+        if (ProcessHelper.cmd("make").exec(new File(".")).getExitCode() != 0)
+            throw new IllegalStateException("Error making kb-sdk");
+        // Running make for repo with adding <kb_sdk>/bin/kb-sdk into PATH
+        File shellFile = new File(moduleDir, "run_make.sh");
+        String pathToSdk = new File(".").getCanonicalPath();
+        List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
+        lines.add("export PATH=" + pathToSdk + "/bin:$PATH");
+        lines.add("which kb-sdk");
+        lines.add("make");
+        TextUtils.writeFileLines(lines, shellFile);
+        if(ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
+                moduleDir).getExitCode() != 0)
+            throw new IllegalStateException("Error making " + moduleName + " repo");
+        //ProcessHelper.cmd("make").exec(moduleDir);
         FileUtils.writeStringToFile(new File(moduleDir, "sdk.cfg"), 
                 "catalog_url=http://kbase.us");
         return moduleDir;
@@ -281,11 +295,13 @@ public class DockerClientServerTester {
                 specFile.getCanonicalPath(), "lib2");
         shellFile = new File(moduleDir, "test_perl_client.sh");
         lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-        lines.addAll(Arrays.asList(
-                "perl " + new File("test_scripts/perl/test-client.pl").getAbsolutePath() + 
+        String pathToSdk = new File(".").getCanonicalPath();
+        lines.add("export PERL5LIB=" + pathToSdk + "/lib/:" +
+                pathToSdk + "/submodules/auth/Bio-KBase-Auth/lib:$PERL5LIB");
+        lines.add("perl " + new File("test_scripts/perl/test-client.pl").getAbsolutePath() + 
                 " -tests " + configFilePerl.getAbsolutePath() + " -user " + user + 
                 " -password " + pwd + " -endpoint " + clientEndpointUrl
-                ));
+                );
         TextUtils.writeFileLines(lines, shellFile);
         {
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
@@ -439,15 +455,16 @@ public class DockerClientServerTester {
         {
             File shellFile = new File(moduleDir, "test_perl_client.sh");
             List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-            lines.addAll(Arrays.asList(
-                    "perl " + new File("test_scripts/perl/run-client.pl").getAbsolutePath() + 
+            String pathToSdk = new File(".").getCanonicalPath();
+            lines.add("export PERL5LIB=" + pathToSdk + "/lib/:" +
+                    pathToSdk + "/submodules/auth/Bio-KBase-Auth/lib:$PERL5LIB");
+            lines.add("perl " + new File("test_scripts/perl/run-client.pl").getAbsolutePath() + 
                     " -package " + moduleName + "::" + moduleName + "Client" + 
                     " -method " + mtd + " -input " + inputFile.getAbsolutePath() + 
                     " -output " + outputFile.getAbsolutePath() + 
                     " -error " + errorFile.getAbsolutePath() +
                     " -endpoint " + clientEndpointUrl +
-                    (async ? (" -user " + user + " -password " + pwd) : "")
-                    ));
+                    (async ? (" -user " + user + " -password " + pwd) : ""));
             TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     lib2.getCanonicalFile(), null, true, true);
