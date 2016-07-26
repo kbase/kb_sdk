@@ -256,7 +256,9 @@ public class ModuleRunner {
                             }
                         }
                     }).build();
-            Set<String> releaseTags = new TreeSet<String>(mv.getReleaseTags());
+            Set<String> releaseTags = new TreeSet<String>();
+            if (mv.getReleaseTags() != null)
+                releaseTags.addAll(mv.getReleaseTags());
             String requestedRelease = releaseTags.contains("release") ? "release" :
                 (releaseTags.contains("beta") ? "beta" : "dev");
             final ModuleRunVersion runver = new ModuleRunVersion(
