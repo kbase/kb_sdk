@@ -249,12 +249,16 @@ public class ModuleRunner {
                     new LineLogger() {
                         @Override
                         public void logNextLine(String line, boolean isError) {
-                            //do nothing, SDK callback server doesn't use a logger
+                            if (isError) {
+                                System.err.println(line);
+                            } else {
+                                System.out.println(line);
+                            }
                         }
                     }).build();
             Set<String> releaseTags = new TreeSet<String>(mv.getReleaseTags());
-            System.out.println("Release tags: " + releaseTags);
-            String requestedRelease = null;
+            String requestedRelease = releaseTags.contains("release") ? "release" :
+                (releaseTags.contains("beta") ? "beta" : "dev");
             final ModuleRunVersion runver = new ModuleRunVersion(
                     new URL(mv.getGitUrl()), new ModuleMethod(methodName),
                     mv.getGitCommitHash(), mv.getVersion(),
