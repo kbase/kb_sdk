@@ -768,7 +768,7 @@ public class CallbackServerTest {
             assertThat("correct code url", got.getCodeUrl(),
                     is("https://github.com/kbasetest/" + sa.module));
             assertThat("correct commit", got.getCommit(), is(sa.commit));
-            assertThat("correct name", got.getName(), is(sa.module + ".run"));
+            assertThat("correct name", got.getName(), is(sa.module));
             assertThat("correct version", got.getVer(), is(sa.getVerRel()));
         }
     }
