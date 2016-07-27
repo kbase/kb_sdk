@@ -131,7 +131,7 @@ public abstract class CallbackServer extends JsonServerServlet {
            sas.add(new SubAction()
                .withCodeUrl(mrv.getGitURL().toExternalForm())
                .withCommit(mrv.getGitHash())
-               .withName(mrv.getModuleMethod().getModuleDotMethod())
+               .withName(mrv.getModuleMethod().getModule())
                .withVer(mrv.getVersionAndRelease()));
         }
         return new LinkedList<ProvenanceAction>(Arrays.asList(
@@ -154,9 +154,9 @@ public abstract class CallbackServer extends JsonServerServlet {
         return new UObject(data);
     }
 
-    protected static void cbLog(String log) {
-        System.out.println(String.format("%.2f - CallbackServer: %s",
-                (System.currentTimeMillis() / 1000.0), log));
+    protected void cbLog(String log) {
+        config.getLogger().logNextLine(String.format("%.2f - CallbackServer: %s",
+                (System.currentTimeMillis() / 1000.0), log), false);
     }
     
     protected void processRpcCall(RpcCallData rpcCallData, String token, JsonServerSyslog.RpcInfo info, 
@@ -462,15 +462,16 @@ public abstract class CallbackServer extends JsonServerServlet {
     public static URL getCallbackUrl(int callbackPort)
             throws SocketException {
         final List<String> hostIps = NetUtils.findNetworkAddresses(
-                "docker0", "vboxnet0", "vboxnet1", "VirtualBox Host-Only Ethernet Adapter", "en0");
+                "docker0", "vboxnet0", "vboxnet1",
+                "VirtualBox Host-Only Ethernet Adapter", "en0");
         final String hostIp;
         if (hostIps.isEmpty()) {
             return null;
         } else {
             hostIp = hostIps.get(0);
             if (hostIps.size() > 1) {
-                cbLog("WARNING! Several Docker host IP addresses " +
-                        "detected, used first:  " + hostIp);
+                System.out.println("WARNING! Several Docker host IP " +
+                        "addresses detected, used first:  " + hostIp);
             }
         }
         try {
