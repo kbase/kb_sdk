@@ -467,7 +467,9 @@ public class JavaTypeGenerator {
 					"    private " + callerClass + " caller;"
 					));
 			if (anyAsync) {
-			    classLines.add("    private long asyncJobCheckTimeMs = 5000;");
+			    classLines.add("    private long asyncJobCheckTimeMs = 100;");
+                classLines.add("    private int asyncJobCheckTimeScalePercent = 150;");
+                classLines.add("    private long asyncJobCheckMaxTimeMs = 300000;  // 5 minutes");
 			}
             classLines.add("    private String serviceVersion = " + 
                     (serviceVersion == null ? "null" : ("\"" + serviceVersion + "\"")) + ";");
@@ -701,6 +703,22 @@ public class JavaTypeGenerator {
                         "",
                         "    public void setAsyncJobCheckTimeMs(long newValue) {",
                         "        this.asyncJobCheckTimeMs = newValue;",
+                        "    }",
+                        "",
+                        "    public int getAsyncJobCheckTimeScalePercent() {",
+                        "        return this.asyncJobCheckTimeScalePercent;",
+                        "    }",
+                        "",
+                        "    public void setAsyncJobCheckTimeScalePercent(int newValue) {",
+                        "        this.asyncJobCheckTimeScalePercent = newValue;",
+                        "    }",
+                        "",
+                        "    public long getAsyncJobCheckMaxTimeMs() {",
+                        "        return this.asyncJobCheckMaxTimeMs;",
+                        "    }",
+                        "",
+                        "    public void setAsyncJobCheckMaxTimeMs(long newValue) {",
+                        "        this.asyncJobCheckMaxTimeMs = newValue;",
                         "    }"
 			            ));
 			}
@@ -797,14 +815,16 @@ public class JavaTypeGenerator {
                             "    public " + retTypeName + " " + func.getJavaName() + "(" + funcParams + ") " + exceptions+ " {",
                             "        String jobId = _" + func.getJavaName() + "Submit(" + funcParamNames + ");",
                             "        " + trFull + " retType = new " + trFull + "() {};",
+                            "        long asyncJobCheckTimeMs = this.asyncJobCheckTimeMs;",
                             "        while (true) {",
                             "            if (Thread.currentThread().isInterrupted())",
                             "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
                             "            try { ",
-                            "                Thread.sleep(this.asyncJobCheckTimeMs);",
+                            "                Thread.sleep(asyncJobCheckTimeMs);",
                             "            } catch(Exception ex) {",
                             "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
                             "            }",
+                            "            asyncJobCheckTimeMs = Math.min(asyncJobCheckTimeMs * this.asyncJobCheckTimeScalePercent / 100, this.asyncJobCheckMaxTimeMs);",
                             "            " + jobStateType + "<" + innerRetType + "> res = _checkJob(jobId, retType);",
                             "            if (res.getFinished() != 0L)",
                             "                return" + (func.getRetMultyType() == null ? (retType == null ? "" : " res.getResult().get(0)") : " res.getResult()") + ";",
@@ -881,14 +901,16 @@ public class JavaTypeGenerator {
                                     "status_submit" + "\", args, retType1, true, true, " + contextField + ");",
                             "        String jobId = res1.get(0);",
 			                "        " + trFull2 + " retType2 = new " + trFull2 + "() {};",
+                            "        long asyncJobCheckTimeMs = this.asyncJobCheckTimeMs;",
 			                "        while (true) {",
 			                "            if (Thread.currentThread().isInterrupted())",
 			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
 			                "            try { ",
-			                "                Thread.sleep(this.asyncJobCheckTimeMs);",
+			                "                Thread.sleep(asyncJobCheckTimeMs);",
 			                "            } catch(Exception ex) {",
 			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
 			                "            }",
+                            "            asyncJobCheckTimeMs = Math.min(asyncJobCheckTimeMs * this.asyncJobCheckTimeScalePercent / 100, this.asyncJobCheckMaxTimeMs);",
 			                "            " + jobStateType + "<" + innerRetType + "> res2 = _checkJob(jobId, retType2);",
 			                "            if (res2.getFinished() != 0L)",
 			                "                return res2.getResult().get(0);",
