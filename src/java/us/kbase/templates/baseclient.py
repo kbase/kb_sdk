@@ -123,7 +123,9 @@ class BaseClient(object):
             trust_all_ssl_certificates=False,
             auth_svc='https://kbase.us/services/authorization/Sessions/Login',
             lookup_url=False,
-            async_job_check_time_ms=5000):
+            async_job_check_time_ms=100,
+            async_job_check_time_scale_percent=150,
+            async_job_check_max_time_ms=300000):
         if url is None:
             raise ValueError('A url is required')
         scheme, _, _, _, _, _ = _urlparse(url)
@@ -135,6 +137,8 @@ class BaseClient(object):
         self.trust_all_ssl_certificates = trust_all_ssl_certificates
         self.lookup_url = lookup_url
         self.async_job_check_time = async_job_check_time_ms / 1000.0
+        self.async_job_check_time_scale_percent = async_job_check_time_scale_percent
+        self.async_job_check_max_time = async_job_check_max_time_ms / 1000.0
         # token overrides user_id and password
         if token is not None:
             self._headers['AUTHORIZATION'] = token
@@ -230,8 +234,13 @@ class BaseClient(object):
         '''
         mod, _ = service_method.split('.')
         job_id = self._submit_job(service_method, args, service_ver, context)
+        async_job_check_time = self.async_job_check_time
         while True:
-            time.sleep(self.async_job_check_time)
+            time.sleep(async_job_check_time)
+            async_job_check_time = (async_job_check_time *
+                self.async_job_check_time_scale_percent / 100.0)
+            if async_job_check_time > self.async_job_check_max_time:
+                async_job_check_time = self.async_job_check_max_time
             job_state = self._check_job(mod, job_id)
             if job_state['finished']:
                 if not job_state['result']:

@@ -58,6 +58,8 @@ public class ExecEngineMock extends JsonServerServlet {
     private Map<String, FinishJobParams> jobToResults = new LinkedHashMap<String, FinishJobParams>();
     private Map<String, String> moduleToDockerImage = new LinkedHashMap<String, String>();
     private Map<String, File> moduleToRepoDir = new LinkedHashMap<String, File>();
+    private static boolean debugCheckJobTimes = false;
+    private Long lastCheckJobAccessTime = null;
     
     public ExecEngineMock withModule(String moduleName, String dockerImage, File repoDir) {
         moduleToDockerImage.put(moduleName, dockerImage);
@@ -341,6 +343,10 @@ public class ExecEngineMock extends JsonServerServlet {
     public JobState checkJob(String jobId, AuthToken authPart, us.kbase.common.service.RpcContext... jsonRpcCallContext) throws Exception {
         JobState returnVal = null;
         //BEGIN check_job
+        if (lastCheckJobAccessTime != null && debugCheckJobTimes) {
+            System.out.println("ExecEngineMock.checkJob: time = " + (System.currentTimeMillis() - lastCheckJobAccessTime));
+        }
+        lastCheckJobAccessTime = System.currentTimeMillis();
         returnVal = new JobState();
         FinishJobParams result = jobToResults.get(jobId);
         if (result == null) {

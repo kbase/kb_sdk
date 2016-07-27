@@ -339,7 +339,7 @@ public class DockerClientServerTester {
                 "casperjs test " + new File("test_scripts/js/test-client.js").getAbsolutePath() + " "
                         + "--jq=" + new File("test_scripts/js/jquery-1.10.2.min.js").getAbsolutePath() + " "
                         + "--tests=" + configFile.getAbsolutePath() + 
-                        " --endpoint=" + clientEndpointUrl + " --token=" + token
+                        " --endpoint=" + clientEndpointUrl + " --token=\"" + token + "\""
                 ));
         TextUtils.writeFileLines(lines, shellFile);
         {
