@@ -42,7 +42,6 @@ import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
 import us.kbase.templates.TemplateFormatter;
-import us.kbase.tools.WinShortPath;
 
 public class ModuleTester {
     private File moduleDir;
