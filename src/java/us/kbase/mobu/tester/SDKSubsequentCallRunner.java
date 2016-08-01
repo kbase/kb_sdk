@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.TokenFormatException;
 import us.kbase.common.executionengine.ModuleMethod;
 import us.kbase.common.executionengine.SubsequentCallRunner;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
@@ -25,7 +24,7 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
             final UUID jobId,
             final ModuleMethod modmeth,
             final String serviceVer)
-            throws IOException, JsonClientException, TokenFormatException {
+            throws IOException, JsonClientException {
         super(token, config, jobId, modmeth, serviceVer);
     }
 

@@ -12,7 +12,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.TokenFormatException;
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleVersion;
 import us.kbase.catalog.SelectModuleVersion;
@@ -47,8 +46,7 @@ public abstract class SubsequentCallRunner {
             final UUID jobId,
             final ModuleMethod modmeth, 
             String serviceVer)
-            throws IOException, JsonClientException,
-            TokenFormatException {
+            throws IOException, JsonClientException {
         this.token = token;
         this.config = config;
         final CatalogClient catClient = new CatalogClient(

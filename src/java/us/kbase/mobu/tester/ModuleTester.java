@@ -137,14 +137,14 @@ public class ModuleTester {
             System.out.println("You haven't preset your password in test_local/test.cfg file. Please enter it now.");
             password = new String(System.console().readPassword("Password: "));
         }
-        String token = AuthService.login(user.trim(), password.trim())
-                .getTokenString();
+        AuthToken token = AuthService.login(user.trim(), password.trim())
+                .getToken();
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
         FileWriter fw = new FileWriter(tokenFile);
         try {
-            fw.write(token);
+            fw.write(token.getToken());
         } finally {
             fw.close();
         }
@@ -210,7 +210,7 @@ public class ModuleTester {
                     new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
                     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    new AuthToken(token), cfg, runver, new ArrayList<UObject>(),
+                    token, cfg, runver, new ArrayList<UObject>(),
                     new ArrayList<String>());
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
