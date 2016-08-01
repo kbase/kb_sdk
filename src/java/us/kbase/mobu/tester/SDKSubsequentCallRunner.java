@@ -63,7 +63,7 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         final Path jobWorkDir = getJobWorkDir(jobId, config, imageName)
                 .toAbsolutePath();
         Files.write(jobWorkDir.resolve("token"),
-                Arrays.asList(token.toString()), StandardCharsets.UTF_8);
+                Arrays.asList(token.getToken()), StandardCharsets.UTF_8);
         
         ProcessHelper.cmd("bash", runSubJobsSh.toString(),
                 jobWorkDir.getParent().getFileName().toString(), imageName,
