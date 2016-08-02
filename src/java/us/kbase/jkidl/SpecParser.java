@@ -25,6 +25,7 @@ import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbType;
 import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.JSONableVisitor;
 import us.kbase.kidl.KidlParseException;
 
 /**
@@ -69,7 +70,7 @@ public class SpecParser implements SpecParserConstants {
                         modList = new ArrayList<Object>();
                         ret.put(module.getServiceName(), modList);
                 }
-                modList.add(module.toJson());
+                modList.add(module.accept(new JSONableVisitor()));
         }
         return ret;
     }
@@ -254,7 +255,11 @@ ret = new KbModule(srvToken == null ? null : srvToken.toString(), nameToken.toSt
       jj_consume_token(T_semicolon);
 if (!(comp instanceof KbAuthdef))
           lastComment.set(null);
-      ret.addModuleComponent(comp);
+      try {
+          ret.addModuleComponent(comp);
+      } catch (KidlParseException ex) {
+          generateParseException(ex);
+      }
     }
     jj_consume_token(T_figure_close_bracket);
     jj_consume_token(T_semicolon);
@@ -520,7 +525,11 @@ async = true;
 comment = getLastComment(first);
     name = Identifier();
     jj_consume_token(T_round_open_bracket);
-ret = new KbFuncdef(name.toString(), comment, async);
+try {
+                ret = new KbFuncdef(name.toString(), comment, async);
+        } catch (KidlParseException ex) {
+                generateParseException(ex);
+        }
     args = OptNameParams(curModule, includes);
 ret.getParameters().addAll(args);
     jj_consume_token(T_round_close_bracket);
@@ -630,6 +639,13 @@ name = nameToken.toString();
     finally { jj_save(1, xla); }
   }
 
+  private boolean jj_3_2()
+ {
+    if (jj_3R_7()) return true;
+    if (jj_scan_token(T_dot)) return true;
+    return false;
+  }
+
   private boolean jj_3_1()
  {
     if (jj_3R_7()) return true;
@@ -654,13 +670,6 @@ name = nameToken.toString();
     }
     }
     }
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_7()) return true;
-    if (jj_scan_token(T_dot)) return true;
     return false;
   }
 

@@ -2,7 +2,6 @@ package us.kbase.mobu.compiler.test;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import us.kbase.common.service.UObject;
 import us.kbase.kidl.KbModule;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;

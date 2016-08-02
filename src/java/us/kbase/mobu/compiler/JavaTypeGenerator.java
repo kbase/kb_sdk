@@ -30,6 +30,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import us.kbase.kidl.KbAuthdef;
 import us.kbase.kidl.KbBasicType;
 import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbList;
@@ -160,25 +161,27 @@ public class JavaTypeGenerator {
 	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
 	        FileSaver buildXml, FileSaver makefile) throws Exception {
 	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
-	            buildXml, makefile, null, null, null, null, null);
+	            buildXml, makefile, null, null, null, null, null, null);
 	}
 
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 	        boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-	        FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
+	        FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, String clientDynservVersion, 
 	        String semanticVersion, String gitUrl, String gitCommitHash) throws Exception {        
 	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url, 
-	            buildXml, makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, null);
+	            buildXml, makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, gitUrl, 
+	            gitCommitHash, null);
 	}
 
 	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
 			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
-			String semanticVersion, String gitUrl, String gitCommitHash,
+			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, 
+			String clientDynservVersion, String semanticVersion, String gitUrl, String gitCommitHash,
 			Map<String, String> originalCode) throws Exception {		
 		JavaData data = prepareDataStructures(services);
 		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
-		        makefile, clientAsyncVersion, semanticVersion, gitUrl, gitCommitHash, originalCode);
+		        makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, gitUrl, 
+		        gitCommitHash, originalCode);
 		return data;
 	}
 
@@ -201,13 +204,17 @@ public class JavaTypeGenerator {
 						String funcJavaName = TextUtils.inCamelCase(func.getName());
 						List<JavaFuncParam> params = new ArrayList<JavaFuncParam>();
 						for (KbParameter param : func.getParameters()) {
-							JavaType type = findBasic(param.getType(), module.getModuleName(), nonPrimitiveTypes, tupleTypes);
-							params.add(new JavaFuncParam(param, TextUtils.inCamelCase(param.getName()), type));
+							JavaType type = findBasic(param.getType(), module.getModuleName(), 
+							        nonPrimitiveTypes, tupleTypes);
+							params.add(new JavaFuncParam(param, 
+							        TextUtils.inCamelCase(param.getName()), type));
 						}
 						List<JavaFuncParam> returns = new ArrayList<JavaFuncParam>();
 						for (KbParameter param : func.getReturnType()) {
-							JavaType type = findBasic(param.getType(), module.getModuleName(), nonPrimitiveTypes, tupleTypes);
-							returns.add(new JavaFuncParam(param, param.getName() == null ? null : TextUtils.inCamelCase(param.getName()), type));
+							JavaType type = findBasic(param.getType(), module.getModuleName(), 
+							        nonPrimitiveTypes, tupleTypes);
+							returns.add(new JavaFuncParam(param, param.getName() == null ? null : 
+							    TextUtils.inCamelCase(param.getName()), type));
 						}
 						JavaType retMultiType = null;
 						if (returns.size() > 1) {
@@ -221,6 +228,8 @@ public class JavaTypeGenerator {
 							tupleTypes.add(returns.size());
 						}
 						funcs.add(new JavaFunc(moduleName, func, funcJavaName, params, returns, retMultiType));
+					} else if (comp instanceof KbAuthdef) {
+						//skip
 					} else {
 						findBasic((KbTypedef)comp, module.getModuleName(), nonPrimitiveTypes, tupleTypes);
 					}
@@ -235,13 +244,14 @@ public class JavaTypeGenerator {
 	private static void outputData(JavaData data, FileSaver srcOutDir, String packageParent, 
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
 			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
-			String semanticVersion, String gitUrl, String gitCommitHash,
-			Map<String, String> originalCode) throws Exception {
+			String clientDynservVersion, String semanticVersion, String gitUrl, 
+			String gitCommitHash, Map<String, String> originalCode) throws Exception {
 	    if (packageParent.equals("."))  // Special value meaning top level package.
 	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
-		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion);
+		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion, 
+		        clientDynservVersion);
 		if (createServers)
 			generateServerClass(data, srcOutDir, packageParent, semanticVersion, gitUrl, 
 			        gitCommitHash, originalCode);
@@ -253,10 +263,12 @@ public class JavaTypeGenerator {
 		}
 	}
 
-	private static void generatePojos(JavaData data, FileSaver srcOutDir, String packageParent) throws Exception {
+	private static void generatePojos(JavaData data, FileSaver srcOutDir, 
+	        String packageParent) throws Exception {
         InMemorySchemaStore ss = new InMemorySchemaStore();
 		for (JavaType type : data.getTypes()) {
-		    URI id = new URI("file:/" + type.getModuleName() + "/" + type.getJavaClassName() + ".json");
+		    URI id = new URI("file:/" + type.getModuleName() + "/" + type.getJavaClassName() + 
+		            ".json");
 			Set<Integer> tupleTypes = data.getTupleTypes();
 			ByteArrayOutputStream jsonFile = new ByteArrayOutputStream();
 			writeJsonSchema(jsonFile, packageParent, type, tupleTypes);
@@ -419,7 +431,7 @@ public class JavaTypeGenerator {
 	}
 
 	private static void generateClientClass(JavaData data, FileSaver srcOutDir,
-			String packageParent, URL url, String asyncVersion) throws Exception {
+			String packageParent, URL url, String asyncVersion, String dynservVersion) throws Exception {
         if (asyncVersion != null) {
             if (Pattern.compile("[^a-zA-Z0-9]").matcher(asyncVersion).find())
                 throw new IllegalStateException("Unsupported non-alfanumeric characters in client " +
@@ -440,6 +452,12 @@ public class JavaTypeGenerator {
 				}
 			}
             boolean anyAsync = asyncVersion != null || anyAsync(module);
+            String serviceVersion = null;
+            if (asyncVersion != null) {
+                serviceVersion = asyncVersion;
+            } else if (dynservVersion != null) {
+                serviceVersion = dynservVersion;
+            }
 			List<String> classLines = new ArrayList<String>();
 			String urlClass = model.ref("java.net.URL");
 			String tokenClass = model.ref("us.kbase.auth.AuthToken");
@@ -449,26 +467,35 @@ public class JavaTypeGenerator {
 					"    private " + callerClass + " caller;"
 					));
 			if (anyAsync) {
-			    classLines.add("    private long asyncJobCheckTimeMs = 5000;");
-			    classLines.add("    private String asyncVersion = " + 
-			            (asyncVersion == null ? "null" : ("\"" + asyncVersion + "\"")) + ";");
+			    classLines.add("    private long asyncJobCheckTimeMs = 100;");
+                classLines.add("    private int asyncJobCheckTimeScalePercent = 150;");
+                classLines.add("    private long asyncJobCheckMaxTimeMs = 300000;  // 5 minutes");
 			}
-			if (url != null) {
-				classLines.addAll(Arrays.asList(
-					"    private static URL DEFAULT_URL = null;",
-					"    static {",
-					"        try {",
-					"            DEFAULT_URL = new URL(\"" + url + "\");",
-					"        } catch (" + model.ref("java.net.MalformedURLException") + " mue) {",
-					"            throw new RuntimeException(\"Compile error in client - bad url compiled\");",
-					"        }",
-					"    }",
-					"",
-					"    /** Constructs a client with the default url and no user credentials.*/",
-					"    public " + clientClassName + "() {",
-					"       caller = new " + callerClass + "(DEFAULT_URL);",
-					"    }"
-					));
+            classLines.add("    private String serviceVersion = " + 
+                    (serviceVersion == null ? "null" : ("\"" + serviceVersion + "\"")) + ";");
+            if (url != null) {
+                classLines.addAll(Arrays.asList(
+                        "    private static URL DEFAULT_URL = null;",
+                        "    static {",
+                        "        try {",
+                        "            DEFAULT_URL = new URL(\"" + url + "\");",
+                        "        } catch (" + model.ref("java.net.MalformedURLException") + " mue) {",
+                        "            throw new RuntimeException(\"Compile error in client - bad url compiled\");",
+                        "        }",
+                        "    }",
+                        "",
+                        "    /** Constructs a client with the default url and no user credentials.*/",
+                        "    public " + clientClassName + "() {",
+                        "       caller = new " + callerClass + "(DEFAULT_URL);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
+                        "    }"
+                        ));
 			}
 			classLines.addAll(Arrays.asList(
 					"",
@@ -477,38 +504,108 @@ public class JavaTypeGenerator {
 					"     * @param url the URL of the service.",
 					"     */",
 					"    public " + clientClassName + "(" + urlClass + " url) {",
-					"        caller = new " + callerClass + "(url);",
-					"    }"
-					));
-			if (anyAuth) {
-				classLines.addAll(Arrays.asList(
-						"    /** Constructs a client with a custom URL.",
-						"     * @param url the URL of the service.",
-						"     * @param token the user's authorization token.",
-						"     * @throws UnauthorizedException if the token is not valid.",
-						"     * @throws IOException if an IOException occurs when checking the token's",
-						"     * validity.",
-						"     */",
-						"    public " + clientClassName + "(" + urlClass + " url, " + 
-								model.ref("us.kbase.auth.AuthToken") + " token) throws " + 
-								model.ref(utilPackage + ".UnauthorizedException") + ", " +
-								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(url, token);",
-						"    }",
-						"",
-						"    /** Constructs a client with a custom URL.",
-						"     * @param url the URL of the service.",
-						"     * @param user the user name.",
-						"     * @param password the password for the user name.",
-						"     * @throws UnauthorizedException if the credentials are not valid.",
-						"     * @throws IOException if an IOException occurs when checking the user's",
-						"     * credentials.",
-						"     */",
-						"    public " + clientClassName + "(" + urlClass + 
-								" url, String user, String password) throws " + 
-								model.ref(utilPackage + ".UnauthorizedException") + ", " +
-								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(url, user, password);",
+					"        caller = new " + callerClass + "(url);"
+                    ));
+            if (dynservVersion != null) {
+                classLines.add(
+                        "        caller.setDynamic(true);"
+                        );
+            }
+            classLines.addAll(Arrays.asList(
+                    "    }"
+                    ));
+            if (anyAuth) {
+                classLines.addAll(Arrays.asList(
+                        "    /** Constructs a client with a custom URL.",
+                        "     * @param url the URL of the service.",
+                        "     * @param token the user's authorization token.",
+                        "     * @throws UnauthorizedException if the token is not valid.",
+                        "     * @throws IOException if an IOException occurs when checking the token's",
+                        "     * validity.",
+                        "     */",
+                        "    public " + clientClassName + "(" + urlClass + " url, " +
+                                model.ref("us.kbase.auth.AuthToken") + " token) throws " +
+                                model.ref(utilPackage + ".UnauthorizedException") + ", " +
+                                model.ref("java.io.IOException") + " {",
+                        "        caller = new " + callerClass + "(url, token);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
+                        "    }",
+                        "",
+                        "    /** Constructs a client with a custom URL",
+                        "     * and a custom authorization service URL.",
+                        "     * @param url the URL of the service.",
+                        "     * @param token the user's authorization token.",
+                        "     * @param auth the URL of the authorization server.",
+                        "     * @throws UnauthorizedException if the token is not valid.",
+                        "     * @throws IOException if an IOException occurs when checking the token's",
+                        "     * validity.",
+                        "     */",
+                        "    public " + clientClassName + "(" + urlClass + " url, " + 
+                                model.ref("us.kbase.auth.AuthToken") + " token, " +
+                                urlClass + " auth) throws " + 
+                                model.ref(utilPackage + ".UnauthorizedException") + ", " +
+                                model.ref("java.io.IOException") + " {",
+                        "        caller = new " + callerClass + "(url, token, auth);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
+                        "    }",
+                        "",
+                        "    /** Constructs a client with a custom URL.",
+                        "     * @param url the URL of the service.",
+                        "     * @param user the user name.",
+                        "     * @param password the password for the user name.",
+                        "     * @throws UnauthorizedException if the credentials are not valid.",
+                        "     * @throws IOException if an IOException occurs when checking the user's",
+                        "     * credentials.",
+                        "     */",
+                        "    public " + clientClassName + "(" + urlClass +
+                                " url, String user, String password) throws " +
+                                model.ref(utilPackage + ".UnauthorizedException") + ", " +
+                                model.ref("java.io.IOException") + " {",
+                        "        caller = new " + callerClass + "(url, user, password);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
+                        "    }",
+                        "",
+                        "    /** Constructs a client with a custom URL",
+                        "     * and a custom authorization service URL.",
+                        "     * @param url the URL of the service.",
+                        "     * @param user the user name.",
+                        "     * @param password the password for the user name.",
+                        "     * @param auth the URL of the authorization server.",
+                        "     * @throws UnauthorizedException if the credentials are not valid.",
+                        "     * @throws IOException if an IOException occurs when checking the user's",
+                        "     * credentials.",
+                        "     */",
+                        "    public " + clientClassName + "(" + urlClass + 
+                                " url, String user, String password, " +
+                                urlClass + " auth) throws " + 
+                                model.ref(utilPackage + ".UnauthorizedException") + ", " +
+                                model.ref("java.io.IOException") + " {",
+                        "        caller = new " + callerClass + "(url, user, password, auth);"
+                        ));
+                if (dynservVersion != null) {
+                    classLines.add(
+                            "        caller.setDynamic(true);"
+                            );
+                }
+                classLines.addAll(Arrays.asList(
 						"    }"
 						));
 				if (url != null) {
@@ -523,7 +620,14 @@ public class JavaTypeGenerator {
 						"    public " + clientClassName + "(" + tokenClass + " token) throws " + 
 								model.ref(utilPackage + ".UnauthorizedException") + ", " +
 								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(DEFAULT_URL, token);",
+						"        caller = new " + callerClass + "(DEFAULT_URL, token);"
+	                        ));
+	                if (dynservVersion != null) {
+	                    classLines.add(
+	                            "        caller.setDynamic(true);"
+	                            );
+	                }
+	                classLines.addAll(Arrays.asList(
 						"    }",
 						"",
 						"    /** Constructs a client with the default URL.",
@@ -536,7 +640,14 @@ public class JavaTypeGenerator {
 						"    public " + clientClassName + "(String user, String password) throws " + 
 								model.ref(utilPackage + ".UnauthorizedException") + ", " +
 								model.ref("java.io.IOException") + " {",
-						"        caller = new " + callerClass + "(DEFAULT_URL, user, password);",
+						"        caller = new " + callerClass + "(DEFAULT_URL, user, password);"
+	                        ));
+	                if (dynservVersion != null) {
+	                    classLines.add(
+	                            "        caller.setDynamic(true);"
+	                            );
+	                }
+	                classLines.addAll(Arrays.asList(
 						"    }"
 						));
 				}
@@ -632,7 +743,7 @@ public class JavaTypeGenerator {
 					"        caller.setFileForNextRpcResponse(f);",
 					"    }"
 					));
-			if (anyAsync) {
+			if (anyAsync || asyncVersion != null) {
 			    classLines.addAll(Arrays.asList(
 			            "",
 			            "    public long getAsyncJobCheckTimeMs() {",
@@ -641,19 +752,35 @@ public class JavaTypeGenerator {
                         "",
                         "    public void setAsyncJobCheckTimeMs(long newValue) {",
                         "        this.asyncJobCheckTimeMs = newValue;",
+                        "    }",
+                        "",
+                        "    public int getAsyncJobCheckTimeScalePercent() {",
+                        "        return this.asyncJobCheckTimeScalePercent;",
+                        "    }",
+                        "",
+                        "    public void setAsyncJobCheckTimeScalePercent(int newValue) {",
+                        "        this.asyncJobCheckTimeScalePercent = newValue;",
+                        "    }",
+                        "",
+                        "    public long getAsyncJobCheckMaxTimeMs() {",
+                        "        return this.asyncJobCheckMaxTimeMs;",
+                        "    }",
+                        "",
+                        "    public void setAsyncJobCheckMaxTimeMs(long newValue) {",
+                        "        this.asyncJobCheckMaxTimeMs = newValue;",
                         "    }"
 			            ));
-			    classLines.addAll(Arrays.asList(
-			            "",
-			            "    public String getAsyncVersion() {",
-			            "        return this.asyncVersion;",
-			            "    }",
-			            "",
-			            "    public void setAsyncVersion(String newValue) {",
-			            "        this.asyncVersion = newValue;",
-			            "    }"
-			            ));
 			}
+            classLines.addAll(Arrays.asList(
+                    "",
+                    "    public String getServiceVersion() {",
+                    "        return this.serviceVersion;",
+                    "    }",
+                    "",
+                    "    public void setServiceVersion(String newValue) {",
+                    "        this.serviceVersion = newValue;",
+                    "    }"
+                    ));
 			if (anyAsync || asyncVersion != null) {
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
@@ -673,7 +800,11 @@ public class JavaTypeGenerator {
                         "    }"
                         ));
 			}
+			boolean isStatusInKidl = false;
+            String listClass = model.ref("java.util.List");
 			for (JavaFunc func : module.getFuncs()) {
+                if (func.getOriginal().getName().equals("status"))
+                    isStatusInKidl = true;
                 JavaType retType = null;
                 if (func.getRetMultyType() == null) {
                     if (func.getReturns().size() > 0) {
@@ -693,7 +824,6 @@ public class JavaTypeGenerator {
                 appendWithComma(funcParams, contextType).append("... ").append(contextField);
                 appendWithComma(funcParamNames, contextField);
                 String retTypeName = retType == null ? "void" : getJType(retType, packageParent, model);
-                String listClass = model.ref("java.util.List");
                 String arrayListClass = model.ref("java.util.ArrayList");
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
@@ -705,10 +835,10 @@ public class JavaTypeGenerator {
 			        classLines.add("    protected String _" + func.getJavaName() + "Submit(" + funcParams + ") " + exceptions+ " {");
 			        if (asyncVersion != null) {
 	                    classLines.addAll(Arrays.asList(
-	                            "        if (asyncVersion != null) {",
+	                            "        if (this.serviceVersion != null) {",
 	                            "            if (" + contextField + " == null || " + contextField + ".length == 0 || " + contextField + "[0] == null)",
 	                            "                " + contextField + " = new " + contextType + "[] {new " + contextType + "()};",
-	                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", asyncVersion);",
+	                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", this.serviceVersion);",
 	                            "        }"
 	                            ));
 			        }
@@ -734,14 +864,16 @@ public class JavaTypeGenerator {
                             "    public " + retTypeName + " " + func.getJavaName() + "(" + funcParams + ") " + exceptions+ " {",
                             "        String jobId = _" + func.getJavaName() + "Submit(" + funcParamNames + ");",
                             "        " + trFull + " retType = new " + trFull + "() {};",
+                            "        long asyncJobCheckTimeMs = this.asyncJobCheckTimeMs;",
                             "        while (true) {",
                             "            if (Thread.currentThread().isInterrupted())",
                             "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
                             "            try { ",
-                            "                Thread.sleep(this.asyncJobCheckTimeMs);",
+                            "                Thread.sleep(asyncJobCheckTimeMs);",
                             "            } catch(Exception ex) {",
                             "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
                             "            }",
+                            "            asyncJobCheckTimeMs = Math.min(asyncJobCheckTimeMs * this.asyncJobCheckTimeScalePercent / 100, this.asyncJobCheckMaxTimeMs);",
                             "            " + jobStateType + "<" + innerRetType + "> res = _checkJob(jobId, retType);",
                             "            if (res.getFinished() != 0L)",
                             "                return" + (func.getRetMultyType() == null ? (retType == null ? "" : " res.getResult().get(0)") : " res.getResult()") + ";",
@@ -764,14 +896,14 @@ public class JavaTypeGenerator {
 			                String trFull = typeReferenceClass + "<Object>";
 			                classLines.addAll(Arrays.asList(
 			                        "        " + trFull + " retType = new " + trFull + "() {};",
-			                        "        caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ");",
+			                        "        caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ", this.serviceVersion);",
 			                        "    }"
 			                        ));
 			            } else {
 			                String trFull = typeReferenceClass + "<" + listClass + "<" + retTypeName + ">>";
 			                classLines.addAll(Arrays.asList(
 			                        "        " + trFull + " retType = new " + trFull + "() {};",
-			                        "        " + listClass + "<" + retTypeName + "> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ");",
+			                        "        " + listClass + "<" + retTypeName + "> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ", this.serviceVersion);",
 			                        "        return res.get(0);",
 			                        "    }"
 			                        ));
@@ -780,11 +912,72 @@ public class JavaTypeGenerator {
 			            String trFull = typeReferenceClass + "<" + retTypeName + ">";
 			            classLines.addAll(Arrays.asList(
 			                    "        " + trFull + " retType = new " + trFull + "() {};",
-			                    "        " + retTypeName + " res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ");",
+			                    "        " + retTypeName + " res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." + func.getOriginal().getName() + "\", args, retType, " + needRet + ", " + authRequired + ", " + contextField + ", this.serviceVersion);",
 			                    "        return res;",
 			                    "    }"
 			                    ));					
 			        }
+			    }
+			}
+			if (!isStatusInKidl) {
+                classLines.add("");
+			    String mapType = model.ref("java.util.Map") + "<String, Object>";
+                String contextType = model.ref(utilPackage + ".RpcContext");
+                String contextField = "jsonRpcContext";
+                StringBuilder funcParams = new StringBuilder();
+                StringBuilder funcParamNames = new StringBuilder();
+                appendWithComma(funcParams, contextType).append("... ").append(contextField);
+                appendWithComma(funcParamNames, contextField);
+                String arrayListClass = model.ref("java.util.ArrayList");
+                String exceptions = "throws " + model.ref("java.io.IOException") 
+                        + ", " + model.ref(utilPackage + ".JsonClientException");
+			    if (asyncVersion != null) {
+                    String typeReferenceClass = model.ref("com.fasterxml.jackson.core.type.TypeReference");
+                    String trFull1 = typeReferenceClass + "<" + listClass + "<String>>";
+                    String jobStateType = model.ref(utilPackage + ".JobState");
+                    String innerRetType = listClass + "<" + mapType + ">";
+			        String trFull2 = typeReferenceClass + "<" + listClass + "<" + jobStateType + "<" + innerRetType + ">>>";
+			        classLines.addAll(Arrays.asList(
+			                "    public " + mapType + " status(" + funcParams + ") " + exceptions+ " {",
+                            "        if (this.serviceVersion != null) {",
+                            "            if (" + contextField + " == null || " + contextField + ".length == 0 || " + contextField + "[0] == null)",
+                            "                " + contextField + " = new " + contextType + "[] {new " + contextType + "()};",
+                            "            " + contextField + "[0].getAdditionalProperties().put(\"service_ver\", this.serviceVersion);",
+                            "        }",
+                            "        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();",
+                            "        " + trFull1 + " retType1 = new " + trFull1 + "() {};",
+                            "        " + listClass + "<String> res1 = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "._" + 
+                                    "status_submit" + "\", args, retType1, true, true, " + contextField + ");",
+                            "        String jobId = res1.get(0);",
+			                "        " + trFull2 + " retType2 = new " + trFull2 + "() {};",
+                            "        long asyncJobCheckTimeMs = this.asyncJobCheckTimeMs;",
+			                "        while (true) {",
+			                "            if (Thread.currentThread().isInterrupted())",
+			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\");",
+			                "            try { ",
+			                "                Thread.sleep(asyncJobCheckTimeMs);",
+			                "            } catch(Exception ex) {",
+			                "                throw new " + model.ref(utilPackage + ".JsonClientException") + "(\"Thread was interrupted\", ex);",
+			                "            }",
+                            "            asyncJobCheckTimeMs = Math.min(asyncJobCheckTimeMs * this.asyncJobCheckTimeScalePercent / 100, this.asyncJobCheckMaxTimeMs);",
+			                "            " + jobStateType + "<" + innerRetType + "> res2 = _checkJob(jobId, retType2);",
+			                "            if (res2.getFinished() != 0L)",
+			                "                return res2.getResult().get(0);",
+			                "        }",
+			                "    }"
+			                ));
+			    } else {
+                    String typeReferenceClass = model.ref("com.fasterxml.jackson.core.type.TypeReference");
+                    String trFull = typeReferenceClass + "<" + listClass + "<" + mapType + ">>";
+                    classLines.addAll(Arrays.asList(
+                            "    public " + mapType + " status(" + funcParams + ") " + exceptions+ " {",
+                            "        " + listClass + "<Object> args = new " + arrayListClass + "<Object>();",
+                            "        " + trFull + " retType = new " + trFull + "() {};",
+                            "        " + listClass + "<" + mapType + "> res = caller.jsonrpcCall(\"" + module.getOriginal().getModuleName() + "." +
+                                    "status\", args, retType, true, false, " + contextField + ", this.serviceVersion);",
+                            "        return res.get(0);",
+                            "    }"
+                            ));
 			    }
 			}
 			classLines.add("}");
@@ -1137,6 +1330,10 @@ public class JavaTypeGenerator {
 		    jars.add(checkLib(libOutDir, "ini4j-0.5.2"));
 		    jars.add(checkLib(libOutDir, "syslog4j-0.9.46"));
 		    jars.add(checkLib(libOutDir, "jna-3.4.0"));
+		    jars.add(checkLib(libOutDir, "joda-time-2.2"));
+            jars.add(checkLib(libOutDir, "logback-core-1.1.2"));
+            jars.add(checkLib(libOutDir, "logback-classic-1.1.2"));
+            jars.add(checkLib(libOutDir, "slf4j-api-1.7.7"));
 		}
 		return jars;
 	}

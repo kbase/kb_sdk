@@ -21,7 +21,7 @@
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/jcommander/jcommander-1.48.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/snakeyaml/snakeyaml-1.11.jar"/>
-	<classpathentry kind="lib" path="../jars/lib/jars/kbase/common/kbase-common-0.0.13.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/common/kbase-common-0.0.17.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/kbase/shock/shock-client-0.0.8.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/kbase/handle/HandleServiceClient-141020-5eda76e.jar"/>
@@ -29,8 +29,13 @@
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/http/httpcore-4.3.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/http/httpmime-4.3.1.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/jars/lib/jars/kbase/workspace/WorkspaceClient-0.4.1.jar"/>
-	<classpathentry kind="lib" path="/jars/lib/jars/joda/joda-time-2.2.jar"/>
-	<classpathentry kind="lib" path="/jars/lib/jars/google/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/workspace/WorkspaceClient-0.4.1.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/joda/joda-time-2.2.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/google/guava-18.0.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/j2html/j2html-0.7.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/logback/logback-classic-1.1.2.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/logback/logback-core-1.1.2.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/slf4j/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

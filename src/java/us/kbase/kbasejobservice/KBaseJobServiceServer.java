@@ -14,7 +14,6 @@ import us.kbase.common.service.JsonServerSyslog;
 
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +21,13 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import us.kbase.common.service.UObject;
-import us.kbase.common.utils.UTCDateFormat;
 import us.kbase.mobu.util.ProcessHelper;
 
 //END_HEADER
@@ -79,10 +81,10 @@ public class KBaseJobServiceServer extends JsonServerServlet {
             String rpcName = rpcCallData.getMethod();
             List<UObject> paramsList = rpcCallData.getParams();
             List<Object> result = null;
-            String errorMessage = null;
             ObjectMapper mapper = new ObjectMapper().registerModule(new JacksonTupleModule());
             RpcContext context = UObject.transformObjectToObject(rpcCallData.getContext(),
                             RpcContext.class);
+            Exception exc = null;
             try {
                 if (rpcName.endsWith("_submit")) {
                     String origRpcName = rpcName.substring(0, rpcName.lastIndexOf('_'));
@@ -119,32 +121,31 @@ public class KBaseJobServiceServer extends JsonServerServlet {
                     result = new ArrayList<Object>();
                     result.add(jobState);
                 } else {
-                    errorMessage = "Method [" + rpcName + "] doesn't ends with \"_async\" or \"_check\" suffix";
+                    throw new IllegalArgumentException("Method [" + rpcName +
+                            "] doesn't ends with \"_submit\" or \"_check_job\" suffix");
                 }
-                if (errorMessage == null && result != null) {
-                    Map<String, Object> ret = new LinkedHashMap<String, Object>();
-                    ret.put("version", "1.1");
-                    ret.put("result", result);
-                    mapper.writeValue(new UnclosableOutputStream(output), ret);
-                    return;
-                } else if (errorMessage == null) {
-                    errorMessage = "Unknown server error";
-                }
+                Map<String, Object> ret = new LinkedHashMap<String, Object>();
+                ret.put("version", "1.1");
+                ret.put("result", result);
+                mapper.writeValue(new UnclosableOutputStream(output), ret);
+                return;
             } catch (Exception ex) {
-                errorMessage = ex.getMessage();
+                exc = ex;
             }
             try {
                 Map<String, Object> error = new LinkedHashMap<String, Object>();
                 error.put("name", "JSONRPCError");
                 error.put("code", -32601);
-                error.put("message", errorMessage);
-                error.put("error", errorMessage);
+                error.put("message", exc.getLocalizedMessage());
+                error.put("error", ExceptionUtils.getStackTrace(exc));
                 Map<String, Object> ret = new LinkedHashMap<String, Object>();
                 ret.put("version", "1.1");
                 ret.put("error", error);
                 mapper.writeValue(new UnclosableOutputStream(output), ret);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             } catch (Exception ex) {
-                new Exception("Error sending error: " + errorMessage, ex).printStackTrace();
+                new Exception("Error sending error: " +
+                        exc.getLocalizedMessage(), ex).printStackTrace();
             }
         }
     }
@@ -229,7 +230,8 @@ public class KBaseJobServiceServer extends JsonServerServlet {
                     if (context.getCallStack() == null)
                         context.setCallStack(new ArrayList<MethodCall>());
                     context.getCallStack().add(new MethodCall().withJobId(jobId).withMethod(job.getMethod())
-                            .withTime(new UTCDateFormat().formatDate(new Date())));
+                            .withTime(DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZoneUTC()
+                                    .print(new DateTime())));
                     File jobDir = new File(tempDir, "job_" + jobId);
                     if (!jobDir.exists())
                         jobDir.mkdirs();

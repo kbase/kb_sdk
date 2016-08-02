@@ -33,6 +33,7 @@ public class Utils {
 		return propAbstract(map, propName, Map.class);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private static <T> T propAbstract(Map<?,?> map, String propName, Class<T> returnType) throws KidlParseException {
 		if (!map.containsKey(propName))
 			throw new KidlParseException("No property in the map: " + propName);
@@ -49,10 +50,12 @@ public class Utils {
 		return repareTypingAbstract(list, String.class);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static List<Map> repareTypingMap(List<?> list) throws KidlParseException {
 		return repareTypingAbstract(list, Map.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <T> List<T> repareTypingAbstract(List<?> list, Class<T> itemType) throws KidlParseException {
 		List<T> ret = new ArrayList<T>();
 		for (Object item : list) {
@@ -64,6 +67,7 @@ public class Utils {
 		return ret;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static List<Map> getListOfMapProp(Map<?,?> data, String propName) throws KidlParseException {
 		return Utils.repareTypingMap(Utils.propList(data, propName));
 	}

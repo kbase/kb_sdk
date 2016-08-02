@@ -22,6 +22,7 @@ import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbType;
 import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.JSONableVisitor;
 import us.kbase.kidl.KidlParseException;
 
 /** Token Manager. */

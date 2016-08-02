@@ -254,6 +254,9 @@ public class ModuleValidator {
 	protected void validateMethodSpecMapping(String specText, KbModule parsedKidl,
 	        boolean allowSyncMethods) throws IOException {
 	    JsonNode spec = new ObjectMapper().readTree(specText);
+        JsonNode behaviorNode = get("/", spec, "behavior");
+        if (behaviorNode.get("none") != null)
+            return;  // Don't pay attention at viewer methods (since they don't use back-end)
         if (!allowSyncMethods) {
             String jobId = get("/", spec, "job_id_output_field").asText();
             if (!jobId.equals("docker")) {
@@ -274,7 +277,6 @@ public class ModuleValidator {
             String paramId = get(paramPath, paramNode, "id").asText();
             inputParamIdToType.put(paramId, paramNode);
         }
-        JsonNode behaviorNode = get("/", spec, "behavior");
         JsonNode serviceMappingNode = get("behavior", behaviorNode, "service-mapping");
         String moduleName = get("behavior/service-mapping", serviceMappingNode, "name").asText();
         String methodName = get("behavior/service-mapping", serviceMappingNode, "method").asText();
