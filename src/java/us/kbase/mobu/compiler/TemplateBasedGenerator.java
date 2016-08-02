@@ -1,6 +1,7 @@
 package us.kbase.mobu.compiler;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -336,17 +337,26 @@ public class TemplateBasedGenerator {
                 output.openWriter(initPath).close();
             }
         }
-        final String baseCli = "baseclient.py";
-        final Path baseCliPath;
-        if (Paths.get(relativePyPath).getParent() == null) {
-            baseCliPath = Paths.get(baseCli);
+        
+        copyResourceFile(relativePyPath, output, "authclient.py");
+        copyResourceFile(relativePyPath, output, "baseclient.py");
+    }
+
+    private static void copyResourceFile(
+            final String relativePath,
+            final FileSaver output,
+            final String file)
+            throws IOException {
+        final Path filepath;
+        if (Paths.get(relativePath).getParent() == null) {
+            filepath = Paths.get(file);
         } else {
-            baseCliPath = Paths.get(relativePyPath).getParent()
-                    .resolve(baseCli);
+            filepath = Paths.get(relativePath).getParent()
+                    .resolve(file);
         }
         try (final InputStream input =
-                TemplateFormatter.getResource(baseCli);
-             final Writer w = output.openWriter(baseCliPath.toString())) {
+                TemplateFormatter.getResource(file);
+             final Writer w = output.openWriter(filepath.toString())) {
             IOUtils.copy(input, w);
         }
     }

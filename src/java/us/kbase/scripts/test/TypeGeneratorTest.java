@@ -632,7 +632,8 @@ public class TypeGeneratorTest extends Assert {
 	private static void startTest(int testNum, boolean needJavaServer, boolean needPerlServer, boolean needPythonServer) throws Exception {
 		File workDir = prepareWorkDir(testNum);
 		System.out.println();
-		System.out.println("Test " + testNum + " (" + getCallingMethod() + ") is starting in directory: " + workDir.getName());
+		System.out.println("Test " + testNum + " (" + getCallingMethod() +
+		        ") is starting in directory: " + workDir.getAbsolutePath());
 		String testPackage = rootPackageName + ".test" + testNum;
 		File libDir = new File(workDir, "lib");
 		File binDir = new File(workDir, "bin");
