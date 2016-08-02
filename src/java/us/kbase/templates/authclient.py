@@ -34,6 +34,10 @@ class TokenCache(object):
         return user
 
     def add_valid_token(self, token, user):
+        if not token:
+            raise ValueError('token cannot be None')
+        if not user:
+            raise ValueError('user cannot be None')
         with self._lock:
             self._cache[token] = [user, _time.time()]
             if len(self._cache) > self._maxsize:
@@ -62,6 +66,8 @@ class KBaseAuth(object):
         self._cache = TokenCache()
 
     def get_user(self, token):
+        if not token:
+            raise ValueError('token cannot be None')
         user = self._cache.get_user(token)
         if user:
             return user
