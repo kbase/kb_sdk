@@ -199,7 +199,8 @@ public class DockerClientServerTester {
             boolean async, boolean dynamic, String serverType) throws Exception { 
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
-        String token = AuthService.login(user, pwd).getTokenString();
+        //TODO AUTH make configurable?
+        AuthToken token = AuthService.login(user, pwd).getToken();
         // Java client
         System.out.print("Java client -> " + serverType + " server ");
         ClientInstaller clInst = new ClientInstaller(moduleDir);
@@ -223,7 +224,7 @@ public class DockerClientServerTester {
         String clientClassName = moduleName.toLowerCase() + "." + moduleName + "Client";
         Class<?> clientClass = urlcl.loadClass(clientClassName);
         Object client = clientClass.getConstructor(URL.class, AuthToken.class)
-                .newInstance(new URL(clientEndpointUrl), new AuthToken(token));
+                .newInstance(new URL(clientEndpointUrl), token);
         clientClass.getMethod("setIsInsecureHttpConnectionAllowed", Boolean.TYPE).invoke(client, true);
         Method method = null;
         for (Method m : client.getClass().getMethods())
@@ -364,7 +365,7 @@ public class DockerClientServerTester {
             boolean async, boolean dynamic, String serverType) throws Exception {
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
-        String token = AuthService.login(user, pwd).getTokenString();
+        AuthToken token = AuthService.login(user, pwd).getToken();
         // Java client
         System.out.println("Java client (status) -> " + serverType + " server");
         ClientInstaller clInst = new ClientInstaller(moduleDir);
@@ -390,7 +391,7 @@ public class DockerClientServerTester {
         if (async) {
             Class<?> clientClass = urlcl.loadClass(clientClassName);
             client = clientClass.getConstructor(URL.class, AuthToken.class)
-                    .newInstance(new URL(clientEndpointUrl), new AuthToken(token));
+                    .newInstance(new URL(clientEndpointUrl), token);
             clientClass.getMethod("setIsInsecureHttpConnectionAllowed", Boolean.TYPE).invoke(client, true);
 
         } else {

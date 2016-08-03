@@ -34,7 +34,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.TokenFormatException;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonClientException;
@@ -201,7 +200,7 @@ public abstract class CallbackServer extends JsonServerServlet {
 
     private Map<String, Object> handleCall(
             final RpcCallData rpcCallData) throws IOException,
-            JsonClientException, InterruptedException, TokenFormatException {
+            JsonClientException, InterruptedException {
 
         final ModuleMethod modmeth = new ModuleMethod(
                 rpcCallData.getMethod());
@@ -409,7 +408,7 @@ public abstract class CallbackServer extends JsonServerServlet {
             final UUID jobId,
             final RpcContext rpcContext,
             final ModuleMethod modmeth)
-            throws IOException, JsonClientException, TokenFormatException  {
+            throws IOException, JsonClientException {
         final SubsequentCallRunner runner;
         synchronized (getRunnerLock) {
             final String serviceVer;
@@ -448,7 +447,7 @@ public abstract class CallbackServer extends JsonServerServlet {
             final UUID jobId,
             final ModuleMethod modmeth,
             final String serviceVer)
-            throws IOException, JsonClientException, TokenFormatException;
+            throws IOException, JsonClientException;
     
     @Override
     public void destroy() {

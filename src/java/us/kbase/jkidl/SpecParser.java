@@ -797,7 +797,6 @@ name = nameToken.toString();
     throw generateParseException();
   }
 
-  @SuppressWarnings("serial")
   static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(int kind) {
