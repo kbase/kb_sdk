@@ -78,9 +78,7 @@ class TestAuth(unittest.TestCase):
         kba2 = KBaseAuth('https://thisisasuperfakeurlihope.com')
         with self.assertRaises(ConnectionError) as context:
             kba2.get_user(self.token1)
-        self.assertIn(
-            "HTTPSConnectionPool(host='thisisasuperfakeurlihope.com'",
-            str(context.exception.message))
+        self.assertIn('not known', str(context.exception.message))
 
     def fail_get_user(self, token, error):
         with self.assertRaises(ValueError) as context:

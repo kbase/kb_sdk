@@ -34,7 +34,7 @@ public class ModuleRenamerTest {
         user = testini.get(TEST_CFG, "test.user");
         pwd = testini.get(TEST_CFG, "test.pwd");
         if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
-            throw new TestException("missing user and / or pwd from test cfg");
+            throw new TestException("missing user and / or pws from test cfg");
         }
     }
 
