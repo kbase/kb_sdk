@@ -122,7 +122,7 @@ public class ModuleTester {
             return 1;
         }
         Properties props = new Properties();
-        InputStream is = new FileInputStream(new File(tlDir, "test.cfg"));
+        InputStream is = new FileInputStream(testCfg);
         try {
             props.load(is);
         } finally {

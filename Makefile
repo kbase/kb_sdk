@@ -88,8 +88,9 @@ sdkbase:
 	docker build --no-cache -t kbase/kbase:sdkbase.latest sdkbase
 
 test: submodule-init
-	@# todo: remove perl typecomp tests and add it as a separate target
 	@echo "Running unit tests"
+	nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
+	@# todo: remove perl typecomp tests and add it as a separate target
 	$(ANT) test
 
 test-client:

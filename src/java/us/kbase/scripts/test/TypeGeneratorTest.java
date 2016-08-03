@@ -2,7 +2,6 @@ package us.kbase.scripts.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -30,6 +28,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
+import org.ini4j.Ini;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,6 +45,7 @@ import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
+import us.kbase.common.test.TestException;
 import us.kbase.kbasejobservice.KBaseJobServiceServer;
 import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbService;
@@ -80,6 +80,7 @@ public class TypeGeneratorTest extends Assert {
     
 	public static final String rootPackageName = "us.kbase";
     public static final String tempDirName = "temp_test";
+    private static final String TEST_CFG = "kb_sdk_test";
     
     private static Boolean isCasperJsInstalled = null;
     private static String token = null;
@@ -100,17 +101,19 @@ public class TypeGeneratorTest extends Assert {
 		}
 	}
 	
-	@BeforeClass
-	public static void prepareTestConfigParams() throws Exception {
-		Properties props = new Properties();
-		InputStream is = new FileInputStream(new File("test_scripts/test.cfg"));
-		props.load(is);
-		is.close();
-		for (Object key : props.keySet()) {
-			String prop = key.toString();
-			String value = props.getProperty(prop);
-			System.setProperty(prop, value);
-		}
+    @BeforeClass
+    public static void prepareTestConfigParams() throws Exception {
+        final Ini testini = new Ini(new File("test_scripts/test.cfg"));
+        for (Object key: testini.get(TEST_CFG).keySet()) {
+            String prop = key.toString();
+            String value = testini.get(TEST_CFG, key);
+            System.setProperty(prop, value);
+        }
+        final String user = System.getProperty("test.user");
+        final String pwd = System.getProperty("test.pwd");
+        if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
+            throw new TestException("missing user and / or pws from test cfg");
+        }
         suppressJettyLogging();
 	}
 
@@ -632,7 +635,8 @@ public class TypeGeneratorTest extends Assert {
 	private static void startTest(int testNum, boolean needJavaServer, boolean needPerlServer, boolean needPythonServer) throws Exception {
 		File workDir = prepareWorkDir(testNum);
 		System.out.println();
-		System.out.println("Test " + testNum + " (" + getCallingMethod() + ") is starting in directory: " + workDir.getName());
+		System.out.println("Test " + testNum + " (" + getCallingMethod() +
+		        ") is starting in directory: " + workDir.getAbsolutePath());
 		String testPackage = rootPackageName + ".test" + testNum;
 		File libDir = new File(workDir, "lib");
 		File binDir = new File(workDir, "bin");

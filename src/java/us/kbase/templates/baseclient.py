@@ -137,7 +137,8 @@ class BaseClient(object):
         self.trust_all_ssl_certificates = trust_all_ssl_certificates
         self.lookup_url = lookup_url
         self.async_job_check_time = async_job_check_time_ms / 1000.0
-        self.async_job_check_time_scale_percent = async_job_check_time_scale_percent
+        self.async_job_check_time_scale_percent = (
+            async_job_check_time_scale_percent)
         self.async_job_check_max_time = async_job_check_max_time_ms / 1000.0
         # token overrides user_id and password
         if token is not None:
@@ -238,7 +239,8 @@ class BaseClient(object):
         while True:
             time.sleep(async_job_check_time)
             async_job_check_time = (async_job_check_time *
-                self.async_job_check_time_scale_percent / 100.0)
+                                    self.async_job_check_time_scale_percent /
+                                    100.0)
             if async_job_check_time > self.async_job_check_max_time:
                 async_job_check_time = self.async_job_check_max_time
             job_state = self._check_job(mod, job_id)

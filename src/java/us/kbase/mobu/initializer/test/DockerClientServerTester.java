@@ -1,9 +1,7 @@
 package us.kbase.mobu.initializer.test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -12,9 +10,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.ini4j.Ini;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -23,6 +21,7 @@ import org.junit.BeforeClass;
 import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.UObject;
+import us.kbase.common.test.TestException;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.tester.ModuleTester;
@@ -37,15 +36,17 @@ public class DockerClientServerTester {
     protected static List<String> createdModuleNames = new ArrayList<String>();
     protected static String user;
     protected static String pwd;
+    
+    private static final String TEST_CFG = "kb_sdk_test";
 
     @BeforeClass
     public static void beforeTesterClass() throws Exception {
-        Properties props = new Properties();
-        InputStream is = new FileInputStream(new File("test_scripts/test.cfg"));
-        props.load(is);
-        is.close();
-        user = props.getProperty("test.user");
-        pwd = props.getProperty("test.pwd");
+        final Ini testini = new Ini(new File("test_scripts/test.cfg"));
+        user = testini.get(TEST_CFG, "test.user");
+        pwd = testini.get(TEST_CFG, "test.pwd");
+        if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
+            throw new TestException("missing user and / or pws from test cfg");
+        }
         TypeGeneratorTest.suppressJettyLogging();
     }
     
