@@ -1,20 +1,19 @@
 package us.kbase.mobu.tester.test;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
+import org.ini4j.Ini;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import us.kbase.common.test.TestException;
 import us.kbase.mobu.ModuleBuilder;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.tester.ModuleTester;
@@ -24,20 +23,22 @@ public class ModuleTesterTest {
 	private static final String SIMPLE_MODULE_NAME = "ASimpleModule_for_unit_testing";
 	private static final boolean cleanupAfterTests = true;
 	
+	private static final String TEST_CFG = "kb_sdk_test";
+	
 	private static List<String> createdModuleNames = new ArrayList<String>();
 	private static String user;
 	private static String pwd;
 	
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-	    Properties props = new Properties();
-	    InputStream is = new FileInputStream(new File("test_scripts/test.cfg"));
-	    props.load(is);
-	    is.close();
-	    user = props.getProperty("test.user");
-	    pwd = props.getProperty("test.pwd");
-	}
-	
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        final Ini testini = new Ini(new File("test_scripts/test.cfg"));
+        user = testini.get(TEST_CFG, "test.user");
+        pwd = testini.get(TEST_CFG, "test.pwd");
+        if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
+            throw new TestException("missing user and / or pwd from test cfg");
+        }
+    }
+
 	@AfterClass
 	public static void tearDownModule() throws Exception {
 	    if (cleanupAfterTests)

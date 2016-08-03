@@ -9,8 +9,7 @@ import unittest
 
 from authclient import KBaseAuth  # @UnresolvedImport
 import os
-# can't use configparser here because doesn't allow cfgs with no sections
-from configobj import ConfigObj
+from ConfigParser import ConfigParser
 import requests
 from requests import ConnectionError
 
@@ -21,15 +20,18 @@ class TestAuth(unittest.TestCase):
     TOKEN1 = 'test.token1'
     TOKEN2 = 'test.token2'
 
+    CFG_SEC = 'kb_sdk_test'
+
     @classmethod
     def setUpClass(cls):
         configfile = os.path.abspath(os.path.dirname(
             os.path.abspath(__file__)) + '/../test.cfg')
         print('Loading test config from ' + configfile)
-        cfg = ConfigObj(configfile)
-        authurl = cfg.get(cls.AUTHURL)
-        cls.token1 = cfg.get(cls.TOKEN1)
-        cls.token2 = cfg.get(cls.TOKEN2)
+        cfg = ConfigParser()
+        cfg.read(configfile)
+        authurl = cfg.get(cls.CFG_SEC, cls.AUTHURL)
+        cls.token1 = cfg.get(cls.CFG_SEC, cls.TOKEN1)
+        cls.token2 = cfg.get(cls.CFG_SEC, cls.TOKEN2)
         if not authurl:
             raise ValueError('Missing {} from test config'.format(cls.AUTHURL))
         if not cls.token1:
@@ -76,8 +78,9 @@ class TestAuth(unittest.TestCase):
         kba2 = KBaseAuth('https://thisisasuperfakeurlihope.com')
         with self.assertRaises(ConnectionError) as context:
             kba2.get_user(self.token1)
-        self.assertTrue(str(context.exception.message).startswith(
-            "HTTPSConnectionPool(host='thisisasuperfakeurlihope.com'"))
+        self.assertIn(
+            "HTTPSConnectionPool(host='thisisasuperfakeurlihope.com'",
+            str(context.exception.message))
 
     def fail_get_user(self, token, error):
         with self.assertRaises(ValueError) as context:
