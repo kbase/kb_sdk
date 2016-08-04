@@ -537,30 +537,6 @@ public class JavaTypeGenerator {
                 classLines.addAll(Arrays.asList(
                         "    }",
                         "",
-                        "    /** Constructs a client with a custom URL",
-                        "     * and a custom authorization service URL.",
-                        "     * @param url the URL of the service.",
-                        "     * @param token the user's authorization token.",
-                        "     * @param auth the URL of the authorization server.",
-                        "     * @throws UnauthorizedException if the token is not valid.",
-                        "     * @throws IOException if an IOException occurs when checking the token's",
-                        "     * validity.",
-                        "     */",
-                        "    public " + clientClassName + "(" + urlClass + " url, " + 
-                                model.ref("us.kbase.auth.AuthToken") + " token, " +
-                                urlClass + " auth) throws " + 
-                                model.ref(utilPackage + ".UnauthorizedException") + ", " +
-                                model.ref("java.io.IOException") + " {",
-                        "        caller = new " + callerClass + "(url, token, auth);"
-                        ));
-                if (dynservVersion != null) {
-                    classLines.add(
-                            "        caller.setDynamic(true);"
-                            );
-                }
-                classLines.addAll(Arrays.asList(
-                        "    }",
-                        "",
                         "    /** Constructs a client with a custom URL.",
                         "     * @param url the URL of the service.",
                         "     * @param user the user name.",
