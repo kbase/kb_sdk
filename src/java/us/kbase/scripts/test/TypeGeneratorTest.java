@@ -200,7 +200,7 @@ public class TypeGeneratorTest extends Assert {
 		int testNum = 6;
 		File workDir = prepareWorkDir(testNum);
 		System.out.println();
-		System.out.println("Test " + testNum + " (testAuth) is starting in directory: " + workDir.getName());
+		System.out.println("Test " + testNum + " (testAuth) is starting in directory: " + workDir.getAbsolutePath());
 		String testPackage = rootPackageName + ".test" + testNum;
 		File libDir = new File(workDir, "lib");
 		File binDir = new File(workDir, "bin");
@@ -1073,10 +1073,11 @@ public class TypeGeneratorTest extends Assert {
 					if (t instanceof ConnectException) {
 						error = (ConnectException)t;
 					} else {
-					    if (t instanceof ServerException) {
-					        throw new IllegalStateException("ServerException: " + t.getMessage() + 
-					                " (" + ((ServerException)t).getData() + ")");
-					    }
+						if (t instanceof ServerException) {
+							t.printStackTrace();
+							throw new IllegalStateException("ServerException: " + t.getMessage() + 
+									" (" + ((ServerException)t).getData() + ")");
+						}
 						throw (Exception)t;
 					}
 				} else if (t != null && t instanceof Error) {
