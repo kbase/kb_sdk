@@ -65,7 +65,7 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(kba2.get_user(self.token2), self.user2)
 
     def test_bad_token(self):
-        self.fail_get_user(None, 'token cannot be None')
+        self.fail_get_user(None, 'Must supply token')
         self.fail_get_user(
             'bleah', 'Error connecting to auth service: 500 ' +
             'INTERNAL SERVER ERROR\nValueError: need more than 1 value to ' +
