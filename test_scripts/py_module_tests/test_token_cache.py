@@ -20,8 +20,8 @@ class TestTokenCache(unittest.TestCase):
         self.assertEqual(None, tc.get_user('womp'))
 
     def test_fail_set(self):
-        self.fail_set(None, 'foo', 'token cannot be None')
-        self.fail_set('foo', None, 'user cannot be None')
+        self.fail_set(None, 'foo', 'Must supply token')
+        self.fail_set('foo', None, 'Must supply user')
 
     def test_fast_expire(self):
         tc = TokenCache()
@@ -35,21 +35,21 @@ class TestTokenCache(unittest.TestCase):
         sz = 4
         tc = TokenCache(sz)
         for x in xrange(1, sz + 1):
-            tc.add_valid_token(x, str(x))
+            tc.add_valid_token(str(x), x)
         for x in xrange(1, sz + 1):
-            self.assertEqual(str(x), tc.get_user(x))
+            self.assertEqual(x, tc.get_user(str(x)))
 
         # shouldn't dump the cache
-        tc.add_valid_token(2, '2')
+        tc.add_valid_token('2', 2)
         for x in xrange(1, sz + 1):
-            self.assertEqual(str(x), tc.get_user(x))
+            self.assertEqual(x, tc.get_user(str(x)))
 
         # should dump the cache
-        tc.add_valid_token(5, '5')
+        tc.add_valid_token('5', 5)
         for x in [1, 3, 4]:
-            self.assertEqual(None, tc.get_user(x))
+            self.assertEqual(None, tc.get_user(str(x)))
         for x in [2, 5]:
-            self.assertEqual(str(x), tc.get_user(x))
+            self.assertEqual(x, tc.get_user(str(x)))
 
     def fail_set(self, token, user, error):
         with self.assertRaises(ValueError) as context:
