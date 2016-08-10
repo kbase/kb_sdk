@@ -48,7 +48,9 @@
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
   <property name="jardir" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
-  <condition property="commonjar" value="kbase/common/kbase-common-0.0.20.jar">
+  
+  <!-- KBASE_COMMON_JAR should come from Makefile because of "make bin" mode support -->
+  <condition property="commonjar" value="${KBASE_COMMON_JAR}">
     <or>
       <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
       <not>
@@ -116,47 +118,9 @@ commit=${git.commit}</echo>
   </target>
 
   <path id="compile.classpath">
-    <fileset dir="${jardir}">
-      <include name="kohsuke/args4j-2.0.21.jar"/>
-      <include name="codemodel/codemodel-2.4.1.jar"/>
-      <include name="apache_commons/commons-io-2.4.jar"/>
-      <include name="ini4j/ini4j-0.5.2.jar"/>
-      <include name="jackson/jackson-annotations-2.2.3.jar"/>
-      <include name="jackson/jackson-core-2.2.3.jar"/>
-      <include name="jackson/jackson-databind-2.2.3.jar"/>
-      <include name="jetty/jetty-all-7.0.0.jar"/>
-      <include name="jna/jna-3.4.0.jar"/>
-      <include name="google/jsonschema2pojo-core-0.3.6.jar"/>
-      <include name="google/guava-14.0.1.jar"/>
-      <include name="junit/junit-4.9.jar"/>
-      <include name="kbase/auth/kbase-auth-0.4.1.jar"/>
-      <include name="servlet/servlet-api-2.5.jar"/>
-      <include name="syslog4j/syslog4j-0.9.46.jar"/>
-      <include name="apache_commons/commons-lang-2.4.jar"/>
-      <include name="apache_commons/commons-lang3-3.1.jar"/>
-      <include name="apache_commons/velocity-1.7.jar"/>
-      <include name="apache_commons/commons-collections-3.2.1.jar"/>
-      <include name="jcommander/jcommander-1.48.jar"/>
-      <include name="snakeyaml/snakeyaml-1.11.jar"/>
-      <include name="j2html/j2html-0.7.jar"/>
-      <include name="kbase/workspace/WorkspaceClient-0.4.1.jar"/>
-      <include name="kbase/shock/shock-client-0.0.14.jar"/>
-      <include name="kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>
-      <include name="kbase/handle/HandleServiceClient-141020-5eda76e.jar"/>
-      <include name="apache_commons/http/httpclient-4.3.1.jar"/>
-      <include name="apache_commons/http/httpcore-4.3.jar"/>
-      <include name="apache_commons/http/httpmime-4.3.1.jar"/>
-      <include name="apache_commons/commons-logging-1.1.1.jar"/>
-      <include name="joda/joda-time-2.2.jar"/>
-      <include name="google/guava-18.0.jar"/>
-      <include name="logback/logback-classic-1.1.2.jar"/>
-      <include name="logback/logback-core-1.1.2.jar"/>
-      <include name="slf4j/slf4j-api-1.7.7.jar"/>
+    <fileset dir="${jardir}" includesfile="JAR_DEPS">
       <include name="${commonjar}"/>
     </fileset>
-    <!--fileset dir=".">
-      <include name="kbase-common-temp.jar"/>
-    </fileset-->
   </path>
 
   <target name="copy_kidl_jar" if="EXT_KIDL_JAR">

@@ -360,7 +360,7 @@ public class DockerClientServerTester {
                 "casperjs test " + new File("test_scripts/js/test-client.js").getAbsolutePath() + " "
                         + "--jq=" + new File("test_scripts/js/jquery-1.10.2.min.js").getAbsolutePath() + " "
                         + "--tests=" + configFile.getAbsolutePath() + 
-                        " --endpoint=" + clientEndpointUrl + " --token=\"" + token + "\""
+                        " --endpoint=" + clientEndpointUrl + " --token=\"" + token.getToken() + "\""
                 ));
         TextUtils.writeFileLines(lines, shellFile);
         {
@@ -534,7 +534,7 @@ public class DockerClientServerTester {
                             " --output=" + outputFile.getAbsolutePath() + 
                             " --error=" + errorFile.getAbsolutePath() + 
                             " --package=" + pcg + " --class=" + cls + " --method=" + mtd +
-                            " --endpoint=" + clientEndpointUrl +  (async ? (" --token=\"" + token + "\"") : "")
+                            " --endpoint=" + clientEndpointUrl +  (async ? (" --token=\"" + token.getToken() + "\"") : "")
                     ));
             TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
