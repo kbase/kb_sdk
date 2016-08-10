@@ -168,8 +168,7 @@ public class DockerClientServerTester {
         return moduleDir;
     }
     
-    protected static String prepareDockerImage(File moduleDir, 
-            String user, String pwd) throws Exception {
+    public static void correctDockerfile(File moduleDir) throws Exception {
         File buildXmlFile = new File("build.xml");
         File sdkSubFolder = new File(moduleDir, "kb_sdk");
         FileUtils.copyFile(buildXmlFile, new File(sdkSubFolder, buildXmlFile.getName()));
@@ -177,7 +176,6 @@ public class DockerClientServerTester {
         FileUtils.copyFile(sdkJarFile, new File(sdkSubFolder, sdkJarFile.getName()));
         File jarDepsFile = new File("JAR_DEPS");
         FileUtils.copyFile(jarDepsFile, new File(sdkSubFolder, jarDepsFile.getName()));
-        String moduleName = moduleDir.getName();
         File dockerFile = new File(moduleDir, "Dockerfile");
         String dockerText = FileUtils.readFileToString(dockerFile);
         dockerText = dockerText.replace("COPY ./ /kb/module", "" +
@@ -191,6 +189,12 @@ public class DockerClientServerTester {
                 "    cp /kb/module/kb_sdk/" + sdkJarFile.getName() + " ./dist/ && \\\n" +
                 "    make deploy && echo \"" + new Date(startingTime) + "\"");
         FileUtils.writeStringToFile(dockerFile, dockerText);
+    }
+    
+    protected static String prepareDockerImage(File moduleDir, 
+            String user, String pwd) throws Exception {
+        String moduleName = moduleDir.getName();
+        correctDockerfile(moduleDir);
         File testCfgFile = new File(moduleDir, "test_local/test.cfg");
         String testCfgText = FileUtils.readFileToString(testCfgFile);
         testCfgText = testCfgText.replace("test_user=", "test_user=" + user);

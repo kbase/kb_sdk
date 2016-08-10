@@ -16,6 +16,7 @@ import org.junit.Test;
 import us.kbase.common.test.TestException;
 import us.kbase.mobu.ModuleBuilder;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.initializer.test.DockerClientServerTester;
 import us.kbase.mobu.tester.ModuleTester;
 
 public class ModuleTesterTest {
@@ -75,6 +76,7 @@ public class ModuleTesterTest {
 	}
 	
 	public static int runTestsInDocker(File moduleDir, String user, String pwd) throws Exception {
+	    DockerClientServerTester.correctDockerfile(moduleDir);
 	    File testCfgFile = new File(moduleDir, "test_local/test.cfg");
 	    String testCfgText = FileUtils.readFileToString(testCfgFile);
 	    testCfgText = testCfgText.replace("test_user=", "test_user=" + user);
