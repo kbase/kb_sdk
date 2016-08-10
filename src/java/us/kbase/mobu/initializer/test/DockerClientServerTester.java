@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class DockerClientServerTester {
     protected static String pwd;
     
     private static final String TEST_CFG = "kb_sdk_test";
+    private static final long startingTime = System.currentTimeMillis();
 
     @BeforeClass
     public static void beforeTesterClass() throws Exception {
@@ -168,7 +170,24 @@ public class DockerClientServerTester {
     
     protected static String prepareDockerImage(File moduleDir, 
             String user, String pwd) throws Exception {
+        File buildXmlFile = new File("build.xml");
+        File sdkSubFolder = new File(moduleDir, "kb_sdk");
+        FileUtils.copyFile(buildXmlFile, new File(sdkSubFolder, buildXmlFile.getName()));
+        File sdkJarFile = new File("dist/kbase_module_builder2.jar");
+        FileUtils.copyFile(sdkJarFile, new File(sdkSubFolder, sdkJarFile.getName()));
         String moduleName = moduleDir.getName();
+        File dockerFile = new File(moduleDir, "Dockerfile");
+        String dockerText = FileUtils.readFileToString(dockerFile);
+        dockerText = dockerText.replace("COPY ./ /kb/module", "" +
+                "COPY ./ /kb/module\n" +
+                "RUN . /kb/dev_container/user-env.sh && \\\n" +
+                "    cd /kb/dev_container/modules/jars && \\\n" +
+                "    git pull && make && make deploy && \\\n" +
+                "    cd /kb/dev_container/modules/kb_sdk && \\\n" +
+                "    cp /kb/module/kb_sdk/build.xml ./ && \\\n" +
+                "    cp /kb/module/kb_sdk/" + sdkJarFile.getName() + " ./dist/ && \\\n" +
+                "    make deploy && echo \"" + new Date(startingTime) + "\"");
+        FileUtils.writeStringToFile(dockerFile, dockerText);
         File testCfgFile = new File(moduleDir, "test_local/test.cfg");
         String testCfgText = FileUtils.readFileToString(testCfgFile);
         testCfgText = testCfgText.replace("test_user=", "test_user=" + user);
