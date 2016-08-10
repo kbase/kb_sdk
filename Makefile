@@ -96,7 +96,7 @@ test: submodule-init
 	@echo "Running unit tests"
 	nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
 	@# todo: remove perl typecomp tests and add it as a separate target
-	$(ANT) test
+	$(ANT) test -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 test-client:
 	@echo "No tests for client - this kbase module is not a service, and has no clients"
