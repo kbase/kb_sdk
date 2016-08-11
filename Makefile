@@ -54,10 +54,21 @@ bin: jars-submodule-init
 	echo '#!/bin/bash' > bin/kb-sdk
 	echo 'DIR=$(DIR)' >> bin/kb-sdk
 	echo 'KBASE_JARS_DIR=$$DIR/submodules/jars/lib/jars' >> bin/kb-sdk
-	echo 'cat ./JAR_DEPS | awk $(QUOTE){print "$$KBASE_JARS_DIR/"$$1":"}$(QUOTE) ORS="" | awk $(QUOTE){print "CLASS_PATH_PREFIX="$$1}$(QUOTE) >> bin/kb-sdk' > bin/temp-script
+	@# Next command processes links in JAR_DEPS_BIN file and has 5 parts (one on each line): 
+	@#  (1) removing comments
+	@#  (2) trimming each line (picking first word actually)
+	@#  (3) skipping empty lines
+	@#  (4) joining lines into one with colon separator
+	@#  (5) adding variable name prefix followed by equal character
+	echo 'cat ./JAR_DEPS_BIN | sed "/^[[:blank:]]*#/d;s/#.*//" \
+		| awk $(QUOTE){print $$1}$(QUOTE) \
+		| grep -v "^$$" \
+		| awk $(QUOTE){print "$$KBASE_JARS_DIR/"$$1":"}$(QUOTE) ORS="" \
+		| awk $(QUOTE){print "CLASS_PATH_PREFIX="$$1}$(QUOTE) >> bin/kb-sdk' > bin/temp-script
 	bash bin/temp-script
 	rm bin/temp-script
-	echo 'java -cp $$CLASS_PATH_PREFIX$$KBASE_JARS_DIR/$(KBASE_COMMON_JAR):$$DIR/lib/kbase_module_builder2.jar us.kbase.mobu.ModuleBuilder $$@' >> bin/kb-sdk
+	echo 'java -cp $$CLASS_PATH_PREFIX$$KBASE_JARS_DIR/$(KBASE_COMMON_JAR):$$DIR/lib/kbase_module_builder2.jar \
+	 us.kbase.mobu.ModuleBuilder $$@' >> bin/kb-sdk
 	chmod +x bin/kb-sdk
 
 submodule-init:
