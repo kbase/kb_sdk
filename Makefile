@@ -38,6 +38,8 @@ compile:
 	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 	$(ANT) copy_local_bin -DBIN_TARGET=$(TOP_DIR)/bin
 
+prepare-bin:
+	$(ANT) prepare_bin -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 else
 ###############################
@@ -46,6 +48,9 @@ else
 
 compile: jars-submodule-init
 	$(ANT) -Djardir=submodules/jars/lib/jars/ -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
+
+prepare-bin:
+	$(ANT) prepare_bin -Djardir=submodules/jars/lib/jars/ -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 endif
 
@@ -105,7 +110,7 @@ sdkbase:
 
 test: submodule-init
 	@echo "Running unit tests"
-	nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
+	@# nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
 	@# todo: remove perl typecomp tests and add it as a separate target
 	$(ANT) test -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 

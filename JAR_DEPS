@@ -1,6 +1,6 @@
 # All links are sorted in alphbetical order and relative to lib/jars/ 
 # folder in jars repo (https://github.com/kbase/jars). This repo 
-# is included into kb_sdk file structure as git submodule
+# is included into kb_sdk file structure as git submodule.
 
 apache_commons/commons-collections-3.2.1.jar
 apache_commons/commons-io-2.4.jar

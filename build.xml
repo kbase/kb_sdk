@@ -13,7 +13,7 @@
   <property name="dist" location="dist"/>
   <property name="bin.local" location="bin"/>
   <property name="classes"  location="classes"/>
-
+  <property name="lib"	location="lib"/>
 
   <property name="test.dir" location="temp_test_files"/>
   <property name="test.script.dir" location="test_scripts"/>
@@ -75,9 +75,9 @@
 
 
   <path id="compile.classpath">
-	<fileset dir="${jardir}" includesfile="JAR_DEPS">
-	  <include name="${commonjar}"/>
-	</fileset>
+    <fileset dir="${jardir}" includesfile="JAR_DEPS">
+      <include name="${commonjar}"/>
+    </fileset>
   </path>
 
 
@@ -238,6 +238,20 @@ kill $(&lt;"$DIR/pid.txt")
     </copy>
     <chmod file="${BIN_TARGET}/${ws_tools.sh.file}" perm="a+x"/>
     <echo>Successfully deployed dev bin to: ${BIN_TARGET}/${module_builder.sh.file}</echo>
+  </target>
+
+
+
+  <target name="prepare_bin" depends="compile" description="prepares binary jar in lib folder and copies JAR_DEPS to JAR_DEPS_BIN">
+    <copy file="${dist}/${module_builder.jar.file}" tofile="${lib}/${module_builder.jar.file}"/>
+    <concat destfile="JAR_DEPS_BIN">
+      <header filtering="no" trimleading="yes">
+        # THIS FILE IS A COPY OF THE JAR_DEPS FILE USED FOR "MAKE BIN" MODE.
+        # PLEASE DO NOT CHANGE IT MANUALLY!
+
+      </header>
+      <path path="JAR_DEPS"/>
+    </concat>
   </target>
 
 
