@@ -171,11 +171,14 @@ public class DockerClientServerTester {
     public static void correctDockerfile(File moduleDir) throws Exception {
         File buildXmlFile = new File("build.xml");
         File sdkSubFolder = new File(moduleDir, "kb_sdk");
+        File sdkDistSubFolder = new File(sdkSubFolder, "dist");
         FileUtils.copyFile(buildXmlFile, new File(sdkSubFolder, buildXmlFile.getName()));
         File sdkJarFile = new File("dist/kbase_module_builder2.jar");
-        FileUtils.copyFile(sdkJarFile, new File(sdkSubFolder, sdkJarFile.getName()));
+        FileUtils.copyFile(sdkJarFile, new File(sdkDistSubFolder, sdkJarFile.getName()));
         File jarDepsFile = new File("JAR_DEPS");
         FileUtils.copyFile(jarDepsFile, new File(sdkSubFolder, jarDepsFile.getName()));
+        File makeFile = new File("Makefile");
+        FileUtils.copyFile(makeFile, new File(sdkSubFolder, makeFile.getName()));
         File dockerFile = new File(moduleDir, "Dockerfile");
         String dockerText = FileUtils.readFileToString(dockerFile);
         dockerText = dockerText.replace("COPY ./ /kb/module", "" +
@@ -183,10 +186,10 @@ public class DockerClientServerTester {
                 "RUN . /kb/dev_container/user-env.sh && \\\n" +
                 "    cd /kb/dev_container/modules/jars && \\\n" +
                 "    git pull && make && make deploy && \\\n" +
+                "    rm /kb/dev_container/bin/kb-sdk && \\\n" + 
+                "    rm /kb/deployment/bin/kb-sdk && \\\n" + 
                 "    cd /kb/dev_container/modules/kb_sdk && \\\n" +
-                "    cp /kb/module/kb_sdk/build.xml ./ && \\\n" +
-                "    cp /kb/module/kb_sdk/JAR_DEPS ./ && \\\n" +
-                "    cp /kb/module/kb_sdk/" + sdkJarFile.getName() + " ./dist/ && \\\n" +
+                "    cp -r /kb/module/kb_sdk/* ./ && \\\n" +
                 "    make deploy && echo \"" + new Date(startingTime) + "\"");
         FileUtils.writeStringToFile(dockerFile, dockerText);
     }

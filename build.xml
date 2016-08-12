@@ -31,6 +31,7 @@
   <property name="ws_tools.sh.file"		value="ws-tools"/>
 
 
+
   <!-- If the BIN_LIB_TARGET is defined, then use the jars from the target destination
        when including the classpath for the bin -->
   <condition property="jardir" value="${BIN_LIB_TARGET}/jars">
@@ -51,15 +52,35 @@
   
   <!-- KBASE_COMMON_JAR should come from Makefile because of "make bin" mode support -->
   <condition property="commonjar" value="${KBASE_COMMON_JAR}">
-    <or>
-      <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
-      <not>
-        <isset property="env.JENKINS_JAVA_COMMON_JARFILE"/>
-      </not>
-    </or>
+    <and>
+      <isset property="KBASE_COMMON_JAR"/>
+      <or>
+        <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
+        <not>
+          <isset property="env.JENKINS_JAVA_COMMON_JARFILE"/>
+        </not>
+      </or>
+    </and>
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
-  <property name="commonjar" value="${env.JENKINS_JAVA_COMMON_JARFILE}"/>
+  <condition property="commonjar" value="${env.JENKINS_JAVA_COMMON_JARFILE}">
+    <and>
+      <isset property="env.JENKINS_JAVA_COMMON_JARFILE"/>
+      <not>
+        <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
+      </not>
+    </and>
+  </condition>
+
+
+
+  <path id="compile.classpath">
+	<fileset dir="${jardir}" includesfile="JAR_DEPS">
+	  <include name="${commonjar}"/>
+	</fileset>
+  </path>
+
+
 
   <target name="init">
     <!-- Create the output directory structure-->
@@ -69,8 +90,15 @@
     <mkdir dir="${test.dir}"/>
     <mkdir dir="${ee.dir}"/>
   </target>
-	
+
+
+
   <target name="compile" depends="init" description="compile the source">
+    <fail message="KBase common jar is not set">
+        <condition>
+            <not><isset property="commonjar" /></not>
+        </condition>
+    </fail>
     <!-- Compile class files-->
     <exec executable="git" outputproperty="git.url"><arg line="config --get remote.origin.url"/></exec>
     <exec executable="git" outputproperty="git.branch"><arg line="rev-parse --abbrev-ref HEAD"/></exec>
@@ -117,11 +145,7 @@ commit=${git.commit}</echo>
     <delete dir="${classes}"/>
   </target>
 
-  <path id="compile.classpath">
-    <fileset dir="${jardir}" includesfile="JAR_DEPS">
-      <include name="${commonjar}"/>
-    </fileset>
-  </path>
+
 
   <target name="copy_kidl_jar" if="EXT_KIDL_JAR">
     <!-- copy the kidl jar to a versioned jar suitable for addition to the jars repo -->
@@ -130,8 +154,13 @@ commit=${git.commit}</echo>
   </target>
 
 
-  
+
   <target name="sh_bin" description="create shell file wrappers">
+    <fail message="KBase common jar is not set">
+        <condition>
+            <not><isset property="commonjar" /></not>
+        </condition>
+    </fail>
     <!-- Define absolute path to main jar file-->
     <property name="jar.absolute.path" location="${dist}/${module_builder.jar.file}"/>
     <!-- Define classpath string with : delimiter from list of lib-jar files-->
@@ -212,6 +241,7 @@ kill $(&lt;"$DIR/pid.txt")
   </target>
 
 
+
   <!-- deploy the module builder bin to the BIN_TARGET -->
   <target name="deploy_bin" description="deploys the module builder shell script and libs if ">
     <!-- fail if the jar file is missing -->
@@ -230,6 +260,14 @@ kill $(&lt;"$DIR/pid.txt")
     <!-- fail if the jars repo is not deployed to the BIN_TARGET location -->
     <fail message="jars folder in ${BIN_LIB_TARGET} is missing- did you forget to deploy 'jars'?">
         <condition><not><available file="${BIN_LIB_TARGET}/jars" /></not></condition>
+    </fail>
+    <fail message="KBase common jar is not set">
+        <condition>
+        	<or>
+        	    <not><isset property="commonjar" /></not>
+        	    <equals arg1="${commonjar}" arg2=""/>
+        	</or>
+        </condition>
     </fail>
     <!-- copy lib to target -->
     <copy todir="${BIN_LIB_TARGET}" flatten="true">
@@ -264,10 +302,12 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
   </target>
 
 
+
   <target name="preparejunitreportdir" if="env.JENKINS_REPORT_DIR">
     <delete dir="${env.JENKINS_REPORT_DIR}"/>
     <mkdir dir="${env.JENKINS_REPORT_DIR}"/>
   </target>
+
 
 
   <target name="test" depends="compile, preparejunitreportdir" description="create test script">
@@ -286,6 +326,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
       </batchtest>
     </junit>
   </target>
+
 
 
   <target name="clean" description="clean up" >
