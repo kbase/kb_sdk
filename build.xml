@@ -108,7 +108,7 @@ giturl=${git.url}
 branch=${git.branch}
 commit=${git.commit}</echo>
     <echo>Compiling with jar directory: ${jardir}</echo>
-    <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" />
+    <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" target="1.7" source="1.7" />
     <!-- Copy resource files-->
     <copy todir="${classes}">
       <fileset dir="${src}">
