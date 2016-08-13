@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class DockerClientServerTester {
     protected static String pwd;
     
     private static final String TEST_CFG = "kb_sdk_test";
+    private static final long startingTime = System.currentTimeMillis();
 
     @BeforeClass
     public static void beforeTesterClass() throws Exception {
@@ -166,9 +168,36 @@ public class DockerClientServerTester {
         return moduleDir;
     }
     
+    public static void correctDockerfile(File moduleDir) throws Exception {
+        File buildXmlFile = new File("build.xml");
+        File sdkSubFolder = new File(moduleDir, "kb_sdk");
+        File sdkDistSubFolder = new File(sdkSubFolder, "dist");
+        FileUtils.copyFile(buildXmlFile, new File(sdkSubFolder, buildXmlFile.getName()));
+        File sdkJarFile = new File("dist/kbase_module_builder2.jar");
+        FileUtils.copyFile(sdkJarFile, new File(sdkDistSubFolder, sdkJarFile.getName()));
+        File jarDepsFile = new File("JAR_DEPS");
+        FileUtils.copyFile(jarDepsFile, new File(sdkSubFolder, jarDepsFile.getName()));
+        File makeFile = new File("Makefile");
+        FileUtils.copyFile(makeFile, new File(sdkSubFolder, makeFile.getName()));
+        File dockerFile = new File(moduleDir, "Dockerfile");
+        String dockerText = FileUtils.readFileToString(dockerFile);
+        dockerText = dockerText.replace("COPY ./ /kb/module", "" +
+                "COPY ./ /kb/module\n" +
+                "RUN . /kb/dev_container/user-env.sh && \\\n" +
+                "    cd /kb/dev_container/modules/jars && \\\n" +
+                "    git pull && make && make deploy && \\\n" +
+                "    rm /kb/dev_container/bin/kb-sdk && \\\n" + 
+                "    rm /kb/deployment/bin/kb-sdk && \\\n" + 
+                "    cd /kb/dev_container/modules/kb_sdk && \\\n" +
+                "    cp -r /kb/module/kb_sdk/* ./ && \\\n" +
+                "    make deploy && echo \"" + new Date(startingTime) + "\"");
+        FileUtils.writeStringToFile(dockerFile, dockerText);
+    }
+    
     protected static String prepareDockerImage(File moduleDir, 
             String user, String pwd) throws Exception {
         String moduleName = moduleDir.getName();
+        correctDockerfile(moduleDir);
         File testCfgFile = new File(moduleDir, "test_local/test.cfg");
         String testCfgText = FileUtils.readFileToString(testCfgFile);
         testCfgText = testCfgText.replace("test_user=", "test_user=" + user);
@@ -341,7 +370,7 @@ public class DockerClientServerTester {
                 "casperjs test " + new File("test_scripts/js/test-client.js").getAbsolutePath() + " "
                         + "--jq=" + new File("test_scripts/js/jquery-1.10.2.min.js").getAbsolutePath() + " "
                         + "--tests=" + configFile.getAbsolutePath() + 
-                        " --endpoint=" + clientEndpointUrl + " --token=\"" + token + "\""
+                        " --endpoint=" + clientEndpointUrl + " --token=\"" + token.getToken() + "\""
                 ));
         TextUtils.writeFileLines(lines, shellFile);
         {
@@ -515,7 +544,7 @@ public class DockerClientServerTester {
                             " --output=" + outputFile.getAbsolutePath() + 
                             " --error=" + errorFile.getAbsolutePath() + 
                             " --package=" + pcg + " --class=" + cls + " --method=" + mtd +
-                            " --endpoint=" + clientEndpointUrl +  (async ? (" --token=\"" + token + "\"") : "")
+                            " --endpoint=" + clientEndpointUrl +  (async ? (" --token=\"" + token.getToken() + "\"") : "")
                     ));
             TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
