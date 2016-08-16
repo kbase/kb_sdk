@@ -70,7 +70,9 @@ https://www.docker.com/mac
 
 https://www.docker.com/linux
 
-On Linux Docker is fairly easy to install.  On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start the Docker Kitematic and then launch the "Docker CLI" Command Line Interface to start the Docker daemon and **run commands that depend on docker (e.g. *make sdkbase*) within that shell**.
+On Linux Docker is fairly easy to install, although note that the service runs as the root user. As such, all Docker commands require root permissions and any KB_SDK commands that interact with Docker (such as `make sdkbase`) will require root permissions. An alterative to this is to create a docker group for Docker users as described in the Docker installation instructions.
+
+On a Mac the standard installer will include an installation of VirtualBox and create a VirtualBox virtual machine to run Docker.  Basically just start the Docker Kitematic and then launch the "Docker CLI" Command Line Interface to start the Docker daemon and **run commands that depend on docker (e.g. *make sdkbase*) within that shell**.
 
 In order to be able to pull remote images, you may need to modify your VirtualBox network settings.  From a command prompt run
 

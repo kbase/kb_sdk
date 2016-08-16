@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.ServerSocket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,9 +26,18 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.yaml.snakeyaml.Yaml;
 
 import us.kbase.auth.AuthService;
+import us.kbase.auth.AuthToken;
+import us.kbase.common.executionengine.CallbackServer;
+import us.kbase.common.executionengine.CallbackServerConfigBuilder;
+import us.kbase.common.executionengine.LineLogger;
+import us.kbase.common.executionengine.ModuleMethod;
+import us.kbase.common.executionengine.ModuleRunVersion;
+import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonServerServlet;
+import us.kbase.common.service.JsonServerSyslog;
+import us.kbase.common.service.UObject;
+import us.kbase.common.utils.NetUtils;
 import us.kbase.mobu.util.DirUtils;
-import us.kbase.mobu.util.NetUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
@@ -38,9 +47,13 @@ public class ModuleTester {
     private File moduleDir;
     protected Map<String,Object> kbaseYmlConfig;
     private Map<String, Object> moduleContext;
-    
+
     public ModuleTester() throws Exception {
-        moduleDir = DirUtils.findModuleDir();
+        this(null);
+    }
+    
+    public ModuleTester(File dir) throws Exception {
+        moduleDir = dir == null ? DirUtils.findModuleDir() : DirUtils.findModuleDir(dir);
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
         @SuppressWarnings("unchecked")
         Map<String,Object> config = (Map<String, Object>)new Yaml().load(kbaseYml);
@@ -51,6 +64,7 @@ public class ModuleTester {
         if (kbaseYmlConfig.get("data-version") != null) {
             moduleContext.put("data_version", kbaseYmlConfig.get("data-version"));
         }
+        moduleContext.put("os_name", System.getProperty("os.name"));
     }
     
     private static void checkIgnoreLine(File f, String line) throws IOException {
@@ -64,7 +78,7 @@ public class ModuleTester {
         }
     }
     
-    public void runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods) throws Exception {
+    public int runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods) throws Exception {
         if (skipValidation) {
             System.out.println("Validation step is skipped");
         } else {
@@ -80,28 +94,35 @@ public class ModuleTester {
         checkIgnoreLine(new File(moduleDir, ".gitignore"), testLocal);
         checkIgnoreLine(new File(moduleDir, ".dockerignore"), testLocal);
         File tlDir = new File(moduleDir, testLocal);
+        File readmeFile = new File(tlDir, "readme.txt");
+        File testCfg = new File(tlDir, "test.cfg");
         File runTestsSh = new File(tlDir, "run_tests.sh");
         File runBashSh = new File(tlDir, "run_bash.sh");
-        if (!tlDir.exists()) {
+        File runDockerSh = new File(tlDir, "run_docker.sh");
+        if (!tlDir.exists())
             tlDir.mkdir();
-            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, new File(tlDir, "readme.txt"));
-            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, new File(tlDir, "test.cfg"));
-            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
-            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
-            System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
-            return;
-        } else if (kbaseYmlConfig.get("data-version") != null) {
+        if (!readmeFile.exists())
+            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, readmeFile);
+        if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
                 TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
                 refDataDir.mkdir();
             }
         }
-        if (!runTestsSh.exists()) {
+        if (!runTestsSh.exists())
             TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
+        if (!runBashSh.exists())
+            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
+        if (!runDockerSh.exists())
+            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, true, runDockerSh);
+        if (!testCfg.exists()) {
+            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, testCfg);
+            System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
+            return 1;
         }
         Properties props = new Properties();
-        InputStream is = new FileInputStream(new File(tlDir, "test.cfg"));
+        InputStream is = new FileInputStream(testCfg);
         try {
             props.load(is);
         } finally {
@@ -109,56 +130,53 @@ public class ModuleTester {
         }
         String user = props.getProperty("test_user");
         String password = props.getProperty("test_password");
-        if (user == null || user.trim().isEmpty() || password == null) {
+        if (user == null || user.trim().isEmpty()) {
             throw new IllegalStateException("Error: KBase account credentials are not set in test_local/test.cfg");
         }
-        String token = AuthService.login(user, password).getTokenString();
+        if (password == null || password.trim().isEmpty()) {
+            System.out.println("You haven't preset your password in test_local/test.cfg file. Please enter it now.");
+            password = new String(System.console().readPassword("Password: "));
+        }
+        AuthToken token = AuthService.login(user.trim(), password.trim())
+                .getToken();
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
         FileWriter fw = new FileWriter(tokenFile);
         try {
-            fw.write(token);
+            fw.write(token.getToken());
         } finally {
             fw.close();
         }
+        String endPoint = props.getProperty("kbase_endpoint");
+        if (endPoint == null)
+            throw new IllegalStateException("Error: KBase services end-point is not set in test_local/test.cfg");
+        String jobSrvUrl = props.getProperty("job_service_url");
+        if (jobSrvUrl == null)
+            jobSrvUrl = endPoint + "/userandjobstate";
+        String wsUrl = props.getProperty("workspace_url");
+        if (wsUrl == null)
+            wsUrl = endPoint + "/ws";
+        String shockUrl = props.getProperty("shock_url");
+        if (shockUrl == null)
+            shockUrl = endPoint + "/shock-api";
         File configPropsFile = new File(workDir, "config.properties");
         PrintWriter pw = new PrintWriter(configPropsFile);
         try {
             pw.println("[global]");
-            pw.println("job_service_url = " + props.getProperty("job_service_url"));
-            pw.println("workspace_url = " + props.getProperty("workspace_url"));
-            pw.println("shock_url = " + props.getProperty("shock_url"));
-            pw.println("kbase_endpoint = " + props.getProperty("kbase_endpoint"));
+            pw.println("job_service_url = " + jobSrvUrl);
+            pw.println("workspace_url = " + wsUrl);
+            pw.println("shock_url = " + shockUrl);
+            pw.println("kbase_endpoint = " + endPoint);
         } finally {
             pw.close();
         }
         ProcessHelper.cmd("chmod", "+x", runBashSh.getCanonicalPath()).exec(tlDir);
+        ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(tlDir);
         String moduleName = (String)kbaseYmlConfig.get("module-name");
         String imageName = "test/" + moduleName.toLowerCase() + ":latest";
-        System.out.println();
-        System.out.println("Delete old Docker containers");
-        List<String> lines = exec(tlDir, "docker", "ps", "-a");
-        for (String line : lines) {
-            String[] parts = splitByWhiteSpaces(line);
-            if (parts[1].equals(imageName)) {
-                String cntId = parts[0];
-                ProcessHelper.cmd("docker", "rm", "-v", "-f", cntId).exec(tlDir);
-            }
-        }
-        String oldImageId = findImageIdByName(tlDir, imageName);    
-        System.out.println();
-        System.out.println("Build Docker image");
-        boolean ok = buildImage(moduleDir, imageName);
-        if (!ok)
-            return;
-        if (oldImageId != null) {
-            String newImageId = findImageIdByName(tlDir, imageName);
-            if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
-                System.out.println("Delete old Docker image");
-                ProcessHelper.cmd("docker", "rmi", oldImageId).exec(tlDir);
-            }
-        }
+        if (!buildNewDockerImageWithCleanup(moduleDir, tlDir, runDockerSh, imageName))
+            return 1;
         File subjobsDir = new File(tlDir, "subjobs");
         if (subjobsDir.exists())
             TextUtils.deleteRecursively(subjobsDir);
@@ -167,55 +185,93 @@ public class ModuleTester {
             TextUtils.deleteRecursively(scratchDir);
         scratchDir.mkdir();
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        int callbackPort = findFreePort();
-        String callbackUrl = getCallbackUrl(tlDir, callbackPort);
-        JsonServerServlet catalogSrv = new CallbackServer(callbackPort);
-        Server jettyServer = new Server(callbackPort);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        jettyServer.setHandler(context);
-        context.addServlet(new ServletHolder(catalogSrv),"/*");
-        jettyServer.start();
+        int callbackPort = NetUtils.findFreePort();
+        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        Server jettyServer = null;
+        if (callbackUrl != null) {
+            if( System.getProperty("os.name").startsWith("Windows") ) {
+                JsonServerSyslog.setStaticUseSyslog(false);
+                JsonServerSyslog.setStaticMlogFile("callback.log");
+            }
+            CallbackServerConfig cfg = new CallbackServerConfigBuilder(
+                    new URL(endPoint), callbackUrl, tlDir.toPath(),
+                    new LineLogger() {
+                        @Override
+                        public void logNextLine(String line, boolean isError) {
+                            if (isError) {
+                                System.err.println(line);
+                            } else {
+                                System.out.println(line);
+                            }
+                        }
+                    }).build();
+            ModuleRunVersion runver = new ModuleRunVersion(
+                    new URL("https://fakefakefakefakefake.com"),
+                    new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+            JsonServerServlet catalogSrv = new SDKCallbackServer(
+                    token, cfg, runver, new ArrayList<UObject>(),
+                    new ArrayList<String>());
+            jettyServer = new Server(callbackPort);
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.setContextPath("/");
+            jettyServer.setHandler(context);
+            context.addServlet(new ServletHolder(catalogSrv),"/*");
+            jettyServer.start();
+        } else {
+            System.out.println("WARNING: No callback URL was recieved " +
+                    "by the job runner. Local callbacks are disabled.");
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            ProcessHelper.cmd("bash", runTestsSh.getCanonicalPath(), callbackUrl).exec(tlDir);
+            int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runTestsSh),
+                    callbackUrl == null ? "http://fakecallbackurl" : 
+                        callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
+            return exitCode;
         } finally {
-            System.out.println("Shutting down callback server...");
-            jettyServer.stop();
-        }
-    }
-
-    public static String getCallbackUrl(File testLocalDir, int callbackPort) throws Exception {
-        List<String> hostIps = NetUtils.findNetworkAddresses("docker0", "vboxnet0");
-        String hostIp = null;
-        if (hostIps.isEmpty()) {
-            System.out.println("WARNING! No SDK host IP addresses was found. Subsequent local calls are not supported in test mode.");
-        } else {
-            hostIp = hostIps.get(0);
-            if (hostIps.size() > 1) {
-                System.out.println("WARNING! Several SDK host IP addresses are detected, first one is used: " + hostIp);
-            } else {
-                System.out.println("SDK host IP address is detected: " + hostIp);
+            if (jettyServer != null) {
+                System.out.println("Shutting down callback server...");
+                jettyServer.stop();
             }
         }
-        String callbackUrl = hostIp == null ? "" : ("http://" + hostIp + ":" + callbackPort);
-        return callbackUrl;
     }
 
-    private static int findFreePort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {}
-        throw new IllegalStateException("Can not find available port in system");
+    public static boolean buildNewDockerImageWithCleanup(File moduleDir, File tlDir,
+            File runDockerSh, String imageName) throws Exception {
+        System.out.println();
+        System.out.println("Delete old Docker containers");
+        String runDockerPath = DirUtils.getFilePath(runDockerSh);
+        List<String> lines = exec(tlDir, "bash", DirUtils.getFilePath(runDockerSh), "ps", "-a");
+        for (String line : lines) {
+            String[] parts = splitByWhiteSpaces(line);
+            if (parts[1].equals(imageName)) {
+                String cntId = parts[0];
+                ProcessHelper.cmd("bash", runDockerPath, "rm", "-v", "-f", cntId).exec(tlDir);
+            }
+        }
+        String oldImageId = findImageIdByName(tlDir, imageName, runDockerSh);    
+        System.out.println();
+        System.out.println("Build Docker image");
+        boolean ok = buildImage(moduleDir, imageName, runDockerSh);
+        if (!ok)
+            return false;
+        if (oldImageId != null) {
+            String newImageId = findImageIdByName(tlDir, imageName, runDockerSh);
+            if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
+                System.out.println("Delete old Docker image");
+                ProcessHelper.cmd("bash", runDockerPath, "rmi", oldImageId).exec(tlDir);
+            }
+        }
+        return true;
     }
     
-    public String findImageIdByName(File tlDir, String imageName)
-            throws Exception {
+    public static String findImageIdByName(File tlDir, String imageName,
+            File runDockerSh) throws Exception {
         List<String> lines;
         String ret = null;
-        lines = exec(tlDir, "docker", "images");
+        lines = exec(tlDir, "bash", DirUtils.getFilePath(runDockerSh), "images");
         for (String line : lines) {
             String[] parts = splitByWhiteSpaces(line);
             String name = parts[0] + ":" + parts[1];
@@ -227,7 +283,7 @@ public class ModuleTester {
         return ret;
     }
 
-    public String[] splitByWhiteSpaces(String line) {
+    public static String[] splitByWhiteSpaces(String line) {
         String[] parts = line.split("\\s+");
         return parts;
     }
@@ -249,9 +305,13 @@ public class ModuleTester {
         return ret;
     }
     
-    private boolean buildImage(File repoDir, String targetImageName) throws Exception {
-        Process p = Runtime.getRuntime().exec(new String[] {"docker", "build", "--rm", "-t", 
-                targetImageName, repoDir.getCanonicalPath()});
+    public static boolean buildImage(File repoDir, String targetImageName, 
+            File runDockerSh) throws Exception {
+        String scriptPath = DirUtils.getFilePath(runDockerSh);
+        String repoPath = DirUtils.getFilePath(repoDir);
+        Process p = Runtime.getRuntime().exec(new String[] {"bash", 
+                scriptPath, "build", "--rm", "-t", 
+                targetImageName, repoPath});
         List<Thread> workers = new ArrayList<Thread>();
         InputStream[] inputStreams = new InputStream[] {p.getInputStream(), p.getErrorStream()};
         final String[] cntIdToDelete = {null};
@@ -305,7 +365,8 @@ public class ModuleTester {
                 if (cntIdToDelete[0] != null) {
                     System.out.println("Cleaning up building container: " + cntIdToDelete[0]);
                     Thread.sleep(1000);
-                    ProcessHelper.cmd("docker", "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
+                    ProcessHelper.cmd("bash", scriptPath, 
+                            "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
                 }
             } catch (Exception ex) {
                 System.err.println(ex.getMessage());
@@ -313,5 +374,4 @@ public class ModuleTester {
         }
         return exitCode == 0;
     }
-
 }

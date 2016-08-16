@@ -37,4 +37,24 @@ public class KbTypeInfo {
 	public KbType getRef() {
 		return ref;
 	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbTypeInfo [name=");
+        builder.append(name);
+        builder.append(", module=");
+        builder.append(module);
+        builder.append(", comment=");
+        builder.append(comment);
+        builder.append(", english=");
+        builder.append(english);
+        builder.append(", ref=");
+        builder.append(ref);
+        builder.append("]");
+        return builder.toString();
+    }
 }

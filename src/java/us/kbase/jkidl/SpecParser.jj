@@ -31,6 +31,7 @@ import us.kbase.kidl.KbTuple;
 import us.kbase.kidl.KbType;
 import us.kbase.kidl.KbTypedef;
 import us.kbase.kidl.KbUnspecifiedObject;
+import us.kbase.kidl.JSONableVisitor;
 import us.kbase.kidl.KidlParseException;
 
 /**
@@ -75,7 +76,7 @@ public class SpecParser {
                         modList = new ArrayList<Object>();
                         ret.put(module.getServiceName(), modList);
                 }
-                modList.add(module.toJson());
+                modList.add(module.accept(new JSONableVisitor()));
         }
         return ret;
     }
@@ -297,7 +298,11 @@ KbModule Module(Map<String, KbModule> includes):
     {
       if (!(comp instanceof KbAuthdef))
           lastComment.set(null);
-      ret.addModuleComponent(comp);
+      try {
+          ret.addModuleComponent(comp);
+      } catch (KidlParseException ex) {
+          generateParseException(ex);
+      }
     }  )*
   "}"
   ";"  { return ret; }
@@ -487,7 +492,12 @@ KbFuncdef Funcdef(KbModule curModule, Map<String, KbModule> includes):
   }
   name = Identifier()
   "("
-  { ret = new KbFuncdef(name.toString(), comment, async); }
+  { try {
+	  	ret = new KbFuncdef(name.toString(), comment, async); 
+	} catch (KidlParseException ex) {
+		generateParseException(ex);
+	}
+  }
   args = OptNameParams(curModule, includes)
   { ret.getParameters().addAll(args); }
   ")"

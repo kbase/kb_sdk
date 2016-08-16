@@ -14,6 +14,8 @@ DIR = $(shell pwd)
 
 ANT ?= ant
 ANT_OPTIONS =
+KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.20.jar
+QUOTE = '\''
 
 # make sure our make test works
 .PHONY : test sdkbase
@@ -33,9 +35,11 @@ TARGET ?= /kb/deployment
 
 # inside dev_container, we build and copy to dev_container/bin
 compile:
-	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR)
+	$(ANT) -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 	$(ANT) copy_local_bin -DBIN_TARGET=$(TOP_DIR)/bin
 
+prepare-bin:
+	$(ANT) prepare_bin -DEXT_KIDL_JAR=$(EXT_KIDL_JAR) -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 else
 ###############################
@@ -43,7 +47,10 @@ else
 ###############################
 
 compile: jars-submodule-init
-	$(ANT) -Djardir=submodules/jars/lib/jars/
+	$(ANT) -Djardir=submodules/jars/lib/jars/ -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
+
+prepare-bin:
+	$(ANT) prepare_bin -Djardir=submodules/jars/lib/jars/ -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 endif
 
@@ -51,13 +58,28 @@ bin: jars-submodule-init
 	mkdir -p bin
 	echo '#!/bin/bash' > bin/kb-sdk
 	echo 'DIR=$(DIR)' >> bin/kb-sdk
-	echo 'JARS_DIR=$$DIR/submodules/jars/lib/jars' >> bin/kb-sdk
-	echo 'java -cp $$JARS_DIR/apache_commons/commons-collections-3.2.1.jar:$$JARS_DIR/apache_commons/commons-io-2.4.jar:$$JARS_DIR/apache_commons/commons-lang-2.4.jar:$$JARS_DIR/apache_commons/commons-logging-1.1.1.jar:$$JARS_DIR/apache_commons/http/httpclient-4.3.1.jar:$$JARS_DIR/apache_commons/http/httpcore-4.3.jar:$$JARS_DIR/apache_commons/http/httpmime-4.3.1.jar:$$JARS_DIR/apache_commons/velocity-1.7.jar:$$JARS_DIR/codemodel/codemodel-2.4.1.jar:$$JARS_DIR/google/guava-14.0.1.jar:$$JARS_DIR/google/jsonschema2pojo-core-0.3.6.jar:$$JARS_DIR/ini4j/ini4j-0.5.2.jar:$$JARS_DIR/jackson/jackson-annotations-2.2.3.jar:$$JARS_DIR/jackson/jackson-core-2.2.3.jar:$$JARS_DIR/jackson/jackson-databind-2.2.3.jar:$$JARS_DIR/jcommander/jcommander-1.48.jar:$$JARS_DIR/jetty/jetty-all-7.0.0.jar:$$JARS_DIR/jna/jna-3.4.0.jar:$$JARS_DIR/junit/junit-4.9.jar:$$JARS_DIR/kbase/auth/kbase-auth-1380919426-d35c17d.jar:$$JARS_DIR/kbase/common/kbase-common-0.0.12.jar:$$JARS_DIR/kbase/handle/HandleManagerClient-141020-ff26a5d.jar:$$JARS_DIR/kbase/handle/HandleServiceClient-141020-5eda76e.jar:$$JARS_DIR/kbase/shock/shock-client-0.0.8.jar:$$JARS_DIR/kbase/workspace/WorkspaceClient-0.2.0.jar:$$JARS_DIR/kohsuke/args4j-2.0.21.jar:$$JARS_DIR/servlet/servlet-api-2.5.jar:$$JARS_DIR/snakeyaml/snakeyaml-1.11.jar:$$JARS_DIR/syslog4j/syslog4j-0.9.46.jar:$$DIR/lib/kbase_module_builder2.jar us.kbase.mobu.ModuleBuilder $$@' >> bin/kb-sdk
+	echo 'KBASE_JARS_DIR=$$DIR/submodules/jars/lib/jars' >> bin/kb-sdk
+	@# Next command processes links in JAR_DEPS_BIN file and has 5 parts (one on each line): 
+	@#  (1) removing comments
+	@#  (2) trimming each line (picking first word actually)
+	@#  (3) skipping empty lines
+	@#  (4) joining lines into one with colon separator
+	@#  (5) adding variable name prefix followed by equal character
+	echo 'cat ./JAR_DEPS_BIN | sed "/^[[:blank:]]*#/d;s/#.*//" \
+		| awk $(QUOTE){print $$1}$(QUOTE) \
+		| grep -v "^$$" \
+		| awk $(QUOTE){print "$$KBASE_JARS_DIR/"$$1":"}$(QUOTE) ORS="" \
+		| awk $(QUOTE){print "CLASS_PATH_PREFIX="$$1}$(QUOTE) >> bin/kb-sdk' > bin/temp-script
+	bash bin/temp-script
+	rm bin/temp-script
+	echo 'java -cp $$CLASS_PATH_PREFIX$$KBASE_JARS_DIR/$(KBASE_COMMON_JAR):$$DIR/lib/kbase_module_builder2.jar \
+	 us.kbase.mobu.ModuleBuilder $$@' >> bin/kb-sdk
 	chmod +x bin/kb-sdk
 
 submodule-init:
 	git submodule init
 	git submodule update
+	cp submodules_hacks/AuthConstants.pm submodules/auth/Bio-KBase-Auth/lib/Bio/KBase/
 
 jars-submodule-init:
 	git submodule update --init submodules/jars
@@ -79,16 +101,18 @@ deploy-scripts:
 	  	 echo "Error makefile variable TARGET must be defined to deploy-scripts"; \
 	  	 exit 1; \
 	fi;
-	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib
+	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 sdkbase:
+	- docker rmi -f kbase/deplbase:latest
 	cd sdkbase && ./makeconfig
-	docker build -t kbase/kbase:sdkbase.latest sdkbase
+	docker build --no-cache -t kbase/kbase:sdkbase.latest sdkbase
 
 test: submodule-init
-	@# todo: remove perl typecomp tests and add it as a separate target
 	@echo "Running unit tests"
-	$(ANT) test
+	nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
+	@# todo: remove perl typecomp tests and add it as a separate target
+	$(ANT) test -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 test-client:
 	@echo "No tests for client - this kbase module is not a service, and has no clients"

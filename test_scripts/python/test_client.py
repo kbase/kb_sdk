@@ -10,6 +10,7 @@ def getErrorMessage(error):
     return message
 
 def main(argv):
+    sys.path.append('./')
     tests_filepath = None
     endpoint = None
     user = None
@@ -18,11 +19,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"ht:e:u:p:a:",["help","tests=","endpoint=","user=","password=","asyncchecktime="])
     except getopt.GetoptError:
-        print 'Please use "test_client.py -h" or "test_client.py --help" for help'
+        print('Please use "test_client.py -h" or "test_client.py --help" for help')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print 'test_client.py --tests <json_file> --endpoint <url> [--user <kbase_account> --password <password> [--asyncchecktime <ms>]]'
+            print('test_client.py --tests <json_file> --endpoint <url> [--user <kbase_account> --password <password> [--asyncchecktime <ms>]]')
             sys.exit()
         elif opt in ("-t", "--tests"):
             tests_filepath = arg
@@ -33,7 +34,10 @@ def main(argv):
         elif opt in ("-p", "--password"):
             password = arg
         elif opt in ("-a", "--asyncchecktime"):
-            async_job_check_time_ms = long(arg)
+            try:
+                async_job_check_time_ms = long(arg)
+            except NameError:
+                async_job_check_time_ms = int(arg)
     fh = open(tests_filepath)
     tests_json = json.load(fh)
     module_file = tests_json['package']
@@ -57,7 +61,7 @@ def main(argv):
         ret = None
         error = None
         try:
-            ret = method_instance(*params)
+            ret = method_instance(*params, context={})
         except Exception as ex:
             error = ex
         if expected_status == 'pass' or expected_status == 'nomatch':

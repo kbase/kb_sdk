@@ -1,9 +1,7 @@
 package us.kbase.kidl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents list in spec-file.
@@ -32,12 +30,8 @@ public class KbList extends KbBasicType {
 	}
 	
 	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::List");
-		ret.put("annotations", new HashMap<String, Object>());
-		ret.put("element_type", elementType.toJson());
-		return ret;
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
+		return visitor.visit(this, elementType.accept(visitor, this));
 	}
 
 	@Override
@@ -48,4 +42,21 @@ public class KbList extends KbBasicType {
 		ret.put("items", getElementType().toJsonSchema(true));
 		return ret;
 	}
+	
+	@Override
+	public String getSpecName() {
+	    return "list<" + elementType.getSpecName() + ">";
+	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbList [elementType=");
+        builder.append(elementType);
+        builder.append("]");
+        return builder.toString();
+    }
 }
