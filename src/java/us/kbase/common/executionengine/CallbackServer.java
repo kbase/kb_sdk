@@ -362,7 +362,11 @@ public abstract class CallbackServer extends JsonServerServlet {
             result.put("result", resp.get("result"));
         }
         final Map<String, Object> copy = new HashMap<String, Object>(resp);
-        copy.put("result", Arrays.asList(result));
+        // Adding this check makes java client happy because it doesn't like
+        // to see both "error" and "result" blocks in JSON-RPC response.
+        if (!copy.containsKey("error")) {
+            copy.put("result", Arrays.asList(result));
+        }
         return copy;
     }
 
