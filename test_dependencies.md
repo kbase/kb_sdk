@@ -1,5 +1,8 @@
 Known test dependencies listed below. Please add more if discovered.
+
 Must force RPC::Any, Moose updates cause XML tests to fail
+
+New versions of paramiko complain about being unable to import SSH2_AGENTC_REQUEST_IDENTITIES, 1.10.2 works
 
 pip install nose2 jsonrpcbase rsa paramiko==1.10.2
 
