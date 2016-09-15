@@ -1,7 +1,7 @@
 Known test dependencies listed below. Please add more if discovered.
 Must force RPC::Any, Moose updates cause XML tests to fail
 
-pip install nose2 jsonrpcbase rsa paramiko=1.10.2
+pip install nose2 jsonrpcbase rsa paramiko==1.10.2
 
 cpan Moose
 
