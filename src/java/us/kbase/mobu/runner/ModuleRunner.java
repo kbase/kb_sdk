@@ -53,6 +53,7 @@ public class ModuleRunner {
     private final File runDir;
     private String user;
     private String password;
+    private String[] callbackNetworks = null;
     
     public ModuleRunner(String sdkHome) throws Exception {
         if (sdkHome == null) {
@@ -75,7 +76,10 @@ public class ModuleRunner {
                     "kbase_endpoint=https://appdev.kbase.us/services",
                     "catalog_url=https://appdev.kbase.us/services/catalog",
                     "user=",
-                    "password="));
+                    "password=",
+                    "### Please use next parameter to specify custom list of network",
+                    "### interfaces used for callback IP address lookup:",
+                    "#callback_networks=docker0,vboxnet0,vboxnet1,en0,en1,en2,en3"));
         }
         Properties sdkConfig = new Properties();
         try (InputStream is = new FileInputStream(sdkCfgFile)) {
@@ -107,15 +111,20 @@ public class ModuleRunner {
                 password = new String(System.console().readPassword("Password: "));
             }
         }
+        String callbackNetworksText = sdkConfig.getProperty("callback_networks");
+        if (callbackNetworksText != null) {
+            callbackNetworks = callbackNetworksText.trim().split("\\s*,\\s*");
+        }
     }
     
     public ModuleRunner(URL catalogUrl, String kbaseEndpoint, File runDir, String user, 
-            String password) {
+            String password, String[] callbackNetworks) {
         this.catalogUrl = catalogUrl;
         this.kbaseEndpoint = kbaseEndpoint;
         this.runDir = runDir;
         this.user = user;
         this.password = password;
+        this.callbackNetworks = callbackNetworks;
     }
     
     public int run(String methodName, File inputFile, boolean stdin, String inputJson, 
@@ -192,7 +201,7 @@ public class ModuleRunner {
             FileUtils.deleteDirectory(subjobsDir);
         File tokenFile = new File(workDir, "token");
         try (FileWriter fw = new FileWriter(tokenFile)) {
-            fw.write(auth.toString());
+            fw.write(auth.getToken());
         }
         String jobSrvUrl = kbaseEndpoint + "/userandjobstate";
         String wsUrl = kbaseEndpoint + "/ws";
@@ -236,7 +245,7 @@ public class ModuleRunner {
         UObject.getMapper().writeValue(new File(workDir, "input.json"), rpc);
         ////////////////////////////////// Starting callback service //////////////////////////////
         int callbackPort = NetUtils.findFreePort();
-        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
         if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
@@ -279,6 +288,10 @@ public class ModuleRunner {
             context.addServlet(new ServletHolder(catalogSrv),"/*");
             jettyServer.start();
         } else {
+            if (callbackNetworks != null && callbackNetworks.length > 0) {
+                throw new IllegalStateException("No proper callback IP was found, " +
+                        "please check callback_networks parameter in configuration");
+            }
             System.out.println("WARNING: No callback URL was recieved " +
                     "by the job runner. Local callbacks are disabled.");
         }
