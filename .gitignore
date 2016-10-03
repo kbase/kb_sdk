@@ -1,7 +1,9 @@
 /bin
 /temp
 /dist
-/temp_test
 /eclipse-classes/
 /sdkbase/ssl
-
+/classes/
+/temp_*
+/ASimpleModule*
+/TestAsyncPerl/

@@ -10,12 +10,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.apache.commons.io.FileUtils;
 
 public class TextUtils {
 	public static String capitalize(String text) {
@@ -57,8 +61,12 @@ public class TextUtils {
 	}
 	
 	public static List<String> readStreamLines(InputStream is, boolean closeAfter) throws IOException {
-		List<String> ret = new ArrayList<String>();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		return readReaderLines(new InputStreamReader(is), closeAfter);
+	}
+	
+	public static List<String> readReaderLines(Reader r, boolean closeAfter) throws IOException {
+	    BufferedReader br = new BufferedReader(r);
+        List<String> ret = new ArrayList<String>();
 		while (true) {
 			String l = br.readLine();
 			if (l == null)
@@ -77,7 +85,7 @@ public class TextUtils {
 	public static void writeFileLines(List<String> lines, Writer targetFile) throws IOException {
 		PrintWriter pw = new PrintWriter(targetFile);
 		for (String l : lines)
-			pw.println(l);
+			pw.print(l + "\n");
 		pw.close();
 	}
 	
@@ -98,9 +106,12 @@ public class TextUtils {
 	}
 
 	public static void deleteRecursively(File fileOrDir) {
-		if (fileOrDir.isDirectory() && !Files.isSymbolicLink(fileOrDir.toPath()))
-			for (File f : fileOrDir.listFiles()) 
-				deleteRecursively(f);
+		if (fileOrDir.isDirectory() && !Files.isSymbolicLink(fileOrDir.toPath())) {
+		    File[] files = fileOrDir.listFiles();
+		    if (files != null)
+		        for (File f : files) 
+		            deleteRecursively(f);
+		}
 		fileOrDir.delete();
 	}
 
@@ -115,5 +126,16 @@ public class TextUtils {
         }
         br.close();
         return ret;
+    }
+    
+    public static void checkIgnoreLine(File f, String line) throws IOException {
+        List<String> lines = new ArrayList<String>();
+        if (f.exists())
+            lines.addAll(FileUtils.readLines(f));
+        if (!new HashSet<String>(lines).contains(line)) {
+            System.out.println("Warning: file \"" + f.getName() + "\" doesn't contain \"" + line + "\" line, it will be added.");
+            lines.add(line);
+            FileUtils.writeLines(f, lines);
+        }
     }
 }

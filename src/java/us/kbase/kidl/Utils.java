@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import us.kbase.common.service.Tuple2;
 
@@ -32,6 +33,7 @@ public class Utils {
 		return propAbstract(map, propName, Map.class);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private static <T> T propAbstract(Map<?,?> map, String propName, Class<T> returnType) throws KidlParseException {
 		if (!map.containsKey(propName))
 			throw new KidlParseException("No property in the map: " + propName);
@@ -48,10 +50,12 @@ public class Utils {
 		return repareTypingAbstract(list, String.class);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static List<Map> repareTypingMap(List<?> list) throws KidlParseException {
 		return repareTypingAbstract(list, Map.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <T> List<T> repareTypingAbstract(List<?> list, Class<T> itemType) throws KidlParseException {
 		List<T> ret = new ArrayList<T>();
 		for (Object item : list) {
@@ -63,6 +67,7 @@ public class Utils {
 		return ret;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static List<Map> getListOfMapProp(Map<?,?> data, String propName) throws KidlParseException {
 		return Utils.repareTypingMap(Utils.propList(data, propName));
 	}
@@ -219,5 +224,24 @@ public class Utils {
         }
         us.kbase.jkidl.Utils.trimWhitespaces(sb);
         return sb.toString();
+    }
+    
+    public static List<String> parseCommentLines(String comment) {
+        List<String> commentLines = new ArrayList<String>();
+        if (comment != null && comment.trim().length() > 0) {
+            StringTokenizer st = new StringTokenizer(comment, "\r\n");
+            while (st.hasMoreTokens()) {
+                commentLines.add(st.nextToken());
+            }
+            removeEmptyLinesOnSides(commentLines);
+        }
+        return commentLines;
+    }
+    
+    public static void removeEmptyLinesOnSides(List<String> lines) {
+        while (lines.size() > 0 && lines.get(0).trim().length() == 0)
+            lines.remove(0);
+        while (lines.size() > 0 && lines.get(lines.size() - 1).trim().length() == 0)
+            lines.remove(lines.size() - 1);
     }
 }

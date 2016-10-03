@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class represents tuple in spec-file.
@@ -14,6 +14,7 @@ import java.util.TreeMap;
 public class KbTuple extends KbBasicType {
 	private List<String> elementNames = new ArrayList<String>();
 	private List<KbType> elementTypes = new ArrayList<KbType>();
+	// per Roman this is only needed for old type compiler compatibility
 	private String name = null;
 	private String comment = null;
 	
@@ -21,7 +22,7 @@ public class KbTuple extends KbBasicType {
 	
 	public KbTuple(List<KbType> types) {
 		elementNames = new ArrayList<String>();
-		for (KbType type : types)
+		for (@SuppressWarnings("unused") KbType type : types)
 			elementNames.add("e_" + (elementNames.size() + 1));
 		elementNames = Collections.unmodifiableList(elementNames);
 		elementTypes = Collections.unmodifiableList(types);
@@ -71,8 +72,6 @@ public class KbTuple extends KbBasicType {
 	}
 	
 	public String getName() {
-		if (name == null)
-			throw new IllegalStateException("Property name was not set for tuple");
 		return name;
 	}
 	
@@ -81,22 +80,14 @@ public class KbTuple extends KbBasicType {
 	}
 	
 	@Override
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::Tuple");
-		if (comment != null && comment.length() > 0)
-			ret.put("comment", comment);
-		ret.put("element_names", elementNames);
-		List<Object> elementTypeList = new ArrayList<Object>();
-		for (KbType type : elementTypes)
-			elementTypeList.add(type.toJson());
-		ret.put("element_types", elementTypeList);
-		ret.put("annotations", new HashMap<String, Object>());
-		if (name != null)
-			ret.put("name", name);
-		return ret;
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
+		final List<T> elementTypes = new LinkedList<T>();
+		for (final KbType t: this.elementTypes) {
+			elementTypes.add(t.accept(visitor, this));
+		}
+		return visitor.visit(this, elementTypes);
 	}
-
+	
 	@Override
 	public Object toJsonSchema(boolean inner) {
 		Map<String, Object> ret = new LinkedHashMap<String, Object>();
@@ -139,4 +130,33 @@ public class KbTuple extends KbBasicType {
 		}
 		elementNames = Collections.unmodifiableList(newElementNames); 
 	}
+	
+	@Override
+	public String getSpecName() {
+	    StringBuilder ret = new StringBuilder();
+	    for (KbType type : elementTypes) {
+	        if (ret.length() > 0)
+	            ret.append(",");
+	        ret.append(type.getSpecName());
+	    }
+	    return "tuple<" + ret + ">";
+	}
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("KbTuple [elementNames=");
+        builder.append(elementNames);
+        builder.append(", elementTypes=");
+        builder.append(elementTypes);
+        builder.append(", name=");
+        builder.append(name);
+        builder.append(", comment=");
+        builder.append(comment);
+        builder.append("]");
+        return builder.toString();
+    }
 }
