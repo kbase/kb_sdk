@@ -362,7 +362,11 @@ public abstract class CallbackServer extends JsonServerServlet {
             result.put("result", resp.get("result"));
         }
         final Map<String, Object> copy = new HashMap<String, Object>(resp);
-        copy.put("result", Arrays.asList(result));
+        // Adding this check makes java client happy because it doesn't like
+        // to see both "error" and "result" blocks in JSON-RPC response.
+        if (!copy.containsKey("error")) {
+            copy.put("result", Arrays.asList(result));
+        }
         return copy;
     }
 
@@ -457,12 +461,20 @@ public abstract class CallbackServer extends JsonServerServlet {
             cbLog(String.format("Failed to stop %s tasks", failed.size()));
         }
     }
-    
+
     public static URL getCallbackUrl(int callbackPort)
             throws SocketException {
+        return getCallbackUrl(callbackPort, null);
+    }
+
+    public static URL getCallbackUrl(int callbackPort, String[] networkInterfaces)
+            throws SocketException {
+        if (networkInterfaces == null || networkInterfaces.length == 0) {
+            networkInterfaces = new String[] {"docker0", "vboxnet0", "vboxnet1",
+                    "VirtualBox Host-Only Ethernet Adapter", "en0"};
+        }
         final List<String> hostIps = NetUtils.findNetworkAddresses(
-                "docker0", "vboxnet0", "vboxnet1",
-                "VirtualBox Host-Only Ethernet Adapter", "en0");
+                networkInterfaces);
         final String hostIp;
         if (hostIps.isEmpty()) {
             return null;
