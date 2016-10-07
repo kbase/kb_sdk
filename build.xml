@@ -1,4 +1,4 @@
-<project name="KBase Module Builder" default="compile_and_bin" basedir=".">
+<project name="KBase Module Builder" default="compile_and_bin" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
 
   <description>
       Java Build file for the KBase Module Builder
@@ -72,6 +72,16 @@
     </and>
   </condition>
 
+  <condition property="report.dir" value="${env.JENKINS_REPORT_DIR}">
+    <and>
+      <isset property="env.JENKINS_REPORT_DIR"/>
+      <not>
+        <equals arg1="${env.JENKINS_REPORT_DIR}" arg2=""/>
+      </not>
+    </and>
+  </condition>
+  <!-- Properties in ant are immutable, so the following assignment will only take place if report.dir was not set above. -->
+  <property name="report.dir" location="reports"/>
 
 
   <path id="compile.classpath">
@@ -317,28 +327,56 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
 
 
 
-  <target name="preparejunitreportdir" if="env.JENKINS_REPORT_DIR">
-    <delete dir="${env.JENKINS_REPORT_DIR}"/>
-    <mkdir dir="${env.JENKINS_REPORT_DIR}"/>
-  </target>
+  <path id="jacoco.classpath">
+	<fileset dir="${jardir}">
+	  <include name="jacoco/jacocoant.jar"/>
+	</fileset>
+  </path>
 
+  <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="jacoco.classpath"/>
 
-
-  <target name="test" depends="compile, preparejunitreportdir" description="create test script">
+  <target name="test" depends="compile" description="create test script">
+    <delete dir="${report.dir}"/>
+    <mkdir dir="${report.dir}"/>
+    <mkdir dir="${report.dir}/html"/>
+  	<unzip src="${dist}/${module_builder.jar.file}" dest="${report.dir}/classes"/>
     <!-- Define absolute path to main jar file-->
-    <junit printsummary="yes" haltonfailure="yes" fork="true">
+  	<jacoco:coverage destfile="${report.dir}/jacoco.exec" excludes="org/*:junit/*">
+     <junit printsummary="yes" haltonfailure="false" fork="true" forkmode="once">
       <classpath>
         <pathelement location="${dist}/${module_builder.jar.file}"/>
         <path refid="compile.classpath"/>
       </classpath>
-      <formatter type="plain" usefile="false" />
+      <formatter type="plain" usefile="false"/>
       <formatter type="xml" usefile="true" if="env.JENKINS_REPORT_DIR"/>
-      <batchtest todir="${env.JENKINS_REPORT_DIR}">
-        <fileset dir="${src}">
-          <include name="**/test/**/**Test.java"/>
+      <batchtest todir="${report.dir}" fork="yes">
+        <fileset dir="${report.dir}/classes">
+          <include name="us/kbase/**/test/**/**Test.class"/>
         </fileset>
       </batchtest>
-    </junit>
+     </junit>
+  	</jacoco:coverage>
+  	<jacoco:report>
+  	    <executiondata>
+  	       <file file="${report.dir}/jacoco.exec"/>
+  	    </executiondata>
+  	    <structure name="SDK">
+  	       <classfiles>
+  	          <fileset dir="${report.dir}/classes">
+                <exclude name="**/test/**/**Test.class" />
+  	          </fileset>
+  	       </classfiles>
+ 	       <sourcefiles encoding="UTF-8">
+  	          <fileset dir="${src}"/>
+  	       </sourcefiles>
+  	    </structure>
+  		<html destdir="${report.dir}/html"/>
+  		<csv destfile="${report.dir}/coverage-report.csv"/>
+  	</jacoco:report>
+    <delete dir="${report.dir}/classes"/>
+  	<exec executable="bash">
+  	  <arg value="./test_scripts/print_test_coverage.sh" />
+  	</exec>
   </target>
 
 
