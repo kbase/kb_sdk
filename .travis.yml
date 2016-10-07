@@ -5,6 +5,9 @@ sudo: required
 services:
   - docker
 
+install:
+  - sudo pip install nose
+
 script:
   - make
   - make test
