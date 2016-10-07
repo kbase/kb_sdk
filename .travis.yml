@@ -7,4 +7,5 @@ services:
 
 script:
   - make
+  - make test
   - make sdkbase
