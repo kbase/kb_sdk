@@ -338,6 +338,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
   <target name="test" depends="compile" description="create test script">
     <delete dir="${report.dir}"/>
     <mkdir dir="${report.dir}"/>
+    <mkdir dir="${report.dir}/html"/>
   	<unzip src="${dist}/${module_builder.jar.file}" dest="${report.dir}/classes"/>
     <!-- Define absolute path to main jar file-->
   	<jacoco:coverage destfile="${report.dir}/jacoco.exec" excludes="org/*:junit/*">
