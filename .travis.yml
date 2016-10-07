@@ -6,7 +6,7 @@ services:
   - docker
 
 install:
-  - sudo pip install nose
+  - sudo pip install nose2
 
 script:
   - make
