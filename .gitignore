@@ -3,8 +3,15 @@
 /dist
 /eclipse-classes/
 /sdkbase/ssl
+/sdkbase/cluster.ini
 /classes/
 /temp_*
 /ASimpleModule*
 /TestAsyncPerl/
-/reports
+/reports/
+/test_scripts/ee_mock_service/
+/*/*.pyc
+/*/*/*.pyc
+/*/*/*/*.pyc
+/*/*/*/*/*.pyc
+/*/*/*/*/*/*.pyc
