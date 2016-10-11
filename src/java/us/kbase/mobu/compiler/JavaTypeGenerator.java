@@ -819,8 +819,8 @@ public class JavaTypeGenerator {
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
 			    if (func.getOriginal().isAsync() || asyncVersion != null) {
-			        if (!func.isAuthRequired())
-			            throw new IllegalStateException("Function " + func.getOriginal().getName() + " is async but doesn't require authentication");
+			        if (!func.isAuthCouldBeUsed())
+			            throw new IllegalStateException("Function " + func.getOriginal().getName() + " is async but doesn't allow authentication");
 			        classLines.add("");
 			        printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
 			        classLines.add("    protected String _" + func.getJavaName() + "Submit(" + funcParams + ") " + exceptions+ " {");
