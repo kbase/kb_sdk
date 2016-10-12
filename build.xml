@@ -342,20 +342,21 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
   	<unzip src="${dist}/${module_builder.jar.file}" dest="${report.dir}/classes"/>
     <!-- Define absolute path to main jar file-->
   	<jacoco:coverage destfile="${report.dir}/jacoco.exec" excludes="org/*:junit/*">
-     <junit printsummary="yes" haltonfailure="false" fork="true" forkmode="once">
+     <junit printsummary="yes" failureproperty="test.failed" fork="true">
       <classpath>
         <pathelement location="${dist}/${module_builder.jar.file}"/>
         <path refid="compile.classpath"/>
       </classpath>
       <formatter type="plain" usefile="false"/>
       <formatter type="xml" usefile="true" if="env.JENKINS_REPORT_DIR"/>
-      <batchtest todir="${report.dir}" fork="yes">
+      <batchtest todir="${report.dir}">
         <fileset dir="${report.dir}/classes">
           <include name="us/kbase/**/test/**/**Test.class"/>
         </fileset>
       </batchtest>
      </junit>
   	</jacoco:coverage>
+    <fail message="Test failure detected, check test results." if="test.failed" />
   	<jacoco:report>
   	    <executiondata>
   	       <file file="${report.dir}/jacoco.exec"/>
