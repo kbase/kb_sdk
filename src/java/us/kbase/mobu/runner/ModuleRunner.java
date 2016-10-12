@@ -48,6 +48,7 @@ import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 
 public class ModuleRunner {
     private final URL catalogUrl;
@@ -200,6 +201,10 @@ public class ModuleRunner {
         } finally {
             pw.close();
         }
+        File scratchDir = new File(workDir, "tmp");
+        if (scratchDir.exists())
+            TextUtils.deleteRecursively(scratchDir);
+        scratchDir.mkdir();
         ////////////////////////////////// Preparing input.json ///////////////////////////////////
         String jsonString;
         if (inputFile != null) {
