@@ -191,9 +191,6 @@ public class ClientInstaller {
             boolean verbose, String moduleName, String libDirName, FileProvider fp, 
             String semanticVersion, String gitUrl, String gitCommitHash,
             String clientName) throws Exception {
-        if (clientName == null) {
-            clientName = moduleName;
-        }
         String url = null;
         String clientAsyncVer = null;
         String dynservVer = null;
@@ -235,6 +232,9 @@ public class ClientInstaller {
             for (KbService srv : services)
                 for (KbModule md : srv.getModules())
                     moduleName = md.getModuleName();
+        if (clientName == null) {
+            clientName = moduleName;
+        }
         if (lang == null)
             lang = language;
         lang = lang.toLowerCase();
