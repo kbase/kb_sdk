@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -226,9 +227,11 @@ public class ModuleTester {
                     new URL("https://fakefakefakefakefake.com"),
                     new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
                     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+            final DockerMountPoints mounts = new DockerMountPoints(
+                    Paths.get("/kb/module/work"), Paths.get("tmp"));
             JsonServerServlet catalogSrv = new SDKCallbackServer(
                     token, cfg, runver, new ArrayList<UObject>(),
-                    new ArrayList<String>());
+                    new ArrayList<String>(), mounts);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
