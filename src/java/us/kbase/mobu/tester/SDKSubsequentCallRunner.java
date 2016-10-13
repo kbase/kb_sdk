@@ -18,14 +18,21 @@ import us.kbase.mobu.util.ProcessHelper;
 
 public class SDKSubsequentCallRunner extends SubsequentCallRunner {
     
+    private DockerMountPoints mounts;
+    
     public SDKSubsequentCallRunner(
             final AuthToken token,
             final CallbackServerConfig config,
             final UUID jobId,
             final ModuleMethod modmeth,
-            final String serviceVer)
+            final String serviceVer,
+            final DockerMountPoints mounts)
             throws IOException, JsonClientException {
         super(token, config, jobId, modmeth, serviceVer);
+        if (mounts == null) {
+            throw new NullPointerException("mounts");
+        }
+        this.mounts = mounts;
     }
 
     @Override
@@ -45,12 +52,12 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
             final boolean isWin = System.getProperty("os.name").toLowerCase()
                     .contains("win");
             final String dockerRunCmd = config.getWorkDir().toAbsolutePath() +
-                    "/run_docker.sh run " + (isMac || isWin ? "" : "--user $(id -u) ") +
+                    "/run_docker.sh run --rm " + (isMac || isWin ? "" : "--user $(id -u) ") +
                     "-v " + config.getWorkDir().resolve(SUBJOBSDIR)
                         .toAbsolutePath() + 
                     "/$1/" + WORKDIR + ":/kb/module/work -v " +
                     getSharedScratchDir(config).toAbsolutePath() +
-                    ":/kb/module/work/tmp -e \"SDK_CALLBACK_URL=$3\" $2 async";
+                    ":/kb/module/work/tmp $4 -e \"SDK_CALLBACK_URL=$3\" $2 async";
             Files.write(runSubJobsSh, Arrays.asList(
                     "#!/bin/bash",
                     dockerRunCmd
@@ -67,7 +74,8 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         
         ProcessHelper.cmd("bash", runSubJobsSh.toString(),
                 jobWorkDir.getParent().getFileName().toString(), imageName,
-                config.getCallbackURL().toExternalForm())
+                config.getCallbackURL().toExternalForm(),
+                mounts.getDockerCommand())
                 .exec(jobWorkDir.getParent().toFile());
         return jobWorkDir.resolve("output.json");
     }

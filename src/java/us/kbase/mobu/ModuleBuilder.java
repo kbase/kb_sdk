@@ -49,7 +49,7 @@ public class ModuleBuilder {
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.7";
+    public static final String VERSION = "1.0.8";
     
     
     public static void main(String[] args) throws Exception {
@@ -394,8 +394,9 @@ public class ModuleBuilder {
         }
         try {
             return new ClientInstaller().install(installArgs.lang, installArgs.async,
-                    installArgs.sync, installArgs.dynamic, installArgs.tagVer, 
-                    installArgs.verbose, installArgs.moduleName.get(0), null);
+                    installArgs.core || installArgs.sync, installArgs.dynamic, 
+                    installArgs.tagVer, installArgs.verbose, installArgs.moduleName.get(0), 
+                    null, installArgs.clientName);
         } catch (Exception e) {
             if (installArgs.verbose)
                 e.printStackTrace();
@@ -673,9 +674,12 @@ public class ModuleBuilder {
         		"(default is chosen based on information registered in catalog)")
         boolean async = false;
 
-        @Parameter(names={"-s", "--sync"}, description="Force generation of synchronous calls" +
-        		"(default is chosen based on information registered in catalog)")
+        @Parameter(names={"-s", "--sync"}, description="Depricated flag, means the same as -c (--core)")
         boolean sync = false;
+
+        @Parameter(names={"-c", "--core"}, description="Force generation of calls to core service" +
+        		"(WARNING: please use it only for core services not registered in catalog)")
+        boolean core = false;
 
         @Parameter(names={"-d", "--dynamic"}, description="Force generation of dynamic service calls" +
                 "(default is chosen based on information registered in catalog)")
@@ -687,6 +691,10 @@ public class ModuleBuilder {
 
         @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
         boolean verbose = false;
+        
+        @Parameter(names={"-n","--clientname"}, description="Optional parameter defining custom client name " +
+                "(default is module name)")
+        String clientName = null;
 
         @Parameter(required=true, description="<module name or path/URL to spec-file>")
         List<String> moduleName;

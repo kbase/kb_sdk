@@ -17,17 +17,23 @@ import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.UObject;
 import us.kbase.workspace.ProvenanceAction;
 
+@SuppressWarnings("serial")
 public class SDKCallbackServer extends CallbackServer {
 
-    private static final long serialVersionUID = 1L;
+    private DockerMountPoints mounts;
 
     public SDKCallbackServer(
             final AuthToken token,
             final CallbackServerConfig config,
             final ModuleRunVersion runver,
             final List<UObject> methodParameters,
-            final List<String> inputWorkspaceObjects) {
+            final List<String> inputWorkspaceObjects,
+            final DockerMountPoints mounts) {
         super(token, config, runver, methodParameters, inputWorkspaceObjects);
+        if (mounts == null) {
+            throw new NullPointerException("mounts");
+        }
+        this.mounts = mounts;
     }
 
     @Override
@@ -39,7 +45,7 @@ public class SDKCallbackServer extends CallbackServer {
             final String serviceVer)
             throws IOException, JsonClientException {
         return new SDKSubsequentCallRunner(token, config,
-                jobId, modmeth, serviceVer);
+                jobId, modmeth, serviceVer, mounts);
     }
 
     @JsonServerMethod(rpc = "CallbackServer.set_provenance")

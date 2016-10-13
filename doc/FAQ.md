@@ -15,7 +15,7 @@
 - Q: [How do I add data and/or reference data to the system?](#config-data)
 - Q: [I need high-performance computing for my application.  Is that available?](#hpc)
 - Q: [How do I set my favorite Apps?](#favorites)
-
+- Q: [Is there an SDK Cheatsheet?](#cheatsheet)
 
 #### <A NAME="repeat"></A>Q: How can I tell if someone's already wrapped a tool I'm interested in?
 **A:** Go to the development [App Catalog](https://narrative.kbase.us/#appcatalog) and start by using *Search* see if there's a released method.  If you don't find a method that way, it may also help to  by selecting "Organize by"... "Category" and selecting what seems to be a likely category for the tool.  There are also methods that have not yet been officially released, so you should also check the "Beta" and "Dev" categories to see if there's something in the pipeline by selecting them from the "Version" dropdown.
@@ -107,5 +107,10 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 #### <A NAME="favorites"></A>Q: How do I set my favorite Apps?
 **A:** After logging into [KBase](https://kbase.us), go to the [App Catalog](https://narrative.kbase.us/#appcatalog), and then click on the stars for your favorite Apps.  You must be logged in for it to associate it with your account.
+
+[back to top](#top)
+
+#### <A NAME="cheatsheet"></A>Q: Is there a cheatsheet?
+**A:** Yes, there is a _living_ document that provides a lot of hints about the SDK [SDK Cheatsheet](https://docs.google.com/document/d/1J6HJGtIoAY9yDI6N9xDyarH8vT7tCao2ZBzvVwLEOdw/edit).
 
 [back to top](#top)

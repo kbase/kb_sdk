@@ -2,6 +2,7 @@ package us.kbase.mobu.initializer.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,6 +18,7 @@ import junit.framework.Assert;
 import us.kbase.mobu.initializer.ModuleInitializer;
 
 public class InitializerTest {
+    private static File tempDir = null;
 
 	private static final String SIMPLE_MODULE_NAME = "a_simple_module_for_unit_testing";
 	private static final String EXAMPLE_OLD_METHOD_NAME = "count_contigs_in_set"; 
@@ -55,15 +58,20 @@ public class InitializerTest {
 	
 	@After
 	public void tearDownModule() throws IOException {
-		File module = Paths.get(SIMPLE_MODULE_NAME).toFile();
+		File module = Paths.get(tempDir.getAbsolutePath(), SIMPLE_MODULE_NAME).toFile();
 		if (module.exists() && module.isDirectory()) {
 			FileUtils.deleteDirectory(module);
 		}
 	}
 	
+	@AfterClass
+	public static void cleanupClass() throws Exception {
+	    FileUtils.deleteQuietly(tempDir);
+	}
+	
 	public boolean checkPaths(List<String> pathList, String moduleName) {
 		for (String p : pathList) {
-			File f = Paths.get(moduleName, p).toFile();
+			File f = Paths.get(tempDir.getAbsolutePath(), moduleName, p).toFile();
 			if (!f.exists()) {
 				System.out.println("Unable to find path: " + f.toString());
 				return false;
@@ -111,7 +119,7 @@ public class InitializerTest {
 	}
 	
 	@BeforeClass
-	public static void prepPathsToCheck() {
+	public static void prepPathsToCheck() throws IOException {
 		allExpectedDefaultPaths = new ArrayList<String>(Arrays.asList(EXPECTED_PATHS));
 		allExpectedDefaultPaths.addAll(Arrays.asList(EXPECTED_DEFAULT_PATHS));
 		allExpectedDefaultPaths.add(SIMPLE_MODULE_NAME + ".spec");
@@ -149,37 +157,46 @@ public class InitializerTest {
 		rPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/spec.json");
 		rPaths.add("ui/narrative/methods/" + EXAMPLE_OLD_METHOD_NAME + "/display.yaml");
 
+		File rootTemp = new File("temp_test");
+		if (!rootTemp.exists()) {
+		    rootTemp.mkdir();
+		}
+		tempDir = Files.createTempDirectory(rootTemp.toPath(), "init_test_").toFile();
 	}
 	
 	@Test
 	public void testSimpleModule() throws Exception {
 		boolean useExample = false;
-		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, false);
+		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, null, 
+		        false, tempDir);
 		initer.initialize(useExample);
-		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, ModuleInitializer.DEFAULT_LANGUAGE));
+		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, 
+		        ModuleInitializer.DEFAULT_LANGUAGE));
 	}
 	
 	@Test
 	public void testModuleWithUser() throws Exception {
 		boolean useExample = false;
 		String language = "python";
-		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, language, false);
+		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, language, 
+		        false, tempDir);
 		initer.initialize(false);
 		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, language));
 	}
 	
 	@Test(expected=IOException.class)
 	public void testModuleAlreadyExists() throws Exception {
-		File f = Paths.get(SIMPLE_MODULE_NAME).toFile();
+		File f = Paths.get(tempDir.getAbsolutePath(), SIMPLE_MODULE_NAME).toFile();
 		if (!f.exists())
 			f.mkdir();
-		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, false);
+		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, null, 
+		        false, tempDir);
 		initer.initialize(false);
 	}
 	
 	@Test(expected=Exception.class)
 	public void testNoNameModule() throws Exception {
-		ModuleInitializer initer = new ModuleInitializer(null, null, false);
+		ModuleInitializer initer = new ModuleInitializer(null, null, null, false, tempDir);
 		initer.initialize(false);
 	}
 	
@@ -187,7 +204,8 @@ public class InitializerTest {
 	public void testPerlModuleExample() throws Exception {
 		boolean useExample = true;
 		String lang = "perl";
-		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, false);
+		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, 
+		        false, tempDir);
 		initer.initialize(useExample);
 		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, lang));
 	}
@@ -196,7 +214,8 @@ public class InitializerTest {
 	public void testPythonModuleExample() throws Exception {
 		boolean useExample = true;
 		String lang = "python";
-		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, false);
+		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, 
+		        false, tempDir);
 		initer.initialize(useExample);
 		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, lang));
 	}
@@ -205,7 +224,8 @@ public class InitializerTest {
 	public void testJavaModuleExample() throws Exception {
 		boolean useExample = true;
 		String lang = "java";
-		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, false);
+		ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, 
+		        false, tempDir);
 		initer.initialize(useExample);
 		Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, lang));
 	}
@@ -214,7 +234,8 @@ public class InitializerTest {
     public void testRModuleExample() throws Exception {
         boolean useExample = true;
         String lang = "r";
-        ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, false);
+        ModuleInitializer initer = new ModuleInitializer(SIMPLE_MODULE_NAME, USER_NAME, lang, 
+                false, tempDir);
         initer.initialize(useExample);
         Assert.assertTrue(examineModule(SIMPLE_MODULE_NAME, useExample, lang));
     }

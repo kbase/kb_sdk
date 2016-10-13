@@ -439,7 +439,16 @@ public abstract class CallbackServer extends JsonServerServlet {
             runner = createJobRunner(token, config, jobId, modmeth,
                     serviceVer);
             if (!vers.containsKey(modmeth.getModule())) {
-                vers.put(modmeth.getModule(), runner.getModuleRunVersion());
+                final ModuleRunVersion v = runner.getModuleRunVersion();
+                cbLog(String.format("Running module %s:\n" +
+                        "url: %s\n" +
+                        "commit: %s\n" +
+                        "version: %s\n" +
+                        "release: %s\n",
+                        modmeth.getModule(), v.getGitURL(),
+                        v.getGitHash(), v.getVersion(),
+                        v.getRelease()));
+                vers.put(modmeth.getModule(), v);
             }
         }
         return runner;

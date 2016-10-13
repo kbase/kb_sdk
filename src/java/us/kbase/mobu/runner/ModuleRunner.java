@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -43,9 +44,11 @@ import us.kbase.common.service.UObject;
 import us.kbase.common.utils.NetUtils;
 import us.kbase.kbasejobservice.FinishJobParams;
 import us.kbase.mobu.ModuleBuilder;
+import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 
 public class ModuleRunner {
     private final URL catalogUrl;
@@ -166,30 +169,11 @@ public class ModuleRunner {
             ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(runDir);
         }
         ////////////////////////////////// Temporary files ////////////////////////////////////////
-        StringBuilder mountPointsDocker = new StringBuilder();
+        final DockerMountPoints mounts = new DockerMountPoints(
+                Paths.get("/kb/module/work"), Paths.get("tmp"));
         if (mountPoints != null) {
             for (String part : mountPoints.split(Pattern.quote(","))) {
-                String[] fromTo = part.split(Pattern.quote(":"));
-                String to;
-                if (fromTo.length != 2) {
-                    if (fromTo.length == 1) {
-                        to = "tmp";
-                    } else {
-                        throw new IllegalStateException("Unexpected mount point format: " + part);
-                    }
-                } else {
-                    to = fromTo[1];
-                }
-                File fromDir = new File(fromTo[0]);
-                if ((!fromDir.exists()) || (!fromDir.isDirectory()))
-                    throw new IllegalStateException("Mount point directory doesn't exist: " +
-                            fromDir);
-                String from = fromDir.getCanonicalPath();
-                if (!to.startsWith("/"))
-                    to = "/kb/module/work/" + to;
-                if (mountPointsDocker.length() > 0)
-                    mountPointsDocker.append(" ");
-                mountPointsDocker.append("-v ").append(from).append(":").append(to);
+                mounts.addMount(part);
             }
         }
         File workDir = new File(runDir, "workdir");
@@ -217,6 +201,10 @@ public class ModuleRunner {
         } finally {
             pw.close();
         }
+        File scratchDir = new File(workDir, "tmp");
+        if (scratchDir.exists())
+            TextUtils.deleteRecursively(scratchDir);
+        scratchDir.mkdir();
         ////////////////////////////////// Preparing input.json ///////////////////////////////////
         String jsonString;
         if (inputFile != null) {
@@ -279,7 +267,7 @@ public class ModuleRunner {
                 inputWsObjects.addAll(Arrays.asList(provRefs.split(Pattern.quote(","))));
             }
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    auth, cfg, runver, params, inputWsObjects);
+                    auth, cfg, runver, params, inputWsObjects, mounts);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
@@ -302,7 +290,7 @@ public class ModuleRunner {
             System.out.println();
             int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runLocalSh),
                     callbackUrl.toExternalForm(), containerName, dockerImage, 
-                    mountPointsDocker.toString()).exec(runDir).getExitCode();
+                    mounts.getDockerCommand()).exec(runDir).getExitCode();
             File outputTmpFile = new File(workDir, "output.json");
             if (!outputTmpFile.exists())
                 throw new IllegalStateException("Output JSON file was not found");
