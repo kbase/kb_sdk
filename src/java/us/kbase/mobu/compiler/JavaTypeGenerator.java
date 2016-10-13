@@ -530,6 +530,7 @@ public class JavaTypeGenerator {
                     "    }"
                     ));
             if (anyAuth) {
+                //TODO update java common & remove exceptions
                 classLines.addAll(Arrays.asList(
                         "    /** Constructs a client with a custom URL.",
                         "     * @param url the URL of the service.",
@@ -600,6 +601,7 @@ public class JavaTypeGenerator {
 						"    }"
 						));
 				if (url != null) {
+				//TODO update java common & remove exceptions
 					classLines.addAll(Arrays.asList(
 						"",
 						"    /** Constructs a client with the default URL.",
