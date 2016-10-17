@@ -144,7 +144,7 @@ public class ModuleRunner {
             throw new IllegalStateException("Reference data is required for module " + moduleName +
             		". This feature is not supported for local calls.");
         String dockerImage = mv.getDockerImgName();
-        System.out.println("Docker image name recieved from Catalog: " + dockerImage);
+        System.out.println("Docker image name received from Catalog: " + dockerImage);
         ////////////////////////////////// Standard files in run_local ////////////////////////////
         if (!runDir.exists())
             runDir.mkdir();
@@ -286,7 +286,7 @@ public class ModuleRunner {
                 throw new IllegalStateException("No proper callback IP was found, " +
                         "please check callback_networks parameter in configuration");
             }
-            System.out.println("WARNING: No callback URL was recieved " +
+            System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
         }
         ////////////////////////////////// Running Docker /////////////////////////////////////////
