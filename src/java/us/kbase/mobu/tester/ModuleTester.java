@@ -13,6 +13,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -160,7 +161,8 @@ public class ModuleTester {
             fw.close();
         }
         File testCfgCopy = new File(workDir, "test.cfg");
-        Files.copy(testCfg.toPath(), testCfgCopy.toPath());
+        Files.copy(testCfg.toPath(), testCfgCopy.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
         String endPoint = props.getProperty("kbase_endpoint");
         if (endPoint == null)
             throw new IllegalStateException("Error: KBase services end-point is not set in " +
