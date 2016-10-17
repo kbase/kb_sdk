@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -158,6 +159,8 @@ public class ModuleTester {
         } finally {
             fw.close();
         }
+        File testCfgCopy = new File(workDir, "test.cfg");
+        Files.copy(testCfg.toPath(), testCfgCopy.toPath());
         String endPoint = props.getProperty("kbase_endpoint");
         if (endPoint == null)
             throw new IllegalStateException("Error: KBase services end-point is not set in " +
