@@ -198,7 +198,9 @@ public class ClientInstaller {
             url = "https://kbase.us/services/service_wizard";
             dynservVer = tagVer == null ? "release" : tagVer;
         } else if (async) {
-            url = "https://kbase.us/services/njs_wrapper";
+            // We are getting rid of default URL in async case because of unexpected behavior
+            // when for local calls callback URL is missed.
+            //url = "https://kbase.us/services/njs_wrapper";
             clientAsyncVer = tagVer == null ? "release" : tagVer;
         }
         final FileProvider fp2 = fp;
