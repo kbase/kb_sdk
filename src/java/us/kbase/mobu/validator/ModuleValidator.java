@@ -1,11 +1,14 @@
 package us.kbase.mobu.validator;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -46,11 +49,31 @@ public class ModuleValidator {
 	protected String methodStoreUrl;
 	protected boolean allowSyncMethods;
 	
-	public ModuleValidator(List<String> modulePaths, boolean verbose, String methodStoreUrl,
-	        boolean allowSyncMethods) {
+	public ModuleValidator(List<String> modulePaths, boolean verbose, 
+	        String defaultMethodStoreUrl, boolean allowSyncMethods) throws Exception {
 		this.modulePaths = modulePaths;
 		this.verbose = verbose;
-		this.methodStoreUrl = methodStoreUrl;
+		if (modulePaths.size() == 1) {
+		    File module = new File(modulePaths.get(0));
+		    File testCfg = new File(new File(module, "test_local"), "test.cfg");
+    		if (testCfg.exists()) {
+    	        Properties props = new Properties();
+    	        InputStream is = new FileInputStream(testCfg);
+    	        try {
+    	            props.load(is);
+    	        } finally {
+    	            is.close();
+    	        }
+    	        String endPoint = props.getProperty("kbase_endpoint");
+    	        if (endPoint != null)
+    	            this.methodStoreUrl = endPoint + "/narrative_method_store/rpc";
+    		}
+		}
+		if (this.methodStoreUrl == null) {
+		    this.methodStoreUrl = defaultMethodStoreUrl;
+		    System.out.println("WARNING! 'kbase_endpoint' property was not found in " +
+		    		"<module>/test_local/test.cfg so validation is done against NMS in appdev");
+		}
 		this.allowSyncMethods = allowSyncMethods;
 	}
 	
@@ -251,7 +274,7 @@ public class ModuleValidator {
         }
 	}
 
-	protected void validateMethodSpecMapping(String specText, KbModule parsedKidl,
+	public static void validateMethodSpecMapping(String specText, KbModule parsedKidl,
 	        boolean allowSyncMethods) throws IOException {
 	    JsonNode spec = new ObjectMapper().readTree(specText);
         JsonNode behaviorNode = get("/", spec, "behavior");
@@ -276,6 +299,23 @@ public class ModuleValidator {
             String paramPath = "parameters/" + i;
             String paramId = get(paramPath, paramNode, "id").asText();
             inputParamIdToType.put(paramId, paramNode);
+        }
+        Set<String> paramsUsed = new TreeSet<String>();
+        JsonNode groupsNode = spec.get("parameter-groups");
+        if (groupsNode != null) {
+            for (int i = 0; i < groupsNode.size(); i++) {
+                JsonNode groupNode = groupsNode.get(i);
+                String groupPath = "parameter-groups/" + i;
+                String paramId = get(groupPath, groupNode, "id").asText();
+                inputParamIdToType.put(paramId, groupNode);
+                JsonNode usedParamIdsNode = groupNode.get("parameters");
+                if (usedParamIdsNode != null) {
+                    for (int j = 0; j < usedParamIdsNode.size(); j++) {
+                        String usedParamId = usedParamIdsNode.get(j).asText();
+                        paramsUsed.add(usedParamId);
+                    }
+                }
+            }
         }
         JsonNode serviceMappingNode = get("behavior", behaviorNode, "service-mapping");
         String moduleName = get("behavior/service-mapping", serviceMappingNode, "name").asText();
@@ -311,7 +351,6 @@ public class ModuleValidator {
                     "[behavior/service-mapping/url] in spec.json");
         }
         JsonNode paramsMappingNode = get("behavior/service-mapping", serviceMappingNode, "input_mapping");
-        Set<String> paramsUsed = new TreeSet<String>();
         Set<Integer> argsUsed = new TreeSet<Integer>();
         for (int j = 0; j < paramsMappingNode.size(); j++) {
             JsonNode paramMappingNode = paramsMappingNode.get(j);

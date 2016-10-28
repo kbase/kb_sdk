@@ -49,7 +49,7 @@ public class ModuleBuilder {
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.9";
+    public static final String VERSION = "1.0.10";
     
     
     public static void main(String[] args) throws Exception {
@@ -152,9 +152,16 @@ public class ModuleBuilder {
     	if(validateArgs.modules.size()==0) {
     		validateArgs.modules.add(".");
     	}
-    	ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose,
-    	        validateArgs.methodStoreUrl, validateArgs.allowSyncMethods);
-    	return mv.validateAll();
+    	try {
+    	    ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose,
+    	            validateArgs.methodStoreUrl, validateArgs.allowSyncMethods);
+    	    return mv.validateAll();
+    	} catch (Exception e) {
+            if (validateArgs.verbose)
+                e.printStackTrace();
+            showError("Error while validating module", e.getMessage());
+            return 1;
+        }
 	}
 
     /**
