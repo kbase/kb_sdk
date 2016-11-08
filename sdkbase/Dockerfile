@@ -5,7 +5,8 @@ RUN apt-get install python-dev libffi-dev libssl-dev \
     && pip install pyopenssl ndg-httpsclient pyasn1 \
     && pip install requests --upgrade \
     && pip install requests_toolbelt --upgrade \
-    && pip install 'requests[security]' --upgrade
+    && pip install 'requests[security]' --upgrade \
+    && pip install coverage
 
 # Update kb_sdk at build time
 ONBUILD RUN \
@@ -21,4 +22,3 @@ ONBUILD RUN \
   make && make deploy && \
   cd /kb/dev_container/modules/kb_sdk && \
   make && make deploy
-
