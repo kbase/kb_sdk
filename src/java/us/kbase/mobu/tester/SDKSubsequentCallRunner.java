@@ -1,16 +1,20 @@
 package us.kbase.mobu.tester;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import us.kbase.auth.AuthToken;
+import us.kbase.catalog.ModuleVersion;
 import us.kbase.common.executionengine.ModuleMethod;
+import us.kbase.common.executionengine.ModuleRunVersion;
 import us.kbase.common.executionengine.SubsequentCallRunner;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonClientException;
@@ -35,6 +39,43 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         this.mounts = mounts;
     }
 
+    @Override
+    protected ModuleVersion loadModuleVersion(ModuleMethod modmeth,
+            String serviceVer) throws IOException, JsonClientException {
+        if (isLocalModule(modmeth.getModule())) {
+            return new ModuleVersion().withModuleName(modmeth.getModule())
+                    .withGitUrl("http://localhost")
+                    .withGitCommitHash("local-docker-image").withVersion("local");
+        } else {
+            return super.loadModuleVersion(modmeth, serviceVer);
+        }
+    }
+
+    protected Map<String, String> getLocalModuleNameToImage() {
+        return null;
+    }
+    
+    public boolean isLocalModule(String module) {
+        Map<String, String> localModuleNameToImage = getLocalModuleNameToImage();
+        return localModuleNameToImage != null && 
+                localModuleNameToImage.containsKey(module);
+    }
+    
+    @Override
+    protected ModuleRunVersion createModuleRunVersion(ModuleMethod modmeth,
+            String serviceVer, ModuleVersion mv) throws MalformedURLException {
+        return super.createModuleRunVersion(modmeth, serviceVer, mv);
+    }
+    
+    @Override
+    protected String getImageName(ModuleVersion mv) {
+        if (isLocalModule(mv.getModuleName())) {
+            return getLocalModuleNameToImage().get(mv.getModuleName());
+        } else {
+            return super.getImageName(mv);
+        }
+    }
+    
     @Override
     protected Path runModule(
             final UUID jobId,

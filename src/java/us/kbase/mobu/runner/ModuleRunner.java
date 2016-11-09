@@ -273,7 +273,7 @@ public class ModuleRunner {
                 inputWsObjects.addAll(Arrays.asList(provRefs.split(Pattern.quote(","))));
             }
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    auth, cfg, runver, params, inputWsObjects, mounts);
+                    auth, cfg, runver, params, inputWsObjects, mounts, null);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);

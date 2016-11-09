@@ -164,7 +164,7 @@ public class CallbackServerTest {
         final DockerMountPoints mounts = new DockerMountPoints(
                 Paths.get("/kb/module/work"), Paths.get("tmp"));
         final CallbackServer callback = new SDKCallbackServer(
-                token, cbcfg, runver, params, wsobjs, mounts);
+                token, cbcfg, runver, params, wsobjs, mounts, null);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(
