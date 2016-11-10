@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -229,14 +230,16 @@ public class ModuleTester {
                         }
                     }).build();
             ModuleRunVersion runver = new ModuleRunVersion(
-                    new URL("https://fakefakefakefakefake.com"),
-                    new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+                    new URL("https://localhost"),
+                    new ModuleMethod(moduleName + ".run_local_tests"),
+                    "local-docker-image", "local", "dev");
             final DockerMountPoints mounts = new DockerMountPoints(
                     Paths.get("/kb/module/work"), Paths.get("tmp"));
+            Map<String, String> localModuleToImage = new LinkedHashMap<>();
+            localModuleToImage.put(moduleName, imageName);
             JsonServerServlet catalogSrv = new SDKCallbackServer(
                     token, cfg, runver, new ArrayList<UObject>(),
-                    new ArrayList<String>(), mounts);
+                    new ArrayList<String>(), mounts, localModuleToImage);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
