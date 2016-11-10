@@ -231,7 +231,7 @@ public class ModuleTester {
                     }).build();
             ModuleRunVersion runver = new ModuleRunVersion(
                     new URL("https://localhost"),
-                    new ModuleMethod(moduleName + ".to_set_provenance_for_tests"),
+                    new ModuleMethod(moduleName + ".run_local_tests"),
                     "local-docker-image", "local", "dev");
             final DockerMountPoints mounts = new DockerMountPoints(
                     Paths.get("/kb/module/work"), Paths.get("tmp"));

@@ -51,6 +51,12 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         }
     }
 
+    /**
+     * This method is supposed to be overwritten in order to provide map with local images
+     * by module name. This is designed this way because this method is used in 
+     * constructor of super-class which is part of common code base shared with execution
+     * engine.
+     */
     protected Map<String, String> getLocalModuleNameToImage() {
         return null;
     }
@@ -59,12 +65,6 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         Map<String, String> localModuleNameToImage = getLocalModuleNameToImage();
         return localModuleNameToImage != null && 
                 localModuleNameToImage.containsKey(module);
-    }
-    
-    @Override
-    protected ModuleRunVersion createModuleRunVersion(ModuleMethod modmeth,
-            String serviceVer, ModuleVersion mv) throws MalformedURLException {
-        return super.createModuleRunVersion(modmeth, serviceVer, mv);
     }
     
     @Override
