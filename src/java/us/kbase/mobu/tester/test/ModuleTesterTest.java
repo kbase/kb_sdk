@@ -18,12 +18,11 @@ import us.kbase.mobu.ModuleBuilder;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.initializer.test.DockerClientServerTester;
 import us.kbase.mobu.tester.ModuleTester;
-import us.kbase.mobu.util.ProcessHelper;
 
 public class ModuleTesterTest {
 
 	private static final String SIMPLE_MODULE_NAME = "ASimpleModule_for_unit_testing";
-	private static final boolean cleanupAfterTests = false;
+	private static final boolean cleanupAfterTests = true;
 	
 	private static final String TEST_CFG = "kb_sdk_test";
 	
