@@ -120,6 +120,13 @@ Edit the local test config file (`test_local/test.cfg`) with a KBase user accoun
 
 Run tests:
 
+First, run test to populate test_local directory:
+
+    kb-sdk test
+
+Now edit test_local/test.cfg to update credentials and kbase_endpoint.
+Then:   
+   
     cd test_local
     kb-sdk test
 
