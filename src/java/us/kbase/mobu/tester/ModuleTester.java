@@ -252,7 +252,7 @@ public class ModuleTester {
                 throw new IllegalStateException("No proper callback IP was found, " +
                 		"please check callback_networks parameter in test.cfg");
             }
-            System.out.println("WARNING: No callback URL was recieved " +
+            System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
         }
         ///////////////////////////////////////////////////////////////////////////////////////////
