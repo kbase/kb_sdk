@@ -13,7 +13,7 @@
   <property name="dist" location="dist"/>
   <property name="bin.local" location="bin"/>
   <property name="classes"  location="classes"/>
-
+  <property name="lib"	location="lib"/>
 
   <property name="test.dir" location="temp_test_files"/>
   <property name="test.script.dir" location="test_scripts"/>
@@ -29,6 +29,7 @@
   <property name="module_builder.sh.old.file"	value="kb-mobu"/>
   <property name="module_builder.sh.file"	value="kb-sdk"/>
   <property name="ws_tools.sh.file"		value="ws-tools"/>
+
 
 
   <!-- If the BIN_LIB_TARGET is defined, then use the jars from the target destination
@@ -48,16 +49,38 @@
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
   <property name="jardir" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
-  <condition property="commonjar" value="kbase/common/kbase-common-0.0.13.jar">
-    <or>
-      <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
-      <not>
-        <isset property="env.JENKINS_JAVA_COMMON_JARFILE"/>
-      </not>
-    </or>
+  
+  <!-- KBASE_COMMON_JAR should come from Makefile because of "make bin" mode support -->
+  <condition property="commonjar" value="${KBASE_COMMON_JAR}">
+    <and>
+      <isset property="KBASE_COMMON_JAR"/>
+      <or>
+        <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
+        <not>
+          <isset property="env.JENKINS_JAVA_COMMON_JARFILE"/>
+        </not>
+      </or>
+    </and>
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
-  <property name="commonjar" value="${env.JENKINS_JAVA_COMMON_JARFILE}"/>
+  <condition property="commonjar" value="${env.JENKINS_JAVA_COMMON_JARFILE}">
+    <and>
+      <isset property="env.JENKINS_JAVA_COMMON_JARFILE"/>
+      <not>
+        <equals arg1="${env.JENKINS_JAVA_COMMON_JARFILE}" arg2=""/>
+      </not>
+    </and>
+  </condition>
+
+
+
+  <path id="compile.classpath">
+    <fileset dir="${jardir}" includesfile="JAR_DEPS">
+      <include name="${commonjar}"/>
+    </fileset>
+  </path>
+
+
 
   <target name="init">
     <!-- Create the output directory structure-->
@@ -67,8 +90,15 @@
     <mkdir dir="${test.dir}"/>
     <mkdir dir="${ee.dir}"/>
   </target>
-	
+
+
+
   <target name="compile" depends="init" description="compile the source">
+    <fail message="KBase common jar is not set">
+        <condition>
+            <not><isset property="commonjar" /></not>
+        </condition>
+    </fail>
     <!-- Compile class files-->
     <exec executable="git" outputproperty="git.url"><arg line="config --get remote.origin.url"/></exec>
     <exec executable="git" outputproperty="git.branch"><arg line="rev-parse --abbrev-ref HEAD"/></exec>
@@ -78,12 +108,16 @@ giturl=${git.url}
 branch=${git.branch}
 commit=${git.commit}</echo>
     <echo>Compiling with jar directory: ${jardir}</echo>
-    <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" />
+    <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" target="1.7" source="1.7" />
     <!-- Copy resource files-->
     <copy todir="${classes}">
       <fileset dir="${src}">
         <patternset>
           <include name="**/*.properties"/>
+          <include name="**/*.py"/>
+          <include name="**/*.css"/>
+          <include name="**/*.spec"/>
+          <include name="**/*.html"/>
         </patternset>
       </fileset>
     </copy>
@@ -111,44 +145,7 @@ commit=${git.commit}</echo>
     <delete dir="${classes}"/>
   </target>
 
-  <path id="compile.classpath">
-    <fileset dir="${jardir}">
-      <include name="kohsuke/args4j-2.0.21.jar"/>
-      <include name="codemodel/codemodel-2.4.1.jar"/>
-      <include name="apache_commons/commons-io-2.4.jar"/>
-      <include name="ini4j/ini4j-0.5.2.jar"/>
-      <include name="jackson/jackson-annotations-2.2.3.jar"/>
-      <include name="jackson/jackson-core-2.2.3.jar"/>
-      <include name="jackson/jackson-databind-2.2.3.jar"/>
-      <include name="jetty/jetty-all-7.0.0.jar"/>
-      <include name="jna/jna-3.4.0.jar"/>
-      <include name="google/jsonschema2pojo-core-0.3.6.jar"/>
-      <include name="google/guava-14.0.1.jar"/>
-      <include name="junit/junit-4.9.jar"/>
-      <include name="kbase/auth/kbase-auth-1380919426-d35c17d.jar"/>
-      <include name="servlet/servlet-api-2.5.jar"/>
-      <include name="syslog4j/syslog4j-0.9.46.jar"/>
-      <include name="apache_commons/commons-lang-2.4.jar"/>
-      <include name="apache_commons/velocity-1.7.jar"/>
-      <include name="apache_commons/commons-collections-3.2.1.jar"/>
-      <include name="jcommander/jcommander-1.48.jar"/>
-      <include name="snakeyaml/snakeyaml-1.11.jar"/>
-      <include name="kbase/workspace/WorkspaceClient-0.4.1.jar"/>
-      <include name="kbase/shock/shock-client-0.0.8.jar"/>
-      <include name="kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>
-      <include name="kbase/handle/HandleServiceClient-141020-5eda76e.jar"/>
-      <include name="apache_commons/http/httpclient-4.3.1.jar"/>
-      <include name="apache_commons/http/httpcore-4.3.jar"/>
-      <include name="apache_commons/http/httpmime-4.3.1.jar"/>
-      <include name="apache_commons/commons-logging-1.1.1.jar"/>
-      <include name="joda/joda-time-2.2.jar"/>
-      <include name="google/guava-18.0.jar"/>
-      <include name="${commonjar}"/>
-    </fileset>
-    <!--fileset dir=".">
-      <include name="kbase-common-temp.jar"/>
-    </fileset-->
-  </path>
+
 
   <target name="copy_kidl_jar" if="EXT_KIDL_JAR">
     <!-- copy the kidl jar to a versioned jar suitable for addition to the jars repo -->
@@ -157,8 +154,13 @@ commit=${git.commit}</echo>
   </target>
 
 
-  
+
   <target name="sh_bin" description="create shell file wrappers">
+    <fail message="KBase common jar is not set">
+        <condition>
+            <not><isset property="commonjar" /></not>
+        </condition>
+    </fail>
     <!-- Define absolute path to main jar file-->
     <property name="jar.absolute.path" location="${dist}/${module_builder.jar.file}"/>
     <!-- Define classpath string with : delimiter from list of lib-jar files-->
@@ -239,6 +241,21 @@ kill $(&lt;"$DIR/pid.txt")
   </target>
 
 
+
+  <target name="prepare_bin" depends="compile" description="prepares binary jar in lib folder and copies JAR_DEPS to JAR_DEPS_BIN">
+    <copy file="${dist}/${module_builder.jar.file}" tofile="${lib}/${module_builder.jar.file}"/>
+    <concat destfile="JAR_DEPS_BIN">
+      <header filtering="no" trimleading="yes">
+        # THIS FILE IS A COPY OF THE JAR_DEPS FILE USED FOR "MAKE BIN" MODE.
+        # PLEASE DO NOT CHANGE IT MANUALLY!
+
+      </header>
+      <path path="JAR_DEPS"/>
+    </concat>
+  </target>
+
+
+
   <!-- deploy the module builder bin to the BIN_TARGET -->
   <target name="deploy_bin" description="deploys the module builder shell script and libs if ">
     <!-- fail if the jar file is missing -->
@@ -257,6 +274,14 @@ kill $(&lt;"$DIR/pid.txt")
     <!-- fail if the jars repo is not deployed to the BIN_TARGET location -->
     <fail message="jars folder in ${BIN_LIB_TARGET} is missing- did you forget to deploy 'jars'?">
         <condition><not><available file="${BIN_LIB_TARGET}/jars" /></not></condition>
+    </fail>
+    <fail message="KBase common jar is not set">
+        <condition>
+        	<or>
+        	    <not><isset property="commonjar" /></not>
+        	    <equals arg1="${commonjar}" arg2=""/>
+        	</or>
+        </condition>
     </fail>
     <!-- copy lib to target -->
     <copy todir="${BIN_LIB_TARGET}" flatten="true">
@@ -291,10 +316,12 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
   </target>
 
 
+
   <target name="preparejunitreportdir" if="env.JENKINS_REPORT_DIR">
     <delete dir="${env.JENKINS_REPORT_DIR}"/>
     <mkdir dir="${env.JENKINS_REPORT_DIR}"/>
   </target>
+
 
 
   <target name="test" depends="compile, preparejunitreportdir" description="create test script">
@@ -313,6 +340,7 @@ $JAVA_HOME/bin/java -cp ${lib.classpath}:${jar.absolute.path} us.kbase.tools.Wor
       </batchtest>
     </junit>
   </target>
+
 
 
   <target name="clean" description="clean up" >

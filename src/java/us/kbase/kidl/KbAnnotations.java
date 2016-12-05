@@ -14,35 +14,55 @@ import java.util.TreeMap;
 public class KbAnnotations {
 	private List<String> optional = null;
 	private KbAnnotationId idReference = null;
+	//TODO ROMAN can this be removed?
 	private KbAnnotationSearch searchableWsSubset = null;
 	private KbAnnotationMetadata wsMetadata = null;
 	private KbAnnotationRange range = null;
+	private boolean isDeprecated = false;
+	private String deprecationReplacement = null;
 	private Map<String, Object> unknown = new HashMap<String, Object>();
+	
+	/* Implementation notes:
+	 * loadFromMap has two uses:
+	 * 1) loading from XML produced by the old Perl type compiler (obsolete)
+	 * 2) loading from maps produced by toJson in this method.
+	 * Thus, toJson must produce output that loadFromMap can consume.
+	 * 
+	 * This class does not have toJsonSchema because only KbType and specific
+	 * annotation classes need toJsonSchema.
+	 */
 	
 	@SuppressWarnings("unchecked")
 	KbAnnotations loadFromMap(Map<?,?> data) throws KidlParseException {
-		for (Map.Entry<?, ?> enrty : data.entrySet()) {
-			String key = enrty.getKey().toString();
+		for (final Map.Entry<?, ?> entry : data.entrySet()) {
+			final String key = entry.getKey().toString();
 			if (key.equals("optional")) {
-				optional = (List<String>)enrty.getValue();
+				optional = (List<String>)entry.getValue();
+			} else if (key.equals("deprecated")) {
+				isDeprecated = true;
+				final String repl = (String) entry.getValue();
+				//is there any other checking we should do here?
+				if (repl != null && !repl.isEmpty()) {
+					deprecationReplacement = repl;
+				}
 			} else if (key.equals("id")) {
 				idReference = new KbAnnotationId();
-				idReference.loadFromMap((Map<String, Object>)enrty.getValue());
+				idReference.loadFromMap((Map<String, Object>)entry.getValue());
 			} else if (key.equals("searchable_ws_subset")) {
 				searchableWsSubset = new KbAnnotationSearch();
-				searchableWsSubset.loadFromMap((Map<String, Object>)enrty.getValue());
+				searchableWsSubset.loadFromMap((Map<String, Object>)entry.getValue());
 			} else if (key.equals("metadata")) {
 				wsMetadata = new KbAnnotationMetadata();
-				wsMetadata.loadFromMap((Map<String, Object>)enrty.getValue());
+				wsMetadata.loadFromMap((Map<String, Object>)entry.getValue());
 			}else if (key.equals("range")) {
 				range = new KbAnnotationRange();
-				range.loadFromMap((Map<String, Object>)enrty.getValue());
+				range.loadFromMap((Map<String, Object>)entry.getValue());
 			} else if (key.equals("unknown_annotations")) {
-				unknown.putAll((Map<String, Object>)enrty.getValue());
+				unknown.putAll((Map<String, Object>)entry.getValue());
 			} else {
 				//throw new KidlParseException("Unknown type of annotation: " + key);
 				if (!unknown.containsKey(key))
-					unknown.put(key, enrty.getValue());
+					unknown.put(key, entry.getValue());
 			}
 		}
 		if (optional != null)
@@ -51,30 +71,43 @@ public class KbAnnotations {
 		return this;
 	}
 	
-	public KbAnnotations loadFromComment(String comment, KbTypedef caller) throws KidlParseException {
-		List<List<String>> lines = new ArrayList<List<String>>();
-		StringTokenizer st = new StringTokenizer(comment, "\r\n");
-		while (st.hasMoreTokens()) {
-			String line = st.nextToken();
-			StringTokenizer st2 = new StringTokenizer(line, " \t");
-			List<String> words = new ArrayList<String>();
-			while (st2.hasMoreTokens())
-				words.add(st2.nextToken());
-			lines.add(words);
+	public KbAnnotations loadFromComment(
+			final String comment, final KbFuncdef caller)
+			throws KidlParseException {
+		final List<List<String>> lines = tokenize(comment);
+		for (final List<String> words: lines) {
+			final String annType = getAnnotationType(words);
+			if (annType == null) {
+				continue;
+			}
+			final List<String> value = words.subList(1, words.size());
+			if (annType.equals("deprecated")) {
+				setDeprecated(value);
+			} else {
+				// TODO: Probably we should throw an exception here
+				unknown.put(annType, value);
+			}
 		}
-		for (int pos = 0; pos < lines.size(); pos++) {
-			if (lines.get(pos).size() == 0)
+		return this;
+	}
+	
+	
+	public KbAnnotations loadFromComment(
+			final String comment, final KbTypedef caller)
+			throws KidlParseException {
+		final List<List<String>> lines = tokenize(comment);
+		for (final List<String> words: lines) {
+			final String annType = getAnnotationType(words);
+			if (annType == null) {
 				continue;
-			List<String> words = lines.get(pos);
-			String annType = words.get(0);
-			if (!annType.startsWith("@"))
-				continue;
-			annType = annType.substring(1);
-			List<String> value = words.subList(1, words.size());
+			}
+			final List<String> value = words.subList(1, words.size());
 			if (annType.equals("optional")) {
 				if (optional == null)
 					optional = new ArrayList<String>();
 				optional.addAll(value);
+			} else if (annType.equals("deprecated")) {
+				setDeprecated(value);
 			} else if (annType.equals("id")) {
 				idReference = new KbAnnotationId();
 				idReference.loadFromComment(value);
@@ -95,6 +128,45 @@ public class KbAnnotations {
 			}
 		}
 		return this;
+	}
+
+	private void setDeprecated(final List<String> value)
+			throws KidlParseException {
+		isDeprecated = true;
+		if (value.size() > 1) {
+			throw new KidlParseException(
+					"deprecation annotations may have at most one argument");
+		}
+		final String repl = value.isEmpty() ? null : value.get(0);
+		if (repl != null && !repl.isEmpty()) {
+			deprecationReplacement = repl;
+		}
+	}
+	
+	private String getAnnotationType(final List<String> words) {
+		//this can't actually happen given the tokenizer setup
+		if (words.size() == 0) {
+			return null;
+		}
+		final String annType = words.get(0);
+		if (!annType.startsWith("@")) {
+			return null;
+		}
+		return annType.substring(1);
+	}
+
+	private List<List<String>> tokenize(final String comment) {
+		final List<List<String>> lines = new ArrayList<List<String>>();
+		final StringTokenizer st = new StringTokenizer(comment, "\r\n");
+		while (st.hasMoreTokens()) {
+			final String line = st.nextToken();
+			final StringTokenizer st2 = new StringTokenizer(line, " \t");
+			final List<String> words = new ArrayList<String>();
+			while (st2.hasMoreTokens())
+				words.add(st2.nextToken());
+			lines.add(words);
+		}
+		return lines;
 	}
 	
 	public List<String> getOptional() {
@@ -117,16 +189,29 @@ public class KbAnnotations {
 		return range;
 	}
 	
+	public boolean isDeprecated() {
+		return isDeprecated;
+	}
+	
+	public String getDeprecationReplacement() {
+		return deprecationReplacement;
+	}
+	
 	public Map<String, Object> getUnknown() {
 		return unknown;
 	}
 	
 	public Object toJson(boolean isTypedef) {
 		Map<String, Object> ret = new TreeMap<String, Object>();
-		if (optional != null)
+		if (optional != null) {
 			ret.put("optional", new ArrayList<String>(optional));
-		if (idReference != null)
+		}
+		if (isDeprecated) {
+			ret.put("deprecated", deprecationReplacement);
+		}
+		if (idReference != null) {
 			ret.put("id", idReference.toJson());
+		}
 		if (isTypedef) {
 			Object searchableJson = searchableWsSubset == null ?
 					new HashMap<String, Object>() : searchableWsSubset.toJson();
@@ -141,5 +226,31 @@ public class KbAnnotations {
 		
 		ret.put("unknown_annotations", unknown);
 		return ret;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("KbAnnotations [optional=");
+		builder.append(optional);
+		builder.append(", idReference=");
+		builder.append(idReference);
+		builder.append(", searchableWsSubset=");
+		builder.append(searchableWsSubset);
+		builder.append(", wsMetadata=");
+		builder.append(wsMetadata);
+		builder.append(", range=");
+		builder.append(range);
+		builder.append(", isDeprecated=");
+		builder.append(isDeprecated);
+		builder.append(", deprecationReplacement=");
+		builder.append(deprecationReplacement);
+		builder.append(", unknown=");
+		builder.append(unknown);
+		builder.append("]");
+		return builder.toString();
 	}
 }

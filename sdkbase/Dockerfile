@@ -1,5 +1,11 @@
 FROM kbase/deplbase:latest
 
+# Fix Python SSL warnings
+RUN apt-get install python-dev libffi-dev libssl-dev \
+    && pip install pyopenssl ndg-httpsclient pyasn1 \
+    && pip install requests --upgrade \
+    && pip install 'requests[security]' --upgrade
+
 # Update kb_sdk at build time
 ONBUILD RUN \
   . /kb/dev_container/user-env.sh && \

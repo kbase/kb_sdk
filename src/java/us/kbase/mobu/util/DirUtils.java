@@ -3,6 +3,8 @@ package us.kbase.mobu.util;
 import java.io.File;
 import java.io.IOException;
 
+import us.kbase.tools.WinShortPath;
+
 public class DirUtils {
 
     public static boolean isModuleDir(File dir) {
@@ -27,5 +29,13 @@ public class DirUtils {
                 throw new IllegalStateException("You're currently not in module folder");
         }
         return dir;
+    }
+    
+    public static String getFilePath(File f) throws Exception {
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        String ret = f.getCanonicalPath();
+        if (isWindows)
+            ret = WinShortPath.getWinShortPath(ret);
+        return ret;
     }
 }

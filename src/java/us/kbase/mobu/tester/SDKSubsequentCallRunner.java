@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.TokenFormatException;
 import us.kbase.common.executionengine.ModuleMethod;
 import us.kbase.common.executionengine.SubsequentCallRunner;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
@@ -25,7 +24,7 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
             final UUID jobId,
             final ModuleMethod modmeth,
             final String serviceVer)
-            throws IOException, JsonClientException, TokenFormatException {
+            throws IOException, JsonClientException {
         super(token, config, jobId, modmeth, serviceVer);
     }
 
@@ -43,8 +42,10 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         if (Files.notExists(runSubJobsSh)) {
             final boolean isMac = System.getProperty("os.name").toLowerCase()
                     .contains("mac");
+            final boolean isWin = System.getProperty("os.name").toLowerCase()
+                    .contains("win");
             final String dockerRunCmd = config.getWorkDir().toAbsolutePath() +
-                    "/run_docker.sh run " + (isMac ? "" : "--user $(id -u) ") +
+                    "/run_docker.sh run " + (isMac || isWin ? "" : "--user $(id -u) ") +
                     "-v " + config.getWorkDir().resolve(SUBJOBSDIR)
                         .toAbsolutePath() + 
                     "/$1/" + WORKDIR + ":/kb/module/work -v " +
@@ -62,7 +63,7 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
         final Path jobWorkDir = getJobWorkDir(jobId, config, imageName)
                 .toAbsolutePath();
         Files.write(jobWorkDir.resolve("token"),
-                Arrays.asList(token.toString()), StandardCharsets.UTF_8);
+                Arrays.asList(token.getToken()), StandardCharsets.UTF_8);
         
         ProcessHelper.cmd("bash", runSubJobsSh.toString(),
                 jobWorkDir.getParent().getFileName().toString(), imageName,

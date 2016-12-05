@@ -28,5 +28,7 @@ public class JobRunnerConstants {
     public static final String CFG_PROP_CATALOG_SRV_URL = "catalog.srv.url";
     public static final String CFG_PROP_AWE_CLIENT_DOCKER_URI =
             "awe.client.docker.uri";
+    public static final String CFG_PROP_EE_SERVER_VERSION = 
+            "ee.server.version";
 
 }
