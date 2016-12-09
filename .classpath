@@ -14,15 +14,12 @@
 	<classpathentry kind="lib" path="../jars/lib/jars/jna/jna-3.4.0.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/junit/junit-4.9.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="../jars/lib/jars/kbase/auth/kbase-auth-1380919426-d35c17d.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/servlet/servlet-api-2.5.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/syslog4j/syslog4j-0.9.46.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/velocity-1.7.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/jcommander/jcommander-1.48.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/snakeyaml/snakeyaml-1.11.jar"/>
-	<classpathentry kind="lib" path="../jars/lib/jars/kbase/common/kbase-common-0.0.17.jar"/>
-	<classpathentry kind="lib" path="../jars/lib/jars/kbase/shock/shock-client-0.0.8.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/kbase/handle/HandleManagerClient-141020-ff26a5d.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/kbase/handle/HandleServiceClient-141020-5eda76e.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/apache_commons/http/httpclient-4.3.1.jar"/>
@@ -37,5 +34,8 @@
 	<classpathentry kind="lib" path="../jars/lib/jars/logback/logback-classic-1.1.2.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/logback/logback-core-1.1.2.jar"/>
 	<classpathentry kind="lib" path="../jars/lib/jars/slf4j/slf4j-api-1.7.7.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/shock/shock-client-0.0.14.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/common/kbase-common-0.0.20.jar"/>
+	<classpathentry kind="lib" path="../jars/lib/jars/kbase/auth/kbase-auth-0.4.1.jar"/>
 	<classpathentry kind="output" path="eclipse-classes"/>
 </classpath>

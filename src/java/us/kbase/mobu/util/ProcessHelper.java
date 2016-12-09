@@ -38,14 +38,11 @@ public class ProcessHelper {
     }
 
     public static ProcessHelper exec(CommandHolder cmd, File workDir, File input, File output, File error, boolean waitFor) throws IOException {
-        try ( // these SWs shouldn't be necessary, but there you go
-            @SuppressWarnings("resource")
+        try (
             final BufferedReader br = input == null ? null :
                 new BufferedReader(new FileReader(input));
-            @SuppressWarnings("resource")
             final PrintWriter pw = output == null ? null :
                 new PrintWriter(output);
-            @SuppressWarnings("resource")
             final PrintWriter epw = error == null ? null :
                 new PrintWriter(error)
         ) {

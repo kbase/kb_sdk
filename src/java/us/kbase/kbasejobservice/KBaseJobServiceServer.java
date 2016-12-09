@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonServerMethod;
@@ -86,6 +87,8 @@ public class KBaseJobServiceServer extends JsonServerServlet {
                             RpcContext.class);
             Exception exc = null;
             try {
+                //TODO AUTH make configurable?
+                final AuthToken t = AuthService.validateToken(token);
                 if (rpcName.endsWith("_submit")) {
                     String origRpcName = rpcName.substring(0, rpcName.lastIndexOf('_'));
                     String[] parts = origRpcName.split(Pattern.quote("."));
@@ -100,11 +103,11 @@ public class KBaseJobServiceServer extends JsonServerServlet {
                     runJobParams.setParams(paramsList);
                     runJobParams.setRpcContext(context);
                     result = new ArrayList<Object>(); 
-                    result.add(runJob(runJobParams, new AuthToken(token),
+                    result.add(runJob(runJobParams, t,
                             rpcCallData.getContext()));
                 } else if (rpcName.endsWith("._check_job") && paramsList.size() == 1) {
                     String jobId = paramsList.get(0).asClassInstance(String.class);
-                    JobState jobState = checkJob(jobId, new AuthToken(token),
+                    JobState jobState = checkJob(jobId, t,
                             rpcCallData.getContext());
                     Long finished = jobState.getFinished();
                     if (finished != 0L) {
@@ -211,7 +214,7 @@ public class KBaseJobServiceServer extends JsonServerServlet {
         //BEGIN run_job
         lastJobId++;
         final String jobId = "" + lastJobId;
-        final String token = authPart.toString();
+        final AuthToken token = authPart;
         returnVal = jobId;
         final File jobDir = new File(tempDir, "job_" + jobId);
         if (!jobDir.exists())
@@ -222,7 +225,7 @@ public class KBaseJobServiceServer extends JsonServerServlet {
             @Override
             public void run() {
                 try {
-                    RunJobParams job = getJobParams(jobId, new AuthToken(token));
+                    RunJobParams job = getJobParams(jobId, token);
                     String serviceName = job.getMethod().split("\\.")[0];
                     RpcContext context = job.getRpcContext();
                     if (context == null)
@@ -245,14 +248,14 @@ public class KBaseJobServiceServer extends JsonServerServlet {
                     String scriptFilePath = getBinScript("run_" + serviceName + "_async_job.sh");
                     File outputFile = new File(jobDir, "output.json");
                     ProcessHelper.cmd("bash", scriptFilePath, inputFile.getCanonicalPath(),
-                            outputFile.getCanonicalPath(), token).exec(jobDir);
+                            outputFile.getCanonicalPath(), token.getToken()).exec(jobDir);
                     FinishJobParams result = UObject.getMapper().readValue(outputFile, FinishJobParams.class);
-                    finishJob(jobId, result, new AuthToken(token));
+                    finishJob(jobId, result, token);
                 } catch (Exception ex) {
                     FinishJobParams result = new FinishJobParams().withError(new JsonRpcError().withCode(-1L)
                             .withName("JSONRPCError").withMessage("Job service side error: " + ex.getMessage()));
                     try {
-                        finishJob(jobId, result, new AuthToken(token));
+                        finishJob(jobId, result, token);
                     } catch (Exception ignore) {}
                 }
             }

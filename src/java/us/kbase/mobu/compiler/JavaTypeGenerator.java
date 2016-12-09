@@ -173,16 +173,27 @@ public class JavaTypeGenerator {
 	            gitCommitHash, null);
 	}
 
-	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, String packageParent, 
-			boolean createServer, FileSaver libOut, String gwtPackage, URL url, 
-			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, 
-			String clientDynservVersion, String semanticVersion, String gitUrl, String gitCommitHash,
-			Map<String, String> originalCode) throws Exception {		
-		JavaData data = prepareDataStructures(services);
-		outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
-		        makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, gitUrl, 
-		        gitCommitHash, originalCode);
-		return data;
+	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, 
+	        String packageParent, boolean createServer, FileSaver libOut, String gwtPackage, 
+	        URL url, FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, 
+			String clientDynservVersion, String semanticVersion, String gitUrl, 
+			String gitCommitHash, Map<String, String> originalCode) throws Exception {
+	    return processSpec(services, srcOut, packageParent, createServer, libOut, gwtPackage, url,
+	            buildXml, makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, 
+	            gitUrl, gitCommitHash, originalCode, null);
+	}
+
+	public static JavaData processSpec(List<KbService> services, FileSaver srcOut, 
+	        String packageParent, boolean createServer, FileSaver libOut, String gwtPackage, 
+	        URL url, FileSaver buildXml, FileSaver makefile, String clientAsyncVersion, 
+	        String clientDynservVersion, String semanticVersion, String gitUrl, 
+	        String gitCommitHash, Map<String, String> originalCode, 
+	        String customClientClassName) throws Exception {        
+	    JavaData data = prepareDataStructures(services);
+	    outputData(data, srcOut, packageParent, createServer, libOut, gwtPackage, url, buildXml, 
+	            makefile, clientAsyncVersion, clientDynservVersion, semanticVersion, gitUrl, 
+	            gitCommitHash, originalCode, customClientClassName);
+	    return data;
 	}
 
 	public static JavaData parseSpec(File specFile) throws Exception {
@@ -245,13 +256,14 @@ public class JavaTypeGenerator {
 			boolean createServers, FileSaver libOutDir, String gwtPackage, URL url,
 			FileSaver buildXml, FileSaver makefile, String clientAsyncVersion,
 			String clientDynservVersion, String semanticVersion, String gitUrl, 
-			String gitCommitHash, Map<String, String> originalCode) throws Exception {
+			String gitCommitHash, Map<String, String> originalCode,
+			String customClientClassName) throws Exception {
 	    if (packageParent.equals("."))  // Special value meaning top level package.
 	        packageParent = "";
 		generatePojos(data, srcOutDir, packageParent);
 		generateTupleClasses(data,srcOutDir, packageParent);
 		generateClientClass(data, srcOutDir, packageParent, url, clientAsyncVersion, 
-		        clientDynservVersion);
+		        clientDynservVersion, customClientClassName);
 		if (createServers)
 			generateServerClass(data, srcOutDir, packageParent, semanticVersion, gitUrl, 
 			        gitCommitHash, originalCode);
@@ -431,7 +443,8 @@ public class JavaTypeGenerator {
 	}
 
 	private static void generateClientClass(JavaData data, FileSaver srcOutDir,
-			String packageParent, URL url, String asyncVersion, String dynservVersion) throws Exception {
+			String packageParent, URL url, String asyncVersion, String dynservVersion,
+			String clientClassName) throws Exception {
         if (asyncVersion != null) {
             if (Pattern.compile("[^a-zA-Z0-9]").matcher(asyncVersion).find())
                 throw new IllegalStateException("Unsupported non-alfanumeric characters in client " +
@@ -441,7 +454,9 @@ public class JavaTypeGenerator {
 		for (JavaModule module : data.getModules()) {
 			String moduleDir = sub(packageParent, module.getModulePackage()).replace('.', '/');
 			JavaImportHolder model = new JavaImportHolder(sub(packageParent, module.getModulePackage()));
-			String clientClassName = TextUtils.capitalize(module.getModuleName()) + "Client";
+			if (clientClassName == null) {
+			    clientClassName = TextUtils.capitalize(module.getModuleName()) + "Client";
+			}
 			String classFile = moduleDir + "/" + clientClassName + ".java";
 			String callerClass = model.ref(utilPackage + ".JsonClientCaller");
 			boolean anyAuth = false;
@@ -515,6 +530,7 @@ public class JavaTypeGenerator {
                     "    }"
                     ));
             if (anyAuth) {
+                //TODO update java common & remove exceptions
                 classLines.addAll(Arrays.asList(
                         "    /** Constructs a client with a custom URL.",
                         "     * @param url the URL of the service.",
@@ -528,30 +544,6 @@ public class JavaTypeGenerator {
                                 model.ref(utilPackage + ".UnauthorizedException") + ", " +
                                 model.ref("java.io.IOException") + " {",
                         "        caller = new " + callerClass + "(url, token);"
-                        ));
-                if (dynservVersion != null) {
-                    classLines.add(
-                            "        caller.setDynamic(true);"
-                            );
-                }
-                classLines.addAll(Arrays.asList(
-                        "    }",
-                        "",
-                        "    /** Constructs a client with a custom URL",
-                        "     * and a custom authorization service URL.",
-                        "     * @param url the URL of the service.",
-                        "     * @param token the user's authorization token.",
-                        "     * @param auth the URL of the authorization server.",
-                        "     * @throws UnauthorizedException if the token is not valid.",
-                        "     * @throws IOException if an IOException occurs when checking the token's",
-                        "     * validity.",
-                        "     */",
-                        "    public " + clientClassName + "(" + urlClass + " url, " + 
-                                model.ref("us.kbase.auth.AuthToken") + " token, " +
-                                urlClass + " auth) throws " + 
-                                model.ref(utilPackage + ".UnauthorizedException") + ", " +
-                                model.ref("java.io.IOException") + " {",
-                        "        caller = new " + callerClass + "(url, token, auth);"
                         ));
                 if (dynservVersion != null) {
                     classLines.add(
@@ -609,6 +601,7 @@ public class JavaTypeGenerator {
 						"    }"
 						));
 				if (url != null) {
+				//TODO update java common & remove exceptions
 					classLines.addAll(Arrays.asList(
 						"",
 						"    /** Constructs a client with the default URL.",
@@ -828,8 +821,8 @@ public class JavaTypeGenerator {
                 String exceptions = "throws " + model.ref("java.io.IOException") 
                         + ", " + model.ref(utilPackage + ".JsonClientException");
 			    if (func.getOriginal().isAsync() || asyncVersion != null) {
-			        if (!func.isAuthRequired())
-			            throw new IllegalStateException("Function " + func.getOriginal().getName() + " is async but doesn't require authentication");
+			        if (!func.isAuthCouldBeUsed())
+			            throw new IllegalStateException("Function " + func.getOriginal().getName() + " is async but doesn't allow authentication");
 			        classLines.add("");
 			        printFuncComment(func, originalToJavaTypes, packageParent, classLines, true);
 			        classLines.add("    protected String _" + func.getJavaName() + "Submit(" + funcParams + ") " + exceptions+ " {");

@@ -269,7 +269,7 @@ Data objects in KBase contain provenance (historical information of their creati
             'text_message':report
         }
 
-        reportName = 'megahit_report_'+str(hex(uuid.getnode()))
+        reportName = 'megahit_report_'+str(uuid.uuid4())   # uuid4() instead of getnode() to ensure uniqueness
         report_obj_info = ws.save_objects({
                 'id':info[6],
                 'objects':[
@@ -393,7 +393,7 @@ Edit *spec.json*:
 	"authors": [
 		"YourName"
 	],
-	"contact": "help@kbase.us",
+	"contact": "http://kbase.us/contact-us/",
 	"visible": true,
 	"categories": ["active","assembly","communities"],
 	"widgets": {

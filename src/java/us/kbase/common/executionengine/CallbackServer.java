@@ -34,7 +34,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.TokenFormatException;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonClientException;
@@ -201,7 +200,7 @@ public abstract class CallbackServer extends JsonServerServlet {
 
     private Map<String, Object> handleCall(
             final RpcCallData rpcCallData) throws IOException,
-            JsonClientException, InterruptedException, TokenFormatException {
+            JsonClientException, InterruptedException {
 
         final ModuleMethod modmeth = new ModuleMethod(
                 rpcCallData.getMethod());
@@ -363,7 +362,11 @@ public abstract class CallbackServer extends JsonServerServlet {
             result.put("result", resp.get("result"));
         }
         final Map<String, Object> copy = new HashMap<String, Object>(resp);
-        copy.put("result", Arrays.asList(result));
+        // Adding this check makes java client happy because it doesn't like
+        // to see both "error" and "result" blocks in JSON-RPC response.
+        if (!copy.containsKey("error")) {
+            copy.put("result", Arrays.asList(result));
+        }
         return copy;
     }
 
@@ -409,7 +412,7 @@ public abstract class CallbackServer extends JsonServerServlet {
             final UUID jobId,
             final RpcContext rpcContext,
             final ModuleMethod modmeth)
-            throws IOException, JsonClientException, TokenFormatException  {
+            throws IOException, JsonClientException {
         final SubsequentCallRunner runner;
         synchronized (getRunnerLock) {
             final String serviceVer;
@@ -436,7 +439,16 @@ public abstract class CallbackServer extends JsonServerServlet {
             runner = createJobRunner(token, config, jobId, modmeth,
                     serviceVer);
             if (!vers.containsKey(modmeth.getModule())) {
-                vers.put(modmeth.getModule(), runner.getModuleRunVersion());
+                final ModuleRunVersion v = runner.getModuleRunVersion();
+                cbLog(String.format("Running module %s:\n" +
+                        "url: %s\n" +
+                        "commit: %s\n" +
+                        "version: %s\n" +
+                        "release: %s\n",
+                        modmeth.getModule(), v.getGitURL(),
+                        v.getGitHash(), v.getVersion(),
+                        v.getRelease()));
+                vers.put(modmeth.getModule(), v);
             }
         }
         return runner;
@@ -448,7 +460,7 @@ public abstract class CallbackServer extends JsonServerServlet {
             final UUID jobId,
             final ModuleMethod modmeth,
             final String serviceVer)
-            throws IOException, JsonClientException, TokenFormatException;
+            throws IOException, JsonClientException;
     
     @Override
     public void destroy() {
@@ -458,12 +470,20 @@ public abstract class CallbackServer extends JsonServerServlet {
             cbLog(String.format("Failed to stop %s tasks", failed.size()));
         }
     }
-    
+
     public static URL getCallbackUrl(int callbackPort)
             throws SocketException {
+        return getCallbackUrl(callbackPort, null);
+    }
+
+    public static URL getCallbackUrl(int callbackPort, String[] networkInterfaces)
+            throws SocketException {
+        if (networkInterfaces == null || networkInterfaces.length == 0) {
+            networkInterfaces = new String[] {"docker0", "vboxnet0", "vboxnet1",
+                    "VirtualBox Host-Only Ethernet Adapter", "en0"};
+        }
         final List<String> hostIps = NetUtils.findNetworkAddresses(
-                "docker0", "vboxnet0", "vboxnet1",
-                "VirtualBox Host-Only Ethernet Adapter", "en0");
+                networkInterfaces);
         final String hostIp;
         if (hostIps.isEmpty()) {
             return null;

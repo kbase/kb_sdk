@@ -11,10 +11,14 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,7 +46,6 @@ import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
 import us.kbase.templates.TemplateFormatter;
-import us.kbase.tools.WinShortPath;
 
 public class ModuleTester {
     private File moduleDir;
@@ -73,13 +76,15 @@ public class ModuleTester {
         if (f.exists())
             lines.addAll(FileUtils.readLines(f));
         if (!new HashSet<String>(lines).contains(line)) {
-            System.out.println("Warning: file \"" + f.getName() + "\" doesn't contain \"" + line + "\" line, it will be added.");
+            System.out.println("Warning: file \"" + f.getName() + "\" doesn't contain \"" + line +
+                    "\" line, it will be added.");
             lines.add(line);
             FileUtils.writeLines(f, lines);
         }
     }
     
-    public int runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods) throws Exception {
+    public int runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods)
+            throws Exception {
         if (skipValidation) {
             System.out.println("Validation step is skipped");
         } else {
@@ -87,7 +92,8 @@ public class ModuleTester {
                     false, methodStoreUrl, allowSyncMethods);
             int returnCode = mv.validateAll();
             if (returnCode!=0) {
-                System.out.println("You can skip validation step using -s (or --skip_validation) flag");
+                System.out.println("You can skip validation step using -s (or --skip_validation)" +
+                		" flag");
                 System.exit(returnCode);
             }
         }
@@ -103,11 +109,13 @@ public class ModuleTester {
         if (!tlDir.exists())
             tlDir.mkdir();
         if (!readmeFile.exists())
-            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, readmeFile);
+            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, 
+                    readmeFile);
         if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
-                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
+                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, 
+                        runTestsSh);
                 refDataDir.mkdir();
             }
         }
@@ -116,14 +124,16 @@ public class ModuleTester {
         if (!runBashSh.exists())
             TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
         if (!runDockerSh.exists())
-            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, true, runDockerSh);
+            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, true, 
+                    runDockerSh);
         if (!testCfg.exists()) {
             TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, testCfg);
-            System.out.println("Set KBase account credentials in test_local/test.cfg and then test again");
+            System.out.println("Set KBase account credentials in test_local/test.cfg and then " +
+            		"test again");
             return 1;
         }
         Properties props = new Properties();
-        InputStream is = new FileInputStream(new File(tlDir, "test.cfg"));
+        InputStream is = new FileInputStream(testCfg);
         try {
             props.load(is);
         } finally {
@@ -132,26 +142,32 @@ public class ModuleTester {
         String user = props.getProperty("test_user");
         String password = props.getProperty("test_password");
         if (user == null || user.trim().isEmpty()) {
-            throw new IllegalStateException("Error: KBase account credentials are not set in test_local/test.cfg");
+            throw new IllegalStateException("Error: KBase account credentials are not set in " +
+            		"test_local/test.cfg");
         }
         if (password == null || password.trim().isEmpty()) {
-            System.out.println("You haven't preset your password in test_local/test.cfg file. Please enter it now.");
+            System.out.println("You haven't preset your password in test_local/test.cfg file. " +
+            		"Please enter it now.");
             password = new String(System.console().readPassword("Password: "));
         }
-        String token = AuthService.login(user.trim(), password.trim())
-                .getTokenString();
+        AuthToken token = AuthService.login(user.trim(), password.trim())
+                .getToken();
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
         FileWriter fw = new FileWriter(tokenFile);
         try {
-            fw.write(token);
+            fw.write(token.getToken());
         } finally {
             fw.close();
         }
+        File testCfgCopy = new File(workDir, "test.cfg");
+        Files.copy(testCfg.toPath(), testCfgCopy.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
         String endPoint = props.getProperty("kbase_endpoint");
         if (endPoint == null)
-            throw new IllegalStateException("Error: KBase services end-point is not set in test_local/test.cfg");
+            throw new IllegalStateException("Error: KBase services end-point is not set in " +
+            		"test_local/test.cfg");
         String jobSrvUrl = props.getProperty("job_service_url");
         if (jobSrvUrl == null)
             jobSrvUrl = endPoint + "/userandjobstate";
@@ -185,9 +201,16 @@ public class ModuleTester {
         if (scratchDir.exists())
             TextUtils.deleteRecursively(scratchDir);
         scratchDir.mkdir();
-        ///////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = NetUtils.findFreePort();
-        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        String[] callbackNetworks = null;
+        String callbackNetworksText = props.getProperty("callback_networks");
+        if (callbackNetworksText != null) {
+            callbackNetworks = callbackNetworksText.trim().split("\\s*,\\s*");
+            System.out.println("Custom network instarface list is defined: " + 
+                    Arrays.asList(callbackNetworks));
+        }
+        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
         if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
@@ -207,23 +230,32 @@ public class ModuleTester {
                         }
                     }).build();
             ModuleRunVersion runver = new ModuleRunVersion(
-                    new URL("https://fakefakefakefakefake.com"),
-                    new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+                    new URL("https://localhost"),
+                    new ModuleMethod(moduleName + ".run_local_tests"),
+                    "local-docker-image", "local", "dev");
+            final DockerMountPoints mounts = new DockerMountPoints(
+                    Paths.get("/kb/module/work"), Paths.get("tmp"));
+            Map<String, String> localModuleToImage = new LinkedHashMap<>();
+            localModuleToImage.put(moduleName, imageName);
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    new AuthToken(token), cfg, runver, new ArrayList<UObject>(),
-                    new ArrayList<String>());
+                    token, cfg, runver, new ArrayList<UObject>(),
+                    new ArrayList<String>(), mounts, localModuleToImage);
             jettyServer = new Server(callbackPort);
-            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            ServletContextHandler context = new ServletContextHandler(
+                    ServletContextHandler.SESSIONS);
             context.setContextPath("/");
             jettyServer.setHandler(context);
             context.addServlet(new ServletHolder(catalogSrv),"/*");
             jettyServer.start();
         } else {
-            System.out.println("WARNING: No callback URL was recieved " +
+            if (callbackNetworks != null && callbackNetworks.length > 0) {
+                throw new IllegalStateException("No proper callback IP was found, " +
+                		"please check callback_networks parameter in test.cfg");
+            }
+            System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
         }
-        ///////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
@@ -260,7 +292,8 @@ public class ModuleTester {
             return false;
         if (oldImageId != null) {
             String newImageId = findImageIdByName(tlDir, imageName, runDockerSh);
-            if (!newImageId.equals(oldImageId)) {  // It's not the same image (not all layers are cached)
+            if (!newImageId.equals(oldImageId)) {
+                // It's not the same image (not all layers are cached)
                 System.out.println("Delete old Docker image");
                 ProcessHelper.cmd("bash", runDockerPath, "rmi", oldImageId).exec(tlDir);
             }
@@ -350,7 +383,8 @@ public class ModuleTester {
                         br.close();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        throw new IllegalStateException("Error reading data from executed container", e);
+                        throw new IllegalStateException("Error reading data from executed " +
+                        		"container", e);
                     }
                 }
             });

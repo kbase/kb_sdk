@@ -75,7 +75,16 @@ public class KbService {
 		for (Map<String, Object> module : modules) {
 			String moduleName = (String)module.get("module_name");
 			module.put("impl_package_name", perlImplName == null ? (moduleName + "Impl") : perlImplName);
-			module.put("pymodule", pythonImplName == null ? (moduleName + "Impl") : pythonImplName);
+			final String pymod = pythonImplName == null ?
+					(moduleName + "Impl") : pythonImplName;
+			module.put("pymodule", pymod);
+			final String pypkg;
+			if (pymod.lastIndexOf(".") > 0) {
+				pypkg = pymod.substring(0, pymod.lastIndexOf(".")) + ".";
+			} else {
+				pypkg = "";
+			}
+			module.put("pypackage", pypkg);
 		}
 		ret.put("modules", modules);
 		if (psbl)
