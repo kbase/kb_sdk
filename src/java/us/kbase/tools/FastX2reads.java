@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import us.kbase.abstracthandle.AbstractHandleClient;
 import us.kbase.abstracthandle.Handle;
+import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.UObject;
 import us.kbase.shock.client.BasicShockClient;
@@ -61,7 +62,8 @@ public class FastX2reads {
         } else if (inputFile2 != null && !pairedEnd) {
             throw new IllegalStateException("Second input file is not allowed in single-end mode");
         }
-        AuthToken auth = new AuthToken(token);
+        //TODO AUTH make configurable?
+        AuthToken auth = AuthService.validateToken(token);
         BasicShockClient shockCl = new BasicShockClient(new URL(shockUrl), auth);
         AbstractHandleClient handleCl = new AbstractHandleClient(new URL(handleUrl), auth);
         Map<String, Object> obj = new LinkedHashMap<String,Object>();

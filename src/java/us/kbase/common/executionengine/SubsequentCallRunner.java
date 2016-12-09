@@ -1,6 +1,7 @@
 package us.kbase.common.executionengine;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,12 +13,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.TokenFormatException;
 import us.kbase.catalog.CatalogClient;
-import us.kbase.catalog.ModuleInfo;
-import us.kbase.catalog.ModuleVersionInfo;
-import us.kbase.catalog.SelectModuleVersionParams;
-import us.kbase.catalog.SelectOneModuleParams;
+import us.kbase.catalog.ModuleVersion;
+import us.kbase.catalog.SelectModuleVersion;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonClientException;
 import us.kbase.common.service.ServerException;
@@ -28,10 +26,9 @@ public abstract class SubsequentCallRunner {
     
     //TODO NJS_SDK move to common repo
     
+    private static final String RELEASE = JobRunnerConstants.RELEASE;
     private static final Set<String> RELEASE_TAGS =
             JobRunnerConstants.RELEASE_TAGS;
-    private static final String RELEASE = JobRunnerConstants.RELEASE;
-    private static final String DEV = JobRunnerConstants.DEV;
     
     public static final String SUBJOBSDIR = "subjobs";
     public static final String WORKDIR = "workdir";
@@ -50,63 +47,50 @@ public abstract class SubsequentCallRunner {
             final UUID jobId,
             final ModuleMethod modmeth, 
             String serviceVer)
-            throws IOException, JsonClientException,
-            TokenFormatException {
+            throws IOException, JsonClientException {
         this.token = token;
         this.config = config;
-        final CatalogClient catClient = new CatalogClient(
-                config.getCatalogURL());
-        //TODO is this needed?
-        catClient.setIsInsecureHttpConnectionAllowed(true);
-        //TODO code duplicated in AweClientDockerJobScript
         this.moduleName = modmeth.getModule();
         this.jobId = jobId;
-        final ModuleInfo mi;
-        try {
-            mi = catClient.getModuleInfo(
-                new SelectOneModuleParams().withModuleName(moduleName));
-        } catch (ServerException se) {
-            throw new IllegalArgumentException(String.format(
-                    "Error looking up module %s: %s", moduleName,
-                    se.getLocalizedMessage()));
-        }
-        final ModuleVersionInfo mvi;
-        if (serviceVer == null || RELEASE_TAGS.contains(serviceVer)) {
-            if (serviceVer == null || serviceVer == RELEASE) {
-                mvi = mi.getRelease();
-                serviceVer = RELEASE;
-            } else if (serviceVer.equals(DEV)) {
-                mvi = mi.getDev();
-            } else {
-                mvi = mi.getBeta();
-            }
-            if (mvi == null) {
-                // the requested release does not exist
-                throw new IllegalArgumentException(String.format(
-                        "There is no release version '%s' for module %s",
-                        serviceVer, moduleName));
-            }
-        } else {
-            try {
-                mvi = catClient.getVersionInfo(new SelectModuleVersionParams()
-                        .withModuleName(moduleName)
-                        .withGitCommitHash(serviceVer));
-                serviceVer = null;
-            } catch (ServerException se) {
-                throw new IllegalArgumentException(String.format(
-                        "Error looking up module %s with version %s: %s",
-                        moduleName, serviceVer, se.getLocalizedMessage()));
-            }
-        }
-        mrv = new ModuleRunVersion(
-                new URL(mi.getGitUrl()), modmeth,
-                mvi.getGitCommitHash(), mvi.getVersion(), serviceVer);
-        imageName = mvi.getDockerImgName();
+        final ModuleVersion mv = loadModuleVersion(modmeth, serviceVer);
+        mrv =  this.createModuleRunVersion(modmeth, serviceVer, mv);
+        imageName = this.getImageName(mv);
         Files.createDirectories(getSharedScratchDir(config));
         final Path jobWorkDir = getJobWorkDir(jobId, config, imageName);
         Files.createDirectories(jobWorkDir);
         config.writeJobConfigToFile(jobWorkDir.resolve(
                 JobRunnerConstants.JOB_CONFIG_FILE));
+    }
+    
+    protected ModuleVersion loadModuleVersion(ModuleMethod modmeth, 
+            String serviceVer) throws IOException, JsonClientException {
+        final CatalogClient catClient = new CatalogClient(
+                config.getCatalogURL());
+        //TODO is this needed?
+        catClient.setIsInsecureHttpConnectionAllowed(true);
+        if (serviceVer == null || serviceVer.isEmpty()) {
+            serviceVer = RELEASE;
+        }
+        try {
+            return catClient.getModuleVersion(new SelectModuleVersion()
+                .withModuleName(moduleName).withVersion(serviceVer));
+        } catch (ServerException se) {
+            throw new IllegalArgumentException(String.format(
+                    "Error looking up module %s with version %s: %s",
+                    moduleName, serviceVer, se.getLocalizedMessage()));
+        }
+    }
+    
+    protected ModuleRunVersion createModuleRunVersion(ModuleMethod modmeth, 
+            String serviceVer, ModuleVersion mv) throws MalformedURLException {
+        return new ModuleRunVersion(
+                new URL(mv.getGitUrl()), modmeth,
+                mv.getGitCommitHash(), mv.getVersion(),
+                RELEASE_TAGS.contains(serviceVer) ? serviceVer : null);
+    }
+    
+    protected String getImageName(ModuleVersion mv) {
+        return mv.getDockerImgName();
     }
 
     protected static Path getJobWorkDir(

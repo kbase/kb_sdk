@@ -22,7 +22,9 @@ import com.beust.jcommander.Parameters;
 
 import us.kbase.mobu.compiler.RunCompileCommand;
 import us.kbase.mobu.initializer.ModuleInitializer;
+import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.renamer.ModuleRenamer;
+import us.kbase.mobu.runner.ModuleRunner;
 import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
@@ -40,10 +42,14 @@ public class ModuleBuilder {
     private static final String TEST_COMMAND     = "test";
     private static final String VERSION_COMMAND  = "version";
     private static final String RENAME_COMMAND   = "rename";
+    private static final String INSTALL_COMMAND  = "install";
+    private static final String RUN_COMMAND      = "run";
+    //private static final String SUBMIT_COMMAND   = "submit";
     
+    public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.4";
+    public static final String VERSION = "1.0.11";
     
     
     public static void main(String[] args) throws Exception {
@@ -82,6 +88,14 @@ public class ModuleBuilder {
         RenameCommandArgs renameArgs = new RenameCommandArgs();
         jc.addCommand(RENAME_COMMAND, renameArgs);
 
+        // add the 'install' command
+        InstallCommandArgs installArgs = new InstallCommandArgs();
+        jc.addCommand(INSTALL_COMMAND, installArgs);
+        
+        // add the 'run' command
+        RunCommandArgs runArgs = new RunCommandArgs();
+        jc.addCommand(RUN_COMMAND, runArgs);
+
     	// parse the arguments and gracefully catch any errors
     	try {
     		jc.parse(args);
@@ -119,6 +133,10 @@ public class ModuleBuilder {
 	        returnCode = runVersionCommand(versionArgs, jc);
 	    } else if (jc.getParsedCommand().equals(RENAME_COMMAND)) {
 	        returnCode = runRenameCommand(renameArgs, jc);
+	    } else if (jc.getParsedCommand().equals(INSTALL_COMMAND)) {
+	        returnCode = runInstallCommand(installArgs, jc);
+	    } else if (jc.getParsedCommand().equals(RUN_COMMAND)) {
+	        returnCode = runRunCommand(runArgs, jc);
 	    }
 	    
 	    if(returnCode!=0) {
@@ -134,9 +152,16 @@ public class ModuleBuilder {
     	if(validateArgs.modules.size()==0) {
     		validateArgs.modules.add(".");
     	}
-    	ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose,
-    	        validateArgs.methodStoreUrl, validateArgs.allowSyncMethods);
-    	return mv.validateAll();
+    	try {
+    	    ModuleValidator mv = new ModuleValidator(validateArgs.modules,validateArgs.verbose,
+    	            validateArgs.methodStoreUrl, validateArgs.allowSyncMethods);
+    	    return mv.validateAll();
+    	} catch (Exception e) {
+            if (validateArgs.verbose)
+                e.printStackTrace();
+            showError("Error while validating module", e.getMessage());
+            return 1;
+        }
 	}
 
     /**
@@ -201,8 +226,17 @@ public class ModuleBuilder {
         	specFile = specFiles.get(0);
 		} catch (IOException | RuntimeException e) {
             showError("Error accessing input KIDL spec file", e.getMessage());
+            if (a.verbose) {
+                e.printStackTrace();
+            }
             return 1;
 		}
+    	
+        if (a.clAsyncVer != null && a.dynservVer != null) {
+            showError("Bad arguments",
+                    "clasyncver and dynserver cannot both be specified");
+            return 1;
+        }
     	
     	// Step 2: check or create the output directory
     	File outDir = a.outDir == null ? new File(".") : new File(a.outDir);
@@ -256,22 +290,26 @@ public class ModuleBuilder {
             }
         }
         try {
-			RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
-			        a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
-			        a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
-			        a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
-			        a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
-			        a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
+            RunCompileCommand.generate(specFile, a.url, a.jsClientSide, a.jsClientName, a.perlClientSide, 
+                    a.perlClientName, a.perlServerSide, a.perlServerName, a.perlImplName, 
+                    a.perlPsgiName, a.perlEnableRetries, a.pyClientSide, a.pyClientName, 
+                    a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
+                    a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
+                    a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
                     a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
-                    a.makefile, a.clAsyncVer, semanticVersion, gitUrl, gitCommitHash);
-		} catch (Throwable e) {
-			System.err.println("Error compiling KIDL specfication:");
-			System.err.println(e.getMessage());
-			return 1;
-		}
+                    a.makefile, a.clAsyncVer, a.dynservVer, a.html,
+                    semanticVersion, gitUrl, gitCommitHash);
+        } catch (Throwable e) {
+            System.err.println("Error compiling KIDL specfication:");
+            System.err.println(e.getMessage());
+            if (a.verbose) {
+                e.printStackTrace();
+            }
+            return 1;
+        }
         return 0;
     }
-    
+
 	private static String getCmdOutput(File workDir, String... cmd) throws Exception {
 	    StringWriter sw = new StringWriter();
 	    PrintWriter pw = new PrintWriter(sw);
@@ -351,6 +389,47 @@ public class ModuleBuilder {
             if (renameArgs.verbose)
                 e.printStackTrace();
             showError("Error while renaming module", e.getMessage());
+            return 1;
+        }
+    }
+
+    private static int runInstallCommand(InstallCommandArgs installArgs, JCommander jc) {
+        if (installArgs.moduleName == null || installArgs.moduleName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", 
+                    "One and only one module name should be provided");
+            return 1;
+        }
+        try {
+            return new ClientInstaller().install(installArgs.lang, installArgs.async,
+                    installArgs.core || installArgs.sync, installArgs.dynamic, 
+                    installArgs.tagVer, installArgs.verbose, installArgs.moduleName.get(0), 
+                    null, installArgs.clientName);
+        } catch (Exception e) {
+            if (installArgs.verbose)
+                e.printStackTrace();
+            showError("Error while installing client", e.getMessage());
+            return 1;
+        }
+    }
+
+    private static int runRunCommand(RunCommandArgs runArgs, JCommander jc) {
+        if (runArgs.methodName == null || runArgs.methodName.size() != 1) {
+            ModuleBuilder.showError("Command Line Argument Error", 
+                    "One and only one method name should be provided");
+            return 1;
+        }
+        try {
+            if (runArgs.inputFile == null && runArgs.inputJson == null && !runArgs.stdin)
+                throw new IllegalStateException("No one input method is used " +
+                		"(should be one of '-i', '-j' or '-s')");
+            return new ModuleRunner(runArgs.sdkHome).run(runArgs.methodName.get(0), 
+                    runArgs.inputFile, runArgs.stdin, runArgs.inputJson, runArgs.output, 
+                    runArgs.tagVer, runArgs.verbose, runArgs.keepTempFiles, runArgs.provRefs, 
+                    runArgs.mountPoints);
+        } catch (Exception e) {
+            if (runArgs.verbose)
+                e.printStackTrace();
+            showError("Error while installing client", e.getMessage());
             return 1;
         }
     }
@@ -541,6 +620,22 @@ public class ModuleBuilder {
         @Parameter(names="--clasyncver",description="Will set in client code version of service for asyncronous calls " +
         		"(it could be git commit hash of version registered in catalog or one of version tags: dev/beta/release)")
         String clAsyncVer = null;
+        
+        @Parameter(names="--dynservver", description="Clients will be built " +
+                "for use with KBase dynamic services (e.g. with URL lookup " +
+                "via the Service Wizard) with the specified version " +
+                "(git commit hash or dev/beta/release)." +
+                "clasyncver may not be specified if " +
+                "dynservver is specified.")
+        String dynservVer = null;
+        
+        @Parameter(names="--html", description="Generate HTML version(s) of " +
+               "the input spec file(s)")
+        boolean html = false;
+        
+        @Parameter(names={"-v", "--verbose"}, description="Print full stack " +
+                "trace on a compile failure")
+        boolean verbose = false;
 
         @Parameter(required=true, description="<KIDL spec file>")
         List <String> specFileNames;
@@ -576,7 +671,95 @@ public class ModuleBuilder {
         List<String> newModuleName;
     }
 
-    
+    @Parameters(commandDescription = "Install a client for KBase module.")
+    private static class InstallCommandArgs {
+        @Parameter(names={"-l", "--language"}, description="Language of generated client code " +
+                "(default is one defined in kbase.yml)")
+        String lang;
+        
+        @Parameter(names={"-a", "--async"}, description="Force generation of asynchronous calls " +
+        		"(default is chosen based on information registered in catalog)")
+        boolean async = false;
+
+        @Parameter(names={"-s", "--sync"}, description="Depricated flag, means the same as -c (--core)")
+        boolean sync = false;
+
+        @Parameter(names={"-c", "--core"}, description="Force generation of calls to core service" +
+        		"(WARNING: please use it only for core services not registered in catalog)")
+        boolean core = false;
+
+        @Parameter(names={"-d", "--dynamic"}, description="Force generation of dynamic service calls" +
+                "(default is chosen based on information registered in catalog)")
+        boolean dynamic = false;
+
+        @Parameter(names={"-t","--tag-or-ver"}, description="Tag or version " +
+                "(default is chosen based on information registered in catalog)")
+        String tagVer = null;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error stack traces")
+        boolean verbose = false;
+        
+        @Parameter(names={"-n","--clientname"}, description="Optional parameter defining custom client name " +
+                "(default is module name)")
+        String clientName = null;
+
+        @Parameter(required=true, description="<module name or path/URL to spec-file>")
+        List<String> moduleName;
+    }
+
+    @Parameters(commandDescription = "Run a method of registered KBase module locally.")
+    private static class RunCommandArgs {
+        @Parameter(names={"-i", "--input"}, description="Input JSON file " +
+        		"(optional, if not set -s or -j should be used)")
+        File inputFile = null;
+
+        @Parameter(names={"-s","--stdin"}, description="Flag for reading input data from STDIN " +
+        		"(default is false, used if neither -i or -j is set)")
+        boolean stdin = false;
+
+        @Parameter(names={"-j","--json"}, description="Input JSON string " +
+        		"(optional, if not set -s or -i should be used)")
+        String inputJson = null;
+
+        @Parameter(names={"-o", "--output"}, description="Output JSON file " +
+        		"(optional, if not set output will be printed to STDOUT)")
+        File output = null;
+
+        @Parameter(names={"-t","--tag-or-ver"}, description="Tag or version " +
+                "(default is chosen based on information registered in catalog)")
+        String tagVer = null;
+
+        @Parameter(names={"-v","--verbose"}, description="Print more details including error " +
+        		"stack traces")
+        boolean verbose = false;
+
+        @Parameter(names={"-k","--keep-tmp"}, description="Keep temporary files/folders at the " +
+        		"end (default value is false)")
+        boolean keepTempFiles = false;
+        
+        @Parameter(names={"-h","--sdk-home"}, description="Home folder of kb-sdk where sdk.cfg " +
+        		"file and run_local folder are expected to be found or created if absent " +
+                "(default path is loaded from 'KB_SDK_HOME' system environment variable)")
+        String sdkHome = null;
+
+        @Parameter(names={"-r","--prov-refs"}, description="Optional comma-separated list of " +
+        		"references workspace objects that will be refered from provenance")
+        String provRefs = null;
+
+        @Parameter(names={"-m","--mount-points"}, description="Optional comma-separated list of " +
+        		"mount point pairs for docker container (this parameter contains of local folder" +
+        		" and inner folder separated by ':', local folder points to place in local file " +
+        		"system, inner folder appears inside docker container, if inner path is not " +
+        		"absolute it's treated as relative to /kb/module/work folder; if some mount " +
+        		"point path doesn't have ':' and inner part then it appears as " +
+        		"/kb/module/work/tmp inside docker)")
+        String mountPoints = null;
+
+        @Parameter(required=true, description="<fully qualified method name " +
+        		"(with SDK module prefix followed by '.')>")
+        List<String> methodName;
+    }
+
     private static void showBriefHelp(JCommander jc, PrintStream out) {
     	Map<String,JCommander> commands = jc.getCommands();
     	out.println("");

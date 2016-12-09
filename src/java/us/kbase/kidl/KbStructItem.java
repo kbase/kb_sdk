@@ -2,12 +2,11 @@ package us.kbase.kidl;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * Class represents structure item in spec-file.
  */
-public class KbStructItem {
+public class KbStructItem implements KidlNode {
 	private String name;
 	private boolean nullable;
 	private KbType itemType;
@@ -50,12 +49,9 @@ public class KbStructItem {
 		return optional;
 	}
 	
-	public Object toJson() {
-		Map<String, Object> ret = new TreeMap<String, Object>();
-		ret.put("!", "Bio::KBase::KIDL::KBT::StructItem");
-		ret.put("item_type", itemType.toJson());
-		ret.put("name", name);
-		ret.put("nullable", nullable ? "1" : "0");
-		return ret;
+	@Override
+	public <T> T accept(final KidlVisitor<T> visitor, final KidlNode parent) {
+		return visitor.visit(this, itemType.accept(visitor, this));
 	}
+	
 }

@@ -61,6 +61,7 @@ import us.kbase.common.service.JsonClientException;
 import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
+import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SubAction;
@@ -160,8 +161,10 @@ public class CallbackServerTest {
         final CallbackServerConfig cbcfg =
                 new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT),
                         callbackUrl, temp, log).build();
+        final DockerMountPoints mounts = new DockerMountPoints(
+                Paths.get("/kb/module/work"), Paths.get("tmp"));
         final CallbackServer callback = new SDKCallbackServer(
-                token, cbcfg, runver, params, wsobjs);
+                token, cbcfg, runver, params, wsobjs, mounts, null);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(
@@ -505,27 +508,28 @@ public class CallbackServerTest {
         // version tracking only happens for prod
         
         failJob(res, "njs_sdk_test_1foo.run", "beta",
-                "Error looking up module njs_sdk_test_1foo: Operation " +
-                "failed - module/repo is not registered.");
+                "Error looking up module njs_sdk_test_1foo with version " +
+                "beta: Module cannot be found based on module_name or " +
+                "git_url parameters.");
         failJob(res, "njs_sdk_test_1.run", "beta",
-                "There is no release version 'beta' for module njs_sdk_test_1");
+                "Error looking up module njs_sdk_test_1 with version " +
+                "beta: No module version found that matches your criteria!");
         failJob(res, "njs_sdk_test_1.run", "release",
-                "There is no release version 'release' for module " +
-                "njs_sdk_test_1");
+                "Error looking up module njs_sdk_test_1 with version " +
+                "release: No module version found that matches your criteria!");
         failJob(res, "njs_sdk_test_1.run", null,
-                "There is no release version 'release' for module " +
-                "njs_sdk_test_1");
-                
-        //TODO fix these when catalog is fixed
+                "Error looking up module njs_sdk_test_1 with version " +
+                 "release: No module version found that matches your criteria!");
+
         //this is the newest git commit and was registered in dev but 
         //then the previous git commit was registered in dev
         String git = "b0d487271c22f793b381da29e266faa9bb0b2d1b";
         failJob(res, "njs_sdk_test_1.run", git,
                 "Error looking up module njs_sdk_test_1 with version " +
-                git + ": 'NoneType' object has no attribute '__getitem__'");
+                git + ": No module version found that matches your criteria!");
         failJob(res, "njs_sdk_test_1.run", "foo",
                 "Error looking up module njs_sdk_test_1 with version foo: " +
-                "'NoneType' object has no attribute '__getitem__'");
+                "No module version found that matches your criteria!");
         
         res.server.stop();
     }
@@ -767,7 +771,7 @@ public class CallbackServerTest {
             assertThat("correct code url", got.getCodeUrl(),
                     is("https://github.com/kbasetest/" + sa.module));
             assertThat("correct commit", got.getCommit(), is(sa.commit));
-            assertThat("correct name", got.getName(), is(sa.module + ".run"));
+            assertThat("correct name", got.getName(), is(sa.module));
             assertThat("correct version", got.getVer(), is(sa.getVerRel()));
         }
     }
