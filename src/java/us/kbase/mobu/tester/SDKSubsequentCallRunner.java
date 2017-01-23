@@ -1,7 +1,6 @@
 package us.kbase.mobu.tester;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +13,6 @@ import java.util.UUID;
 import us.kbase.auth.AuthToken;
 import us.kbase.catalog.ModuleVersion;
 import us.kbase.common.executionengine.ModuleMethod;
-import us.kbase.common.executionengine.ModuleRunVersion;
 import us.kbase.common.executionengine.SubsequentCallRunner;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JsonClientException;
