@@ -28,6 +28,15 @@ setup command into your .bashrc.
 
     eval $(docker run kbase/kb-sdk setup)
 
+The alias will work for most cases.  However, aliases are ignored in by the make utility.  If you wish to be
+able to invoke kb-sdk from make (and not running in a docker build), then it is best to create a wrapper script.
+The kb-sdk docker image can generate this script.  This script can be placed anywhere you wish, but it should be
+on your path.  In this example, we will install it in $HOME/bin/.
+
+    docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
+    chmod 755 $HOME/bin/kb-sdk
+    export PATH=$PATH:$HOME/bin/kb-sdk
+
 #### Test installation:
 
 Test the installation by running the kb-sdk help command.

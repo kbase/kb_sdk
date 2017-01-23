@@ -18,7 +18,7 @@ RUN \
    cd /src && \
    sed -i 's/en0/eth0/' src/java/us/kbase/common/executionengine/CallbackServer.java && \
    make && \
-   /src/entrypoint prune
+   /src/entrypoint prune && rm -rf /src/.git
 
 ENV PATH=$PATH:/src/bin
 

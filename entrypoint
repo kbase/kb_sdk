@@ -7,6 +7,17 @@ elif [ "z$1" = "zsetup" ] ; then
 G=\$(docker run -i -v /run/docker.sock:/run/docker.sock --entrypoint ls kbase/kb-sdk -l /run/docker.sock|awk '{print \$4}');
 alias kb-sdk='docker run -it --rm -v \$HOME:\$HOME -u \$(id -u) -w \$(pwd) -v /run/docker.sock:/run/docker.sock  -e DUSER=\$USER -e DSHELL=\$SHELL --group-add \$G kbase/kb-sdk'
 EOF
+elif [ "z$1" = "zgenscript" ] ; then
+    cat << EOF
+#!/bin/sh
+
+# Cache the group for the docker file
+if [ ! -e \$HOME/.kbsdk.cache ] ; then
+  docker run -i -v /run/docker.sock:/run/docker.sock --entrypoint ls kbase/kb-sdk -l /run/docker.sock|awk '{print \$4}' > \$HOME/.kbsdk.cache
+fi
+
+exec docker run -it --rm -v \$HOME:\$HOME -u \$(id -u) -w \$(pwd) -v /run/docker.sock:/run/docker.sock  -e DUSER=\$USER -e DSHELL=\$SHELL --group-add \$(cat \$HOME/.kbsdk.cache) kbase/kb-sdk \$@
+EOF
 elif [ "z$1" = "zsdkbase" ] ; then
     echo "Pulling and tagging the base image"
     docker pull kbase/sdkbase
