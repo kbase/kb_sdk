@@ -25,15 +25,13 @@ public class ModuleInitializer {
 	private boolean verbose;
 	private File dir;
 	
-	private static String[] subdirs = {"data", 
-									   "docs", 
-									   "scripts",
-									   "lib",
-									   "test", 
-									   "ui", 
-									   "ui/narrative", 
-									   "ui/narrative/methods",
-									   "ui/widgets"};	
+	private static String[] subdirs = {"docs",
+										"scripts",
+										"lib",
+										"test", 
+										"ui", 
+										"ui/narrative", 
+										"ui/narrative/methods"};	
 	
 	public ModuleInitializer(String moduleName, String userName, boolean verbose) {
 		this(moduleName, userName, DEFAULT_LANGUAGE, verbose);
@@ -126,7 +124,7 @@ public class ModuleInitializer {
 		templateFiles.put("module_readme_ui", Paths.get(moduleDir, "ui", "README.md"));
 		templateFiles.put("module_readme_test", Paths.get(moduleDir, "test", "README.md"));
 		templateFiles.put("module_readme_docs", Paths.get(moduleDir, "docs", "README.md"));
-		templateFiles.put("module_readme_data", Paths.get(moduleDir, "data", "README.md"));
+		//templateFiles.put("module_readme_data", Paths.get(moduleDir, "data", "README.md"));
 		templateFiles.put("module_config_yaml", Paths.get(moduleDir, "kbase.yml"));
         templateFiles.put("module_gitignore", Paths.get(moduleDir, ".gitignore"));
         templateFiles.put("module_dockerignore", Paths.get(moduleDir, ".dockerignore"));
@@ -196,7 +194,6 @@ public class ModuleInitializer {
 				case "r":
                     templateFiles.put("module_r_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.r"));
                     break;
-				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
 		            File srcDir = new File(moduleDir, "lib/src");
 		            String modulePackage = (String)moduleContext.get("java_package");
@@ -221,7 +218,7 @@ public class ModuleInitializer {
 		}
 		
 		if (example) {
-			// Examples now require some other SDK dependencies
+			// Generated examples require some other SDK dependencies
 			List <String> requiredDependantModules = Arrays.asList("KBaseReport","AssemblyUtil");
 			ClientInstaller clientInstaller = new ClientInstaller(new File(moduleDir), false);
 			for(String dependantModuleName : requiredDependantModules) {
