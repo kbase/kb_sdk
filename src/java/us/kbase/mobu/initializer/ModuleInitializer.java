@@ -13,6 +13,7 @@ import java.util.Map;
 import us.kbase.mobu.compiler.JavaData;
 import us.kbase.mobu.compiler.JavaModule;
 import us.kbase.mobu.compiler.JavaTypeGenerator;
+import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.templates.TemplateFormatter;
 
 public class ModuleInitializer {
@@ -219,12 +220,31 @@ public class ModuleInitializer {
 			fillTemplate(moduleContext, templateName, templateFiles.get(templateName));
 		}
 		
+		if (example) {
+			// Examples now require some other SDK dependencies
+			List <String> requiredDependantModules = Arrays.asList("KBaseReport","AssemblyUtil");
+			ClientInstaller clientInstaller = new ClientInstaller(new File(moduleDir), false);
+			for(String dependantModuleName : requiredDependantModules) {
+				clientInstaller.install(
+						this.language,
+						true, // async clients
+						false, // core or sync clients
+						false, // dynamic client
+						"release", //tagVer
+						this.verbose,
+						dependantModuleName,
+						null,
+						null // clientName
+					);
+			}
+		}
+
 		System.out.println("Done! Your module is available in the " + moduleDir + " directory.");
 		if (example) {
 			System.out.println("Compile and run the example methods with the following inputs:");
 			System.out.println("  cd " + moduleDir);
-			System.out.println("  make          (could be necessary after changes in " + new File(specFile).getName() + ")");
-            System.out.println("  kb-sdk test   (will require to set GlobusOnline test account in test_local/test.cfg)");
+			System.out.println("  make          (required after making changes to " + new File(specFile).getName() + ")");
+			System.out.println("  kb-sdk test   (will require setting test user account credentials in test_local/test.cfg)");
 			System.out.println();
 		}
 	}
