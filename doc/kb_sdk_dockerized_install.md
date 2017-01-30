@@ -1,7 +1,6 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
-The SDK can be installed and used purely as a Doccker container.  This removes the need to install the dependencies for running
-the SDK such as Java and ant.  Currently this method is only supported with a bash shell and has been tested on Docker for Mac
+The SDK can be installed and used purely as a Docker container.  This removes the need to install the dependencies for running the SDK such as Java and ant.  Currently this method is only supported with a bash shell and has been tested on Docker for Mac
 and Linux.
 
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
