@@ -25,14 +25,15 @@ public class InitializerTest {
     private static final String EXAMPLE_METHOD_NAME = "filter_contigs"; 
 	private static final String USER_NAME = "kbasedev";
 	private static final String[] EXPECTED_PATHS = {
-	   "docs", 
+	   "data",
+	   "docs",
 	   "scripts",
 	   "test", 
 	   "ui", 
 	   "lib",
-	   "ui/narrative", 
+	   "ui/narrative",
 	   "ui/narrative/methods/",
-	   "ui/widgets",
+	   "ui/narrative/widgets/",
 	   "lib/README.md",
 	   "docs/README.md",
 	   "test/README.md",

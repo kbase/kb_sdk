@@ -40,7 +40,7 @@ public class ClientInstallerTest {
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
                 "https://ci.kbase.us/services/catalog"));
-        ClientInstaller ci = new ClientInstaller(moduleDir);
+        ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);
         File dir = new File(moduleDir, "lib/src/" + module2);
@@ -59,7 +59,7 @@ public class ClientInstallerTest {
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
                 "https://ci.kbase.us/services/catalog"));
-        ClientInstaller ci = new ClientInstaller(moduleDir);
+        ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);
         File dir = new File(moduleDir, "lib/" + module2);

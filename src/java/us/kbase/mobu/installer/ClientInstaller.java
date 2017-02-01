@@ -43,10 +43,10 @@ public class ClientInstaller {
     private final URL catalogUrl;
     
     public ClientInstaller() throws Exception {
-        this(null);
+        this(null, true);
     }
 
-    public ClientInstaller(File dir) throws Exception {
+    public ClientInstaller(File dir, boolean showWarnings) throws Exception {
         moduleDir = dir == null ? DirUtils.findModuleDir() : DirUtils.findModuleDir(dir);
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
         @SuppressWarnings("unchecked")
@@ -56,12 +56,14 @@ public class ClientInstaller {
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         sdkConfig = new Properties();
         if (!sdkCfgFile.exists()) {
-            System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
-            		"initialized (with 'catalog_url' parameter pointing to AppDev environment)");
+            if(showWarnings) {
+                System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
+                    "initialized (with 'catalog_url' parameter pointing to AppDev environment)");
+            }
             FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
-            		"https://appdev.kbase.us/services/catalog"));
-            TextUtils.checkIgnoreLine(new File(moduleDir, ".gitignore"), sdkCfgFile.getName());
-            TextUtils.checkIgnoreLine(new File(moduleDir, ".dockerignore"), sdkCfgFile.getName());
+                    "https://appdev.kbase.us/services/catalog"));
+            TextUtils.checkIgnoreLine(new File(moduleDir, ".gitignore"), sdkCfgFile.getName(), showWarnings);
+            TextUtils.checkIgnoreLine(new File(moduleDir, ".dockerignore"), sdkCfgFile.getName(), showWarnings);
         }
         InputStream is = new FileInputStream(sdkCfgFile);
         try {
