@@ -246,7 +246,7 @@ public class DockerClientServerTester {
         File specFile = new File(moduleDir, moduleName + ".spec");
         //TODO AUTH make configurable?
         AuthToken token = AuthService.login(user, pwd).getToken();
-        ClientInstaller clInst = new ClientInstaller(moduleDir);
+        ClientInstaller clInst = new ClientInstaller(moduleDir, true);
         String input = "Super-string";
         // Java client
         {
@@ -443,7 +443,7 @@ public class DockerClientServerTester {
         AuthToken token = AuthService.login(user, pwd).getToken();
         // Java client
         System.out.println("Java client (status) -> " + serverType + " server");
-        ClientInstaller clInst = new ClientInstaller(moduleDir);
+        ClientInstaller clInst = new ClientInstaller(moduleDir, true);
         clInst.install("java", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
         File binDir = new File(moduleDir, "bin");
