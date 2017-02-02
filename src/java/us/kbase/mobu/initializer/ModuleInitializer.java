@@ -108,6 +108,7 @@ public class ModuleInitializer {
 		moduleContext.put("language", this.language);
 		moduleContext.put("module_root_path", Paths.get(moduleDir).toAbsolutePath());
 		moduleContext.put("example", example);
+		moduleContext.put("dollar_sign", "$");
         moduleContext.put("os_name", System.getProperty("os.name"));
 
 
