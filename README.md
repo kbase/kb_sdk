@@ -59,7 +59,7 @@ For the adventurous, there is an experimental Dockerized installation that only 
 
 System Dependencies:
 
-- Mac OS X 10.8+ or Linux
+- Mac OS X 10.8+ or Linux. The SDK tools do not run natively in Windows, but see [here](FAQ.md#windows) for more details.
 - Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
