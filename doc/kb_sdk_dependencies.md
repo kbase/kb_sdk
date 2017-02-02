@@ -14,7 +14,7 @@
 ### 1. Install SDK Dependencies
 
 System Dependencies:
-- Mac OS X 10.8+ (Docker requires this) or Linux.  The SDK tools do not run natively in Windows, but see [here](FAQ.md#windows) for more details.
+- Mac OS X 10.8+ (Docker requires this) or Linux.  kb-sdk does not run natively in Windows, but see [here](FAQ.md#windows) for more details.
 - (Not required for Docker-based installation) Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
