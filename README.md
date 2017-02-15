@@ -114,10 +114,15 @@ Enter your new module directory and do the initial build:
     cd MyContigFilter
     make
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
+Run command to generate initial test_local dir:
 
-    test_user = TEST_USER_NAME
-    test_password = TEST_PASSWORD
+    kb-sdk test
+
+Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password as well as correct KBase endpoint:
+
+    test_user=TEST_USER_NAME
+    test_password=TEST_PASSWORD
+    kbase_endpoint=https://blah.kbase.us
 
 Run tests:
 
