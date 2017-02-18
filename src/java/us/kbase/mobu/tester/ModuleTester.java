@@ -29,8 +29,10 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.yaml.snakeyaml.Yaml;
 
+import us.kbase.auth.AuthConfig;
 import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
+import us.kbase.auth.ConfigurableAuthService;
 import us.kbase.common.executionengine.CallbackServer;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder;
 import us.kbase.common.executionengine.LineLogger;
@@ -139,19 +141,38 @@ public class ModuleTester {
         } finally {
             is.close();
         }
+        String authUrl = props.getProperty("auth_service_url");
+        if (authUrl == null)
+            throw new IllegalStateException("Error: 'auth_service_url' parameter is not set in " +
+                    "test_local/test.cfg");
         String user = props.getProperty("test_user");
+        if (user != null && user.trim().isEmpty()) {
+            user = null;
+        }
         String password = props.getProperty("test_password");
-        if (user == null || user.trim().isEmpty()) {
+        String tokenString = props.getProperty("test_token");
+        if (tokenString != null && tokenString.trim().isEmpty()) {
+            tokenString = null;
+        }
+        if (user == null && tokenString == null) {
             throw new IllegalStateException("Error: KBase account credentials are not set in " +
             		"test_local/test.cfg");
         }
-        if (password == null || password.trim().isEmpty()) {
-            System.out.println("You haven't preset your password in test_local/test.cfg file. " +
-            		"Please enter it now.");
-            password = new String(System.console().readPassword("Password: "));
+        String authAllowInsecure = props.getProperty("auth_service_url_allow_insecure");
+        ConfigurableAuthService auth = new ConfigurableAuthService(
+                new AuthConfig().withKBaseAuthServerURL(new URL(authUrl))
+                .withAllowInsecureURLs("true".equals(authAllowInsecure)));
+        AuthToken token;
+        if (tokenString != null) {
+            token = auth.validateToken(tokenString);
+        } else {
+            if (password == null || password.trim().isEmpty()) {
+                System.out.println("You haven't preset your password in test_local/test.cfg file. " +
+                        "Please enter it now.");
+                password = new String(System.console().readPassword("Password: "));
+            }
+            token = auth.login(user.trim(), password.trim()).getToken();
         }
-        AuthToken token = AuthService.login(user.trim(), password.trim())
-                .getToken();
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
@@ -168,23 +189,27 @@ public class ModuleTester {
         if (endPoint == null)
             throw new IllegalStateException("Error: KBase services end-point is not set in " +
             		"test_local/test.cfg");
-        String jobSrvUrl = props.getProperty("job_service_url");
-        if (jobSrvUrl == null)
-            jobSrvUrl = endPoint + "/userandjobstate";
-        String wsUrl = props.getProperty("workspace_url");
-        if (wsUrl == null)
-            wsUrl = endPoint + "/ws";
-        String shockUrl = props.getProperty("shock_url");
-        if (shockUrl == null)
-            shockUrl = endPoint + "/shock-api";
+        String jobSrvUrl = getConfigUrl(props, "job_service_url", endPoint, "userandjobstate");
+        String wsUrl = getConfigUrl(props, "workspace_url", endPoint, "ws");
+        String shockUrl = getConfigUrl(props, "shock_url", endPoint, "shock-api");
+        String handleUrl = getConfigUrl(props, "handle_url", endPoint, "handle_service");
+        String srvWizUrl = getConfigUrl(props, "srv_wiz_url", endPoint, "service_wizard");
+        String njswUrl = getConfigUrl(props, "njsw_url", endPoint, "njs_wrapper");
+        String catalogUrl = getConfigUrl(props, "catalog_url", endPoint, "catalog");
         File configPropsFile = new File(workDir, "config.properties");
         PrintWriter pw = new PrintWriter(configPropsFile);
         try {
             pw.println("[global]");
+            pw.println("kbase_endpoint = " + endPoint);
             pw.println("job_service_url = " + jobSrvUrl);
             pw.println("workspace_url = " + wsUrl);
             pw.println("shock_url = " + shockUrl);
-            pw.println("kbase_endpoint = " + endPoint);
+            pw.println("handle_url = " + handleUrl);
+            pw.println("srv_wiz_url = " + srvWizUrl);
+            pw.println("njsw_url = " + njswUrl);
+            pw.println("auth_service_url = " + authUrl);
+            pw.println("auth_service_url_allow_insecure = " + 
+                    (authAllowInsecure == null ? "false" : authAllowInsecure));
         } finally {
             pw.close();
         }
@@ -218,7 +243,9 @@ public class ModuleTester {
                 JsonServerSyslog.setStaticMlogFile("callback.log");
             }
             CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-                    new URL(endPoint), callbackUrl, tlDir.toPath(),
+                    new URL(endPoint), new URL(wsUrl), new URL(shockUrl), new URL(jobSrvUrl),
+                    new URL(handleUrl), new URL(srvWizUrl), new URL(njswUrl), new URL(authUrl),
+                    authAllowInsecure, new URL(catalogUrl), callbackUrl, tlDir.toPath(),
                     new LineLogger() {
                         @Override
                         public void logNextLine(String line, boolean isError) {
@@ -271,6 +298,12 @@ public class ModuleTester {
         }
     }
 
+    private static String getConfigUrl(Properties props, String key, String endPoint, 
+            String defaultUrlSuffix) {
+        String ret = props.getProperty(key);
+        return ret == null ? (endPoint + "/" + defaultUrlSuffix) : ret;
+    }
+    
     public static boolean buildNewDockerImageWithCleanup(File moduleDir, File tlDir,
             File runDockerSh, String imageName) throws Exception {
         System.out.println();

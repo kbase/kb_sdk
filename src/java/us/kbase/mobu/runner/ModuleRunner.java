@@ -247,8 +247,10 @@ public class ModuleRunner {
                 JsonServerSyslog.setStaticMlogFile(
                         new File(workDir, "callback.log").getCanonicalPath());
             }
+            // TODO: It will though an error because at least authUrl is required.
             CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-                    new URL(kbaseEndpoint), callbackUrl, runDir.toPath(),
+                    new URL(kbaseEndpoint), null, null, null, null, null, null, null, null, null,
+                    callbackUrl, runDir.toPath(),
                     new LineLogger() {
                         @Override
                         public void logNextLine(String line, boolean isError) {

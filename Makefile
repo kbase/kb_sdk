@@ -14,7 +14,7 @@ DIR = $(shell pwd)
 
 ANT ?= ant
 ANT_OPTIONS =
-KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.20.jar
+KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works
@@ -110,7 +110,7 @@ sdkbase:
 
 test: submodule-init
 	@echo "Running unit tests"
-	nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
+	@# nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
 	@# todo: remove perl typecomp tests and add it as a separate target
 	$(ANT) test -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
