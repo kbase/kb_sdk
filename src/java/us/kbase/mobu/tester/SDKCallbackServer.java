@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import us.kbase.auth.AuthToken;
@@ -21,6 +22,7 @@ import us.kbase.workspace.ProvenanceAction;
 public class SDKCallbackServer extends CallbackServer {
 
     private DockerMountPoints mounts;
+    private Map<String, String> localModuleNameToImage;
 
     public SDKCallbackServer(
             final AuthToken token,
@@ -28,12 +30,14 @@ public class SDKCallbackServer extends CallbackServer {
             final ModuleRunVersion runver,
             final List<UObject> methodParameters,
             final List<String> inputWorkspaceObjects,
-            final DockerMountPoints mounts) {
+            final DockerMountPoints mounts,
+            final Map<String, String> localModuleNameToImage) {
         super(token, config, runver, methodParameters, inputWorkspaceObjects);
         if (mounts == null) {
             throw new NullPointerException("mounts");
         }
         this.mounts = mounts;
+        this.localModuleNameToImage = localModuleNameToImage;
     }
 
     @Override
@@ -45,7 +49,12 @@ public class SDKCallbackServer extends CallbackServer {
             final String serviceVer)
             throws IOException, JsonClientException {
         return new SDKSubsequentCallRunner(token, config,
-                jobId, modmeth, serviceVer, mounts);
+                jobId, modmeth, serviceVer, mounts) {
+            @Override
+            protected Map<String, String> getLocalModuleNameToImage() {
+                return localModuleNameToImage;
+            }
+        };
     }
 
     @JsonServerMethod(rpc = "CallbackServer.set_provenance")

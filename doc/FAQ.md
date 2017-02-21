@@ -82,7 +82,7 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="windows"></A>Q: Can I develop on Windows?
-**A:** If you can get all the dependencies installed, sure.  We don't actively support it.
+**A:**  Sort of.  Your best option right now is to install [VirtualBox](https://www.virtualbox.org) with [Ubuntu Linux](https://www.ubuntu.com/desktop) and work in the Linux VM.  Many developers use this approach in KBase, and we know it works well.  Although the KBase SDK tools do not run natively in Windows, with the release of [Docker for Windows](https://docs.docker.com/docker-for-windows/) and our new experimental [Dockerized kb-sdk](kb_sdk_dockerized_install.md) we plan to fully support Windows very soon.
 
 [back to top](#top)
 

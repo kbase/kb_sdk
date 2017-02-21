@@ -11,11 +11,14 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -158,6 +161,9 @@ public class ModuleTester {
         } finally {
             fw.close();
         }
+        File testCfgCopy = new File(workDir, "test.cfg");
+        Files.copy(testCfg.toPath(), testCfgCopy.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
         String endPoint = props.getProperty("kbase_endpoint");
         if (endPoint == null)
             throw new IllegalStateException("Error: KBase services end-point is not set in " +
@@ -224,14 +230,16 @@ public class ModuleTester {
                         }
                     }).build();
             ModuleRunVersion runver = new ModuleRunVersion(
-                    new URL("https://fakefakefakefakefake.com"),
-                    new ModuleMethod("use_set_provenance.to_set_provenance_for_tests"),
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "0.0.0", "dev");
+                    new URL("https://localhost"),
+                    new ModuleMethod(moduleName + ".run_local_tests"),
+                    "local-docker-image", "local", "dev");
             final DockerMountPoints mounts = new DockerMountPoints(
                     Paths.get("/kb/module/work"), Paths.get("tmp"));
+            Map<String, String> localModuleToImage = new LinkedHashMap<>();
+            localModuleToImage.put(moduleName, imageName);
             JsonServerServlet catalogSrv = new SDKCallbackServer(
                     token, cfg, runver, new ArrayList<UObject>(),
-                    new ArrayList<String>(), mounts);
+                    new ArrayList<String>(), mounts, localModuleToImage);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
@@ -244,7 +252,7 @@ public class ModuleTester {
                 throw new IllegalStateException("No proper callback IP was found, " +
                 		"please check callback_networks parameter in test.cfg");
             }
-            System.out.println("WARNING: No callback URL was recieved " +
+            System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
         }
         ///////////////////////////////////////////////////////////////////////////////////////////

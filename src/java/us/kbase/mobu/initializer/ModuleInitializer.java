@@ -13,6 +13,7 @@ import java.util.Map;
 import us.kbase.mobu.compiler.JavaData;
 import us.kbase.mobu.compiler.JavaModule;
 import us.kbase.mobu.compiler.JavaTypeGenerator;
+import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.templates.TemplateFormatter;
 
 public class ModuleInitializer {
@@ -24,15 +25,15 @@ public class ModuleInitializer {
 	private boolean verbose;
 	private File dir;
 	
-	private static String[] subdirs = {"data", 
-									   "docs", 
-									   "scripts",
-									   "lib",
-									   "test", 
-									   "ui", 
-									   "ui/narrative", 
-									   "ui/narrative/methods",
-									   "ui/widgets"};	
+	private static String[] subdirs = {"data",
+										"docs",
+										"scripts",
+										"lib",
+										"test",
+										"ui",
+										"ui/narrative",
+										"ui/narrative/methods",
+										"ui/narrative/widgets"};
 	
 	public ModuleInitializer(String moduleName, String userName, boolean verbose) {
 		this(moduleName, userName, DEFAULT_LANGUAGE, verbose);
@@ -107,6 +108,7 @@ public class ModuleInitializer {
 		moduleContext.put("language", this.language);
 		moduleContext.put("module_root_path", Paths.get(moduleDir).toAbsolutePath());
 		moduleContext.put("example", example);
+		moduleContext.put("dollar_sign", "$");
         moduleContext.put("os_name", System.getProperty("os.name"));
 
 
@@ -195,7 +197,6 @@ public class ModuleInitializer {
 				case "r":
                     templateFiles.put("module_r_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.r"));
                     break;
-				// Not sure what java needs yet. This isn't really implemented, other than as a placeholder.
 				case "java":
 		            File srcDir = new File(moduleDir, "lib/src");
 		            String modulePackage = (String)moduleContext.get("java_package");
@@ -219,12 +220,31 @@ public class ModuleInitializer {
 			fillTemplate(moduleContext, templateName, templateFiles.get(templateName));
 		}
 		
+		if (example) {
+			// Generated examples require some other SDK dependencies
+			List <String> requiredDependantModules = Arrays.asList("KBaseReport","AssemblyUtil");
+			ClientInstaller clientInstaller = new ClientInstaller(new File(moduleDir), false);
+			for(String dependantModuleName : requiredDependantModules) {
+				clientInstaller.install(
+						this.language,
+						true, // async clients
+						false, // core or sync clients
+						false, // dynamic client
+						"release", //tagVer
+						this.verbose,
+						dependantModuleName,
+						null,
+						null // clientName
+					);
+			}
+		}
+
 		System.out.println("Done! Your module is available in the " + moduleDir + " directory.");
 		if (example) {
 			System.out.println("Compile and run the example methods with the following inputs:");
 			System.out.println("  cd " + moduleDir);
-			System.out.println("  make          (could be necessary after changes in " + new File(specFile).getName() + ")");
-            System.out.println("  kb-sdk test   (will require to set GlobusOnline test account in test_local/test.cfg)");
+			System.out.println("  make          (required after making changes to " + new File(specFile).getName() + ")");
+			System.out.println("  kb-sdk test   (will require setting test user account credentials in test_local/test.cfg)");
 			System.out.println();
 		}
 	}

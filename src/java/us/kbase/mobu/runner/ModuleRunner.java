@@ -144,13 +144,17 @@ public class ModuleRunner {
             throw new IllegalStateException("Reference data is required for module " + moduleName +
             		". This feature is not supported for local calls.");
         String dockerImage = mv.getDockerImgName();
-        System.out.println("Docker image name recieved from Catalog: " + dockerImage);
+        System.out.println("Docker image name received from Catalog: " + dockerImage);
         ////////////////////////////////// Standard files in run_local ////////////////////////////
         if (!runDir.exists())
             runDir.mkdir();
         File runLocalSh = new File(runDir, "run_local.sh");
         File runDockerSh = new File(runDir, "run_docker.sh");
         if (!runLocalSh.exists()) {
+            final boolean isMac = System.getProperty("os.name").toLowerCase()
+                    .contains("mac");
+            final boolean isWin = System.getProperty("os.name").toLowerCase()
+                    .contains("win");
             FileUtils.writeLines(runLocalSh, Arrays.asList(
                     "#!/bin/bash",
                     "sdir=\"$(cd \"$(dirname \"$(readlink -f \"$0\")\")\" && pwd)\"",
@@ -158,7 +162,9 @@ public class ModuleRunner {
                     "cnt_id=$2",
                     "docker_image=$3",
                     "mount_points=$4",
-                    "$sdir/run_docker.sh run -v $sdir/workdir:/kb/module/work $mount_points " +
+                    "$sdir/run_docker.sh run " +
+                    (isMac || isWin ? "" : "--user $(id -u) ") +
+                    "-v $sdir/workdir:/kb/module/work $mount_points " +
                     "-e \"SDK_CALLBACK_URL=$callback_url\" --name $cnt_id $docker_image async"));
             ProcessHelper.cmd("chmod", "+x", runLocalSh.getCanonicalPath()).exec(runDir);
         }
@@ -267,7 +273,7 @@ public class ModuleRunner {
                 inputWsObjects.addAll(Arrays.asList(provRefs.split(Pattern.quote(","))));
             }
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    auth, cfg, runver, params, inputWsObjects, mounts);
+                    auth, cfg, runver, params, inputWsObjects, mounts, null);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
@@ -280,7 +286,7 @@ public class ModuleRunner {
                 throw new IllegalStateException("No proper callback IP was found, " +
                         "please check callback_networks parameter in configuration");
             }
-            System.out.println("WARNING: No callback URL was recieved " +
+            System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
         }
         ////////////////////////////////// Running Docker /////////////////////////////////////////

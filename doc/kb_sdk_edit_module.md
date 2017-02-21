@@ -393,7 +393,7 @@ Edit *spec.json*:
 	"authors": [
 		"YourName"
 	],
-	"contact": "help@kbase.us",
+	"contact": "http://kbase.us/contact-us/",
 	"visible": true,
 	"categories": ["active","assembly","communities"],
 	"widgets": {
