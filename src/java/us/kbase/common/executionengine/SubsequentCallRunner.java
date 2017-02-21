@@ -1,6 +1,7 @@
 package us.kbase.common.executionengine;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,34 +50,47 @@ public abstract class SubsequentCallRunner {
             throws IOException, JsonClientException {
         this.token = token;
         this.config = config;
+        this.moduleName = modmeth.getModule();
+        this.jobId = jobId;
+        final ModuleVersion mv = loadModuleVersion(modmeth, serviceVer);
+        mrv =  this.createModuleRunVersion(modmeth, serviceVer, mv);
+        imageName = this.getImageName(mv);
+        Files.createDirectories(getSharedScratchDir(config));
+        final Path jobWorkDir = getJobWorkDir(jobId, config, imageName);
+        Files.createDirectories(jobWorkDir);
+        config.writeJobConfigToFile(jobWorkDir.resolve(
+                JobRunnerConstants.JOB_CONFIG_FILE));
+    }
+    
+    protected ModuleVersion loadModuleVersion(ModuleMethod modmeth, 
+            String serviceVer) throws IOException, JsonClientException {
         final CatalogClient catClient = new CatalogClient(
                 config.getCatalogURL());
         //TODO is this needed?
         catClient.setIsInsecureHttpConnectionAllowed(true);
-        this.moduleName = modmeth.getModule();
-        this.jobId = jobId;
         if (serviceVer == null || serviceVer.isEmpty()) {
             serviceVer = RELEASE;
         }
-        final ModuleVersion mv;
         try {
-            mv = catClient.getModuleVersion(new SelectModuleVersion()
+            return catClient.getModuleVersion(new SelectModuleVersion()
                 .withModuleName(moduleName).withVersion(serviceVer));
         } catch (ServerException se) {
             throw new IllegalArgumentException(String.format(
                     "Error looking up module %s with version %s: %s",
                     moduleName, serviceVer, se.getLocalizedMessage()));
         }
-        mrv = new ModuleRunVersion(
+    }
+    
+    protected ModuleRunVersion createModuleRunVersion(ModuleMethod modmeth, 
+            String serviceVer, ModuleVersion mv) throws MalformedURLException {
+        return new ModuleRunVersion(
                 new URL(mv.getGitUrl()), modmeth,
                 mv.getGitCommitHash(), mv.getVersion(),
                 RELEASE_TAGS.contains(serviceVer) ? serviceVer : null);
-        imageName = mv.getDockerImgName();
-        Files.createDirectories(getSharedScratchDir(config));
-        final Path jobWorkDir = getJobWorkDir(jobId, config, imageName);
-        Files.createDirectories(jobWorkDir);
-        config.writeJobConfigToFile(jobWorkDir.resolve(
-                JobRunnerConstants.JOB_CONFIG_FILE));
+    }
+    
+    protected String getImageName(ModuleVersion mv) {
+        return mv.getDockerImgName();
     }
 
     protected static Path getJobWorkDir(

@@ -38,7 +38,6 @@ public class CompilationReporter {
             String pyImplName, boolean rServerSide, String rImplName,
             boolean javaServerSide, String javaPackageParent, String javaSrcPath, 
             JavaData javaParsingData, List<SpecFile> specFiles, File reportFile) throws Exception {
-        System.out.println("Preparing SDK compilation report...");
         String sdkVersion = ModuleBuilder.VERSION;
         String sdkGitCommit = ModuleBuilder.getGitCommit();
         String moduleName = null;
@@ -85,6 +84,14 @@ public class CompilationReporter {
             }
             comment = "//";
         }
+        if (implFile == null) {
+            return;  // No server generation here
+        }
+        if (reportFile.exists()) {
+            System.out.println("Skipping SDK compilation report generation: report file already exists");
+            return;
+        }
+        System.out.println("Preparing SDK compilation report...");
         String implText = IOUtils.toString(new LineNumberReader(new FileReader(
                 implFile)));
         Report report = createReport(specFiles, sdkVersion, sdkGitCommit,

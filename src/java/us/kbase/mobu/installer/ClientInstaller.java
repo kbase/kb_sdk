@@ -43,10 +43,10 @@ public class ClientInstaller {
     private final URL catalogUrl;
     
     public ClientInstaller() throws Exception {
-        this(null);
+        this(null, true);
     }
 
-    public ClientInstaller(File dir) throws Exception {
+    public ClientInstaller(File dir, boolean showWarnings) throws Exception {
         moduleDir = dir == null ? DirUtils.findModuleDir() : DirUtils.findModuleDir(dir);
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
         @SuppressWarnings("unchecked")
@@ -56,12 +56,14 @@ public class ClientInstaller {
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         sdkConfig = new Properties();
         if (!sdkCfgFile.exists()) {
-            System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
-            		"initialized (with 'catalog_url' parameter pointing to AppDev environment)");
+            if(showWarnings) {
+                System.out.println("Warning: file " + sdkCfgFile.getAbsolutePath() + " will be " +
+                    "initialized (with 'catalog_url' parameter pointing to AppDev environment)");
+            }
             FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
-            		"https://appdev.kbase.us/services/catalog"));
-            TextUtils.checkIgnoreLine(new File(moduleDir, ".gitignore"), sdkCfgFile.getName());
-            TextUtils.checkIgnoreLine(new File(moduleDir, ".dockerignore"), sdkCfgFile.getName());
+                    "https://appdev.kbase.us/services/catalog"));
+            TextUtils.checkIgnoreLine(new File(moduleDir, ".gitignore"), sdkCfgFile.getName(), showWarnings);
+            TextUtils.checkIgnoreLine(new File(moduleDir, ".dockerignore"), sdkCfgFile.getName(), showWarnings);
         }
         InputStream is = new FileInputStream(sdkCfgFile);
         try {
@@ -75,13 +77,20 @@ public class ClientInstaller {
         }
         catalogUrl = new URL(catalogUrlText);
     }
-    
-    public int install(String lang, boolean async, boolean sync, boolean dynamic, String tagVer, 
+
+    public int install(String lang, boolean async, boolean core, boolean dynamic, String tagVer, 
             boolean verbose, String moduleName, String libDirName) throws Exception {
+        return install(lang, async, core, dynamic, tagVer, verbose, moduleName, libDirName, null);
+    }
+    
+    public int install(String lang, boolean async, boolean core, boolean dynamic, String tagVer, 
+            boolean verbose, String moduleName, String libDirName, String clientName) 
+                    throws Exception {
+        if (core && (dynamic || async)) {
+            throw new IllegalStateException("It's not allowed to set 'core' mode and one " +
+                    "of 'async'/'dynamic' at the same time.");
+        }
         FileProvider fp = null;
-        String url = null;
-        String clientAsyncVer = null;
-        String dynservVer = null;
         String semanticVersion = null;
         String gitUrl = null;
         String gitCommitHash = null;
@@ -136,17 +145,17 @@ public class ClientInstaller {
             gitUrl = modVer.getGitUrl();
             gitCommitHash = modVer.getGitCommitHash();
             semanticVersion = modVer.getVersion();
-            if (!(dynamic || async || sync)) {
+            if (!(core || dynamic || async)) {
                 dynamic = modVer.getDynamicService() != null && modVer.getDynamicService() == 1L;
-                async = !dynamic;
+                async = true;
             }
             if (modVer.getCompilationReport() == null)
-                throw new IllegalStateException("Compilation report is not found for this version " +
-                		"of [" + moduleName + "] module.");
+                throw new IllegalStateException("Compilation report is not found for this " +
+                		"version of [" + moduleName + "] module.");
             List<SpecFile> specFiles = modVer.getCompilationReport().getSpecFiles();
             if (specFiles == null)
-                throw new IllegalStateException("Compilation report returned from catalog is out " +
-                		"of date. [" + moduleName + "] module should be reregistered again.");
+                throw new IllegalStateException("Compilation report returned from catalog is " +
+                		"out of date. [" + moduleName + "] module should be reregistered again.");
             final List<String> mainSpec = new ArrayList<String>();
             final Map<String, String> deps = new LinkedHashMap<String, String>();
             for (SpecFile spec : specFiles) {
@@ -165,17 +174,42 @@ public class ClientInstaller {
                 }
             };
         }
+        if (async && dynamic) {
+            compile(lang, async, false, tagVer, verbose, moduleName, libDirName, fp, 
+                    semanticVersion, gitUrl, gitCommitHash, clientName);
+            if (clientName == null) {
+                clientName = moduleName;
+            }
+            compile(lang, false, dynamic, tagVer, verbose, moduleName, libDirName, fp, 
+                    semanticVersion, gitUrl, gitCommitHash, clientName + "Service");
+        } else {
+            compile(lang, async, dynamic, tagVer, verbose, moduleName, libDirName, fp, 
+                    semanticVersion, gitUrl, gitCommitHash, clientName);
+        }
+        return 0;
+    }
+
+    private void compile(String lang, boolean async, boolean dynamic, String tagVer, 
+            boolean verbose, String moduleName, String libDirName, FileProvider fp, 
+            String semanticVersion, String gitUrl, String gitCommitHash,
+            String clientName) throws Exception {
+        String url = null;
+        String clientAsyncVer = null;
+        String dynservVer = null;
         if (dynamic) {
             url = "https://kbase.us/services/service_wizard";
             dynservVer = tagVer == null ? "release" : tagVer;
         } else if (async) {
-            url = "https://kbase.us/services/njs_wrapper";
+            // We are getting rid of default URL in async case because of unexpected behavior
+            // when for local calls callback URL is missed.
+            //url = "https://kbase.us/services/njs_wrapper";
             clientAsyncVer = tagVer == null ? "release" : tagVer;
         }
         final FileProvider fp2 = fp;
         IncludeProvider ip = new IncludeProvider() {
             @Override
-            public Map<String, KbModule> parseInclude(String includeLine) throws KidlParseException {
+            public Map<String, KbModule> parseInclude(String includeLine) 
+                    throws KidlParseException {
                 String specPath = includeLine.trim();
                 if (specPath.startsWith("#include"))
                     specPath = specPath.substring(8).trim();
@@ -189,8 +223,8 @@ public class ClientInstaller {
                     SpecParser p = new SpecParser(new StringReader(specText));
                     return p.SpecStatement(this);
                 } catch (ParseException e) {
-                    throw new KidlParseException("Error parsing spec-file [" + specFileName + "]: " + 
-                            e.getMessage());
+                    throw new KidlParseException("Error parsing spec-file [" + specFileName +
+                            "]: " + e.getMessage());
                 } catch (Exception e) {
                     throw new IllegalStateException("Unexpected error", e);
                 }
@@ -202,6 +236,9 @@ public class ClientInstaller {
             for (KbService srv : services)
                 for (KbModule md : srv.getModules())
                     moduleName = md.getModuleName();
+        if (clientName == null) {
+            clientName = moduleName;
+        }
         if (lang == null)
             lang = language;
         lang = lang.toLowerCase();
@@ -238,30 +275,30 @@ public class ClientInstaller {
         if (isJava) {
             FileSaver javaSrcDir = new DiskFileSaver(new File(libDir, "src"));
             String javaPackageParent = ".";
-            JavaTypeGenerator.processSpec(services, javaSrcDir, 
-                    javaPackageParent, false, null, null, 
-                    url == null ? null : new URL(url), null, null,
-                    clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
+            String customClientClassName = TextUtils.capitalize(clientName) + "Client";
+            URL urlEndpoint = url == null ? null : new URL(url);
+            JavaTypeGenerator.processSpec(services, javaSrcDir, javaPackageParent, false, null, 
+                    null, urlEndpoint, null, null, clientAsyncVer, dynservVer, semanticVersion, 
+                    gitUrl, gitCommitHash, null, customClientClassName);
         } else {
             String perlClientName = null;
             if (isPerl)
-                perlClientName = moduleName + "::" + moduleName + "Client";
+                perlClientName = moduleName + "::" + clientName + "Client";
             String pyClientName = null;
             if (isPython)
-                pyClientName = moduleName + "." + moduleName + "Client";
+                pyClientName = moduleName + "." + clientName + "Client";
             String rClientName = null;
             if (isR)
-                rClientName = moduleName + "/" + moduleName + "Client";
+                rClientName = moduleName + "/" + clientName + "Client";
             String jsClientName = null;
             if (isJS)
-                jsClientName = moduleName + "/" + moduleName + "Client";
+                jsClientName = moduleName + "/" + clientName + "Client";
             FileSaver output = new DiskFileSaver(libDir);
             TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl, perlClientName, 
                     false, null, null, null, isPython, pyClientName, false, null, null, isR, 
                     rClientName, false, null, null, false, true, ip, output, null, null, 
                     async, clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         }
-        return 0;
     }
     
     private static boolean isUrl(String url) {
