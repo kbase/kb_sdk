@@ -1,19 +1,18 @@
 # ![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") KBase SDK
 
-The KBase SDK is a set of tools for developing new KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase App Catalog, you can build and run a new "Hello World!" App in KBase in minutes.
+The KBase SDK is a set of tools for developing KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase App Catalog, you can build and run a new "Hello World!" App in KBase in minutes.
 
 There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
 
 - Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
-- Requires either no or fairly limited amounts of reference data
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, R, or Perl
 
 If you have a tool you would like to register with KBase that cannot meet these requirements, please contact us to discuss possible solutions.
 
-In order to register your SDK module, you have to be an approved KBase developer.  To become an approved KBase developer, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us at http://kbase.us/contact-us with your username and we will help with the next steps.
+In order to register your Apps with KBase, you have to be an approved developer.  To become approved, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us at http://kbase.us/contact-us with your username and we will help with the next steps.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
@@ -52,13 +51,15 @@ In order to register your SDK module, you have to be an approved KBase developer
 <br>
 ## Quick Install Guide
 
-Below is a quick reference guide for installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
+Below is a quick reference guide for standard installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
+
+For the adventurous, there is an experimental Dockerized installation that only requires Docker.  It is known to work on at least Mac and Linux, but has not been extensively tested yet.  For details, see [Dockerized Installation](doc/kb_sdk_dockerized_install.md)
 
 #### Installation Only
 
 System Dependencies:
 
-- Mac OS X 10.8+ or Linux
+- Mac OS X 10.8+ or Linux. kb-sdk does not run natively in Windows, but see [here](doc/FAQ.md#windows) for more details.
 - Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
@@ -166,4 +167,4 @@ There are a number of modules that we continually update and modify to demonstra
 <br>
 ## Need more?
 
-If you have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
+Browse through the [doc](doc/) directory of this repo for the latest avaialble documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us

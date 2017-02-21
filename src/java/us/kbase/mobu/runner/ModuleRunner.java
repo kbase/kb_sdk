@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -43,9 +44,11 @@ import us.kbase.common.service.UObject;
 import us.kbase.common.utils.NetUtils;
 import us.kbase.kbasejobservice.FinishJobParams;
 import us.kbase.mobu.ModuleBuilder;
+import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.mobu.util.TextUtils;
 
 public class ModuleRunner {
     private final URL catalogUrl;
@@ -53,6 +56,7 @@ public class ModuleRunner {
     private final File runDir;
     private String user;
     private String password;
+    private String[] callbackNetworks = null;
     
     public ModuleRunner(String sdkHome) throws Exception {
         if (sdkHome == null) {
@@ -75,7 +79,10 @@ public class ModuleRunner {
                     "kbase_endpoint=https://appdev.kbase.us/services",
                     "catalog_url=https://appdev.kbase.us/services/catalog",
                     "user=",
-                    "password="));
+                    "password=",
+                    "### Please use next parameter to specify custom list of network",
+                    "### interfaces used for callback IP address lookup:",
+                    "#callback_networks=docker0,vboxnet0,vboxnet1,en0,en1,en2,en3"));
         }
         Properties sdkConfig = new Properties();
         try (InputStream is = new FileInputStream(sdkCfgFile)) {
@@ -107,15 +114,20 @@ public class ModuleRunner {
                 password = new String(System.console().readPassword("Password: "));
             }
         }
+        String callbackNetworksText = sdkConfig.getProperty("callback_networks");
+        if (callbackNetworksText != null) {
+            callbackNetworks = callbackNetworksText.trim().split("\\s*,\\s*");
+        }
     }
     
     public ModuleRunner(URL catalogUrl, String kbaseEndpoint, File runDir, String user, 
-            String password) {
+            String password, String[] callbackNetworks) {
         this.catalogUrl = catalogUrl;
         this.kbaseEndpoint = kbaseEndpoint;
         this.runDir = runDir;
         this.user = user;
         this.password = password;
+        this.callbackNetworks = callbackNetworks;
     }
     
     public int run(String methodName, File inputFile, boolean stdin, String inputJson, 
@@ -132,13 +144,17 @@ public class ModuleRunner {
             throw new IllegalStateException("Reference data is required for module " + moduleName +
             		". This feature is not supported for local calls.");
         String dockerImage = mv.getDockerImgName();
-        System.out.println("Docker image name recieved from Catalog: " + dockerImage);
+        System.out.println("Docker image name received from Catalog: " + dockerImage);
         ////////////////////////////////// Standard files in run_local ////////////////////////////
         if (!runDir.exists())
             runDir.mkdir();
         File runLocalSh = new File(runDir, "run_local.sh");
         File runDockerSh = new File(runDir, "run_docker.sh");
         if (!runLocalSh.exists()) {
+            final boolean isMac = System.getProperty("os.name").toLowerCase()
+                    .contains("mac");
+            final boolean isWin = System.getProperty("os.name").toLowerCase()
+                    .contains("win");
             FileUtils.writeLines(runLocalSh, Arrays.asList(
                     "#!/bin/bash",
                     "sdir=\"$(cd \"$(dirname \"$(readlink -f \"$0\")\")\" && pwd)\"",
@@ -146,7 +162,9 @@ public class ModuleRunner {
                     "cnt_id=$2",
                     "docker_image=$3",
                     "mount_points=$4",
-                    "$sdir/run_docker.sh run -v $sdir/workdir:/kb/module/work $mount_points " +
+                    "$sdir/run_docker.sh run " +
+                    (isMac || isWin ? "" : "--user $(id -u) ") +
+                    "-v $sdir/workdir:/kb/module/work $mount_points " +
                     "-e \"SDK_CALLBACK_URL=$callback_url\" --name $cnt_id $docker_image async"));
             ProcessHelper.cmd("chmod", "+x", runLocalSh.getCanonicalPath()).exec(runDir);
         }
@@ -157,30 +175,11 @@ public class ModuleRunner {
             ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(runDir);
         }
         ////////////////////////////////// Temporary files ////////////////////////////////////////
-        StringBuilder mountPointsDocker = new StringBuilder();
+        final DockerMountPoints mounts = new DockerMountPoints(
+                Paths.get("/kb/module/work"), Paths.get("tmp"));
         if (mountPoints != null) {
             for (String part : mountPoints.split(Pattern.quote(","))) {
-                String[] fromTo = part.split(Pattern.quote(":"));
-                String to;
-                if (fromTo.length != 2) {
-                    if (fromTo.length == 1) {
-                        to = "tmp";
-                    } else {
-                        throw new IllegalStateException("Unexpected mount point format: " + part);
-                    }
-                } else {
-                    to = fromTo[1];
-                }
-                File fromDir = new File(fromTo[0]);
-                if ((!fromDir.exists()) || (!fromDir.isDirectory()))
-                    throw new IllegalStateException("Mount point directory doesn't exist: " +
-                            fromDir);
-                String from = fromDir.getCanonicalPath();
-                if (!to.startsWith("/"))
-                    to = "/kb/module/work/" + to;
-                if (mountPointsDocker.length() > 0)
-                    mountPointsDocker.append(" ");
-                mountPointsDocker.append("-v ").append(from).append(":").append(to);
+                mounts.addMount(part);
             }
         }
         File workDir = new File(runDir, "workdir");
@@ -192,7 +191,7 @@ public class ModuleRunner {
             FileUtils.deleteDirectory(subjobsDir);
         File tokenFile = new File(workDir, "token");
         try (FileWriter fw = new FileWriter(tokenFile)) {
-            fw.write(auth.toString());
+            fw.write(auth.getToken());
         }
         String jobSrvUrl = kbaseEndpoint + "/userandjobstate";
         String wsUrl = kbaseEndpoint + "/ws";
@@ -208,6 +207,10 @@ public class ModuleRunner {
         } finally {
             pw.close();
         }
+        File scratchDir = new File(workDir, "tmp");
+        if (scratchDir.exists())
+            TextUtils.deleteRecursively(scratchDir);
+        scratchDir.mkdir();
         ////////////////////////////////// Preparing input.json ///////////////////////////////////
         String jsonString;
         if (inputFile != null) {
@@ -236,7 +239,7 @@ public class ModuleRunner {
         UObject.getMapper().writeValue(new File(workDir, "input.json"), rpc);
         ////////////////////////////////// Starting callback service //////////////////////////////
         int callbackPort = NetUtils.findFreePort();
-        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort);
+        URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
         if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
@@ -270,7 +273,7 @@ public class ModuleRunner {
                 inputWsObjects.addAll(Arrays.asList(provRefs.split(Pattern.quote(","))));
             }
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    auth, cfg, runver, params, inputWsObjects);
+                    auth, cfg, runver, params, inputWsObjects, mounts, null);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);
@@ -279,7 +282,11 @@ public class ModuleRunner {
             context.addServlet(new ServletHolder(catalogSrv),"/*");
             jettyServer.start();
         } else {
-            System.out.println("WARNING: No callback URL was recieved " +
+            if (callbackNetworks != null && callbackNetworks.length > 0) {
+                throw new IllegalStateException("No proper callback IP was found, " +
+                        "please check callback_networks parameter in configuration");
+            }
+            System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
         }
         ////////////////////////////////// Running Docker /////////////////////////////////////////
@@ -289,7 +296,7 @@ public class ModuleRunner {
             System.out.println();
             int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runLocalSh),
                     callbackUrl.toExternalForm(), containerName, dockerImage, 
-                    mountPointsDocker.toString()).exec(runDir).getExitCode();
+                    mounts.getDockerCommand()).exec(runDir).getExitCode();
             File outputTmpFile = new File(workDir, "output.json");
             if (!outputTmpFile.exists())
                 throw new IllegalStateException("Output JSON file was not found");

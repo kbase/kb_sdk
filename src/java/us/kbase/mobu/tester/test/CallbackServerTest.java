@@ -61,6 +61,7 @@ import us.kbase.common.service.JsonClientException;
 import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
+import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SubAction;
@@ -160,8 +161,10 @@ public class CallbackServerTest {
         final CallbackServerConfig cbcfg =
                 new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT),
                         callbackUrl, temp, log).build();
+        final DockerMountPoints mounts = new DockerMountPoints(
+                Paths.get("/kb/module/work"), Paths.get("tmp"));
         final CallbackServer callback = new SDKCallbackServer(
-                token, cbcfg, runver, params, wsobjs);
+                token, cbcfg, runver, params, wsobjs, mounts, null);
         final Server callbackServer = new Server(callbackPort);
         final ServletContextHandler srvContext =
                 new ServletContextHandler(

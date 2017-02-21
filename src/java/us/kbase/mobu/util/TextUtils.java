@@ -129,11 +129,17 @@ public class TextUtils {
     }
     
     public static void checkIgnoreLine(File f, String line) throws IOException {
+        TextUtils.checkIgnoreLine(f, line, true);
+    }
+    
+    public static void checkIgnoreLine(File f, String line, boolean showWarnings) throws IOException {
         List<String> lines = new ArrayList<String>();
         if (f.exists())
             lines.addAll(FileUtils.readLines(f));
         if (!new HashSet<String>(lines).contains(line)) {
-            System.out.println("Warning: file \"" + f.getName() + "\" doesn't contain \"" + line + "\" line, it will be added.");
+            if(showWarnings) {
+               System.out.println("Warning: file \"" + f.getName() + "\" doesn't contain \"" + line + "\" line, it will be added.");
+            }
             lines.add(line);
             FileUtils.writeLines(f, lines);
         }
