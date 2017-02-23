@@ -17,8 +17,7 @@ ONBUILD RUN \
   rm -rf jars && \
   git clone https://github.com/kbase/jars && \
   rm -rf kb_sdk && \
-#  git clone https://github.com/kbase/kb_sdk -b develop && \
-  git clone https://github.com/kkellerlbl/kb_sdk -b dev-perl_auth && \
+  git clone https://github.com/kbase/kb_sdk -b develop && \
   cd /kb/dev_container/modules/jars && \
   make && make deploy && \
   cd /kb/dev_container/modules/kb_sdk && \
