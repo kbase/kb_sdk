@@ -14,7 +14,7 @@ DIR = $(shell pwd)
 
 ANT ?= ant
 ANT_OPTIONS =
-KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.22.jar
+KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works

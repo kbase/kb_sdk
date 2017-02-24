@@ -44,8 +44,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import us.kbase.auth.AuthService;
+import us.kbase.auth.AuthConfig;
 import us.kbase.auth.AuthToken;
+import us.kbase.auth.ConfigurableAuthService;
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleInfo;
 import us.kbase.catalog.ModuleVersionInfo;
@@ -112,18 +113,36 @@ public class CallbackServerTest {
         
         Properties props = new Properties();
         props.load(Files.newBufferedReader(CREDS_LOC, StandardCharsets.UTF_8));
-        
+        String authUrl = props.getProperty("test.auth-service-url");
+        if (authUrl == null)
+            throw new IllegalStateException("Missing test.auth-service-url from config file " +
+                    CREDS_LOC);
         String user = props.getProperty("test.user");
+        if (user != null && user.trim().isEmpty()) {
+            user = null;
+        }
         String password = props.getProperty("test.pwd");
-        if (user == null || user.trim().isEmpty()) {
-            throw new IllegalStateException(
-                    "Missing test.user from config file " + CREDS_LOC);
+        String tokenString = props.getProperty("test.token");
+        if (tokenString != null && tokenString.trim().isEmpty()) {
+            tokenString = null;
         }
-        if (password == null || password.isEmpty()) {
+        if (user == null && tokenString == null) {
             throw new IllegalStateException(
-                    "Missing test.pwd from config file " + CREDS_LOC);
+                    "Missing test.user/test.token from config file " + CREDS_LOC);
         }
-        token =  AuthService.login(user, password).getToken();
+        String authAllowInsecure = props.getProperty("test.auth-service-url-allow-insecure");
+        ConfigurableAuthService auth = new ConfigurableAuthService(
+                new AuthConfig().withKBaseAuthServerURL(new URL(authUrl))
+                .withAllowInsecureURLs("true".equals(authAllowInsecure)));
+        if (tokenString != null) {
+            token = auth.validateToken(tokenString);
+        } else {
+            if (password == null || password.isEmpty()) {
+                throw new IllegalStateException(
+                        "Missing test.pwd from config file " + CREDS_LOC);
+            }
+            token =  auth.login(user, password).getToken();
+        }
         CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
     }
 
@@ -160,6 +179,7 @@ public class CallbackServerTest {
         Files.setPosixFilePermissions(rundocker, perms);
         final CallbackServerConfig cbcfg =
                 new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT),
+                        null, null, null, null, null, null, null, null, null,
                         callbackUrl, temp, log).build();
         final DockerMountPoints mounts = new DockerMountPoints(
                 Paths.get("/kb/module/work"), Paths.get("tmp"));
