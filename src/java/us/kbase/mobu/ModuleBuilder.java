@@ -343,17 +343,20 @@ public class ModuleBuilder {
     private static int runTestCommand(TestCommandArgs testArgs, JCommander jc) {
         // Figure out module name.
         // Join together spaced out names with underscores if necessary.
+        int returnCode = 1;
+
         try {
             ModuleTester tester = new ModuleTester();
-            tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
+            returnCode = tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
         }
         catch (Exception e) {
             if (testArgs.verbose)
                 e.printStackTrace();
             showError("Error while testing module", e.getMessage());
-            return 1;
+            return returnCode;
         }
-        return 0;
+
+        return returnCode;
     }
 
     private static void printVersion() {
