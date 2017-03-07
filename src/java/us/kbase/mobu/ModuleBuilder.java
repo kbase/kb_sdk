@@ -343,7 +343,7 @@ public class ModuleBuilder {
     private static int runTestCommand(TestCommandArgs testArgs, JCommander jc) {
         // Figure out module name.
         // Join together spaced out names with underscores if necessary.
-        int returnCode = 131;
+        int returnCode = 1;
 
         try {
             ModuleTester tester = new ModuleTester();
