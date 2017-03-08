@@ -106,25 +106,24 @@ public class ModuleTester {
         if (!tlDir.exists())
             tlDir.mkdir();
         if (!readmeFile.exists())
-            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, 
+            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext,
                     readmeFile);
         if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
-                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, 
+                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, 
                         runTestsSh);
                 refDataDir.mkdir();
             }
         }
         if (!runTestsSh.exists())
-            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
+            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, runTestsSh);
         if (!runBashSh.exists())
-            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
+            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, runBashSh);
         if (!runDockerSh.exists())
-            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, true, 
-                    runDockerSh);
+            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, runDockerSh);
         if (!testCfg.exists()) {
-            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, testCfg);
+            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, testCfg);
             System.out.println("Set KBase account credentials in test_local/test.cfg and then " +
             		"test again");
             return 1;

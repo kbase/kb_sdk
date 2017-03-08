@@ -215,7 +215,7 @@ public class ModuleRenamer {
             TemplateBasedGenerator.generate(newParsing, null, false, null, 
                     false, perlClientName, genPerlServer, perlServerName, perlImplName, perlPsgiName, 
                     false, pythonClientName, genPythonServer, pythonServerName, pythonImplName, 
-                    false, rClientName, genRServer, rServerName, rImplName, false, true, ip, 
+                    false, rClientName, genRServer, rServerName, rImplName, false, ip, 
                     srcOut, null, null, false, null, null, null, 
                     null, null, prevCode);
         }

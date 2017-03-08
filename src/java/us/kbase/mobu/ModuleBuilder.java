@@ -296,7 +296,7 @@ public class ModuleBuilder {
                     a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
                     a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
                     a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
-                    a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
+                    a.rServerSide, a.rServerName, a.rImplName, outDir, a.jsonSchema, 
                     a.makefile, a.clAsyncVer, a.dynservVer, a.html,
                     semanticVersion, gitUrl, gitCommitHash);
         } catch (Throwable e) {

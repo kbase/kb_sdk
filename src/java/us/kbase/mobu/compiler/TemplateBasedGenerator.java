@@ -30,14 +30,14 @@ public class TemplateBasedGenerator {
             String perlServerName, String perlImplName, String perlPsgiName, 
             boolean genPython, String pythonClientName, boolean genPythonServer,
             String pythonServerName, String pythonImplName, boolean enableRetries, 
-            boolean newStyle, IncludeProvider ip, FileSaver output) throws Exception {
+            IncludeProvider ip, FileSaver output) throws Exception {
         if (ip == null)
             ip = new FileIncludeProvider(new File("."));
         List<KbService> srvs = KidlParser.parseSpec(KidlParser.parseSpecInt(specReader, null, ip));
         generate(srvs, defaultUrl, genJs, jsClientName, genPerl, perlClientName, genPerlServer, 
                 perlServerName, perlImplName, perlPsgiName, genPython, pythonClientName, 
                 genPythonServer, pythonServerName, pythonImplName, false, null, false, null, null, 
-                enableRetries, newStyle, ip, output, null, null, false, null,
+                enableRetries, ip, output, null, null, false, null,
                 null, null, null, null);
     }
     
@@ -63,7 +63,7 @@ public class TemplateBasedGenerator {
             boolean genPython, String pythonClientName, boolean genPythonServer,
             String pythonServerName, String pythonImplName, boolean genR, 
             String rClientName, boolean genRServer, String rServerName, String rImplName, 
-            boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
+            boolean enableRetries, IncludeProvider ip, FileSaver output,
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
             String clientAsyncVer, String dynservVer, String semanticVersion,
             String gitUrl, String gitCommitHash) throws Exception {
@@ -71,7 +71,7 @@ public class TemplateBasedGenerator {
                 genPerlServer, perlServerName, perlImplName, perlPsgiName, genPython, 
                 pythonClientName, genPythonServer, pythonServerName, pythonImplName, 
                 genR, rClientName, genRServer, rServerName, rImplName, enableRetries, 
-                newStyle, ip, output, perlMakefile, pyMakefile, asyncByDefault, 
+                ip, output, perlMakefile, pyMakefile, asyncByDefault, 
                 clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash, null);
     }
     
@@ -83,7 +83,7 @@ public class TemplateBasedGenerator {
             boolean genPython, String pythonClientName, boolean genPythonServer,
             String pythonServerName, String pythonImplName, boolean genR, 
             String rClientName, boolean genRServer, String rServerName, String rImplName, 
-            boolean enableRetries, boolean newStyle, IncludeProvider ip, FileSaver output,
+            boolean enableRetries, IncludeProvider ip, FileSaver output,
             FileSaver perlMakefile, FileSaver pyMakefile, boolean asyncByDefault,
             String clientAsyncVer, String dynservVer, String semanticVersion,
             String gitUrl, String gitCommitHash, Map<String, String> prevCode)
@@ -146,7 +146,7 @@ public class TemplateBasedGenerator {
         context.put("service_ver", serviceVer);
         if (jsClientName != null) {
             Writer jsClient = output.openWriter(jsClientName + ".js");
-            TemplateFormatter.formatTemplate("javascript_client", context, newStyle, jsClient);
+            TemplateFormatter.formatTemplate("javascript_client", context, jsClient);
             jsClient.close();
         }
         Map<String, Object> perlMakefileContext = new LinkedHashMap<String, Object>(context);
@@ -154,7 +154,7 @@ public class TemplateBasedGenerator {
         if (perlClientName != null) {
             String perlClientPath = fixPath(perlClientName, "::") + ".pm";
             Writer perlClient = output.openWriter(perlClientPath);
-            TemplateFormatter.formatTemplate("perl_client", context, newStyle, perlClient);
+            TemplateFormatter.formatTemplate("perl_client", context, perlClient);
             perlClient.close();
             perlMakefileContext.put("client_package_name", perlClientName);
             perlMakefileContext.put("client_file", perlClientPath);
@@ -163,7 +163,7 @@ public class TemplateBasedGenerator {
             String pythonClientPath = fixPath(pythonClientName, ".") + ".py";
             initPythonPackages(pythonClientPath, output);
             Writer pythonClient = output.openWriter(pythonClientPath);
-            TemplateFormatter.formatTemplate("python_client", context, newStyle, pythonClient);
+            TemplateFormatter.formatTemplate("python_client", context, pythonClient);
             pythonClient.close();
             pyMakefileContext.put("client_package_name", pythonClientName);
             pyMakefileContext.put("client_file", pythonClientPath);
@@ -171,7 +171,7 @@ public class TemplateBasedGenerator {
         if (rClientName != null) {
             String rClientPath = rClientName + ".r";
             Writer rClient = output.openWriter(rClientPath);
-            TemplateFormatter.formatTemplate("r_client", context, newStyle, rClient);
+            TemplateFormatter.formatTemplate("r_client", context, rClient);
             rClient.close();
         }
         //////////////////////////////////////// Servers /////////////////////////////////////////
@@ -198,7 +198,7 @@ public class TemplateBasedGenerator {
         if (perlServerName != null) {
             String perlServerPath = fixPath(perlServerName, "::") + ".pm";
             Writer perlServer = output.openWriter(perlServerPath);
-            TemplateFormatter.formatTemplate("perl_server", context, newStyle, perlServer);
+            TemplateFormatter.formatTemplate("perl_server", context, perlServer);
             perlServer.close();
             perlMakefileContext.put("server_package_name", perlServerName);
             perlMakefileContext.put("server_file", perlServerPath);
@@ -207,7 +207,7 @@ public class TemplateBasedGenerator {
             String pythonServerPath = fixPath(pythonServerName, ".") + ".py";
             initPythonPackages(pythonServerPath, output);
             Writer pythonServer = output.openWriter(pythonServerPath);
-            TemplateFormatter.formatTemplate("python_server", context, newStyle, pythonServer);
+            TemplateFormatter.formatTemplate("python_server", context, pythonServer);
             pythonServer.close();
             pyMakefileContext.put("server_package_name", pythonServerName);
             pyMakefileContext.put("server_file", pythonServerPath);
@@ -215,7 +215,7 @@ public class TemplateBasedGenerator {
         if (rServerName != null) {
             String rServerPath = rServerName + ".r";
             Writer rServer = output.openWriter(rServerPath);
-            TemplateFormatter.formatTemplate("r_server", context, newStyle, rServer);
+            TemplateFormatter.formatTemplate("r_server", context, rServer);
             rServer.close();
         }
         if (genPerlServer || genPythonServer || genRServer) {
@@ -289,35 +289,35 @@ public class TemplateBasedGenerator {
                 moduleContext.put("display", new StringUtils());
                 if (genPerlServer) {
                     Writer perlImpl = output.openWriter(perlImplPath);
-                    TemplateFormatter.formatTemplate("perl_impl", moduleContext, newStyle, perlImpl);
+                    TemplateFormatter.formatTemplate("perl_impl", moduleContext, perlImpl);
                     perlImpl.close();
                 }
                 if (genPythonServer) {
                     Writer pythonImpl = output.openWriter(pythonImplPath);
-                    TemplateFormatter.formatTemplate("python_impl", moduleContext, newStyle, pythonImpl);
+                    TemplateFormatter.formatTemplate("python_impl", moduleContext, pythonImpl);
                     pythonImpl.close();
                 }
                 if (genRServer) {
                     Writer rImpl = output.openWriter(rImplPath);
-                    TemplateFormatter.formatTemplate("r_impl", moduleContext, newStyle, rImpl);
+                    TemplateFormatter.formatTemplate("r_impl", moduleContext, rImpl);
                     rImpl.close();
                 }
             }
         }
         if (perlPsgiName != null) {
             Writer perlPsgi = output.openWriter(perlPsgiName);
-            TemplateFormatter.formatTemplate("perl_psgi", context, newStyle, perlPsgi);
+            TemplateFormatter.formatTemplate("perl_psgi", context, perlPsgi);
             perlPsgi.close();
             perlMakefileContext.put("psgi_file", perlPsgiName);
         }
-        if (newStyle && perlMakefile != null) {
+        if (perlMakefile != null) {
             Writer perlMakefileWr = perlMakefile.openWriter(".");
-            TemplateFormatter.formatTemplate("perl_makefile", perlMakefileContext, true, perlMakefileWr);
+            TemplateFormatter.formatTemplate("perl_makefile", perlMakefileContext, perlMakefileWr);
             perlMakefileWr.close();
         }
-        if (newStyle && pyMakefile != null) {
+        if (pyMakefile != null) {
             Writer pyMakefileWr = pyMakefile.openWriter(".");
-            TemplateFormatter.formatTemplate("python_makefile", pyMakefileContext, true, pyMakefileWr);
+            TemplateFormatter.formatTemplate("python_makefile", pyMakefileContext, pyMakefileWr);
             pyMakefileWr.close();
         }
     }

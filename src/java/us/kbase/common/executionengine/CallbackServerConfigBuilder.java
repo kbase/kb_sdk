@@ -373,8 +373,8 @@ public class CallbackServerConfigBuilder {
                     WS_URL    + "=" + workspaceURL,
                     SHOCK_URL + "=" + shockURL,
                     HANDLE_URL + "=" + handleURL,
-                    SRV_WIZ_URL + "=" + SRV_WIZ_URL,
-                    NJSW_URL + "=" + NJSW_URL,
+                    SRV_WIZ_URL + "=" + srvWizURL,
+                    NJSW_URL + "=" + njswURL,
                     AUTH_URL + "=" + authServiceURL,
                     AUTH_ALLOW_INSECURE + "=" + authAllowInsecure),
                     StandardCharsets.UTF_8);
