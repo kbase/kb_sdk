@@ -358,9 +358,12 @@ public class TypeGeneratorTest extends Assert {
             File serverOutDir = preparePerlAndPyServerCode(testNum, workDir);
 	        List<String> lines = null;
             System.setProperty("KB_JOB_CHECK_WAIT_TIME", "100");
+            File cfgFile = prepareDeployCfg(workDir, getModuleName(parsingData));
 	        //////////////////////////////////////// Perl server ///////////////////////////////////////////
 	        lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
+                    "export KB_DEPLOYMENT_CONFIG=" + cfgFile.getCanonicalPath(),
+                    "export PERL5LIB=" + serverOutDir.getCanonicalPath() + ":$PERL5LIB",
                     "cd \"" + serverOutDir.getAbsolutePath() + "\"",
                     "perl " + findPerlServerScript(serverOutDir).getName() + " $1 $2 $3 > perl_cli.out 2> perl_cli.err"
                     ));
@@ -370,6 +373,7 @@ public class TypeGeneratorTest extends Assert {
             //////////////////////////////////////// Python server ///////////////////////////////////////////
             lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
+                    "export KB_DEPLOYMENT_CONFIG=" + cfgFile.getCanonicalPath(),
                     "cd \"" + serverOutDir.getAbsolutePath() + "\"",
                     "python " + findPythonServerScript(serverOutDir).getName() + " $1 $2 $3 > py_cli.out 2> py_cli.err"
                     ));
@@ -379,6 +383,7 @@ public class TypeGeneratorTest extends Assert {
             //////////////////////////////////////// Java server ///////////////////////////////////////////
             lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
+                    "export KB_DEPLOYMENT_CONFIG=" + cfgFile.getCanonicalPath(),
                     "java -cp \"" + cp + "\" " + testPackage + "." + modulePackage + "." + moduleName + "Server $1 $2 $3"
                     ));
             TextUtils.writeFileLines(lines, new File(workDir, "run_" + moduleName + "_async_job.sh"));
@@ -1164,8 +1169,8 @@ public class TypeGeneratorTest extends Assert {
             lines.add("export PYTHONPATH=");
         lines.addAll(Arrays.asList(
                 pyCmd + " ../../../test_scripts/python/test_client.py -t " + configFile.getName() + 
-                " -e http://localhost:" + portNum + "/ -u " + System.getProperty("test.user") +
-                " -p \"" + System.getProperty("test.pwd") + "\"" +
+                " -e http://localhost:" + portNum +
+                " -o \"" + System.getProperty("test.token") + "\"" +
                 (System.getProperty("KB_JOB_CHECK_WAIT_TIME") == null ? "" :
                     (" -a " + System.getProperty("KB_JOB_CHECK_WAIT_TIME")))
                 ));
