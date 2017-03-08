@@ -25,10 +25,20 @@ public class JobRunnerConstants {
     public static final String CFG_PROP_SHOCK_URL = "shock.url";
     public static final String CFG_PROP_JOBSTATUS_SRV_URL =
             "jobstatus.srv.url";
+    public static final String CFG_PROP_HANDLE_SRV_URL = "handle.url";
+    public static final String CFG_PROP_SRV_WIZ_URL = "srv.wiz.url";
+    public static final String CFG_PROP_NJSW_URL = "self.external.url";
+    public static final String CFG_PROP_AUTH_SERVICE_URL = "auth-service-url";
+    public static final String CFG_PROP_AUTH_SERVICE_ALLOW_INSECURE_URL_PARAM =
+            "auth-service-url-allow-insecure";
     public static final String CFG_PROP_CATALOG_SRV_URL = "catalog.srv.url";
     public static final String CFG_PROP_AWE_CLIENT_DOCKER_URI =
             "awe.client.docker.uri";
     public static final String CFG_PROP_EE_SERVER_VERSION = 
             "ee.server.version";
+    public static final String CFG_PROP_AWE_CLIENT_CALLBACK_NETWORKS = 
+            "awe.client.callback.networks";
+
+    public static final int MAX_IO_BYTE_SIZE = 1024 * 1024;
 
 }
