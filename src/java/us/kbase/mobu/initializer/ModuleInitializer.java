@@ -281,7 +281,7 @@ public class ModuleInitializer {
 	private void fillTemplate(Map<?,?> context, String templateName, Path outfilePath) throws IOException {
 		if (this.verbose) System.out.println("Building file \"" + outfilePath.toString() + "\"");
 		initDirectory(outfilePath.getParent(), false);
-		TemplateFormatter.formatTemplate(templateName, context, true, outfilePath.toFile());
+		TemplateFormatter.formatTemplate(templateName, context, outfilePath.toFile());
 	}
 	
 	/**

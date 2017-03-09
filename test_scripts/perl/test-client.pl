@@ -23,8 +23,7 @@ DESCRIPTION
       
       --tests [filename] config file for tests
       --endpoint [url]   endpoint of the server to test
-      --user [username]  username for testing authenticated calls
-      --password [pswd]  password for the user for testing authenticated calls
+      --token [token]    token for testing authenticated calls
       --asyncchecktime [ms] time client waits every cycle of checking state of async methods 
       -h, --help         display this help message, ignore all arguments
 ";
@@ -34,8 +33,7 @@ my $tests_filename;
 my $verbose;
 my $endpoint;
 
-my $user;
-my $password;
+my $token;
 my $async_job_check_time_ms;
 
 my $help;
@@ -44,8 +42,7 @@ my $opt = GetOptions (
         "tests=s" => \$tests_filename,
         "verbose|v" => \$verbose,
         "endpoint=s" => \$endpoint,
-        "user=s" => \$user,
-        "password=s" => \$password,
+        "token=s" => \$token,
         "asyncchecktime=i" => \$async_job_check_time_ms,
         "help|h" => \$help,
         );
@@ -103,11 +100,11 @@ my $nonauthenticated_client = $client_module->new($endpoint,ignore_kbase_config=
 ok(defined($nonauthenticated_client),"instantiating nonauthenticated client");
 
 my $authenticated_client;
-if($user && $password) {
+if($token) {
     if ($async_job_check_time_ms) {
-        $authenticated_client=$client_module->new($endpoint,user_id=>$user, password=>$password, async_job_check_time_ms=>$async_job_check_time_ms);
+        $authenticated_client=$client_module->new($endpoint, token=>$token, async_job_check_time_ms=>$async_job_check_time_ms);
     } else {
-        $authenticated_client=$client_module->new($endpoint,user_id=>$user, password=>$password);
+        $authenticated_client=$client_module->new($endpoint, token=>$token);
     }
     ok(defined($authenticated_client),"instantiating authenticated client");
 }

@@ -8,6 +8,14 @@ RUN apt-get install python-dev libffi-dev libssl-dev \
     && pip install 'requests[security]' --upgrade \
     && pip install coverage
 
+RUN \
+  . /kb/dev_container/user-env.sh && \
+  cd /kb/dev_container/modules && \
+  rm -rf auth && \
+  git clone -b auth2 https://github.com/kbase/auth && \
+  cd /kb/dev_container/modules/auth && \
+  make && make deploy
+
 # Update kb_sdk at build time
 ONBUILD RUN \
   . /kb/dev_container/user-env.sh && \

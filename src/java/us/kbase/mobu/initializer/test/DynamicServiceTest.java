@@ -18,6 +18,7 @@ import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.JsonServerServlet;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.scripts.test.TestConfigHelper;
 import us.kbase.scripts.test.TypeGeneratorTest;
 
 public class DynamicServiceTest extends DockerClientServerTester {
@@ -48,7 +49,7 @@ public class DynamicServiceTest extends DockerClientServerTester {
     
     public static String runServerInDocker(File moduleDir, 
             int port) throws Exception {
-        String imageName = prepareDockerImage(moduleDir, user, pwd);
+        String imageName = prepareDockerImage(moduleDir, token);
         String moduleName = moduleDir.getName();
         File tlDir = new File(moduleDir, "test_local");
         File workDir = new File(tlDir, "workdir");
@@ -59,10 +60,13 @@ public class DynamicServiceTest extends DockerClientServerTester {
         String workDirPath = DirUtils.getFilePath(workDir);
         String containerName = "test_" + moduleName.toLowerCase() + "_" + 
                 System.currentTimeMillis();
-        String endPoint = "https://ci.kbase.us/services";
+        String endPoint = TestConfigHelper.getKBaseEndpoint();
         ProcessHelper.cmd("bash", runDockerPath, "run", "-d", "-p", port + ":5000",
                 "--dns", "8.8.8.8", "-v", workDirPath + ":/kb/module/work", 
-                "--name", containerName, "-e", "KBASE_ENDPOINT=" + endPoint, imageName).exec(tlDir);
+                "--name", containerName, "-e", "KBASE_ENDPOINT=" + endPoint, "-e", 
+                "AUTH_SERVICE_URL=" + TestConfigHelper.getAuthServiceUrl(), "-e", 
+                "AUTH_SERVICE_URL_ALLOW_INSECURE=" + TestConfigHelper.getAuthServiceUrlInsecure(),
+                imageName).exec(tlDir);
         return containerName;
     }
 

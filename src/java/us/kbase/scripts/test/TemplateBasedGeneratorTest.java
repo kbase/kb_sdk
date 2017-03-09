@@ -15,6 +15,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import us.kbase.jkidl.IncludeProvider;
 import us.kbase.kidl.test.KidlTest;
 import us.kbase.mobu.compiler.TemplateBasedGenerator;
 import us.kbase.mobu.util.DiskFileSaver;
@@ -76,7 +77,7 @@ public class TemplateBasedGeneratorTest {
         long time2 = System.currentTimeMillis();
         TemplateBasedGenerator.generate(fr, defUrl, true, jsClient, true, perlClient, true, 
                 perlServer, perlImpl, perlPsgi, true, pythonClient, true, pythonServer, 
-                pythonImpl, enableRetries, false, null, new DiskFileSaver(outDir));
+                pythonImpl, enableRetries, (IncludeProvider)null, new DiskFileSaver(outDir));
         time2 = System.currentTimeMillis() - time2;
         //System.out.println("Test [" + testNum + "], old-time: " + time1 + ", new-time: " + time2);
         boolean ok = true;
