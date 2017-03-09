@@ -44,11 +44,11 @@ public class TestConfigHelper {
     }
     
     public static String getAuthServiceUrl() throws Exception {
-        return getTestConfigParam("test.auth.url", true);
+        return getTestConfigParam("test.auth-service-url", true);
     }
     
     public static String getAuthServiceUrlInsecure() throws Exception {
-        return getTestConfigParam("test.auth.url.insecure", "false");
+        return getTestConfigParam("test.auth-service-url-allow-insecure", "false");
     }
     
     public static ConfigurableAuthService getAuthService() throws Exception {
@@ -75,7 +75,7 @@ public class TestConfigHelper {
         return token2;
     }
     
-    public String getKBaseEndpoint() throws Exception {
+    public static String getKBaseEndpoint() throws Exception {
         return getTestConfigParam("test.kbase.endpoint", true);
     }
 }

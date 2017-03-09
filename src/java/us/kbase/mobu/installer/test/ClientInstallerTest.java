@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.installer.ClientInstaller;
+import us.kbase.scripts.test.TestConfigHelper;
 
 public class ClientInstallerTest {
     private static File tempDir = null;
@@ -39,7 +40,7 @@ public class ClientInstallerTest {
         File moduleDir = new File(tempDir, moduleName);
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
-                "https://ci.kbase.us/services/catalog"));
+                TestConfigHelper.getKBaseEndpoint() + "/catalog"));
         ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);
@@ -58,7 +59,7 @@ public class ClientInstallerTest {
         File moduleDir = new File(tempDir, moduleName);
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
-                "https://ci.kbase.us/services/catalog"));
+                TestConfigHelper.getKBaseEndpoint() + "/catalog"));
         ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);

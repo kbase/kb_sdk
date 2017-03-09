@@ -58,7 +58,7 @@ def main(argv):
     module = __import__(module_file)
     client_class = getattr(module, class_name)
     client_instance = None
-    if user is not None:
+    if token is not None:
         if async_job_check_time_ms:
             client_instance = client_class(url = endpoint, token = token, async_job_check_time_ms = async_job_check_time_ms)
         else:

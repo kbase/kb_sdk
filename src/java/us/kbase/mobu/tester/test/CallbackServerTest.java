@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,9 +43,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import us.kbase.auth.AuthConfig;
 import us.kbase.auth.AuthToken;
-import us.kbase.auth.ConfigurableAuthService;
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleInfo;
 import us.kbase.catalog.ModuleVersionInfo;
@@ -64,16 +61,13 @@ import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
 import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
+import us.kbase.scripts.test.TestConfigHelper;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SubAction;
 
 public class CallbackServerTest {
 
     private static final Path TEST_DIR = Paths.get("temp_test_callback");
-    private static final String KBASE_ENDPOINT =
-            "https://ci.kbase.us/services/";
-    
-    private static final Path CREDS_LOC = Paths.get("test_scripts/test.cfg");
     
     private static AuthToken token;
     private static CatalogClient CAT_CLI;
@@ -111,39 +105,9 @@ public class CallbackServerTest {
         Files.deleteIfExists(TEST_DIR);
         Files.createDirectories(TEST_DIR);
         
-        Properties props = new Properties();
-        props.load(Files.newBufferedReader(CREDS_LOC, StandardCharsets.UTF_8));
-        String authUrl = props.getProperty("test.auth-service-url");
-        if (authUrl == null)
-            throw new IllegalStateException("Missing test.auth-service-url from config file " +
-                    CREDS_LOC);
-        String user = props.getProperty("test.user");
-        if (user != null && user.trim().isEmpty()) {
-            user = null;
-        }
-        String password = props.getProperty("test.pwd");
-        String tokenString = props.getProperty("test.token");
-        if (tokenString != null && tokenString.trim().isEmpty()) {
-            tokenString = null;
-        }
-        if (user == null && tokenString == null) {
-            throw new IllegalStateException(
-                    "Missing test.user/test.token from config file " + CREDS_LOC);
-        }
-        String authAllowInsecure = props.getProperty("test.auth-service-url-allow-insecure");
-        ConfigurableAuthService auth = new ConfigurableAuthService(
-                new AuthConfig().withKBaseAuthServerURL(new URL(authUrl))
-                .withAllowInsecureURLs("true".equals(authAllowInsecure)));
-        if (tokenString != null) {
-            token = auth.validateToken(tokenString);
-        } else {
-            if (password == null || password.isEmpty()) {
-                throw new IllegalStateException(
-                        "Missing test.pwd from config file " + CREDS_LOC);
-            }
-            token =  auth.login(user, password).getToken();
-        }
-        CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
+        token = TestConfigHelper.getToken();
+        CAT_CLI = new CatalogClient(new URL(TestConfigHelper.getKBaseEndpoint() + 
+                "/catalog"), token);
     }
 
     private static CallbackStuff startCallBackServer()
@@ -177,9 +141,11 @@ public class CallbackServerTest {
         Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"),
                 StandardCharsets.UTF_8);
         Files.setPosixFilePermissions(rundocker, perms);
+        URL authUrl = new URL(TestConfigHelper.getAuthServiceUrl());
+        String authUrlInsecure = TestConfigHelper.getAuthServiceUrlInsecure();
         final CallbackServerConfig cbcfg =
-                new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT),
-                        null, null, null, null, null, null, null, null, null,
+                new CallbackServerConfigBuilder(new URL(TestConfigHelper.getKBaseEndpoint()),
+                        null, null, null, null, null, null, authUrl, authUrlInsecure, null,
                         callbackUrl, temp, log).build();
         final DockerMountPoints mounts = new DockerMountPoints(
                 Paths.get("/kb/module/work"), Paths.get("tmp"));

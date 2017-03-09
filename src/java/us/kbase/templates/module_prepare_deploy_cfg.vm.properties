@@ -20,10 +20,19 @@ if __name__ == "__main__":
     elif "KBASE_ENDPOINT" in os.environ:
         kbase_endpoint = os.environ.get("KBASE_ENDPOINT")
         props = "[global]\n" + \
+                "kbase_endpoint = " + kbase_endpoint + "\n" + \
                 "job_service_url = " + kbase_endpoint + "/userandjobstate\n" + \
                 "workspace_url = " + kbase_endpoint + "/ws\n" + \
                 "shock_url = " + kbase_endpoint + "/shock-api\n" + \
-                "kbase_endpoint = " + kbase_endpoint + "\n"
+                "handle_url = " + kbase_endpoint + "/handle_service\n" + \
+                "srv_wiz_url = " + kbase_endpoint + "/service_wizard\n" + \
+                "njsw_url = " + kbase_endpoint + "/njs_wrapper\n"
+        if "AUTH_SERVICE_URL" in os.environ:
+            props += "auth_service_url = " + os.environ.get("AUTH_SERVICE_URL") + "\n"
+        elif "auth2services" in kbase_endpoint:
+            props += "auth_service_url = " + kbase_endpoint + "/auth/api/legacy/KBase/Sessions/Login\n"
+        props += "auth_service_url_allow_insecure = " + \
+                 os.environ.get("AUTH_SERVICE_URL_ALLOW_INSECURE", "false") + "\n"
         config.readfp(StringIO.StringIO(props))
     else:
         raise ValueError('Neither ' + sys.argv[2] + ' file nor KBASE_ENDPOINT env-variable found')

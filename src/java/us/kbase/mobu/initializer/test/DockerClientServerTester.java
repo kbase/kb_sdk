@@ -30,6 +30,7 @@ import us.kbase.mobu.installer.ClientInstaller;
 import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
+import us.kbase.scripts.test.TestConfigHelper;
 import us.kbase.scripts.test.TypeGeneratorTest;
 
 public class DockerClientServerTester {
@@ -37,20 +38,13 @@ public class DockerClientServerTester {
     protected static final boolean cleanupAfterTests = true;
 
     protected static List<String> createdModuleNames = new ArrayList<String>();
-    protected static String user;
-    protected static String pwd;
+    protected static AuthToken token;
     
-    private static final String TEST_CFG = "kb_sdk_test";
     private static final long startingTime = System.currentTimeMillis();
 
     @BeforeClass
     public static void beforeTesterClass() throws Exception {
-        final Ini testini = new Ini(new File("test_scripts/test.cfg"));
-        user = testini.get(TEST_CFG, "test.user");
-        pwd = testini.get(TEST_CFG, "test.pwd");
-        if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
-            throw new TestException("missing user and / or pws from test cfg");
-        }
+        token = TestConfigHelper.getToken();
         TypeGeneratorTest.suppressJettyLogging();
     }
     
@@ -81,7 +75,8 @@ public class DockerClientServerTester {
             String implInitText) throws Exception {
         deleteDir(moduleName);
         createdModuleNames.add(moduleName);
-        ModuleInitializer initer = new ModuleInitializer(moduleName, user, lang, false);
+        ModuleInitializer initer = new ModuleInitializer(moduleName, token.getUserName(), 
+                lang, false);
         initer.initialize(false);
         File specFile = new File(moduleName, moduleName + ".spec");
         String specText = FileUtils.readFileToString(specFile).replace("};", 
@@ -210,24 +205,24 @@ public class DockerClientServerTester {
     }
     
     protected static String prepareDockerImage(File moduleDir, 
-            String user, String pwd) throws Exception {
+            AuthToken token) throws Exception {
         String moduleName = moduleDir.getName();
         correctDockerfile(moduleDir);
         File testCfgFile = new File(moduleDir, "test_local/test.cfg");
-        String testCfgText = FileUtils.readFileToString(testCfgFile);
-        testCfgText = testCfgText.replace("test_user=", "test_user=" + user);
-        testCfgText = testCfgText.replace("test_password=", "test_password=" + pwd);
-        testCfgText = testCfgText.replace("kbase_endpoint=https://appdev", 
-                "kbase_endpoint=https://ci");
+        String testCfgText = ""+
+                "test_token=" + token.getToken() + "\n" +
+                "kbase_endpoint=" + TestConfigHelper.getKBaseEndpoint() + "\n" +
+                "auth_service_url=" + TestConfigHelper.getAuthServiceUrl() + "\n" +
+                "auth_service_url_allow_insecure=" + 
+                TestConfigHelper.getAuthServiceUrlInsecure() + "\n";
         FileUtils.writeStringToFile(testCfgFile, testCfgText);
         File tlDir = new File(moduleDir, "test_local");
-        String token = AuthService.login(user, pwd).getTokenString();
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
         FileWriter fw = new FileWriter(tokenFile);
         try {
-            fw.write(token);
+            fw.write(token.getToken());
         } finally {
             fw.close();
         }
@@ -244,8 +239,6 @@ public class DockerClientServerTester {
             boolean async, boolean dynamic, String serverType) throws Exception { 
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
-        //TODO AUTH make configurable?
-        AuthToken token = AuthService.login(user, pwd).getToken();
         ClientInstaller clInst = new ClientInstaller(moduleDir, true);
         String input = "Super-string";
         // Java client
@@ -348,7 +341,7 @@ public class DockerClientServerTester {
         File shellFile = new File(moduleDir, "test_python_client.sh");
         List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
         lines.add("python " + new File("test_scripts/python/test_client.py").getAbsolutePath() + 
-                " -t " + configFile.getAbsolutePath() + " -u " + user + " -p " + pwd +
+                " -t " + configFile.getAbsolutePath() + " -o " + token.getToken() +
                 " -e " + clientEndpointUrl);
         TextUtils.writeFileLines(lines, shellFile);
         {
@@ -381,8 +374,8 @@ public class DockerClientServerTester {
         lines.add("export PERL5LIB=" + pathToSdk + "/lib/:" +
                 pathToSdk + "/submodules/auth/Bio-KBase-Auth/lib:$PERL5LIB");
         lines.add("perl " + new File("test_scripts/perl/test-client.pl").getAbsolutePath() + 
-                " -tests " + configFilePerl.getAbsolutePath() + " -user " + user + 
-                " -password " + pwd + " -endpoint " + clientEndpointUrl
+                " -tests " + configFilePerl.getAbsolutePath() + " -token " + token.getToken() + 
+                " -endpoint " + clientEndpointUrl
                 );
         TextUtils.writeFileLines(lines, shellFile);
         {
@@ -412,10 +405,10 @@ public class DockerClientServerTester {
         shellFile = new File(moduleDir, "test_js_client.sh");
         lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
         lines.addAll(Arrays.asList(
-                "casperjs test " + new File("test_scripts/js/test-client.js").getAbsolutePath() + " "
-                        + "--jq=" + new File("test_scripts/js/jquery-1.10.2.min.js").getAbsolutePath() + " "
-                        + "--tests=" + configFile.getAbsolutePath() + 
-                        " --endpoint=" + clientEndpointUrl + " --token=\"" + token.getToken() + "\""
+                "casperjs test " + new File("test_scripts/js/test-client.js").getAbsolutePath() +
+                " --jq=" + new File("test_scripts/js/jquery-1.10.2.min.js")
+                .getAbsolutePath() + " --tests=" + configFile.getAbsolutePath() + 
+                " --endpoint=" + clientEndpointUrl + " --token=\"" + token.getToken() + "\""
                 ));
         TextUtils.writeFileLines(lines, shellFile);
         {
@@ -440,7 +433,6 @@ public class DockerClientServerTester {
             boolean async, boolean dynamic, String serverType) throws Exception {
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
-        AuthToken token = AuthService.login(user, pwd).getToken();
         // Java client
         System.out.println("Java client (status) -> " + serverType + " server");
         ClientInstaller clInst = new ClientInstaller(moduleDir, true);
@@ -510,10 +502,11 @@ public class DockerClientServerTester {
         {
             File shellFile = new File(moduleDir, "test_python_client.sh");
             List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
-            lines.add("python " + new File("test_scripts/python/run_client.py").getAbsolutePath() + 
+            lines.add("python " + new File("test_scripts/python/run_client.py").getAbsolutePath() +
                     " -e " + clientEndpointUrl + " -g " + pcg + " -c " + cls + " -m " + mtd + 
                     " -i " + inputFile.getAbsolutePath() + " -o " + outputFile.getAbsolutePath() + 
-                    " -r " + errorFile.getAbsolutePath() + (async ? (" -u " + user + " -p " + pwd) : ""));
+                    " -r " + errorFile.getAbsolutePath() + 
+                    (async ? (" -t " + token.getToken()) : ""));
             TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     new File(lib2, moduleName).getCanonicalFile(), null, true, true);
@@ -550,7 +543,7 @@ public class DockerClientServerTester {
                     " -output " + outputFile.getAbsolutePath() + 
                     " -error " + errorFile.getAbsolutePath() +
                     " -endpoint " + clientEndpointUrl +
-                    (async ? (" -user " + user + " -password " + pwd) : ""));
+                    (async ? (" -token " + token.getToken()) : ""));
             TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(
                     lib2.getCanonicalFile(), null, true, true);
@@ -584,12 +577,12 @@ public class DockerClientServerTester {
             List<String> lines = new ArrayList<String>(Arrays.asList("#!/bin/bash"));
             lines.addAll(Arrays.asList(
                     "phantomjs " + new File("test_scripts/js/run-client.js").getAbsolutePath() +
-                            " --jq=" + new File("test_scripts/js/jquery-1.10.2.min.js").getAbsolutePath() +
-                            " --input=" + inputFile.getAbsolutePath() + 
-                            " --output=" + outputFile.getAbsolutePath() + 
-                            " --error=" + errorFile.getAbsolutePath() + 
-                            " --package=" + pcg + " --class=" + cls + " --method=" + mtd +
-                            " --endpoint=" + clientEndpointUrl +  (async ? (" --token=\"" + token.getToken() + "\"") : "")
+                    " --jq=" + new File("test_scripts/js/jquery-1.10.2.min.js")
+                    .getAbsolutePath() + " --input=" + inputFile.getAbsolutePath() + 
+                    " --output=" + outputFile.getAbsolutePath() + 
+                    " --error=" + errorFile.getAbsolutePath() + " --package=" + pcg + 
+                    " --class=" + cls + " --method=" + mtd + " --endpoint=" + clientEndpointUrl +
+                    (async ? (" --token=\"" + token.getToken() + "\"") : "")
                     ));
             TextUtils.writeFileLines(lines, shellFile);
             ProcessHelper ph = ProcessHelper.cmd("bash", shellFile.getCanonicalPath()).exec(

@@ -9,6 +9,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import us.kbase.scripts.test.TestConfigHelper;
 import us.kbase.scripts.test.TypeGeneratorTest;
 
 public class AsyncDockerTest extends DockerClientServerTester {
@@ -26,7 +27,7 @@ public class AsyncDockerTest extends DockerClientServerTester {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         execEngineJettyServer.setHandler(context);
-        execEngine = new ExecEngineMock().withKBaseEndpoint("https://ci.kbase.us/services");
+        execEngine = new ExecEngineMock().withKBaseEndpoint(TestConfigHelper.getKBaseEndpoint());
         context.addServlet(new ServletHolder(execEngine), "/*");
         execEngineJettyServer.start();
     }
@@ -40,7 +41,7 @@ public class AsyncDockerTest extends DockerClientServerTester {
     
     private static void testAsyncClients(File moduleDir, String serverType) throws Exception {
         try {
-            String dockerImage = prepareDockerImage(moduleDir, user, pwd);
+            String dockerImage = prepareDockerImage(moduleDir, token);
             execEngine.withModule(moduleDir.getName(), dockerImage, moduleDir);
             String clientEndpointUrl = "http://localhost:" + execEnginePort;
             testClients(moduleDir, clientEndpointUrl, true, false, serverType);

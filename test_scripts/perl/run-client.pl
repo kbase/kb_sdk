@@ -116,7 +116,7 @@ eval("use $client_module;");
 #instantiate an authenticated client and a nonauthenticated client
 my $client;
 
-if($user && $password) {
+if($token) {
     if ($async_job_check_time_ms) {
         $client=$client_module->new($endpoint, token=>$token, async_job_check_time_ms=>$async_job_check_time_ms);
     } else {
