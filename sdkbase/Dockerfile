@@ -16,6 +16,12 @@ RUN \
   cd /kb/dev_container/modules/auth && \
   make && make deploy
 
+COPY ./lets_encript/lets-encrypt-x3-cross-signed.der /tmp/
+RUN keytool -import -keystore /usr/lib/jvm/java-7-oracle/jre/lib/security/cacerts \
+    -storepass changeit -noprompt -trustcacerts -alias letsencryptauthorityx31 \
+    -file /tmp/lets-encrypt-x3-cross-signed.der
+RUN rm /tmp/lets-encrypt-x3-cross-signed.der
+
 # Update kb_sdk at build time
 ONBUILD RUN \
   . /kb/dev_container/user-env.sh && \
