@@ -48,7 +48,6 @@ import us.kbase.kbasejobservice.KBaseJobServiceServer;
 import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbService;
 import us.kbase.kidl.KidlParser;
-import us.kbase.kidl.test.KidlTest;
 import us.kbase.mobu.compiler.JavaData;
 import us.kbase.mobu.compiler.JavaFunc;
 import us.kbase.mobu.compiler.JavaModule;
@@ -898,19 +897,7 @@ public class TypeGeneratorTest extends Assert {
 			File libDir, String testFileName, File srcDir,
 			String gwtPackageName, URL defaultUrl, boolean isDynamic) throws Exception {
 		File specFile = new File(workDir, testFileName);
-		File typecompDir = new File(workDir, "../../typecomp").getCanonicalFile();
-		Map<String, Map<String, String>> origSchemas = new LinkedHashMap<String, Map<String, String>>();
-		long time1 = System.currentTimeMillis();
-		Map<?,?> origMap = KidlParser.parseSpecExt(specFile, workDir, origSchemas, typecompDir);
-		time1 = System.currentTimeMillis() - time1;
-		Map<String, Map<String, String>> intSchemas = new LinkedHashMap<String, Map<String, String>>();
-		long time2 = System.currentTimeMillis();
-		Map<?,?> intMap = KidlParser.parseSpecInt(specFile, intSchemas);
-		time2 = System.currentTimeMillis() - time2;
-		//System.out.println("Compilation time: " + time1 + " vs " + time2);
-		Assert.assertTrue(KidlTest.compareJson(origMap, intMap, "Parsing result for " + testFileName));
-		Assert.assertTrue(KidlTest.compareJsonSchemas(origSchemas, intSchemas, "Json schema for " + testFileName));
-		List<KbService> services = KidlParser.parseSpec(specFile, workDir, null, null, true);
+		List<KbService> services = KidlParser.parseSpec(specFile, null);
 		JavaData parsingData = JavaTypeGenerator.processSpec(services, new DiskFileSaver(srcDir), 
 		        testPackage, true, new DiskFileSaver(libDir), gwtPackageName, defaultUrl, 
 		        new OneFileSaver(new File(workDir, "build.xml")), 

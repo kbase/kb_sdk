@@ -570,7 +570,7 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_2";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.7";
+        String ver = "0.0.8";
         Map<String, Object> methparams = new HashMap<String, Object>();
         methparams.put("id", "myid");
         Map<String, Object> results = res.callMethod(
@@ -604,11 +604,12 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_1";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.2";
+        String ver = "0.0.3";
+        String commit1 = "de445aa9c3404d68be3a87b03c1dbf2f3fccba24";
         final ModuleRunVersion runver = new ModuleRunVersion(
                 new URL("https://github.com/kbasetest/njs_sdk_test_1"),
                 new ModuleMethod(moduleName + "." + methodName),
-                "d0a452d6194cf4289df03585912ab1c7d8ee180c", ver, release);
+                commit1, ver, release);
         List<String> wsobjs = Arrays.asList("foo", "bar", "baz");
         List<UObject> params = new ArrayList<UObject>();
         params.add(new UObject(Arrays.asList("foo", "bar")));
@@ -617,6 +618,7 @@ public class CallbackServerTest {
         final CallbackStuff res = startCallBackServer(runver, params, wsobjs);
         System.out.println("Running multiCallProvenance in dir " + res.tempdir);
         String moduleName2 = "njs_sdk_test_2";
+        String commit2 = "3cd0ed213d8376349bdb0f454c5f5bc8b31ea650";
         @SuppressWarnings("unchecked")
         Map<String, Object> methparams = UObject.transformStringToObject(
                 String.format(
@@ -637,23 +639,23 @@ public class CallbackServerTest {
              "}",
              moduleName2 + "." + methodName,
              // dev is on this commit
-             "07366d715b697b6f9eac9eaba3ec0993c361b71a",
+             commit2,
              moduleName + "." + methodName,
              // this is the latest commit, but a prior commit is registered
              //for dev
-             "5178356a8a7f63be055cc581e9ea90dd53d6aed3",
+             commit1,
              moduleName2 + "." + methodName,
              "dev"), Map.class);
         List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
         expsas.add(new SubActionSpec()
             .withMod(moduleName)
-            .withVer("0.0.2")
+            .withVer("0.0.3")
             .withRel("dev")
         );
         expsas.add(new SubActionSpec()
             .withMod(moduleName2)
-            .withVer("0.0.7")
-            .withCommit("07366d715b697b6f9eac9eaba3ec0993c361b71a")
+            .withVer("0.0.8")
+            .withCommit(commit2)
         );
         Map<String, Object> results = res.callMethod(
                 moduleName + '.' + methodName, methparams, "dev");

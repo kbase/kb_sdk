@@ -16,8 +16,8 @@ from requests import ConnectionError
 
 class TestAuth(unittest.TestCase):
 
-    AUTHURL = 'test.auth.url'
-    TOKEN1 = 'test.token1'
+    AUTHURL = 'test.auth-service-url'
+    TOKEN1 = 'test.token'
     TOKEN2 = 'test.token2'
 
     CFG_SEC = 'kb_sdk_test'

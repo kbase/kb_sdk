@@ -278,6 +278,13 @@ public class ModuleTester {
                 break;
             }
         }
+        if (ret == null) {
+            System.out.println("Can't find image [" + imageName + "]. Here is 'docker images' output:");
+            for (String line : lines) {
+                System.out.println("\t" + line);
+            }
+            System.out.println();
+        }
         return ret;
     }
 
