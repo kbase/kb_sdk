@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,10 +13,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.yaml.snakeyaml.Yaml;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleVersion;
@@ -94,8 +100,10 @@ public class ClientInstaller {
         String semanticVersion = null;
         String gitUrl = null;
         String gitCommitHash = null;
+        String filePath = null;
         if (moduleName.contains("/") || moduleName.contains("\\")) {
             // This is the case for local spec-file processing (defined by file path or URL)
+            filePath = moduleName;
             if (isLocalFile(moduleName)) {
                 final File specFile = new File(moduleName);
                 final File dir = specFile.getParentFile();
@@ -176,15 +184,15 @@ public class ClientInstaller {
         }
         if (async && dynamic) {
             compile(lang, async, false, tagVer, verbose, moduleName, libDirName, fp, 
-                    semanticVersion, gitUrl, gitCommitHash, clientName);
+                    semanticVersion, gitUrl, gitCommitHash, clientName, filePath);
             if (clientName == null) {
                 clientName = moduleName;
             }
             compile(lang, false, dynamic, tagVer, verbose, moduleName, libDirName, fp, 
-                    semanticVersion, gitUrl, gitCommitHash, clientName + "Service");
+                    semanticVersion, gitUrl, gitCommitHash, clientName + "Service", filePath);
         } else {
             compile(lang, async, dynamic, tagVer, verbose, moduleName, libDirName, fp, 
-                    semanticVersion, gitUrl, gitCommitHash, clientName);
+                    semanticVersion, gitUrl, gitCommitHash, clientName, filePath);
         }
         return 0;
     }
@@ -192,7 +200,7 @@ public class ClientInstaller {
     private void compile(String lang, boolean async, boolean dynamic, String tagVer, 
             boolean verbose, String moduleName, String libDirName, FileProvider fp, 
             String semanticVersion, String gitUrl, String gitCommitHash,
-            String clientName) throws Exception {
+            String clientName, String filePath) throws Exception {
         String url = null;
         String clientAsyncVer = null;
         String dynservVer = null;
@@ -294,10 +302,45 @@ public class ClientInstaller {
             if (isJS)
                 jsClientName = moduleName + "/" + clientName + "Client";
             FileSaver output = new DiskFileSaver(libDir);
-            TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl, perlClientName, 
-                    false, null, null, null, isPython, pyClientName, false, null, null, isR, 
-                    rClientName, false, null, null, false, ip, output, null, null, 
+            TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl, 
+                    perlClientName, false, null, null, null, isPython, pyClientName, false, null,
+                    null, isR, rClientName, false, null, null, false, ip, output, null, null, 
                     async, clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
+        }
+        // Now let's add record about this client to dependencies.json file
+        boolean isSdk = dynamic || async;
+        String versionTag = isSdk ? (tagVer == null ? "release" : tagVer) : null;
+        FileSaver depsDir = new DiskFileSaver(moduleDir);
+        addDependency(moduleName, isSdk, versionTag, filePath, depsDir);
+    }
+    
+    public static void addDependency(String moduleName, boolean isSdk, String versionTag, 
+            String filePath, FileSaver depsDir) throws Exception {
+        Map<String, Dependency> depMap = new TreeMap<String, Dependency>();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        File depsFile = depsDir.getAsFileOrNull("dependencies.json");
+        if (depsFile != null && depsFile.exists()) {
+            try {
+                List<Dependency> deps = mapper.readValue(depsFile, 
+                        new TypeReference<List<Dependency>>() {});
+                for (Dependency dep : deps) {
+                    depMap.put(dep.moduleName.toLowerCase(), dep);
+                }
+            } catch (Exception ex) {
+                throw new IllegalStateException("Error parsing depedencies file [" + depsFile +
+                        "]: " + ex.getMessage(), ex);
+            }
+        }
+        Dependency dep = new Dependency();
+        dep.moduleName = moduleName;
+        dep.type = isSdk ? "sdk" : "core";
+        dep.versionTag = versionTag;
+        dep.filePath = filePath;
+        depMap.put(moduleName.toLowerCase(), dep);
+        List<Dependency> deps = new ArrayList<Dependency>(depMap.values());
+        try (Writer depsWr = depsDir.openWriter("dependencies.json")) {
+            mapper.writeValue(depsWr, deps);
         }
     }
     
