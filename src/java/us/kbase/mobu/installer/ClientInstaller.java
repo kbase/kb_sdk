@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleVersion;
 import us.kbase.catalog.SelectModuleVersion;
 import us.kbase.catalog.SpecFile;
-import us.kbase.common.service.UObject;
 import us.kbase.jkidl.IncludeProvider;
 import us.kbase.jkidl.ParseException;
 import us.kbase.jkidl.SpecParser;
@@ -310,16 +310,17 @@ public class ClientInstaller {
         // Now let's add record about this client to dependencies.json file
         boolean isSdk = dynamic || async;
         String versionTag = isSdk ? (tagVer == null ? "release" : tagVer) : null;
-        addDependency(moduleName, isSdk, versionTag, filePath, moduleDir);
+        FileSaver depsDir = new DiskFileSaver(moduleDir);
+        addDependency(moduleName, isSdk, versionTag, filePath, depsDir);
     }
     
     public static void addDependency(String moduleName, boolean isSdk, String versionTag, 
-            String filePath, File moduleDir) throws Exception {
+            String filePath, FileSaver depsDir) throws Exception {
         Map<String, Dependency> depMap = new TreeMap<String, Dependency>();
-        File depsFile = new File(moduleDir, "dependencies.json");
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        if (depsFile.exists()) {
+        File depsFile = depsDir.getAsFileOrNull("dependencies.json");
+        if (depsFile != null && depsFile.exists()) {
             try {
                 List<Dependency> deps = mapper.readValue(depsFile, 
                         new TypeReference<List<Dependency>>() {});
@@ -338,7 +339,9 @@ public class ClientInstaller {
         dep.filePath = filePath;
         depMap.put(moduleName.toLowerCase(), dep);
         List<Dependency> deps = new ArrayList<Dependency>(depMap.values());
-        mapper.writeValue(depsFile, deps);
+        try (Writer depsWr = depsDir.openWriter("dependencies.json")) {
+            mapper.writeValue(depsWr, deps);
+        }
     }
     
     private static boolean isUrl(String url) {

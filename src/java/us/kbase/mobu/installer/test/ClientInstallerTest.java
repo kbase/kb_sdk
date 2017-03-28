@@ -26,7 +26,7 @@ public class ClientInstallerTest {
     
     @AfterClass
     public static void teardownClass() throws Exception {
-        if (tempDir.exists()) {
+        if (tempDir != null && tempDir.exists()) {
             FileUtils.deleteQuietly(tempDir);
         }
     }
@@ -48,6 +48,7 @@ public class ClientInstallerTest {
         //ProcessHelper.cmd("ls", "-l", dir.getAbsolutePath()).exec(moduleDir);
         Assert.assertTrue(new File(dir, "OnerepotestClient.java").exists());
         Assert.assertTrue(new File(dir, "OnerepotestServiceClient.java").exists());
+        checkDeps(moduleDir);
     }
     
     @Test
@@ -66,5 +67,22 @@ public class ClientInstallerTest {
         File dir = new File(moduleDir, "lib/" + module2);
         Assert.assertTrue(new File(dir, "onerepotestClient.py").exists());
         Assert.assertTrue(new File(dir, "onerepotestServiceClient.py").exists());
+        checkDeps(moduleDir);
+    }
+    
+    private static void checkDeps(File moduleDir) throws Exception {
+        File depsFile = new File(moduleDir, "dependencies.json");
+        Assert.assertTrue(depsFile.exists());
+        String expectedText = "" +
+                "[ {\n" +
+                "  \"module_name\" : \"onerepotest\",\n" +
+                "  \"type\" : \"sdk\",\n" +
+                "  \"version_tag\" : \"dev\"\n" +
+                "}, {\n" +
+                "  \"module_name\" : \"Workspace\",\n" +
+                "  \"type\" : \"core\",\n" +
+                "  \"file_path\" : \"https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec\"\n" +
+                "} ]";
+        Assert.assertEquals(expectedText, FileUtils.readFileToString(depsFile));
     }
 }
