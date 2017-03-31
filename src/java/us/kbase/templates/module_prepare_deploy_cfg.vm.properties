@@ -29,10 +29,12 @@ if __name__ == "__main__":
                 "njsw_url = " + kbase_endpoint + "/njs_wrapper\n"
         if "AUTH_SERVICE_URL" in os.environ:
             props += "auth_service_url = " + os.environ.get("AUTH_SERVICE_URL") + "\n"
-        elif "auth2services" in kbase_endpoint:
-            props += "auth_service_url = " + kbase_endpoint + "/auth/api/legacy/KBase/Sessions/Login\n"
         props += "auth_service_url_allow_insecure = " + \
                  os.environ.get("AUTH_SERVICE_URL_ALLOW_INSECURE", "false") + "\n"
+        for key in os.environ:
+            if key.startswith('KBASE_SECURE_CONFIG_PARAM_'):
+                param_name = key[len('KBASE_SECURE_CONFIG_PARAM_'):]
+                props += param_name + " = " + os.environ.get(key) + "\n"
         config.readfp(StringIO.StringIO(props))
     else:
         raise ValueError('Neither ' + sys.argv[2] + ' file nor KBASE_ENDPOINT env-variable found')

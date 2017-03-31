@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import us.kbase.auth.AuthConfig;
 import us.kbase.auth.AuthToken;
@@ -25,6 +27,7 @@ public class ConfigLoader {
     private final String srvWizUrl;
     private final String njswUrl;
     private final String catalogUrl;
+    private final Map<String, String> secureCfgParams;
 
     public ConfigLoader(Properties props, boolean testMode, 
             String configPathInfo, boolean tryHomeCfg) throws Exception {
@@ -74,6 +77,14 @@ public class ConfigLoader {
         srvWizUrl = getConfigUrl(props, "srv_wiz_url", endPoint, "service_wizard");
         njswUrl = getConfigUrl(props, "njsw_url", endPoint, "njs_wrapper");
         catalogUrl = getConfigUrl(props, "catalog_url", endPoint, "catalog");
+        secureCfgParams = new TreeMap<String, String>();
+        for (Object propObj : props.keySet()) {
+            String propName = propObj.toString();
+            if (propName.startsWith("secure.")) {
+                String paramName = propName.substring(7);
+                secureCfgParams.put(paramName, props.getProperty(propName));
+            }
+        }
     }
     
     public String getAuthUrl() {
@@ -134,6 +145,9 @@ public class ConfigLoader {
             pw.println("auth_service_url = " + authUrl);
             pw.println("auth_service_url_allow_insecure = " + 
                     (authAllowInsecure == null ? "false" : authAllowInsecure));
+            for (String param : secureCfgParams.keySet()) {
+                pw.println(param + " = " + secureCfgParams.get(param));
+            }
         } finally {
             pw.close();
         }
