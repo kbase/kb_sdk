@@ -1,5 +1,7 @@
 FROM kbase/deplbase:latest
 
+COPY ./sdkbase.build.tag /tmp/
+
 # Fix Python SSL warnings
 RUN apt-get install python-dev libffi-dev libssl-dev \
     && pip install pyopenssl ndg-httpsclient pyasn1 \
@@ -23,7 +25,7 @@ RUN keytool -import -keystore /usr/lib/jvm/java-7-oracle/jre/lib/security/cacert
 RUN rm /tmp/lets-encrypt-x3-cross-signed.der
 
 # Update kb_sdk at build time
-ONBUILD RUN \
+RUN \
   . /kb/dev_container/user-env.sh && \
   rm /kb/runtime/java && \
   ln -s /usr/lib/jvm/java-7-oracle /kb/runtime/java && \
@@ -31,7 +33,7 @@ ONBUILD RUN \
   rm -rf jars && \
   git clone https://github.com/kbase/jars && \
   rm -rf kb_sdk && \
-  git clone https://github.com/kbase/kb_sdk -b auth2 && \
+  git clone https://github.com/kbase/kb_sdk -b develop && \
   cd /kb/dev_container/modules/jars && \
   make && make deploy && \
   cd /kb/dev_container/modules/kb_sdk && \
