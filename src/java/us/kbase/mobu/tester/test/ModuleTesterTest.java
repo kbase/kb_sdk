@@ -7,37 +7,29 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.ini4j.Ini;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.common.test.TestException;
+import us.kbase.auth.AuthToken;
 import us.kbase.mobu.ModuleBuilder;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.initializer.test.DockerClientServerTester;
 import us.kbase.mobu.tester.ModuleTester;
+import us.kbase.scripts.test.TestConfigHelper;
 
 public class ModuleTesterTest {
 
 	private static final String SIMPLE_MODULE_NAME = "ASimpleModule_for_unit_testing";
 	private static final boolean cleanupAfterTests = true;
 	
-	private static final String TEST_CFG = "kb_sdk_test";
-	
 	private static List<String> createdModuleNames = new ArrayList<String>();
-	private static String user;
-	private static String pwd;
+	private static AuthToken token;
 	
     @BeforeClass
     public static void beforeClass() throws Exception {
-        final Ini testini = new Ini(new File("test_scripts/test.cfg"));
-        user = testini.get(TEST_CFG, "test.user");
-        pwd = testini.get(TEST_CFG, "test.pwd");
-        if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
-            throw new TestException("missing user and / or pws from test cfg");
-        }
+        token = TestConfigHelper.getToken();
     }
 
 	@AfterClass
@@ -66,30 +58,32 @@ public class ModuleTesterTest {
     private void init(String lang, String moduleName) throws Exception {
         deleteDir(moduleName);
         createdModuleNames.add(moduleName);
-        ModuleInitializer initer = new ModuleInitializer(moduleName, user, lang, false);
+        ModuleInitializer initer = new ModuleInitializer(moduleName, token.getUserName(), 
+                lang, false);
         initer.initialize(true);
     }
 
-	private int runTestsInDocker(String moduleName) throws Exception {
-	    File moduleDir = new File(moduleName);
-	    return runTestsInDocker(moduleDir, user, pwd);
-	}
-	
-	public static int runTestsInDocker(File moduleDir, String user, String pwd) throws Exception {
-	    return runTestsInDocker(moduleDir, user, pwd, false);
+    private int runTestsInDocker(String moduleName) throws Exception {
+        File moduleDir = new File(moduleName);
+        return runTestsInDocker(moduleDir, token);
+    }
+
+	public static int runTestsInDocker(File moduleDir, AuthToken token) throws Exception {
+	    return runTestsInDocker(moduleDir, token, false);
 	}
 
-	public static int runTestsInDocker(File moduleDir, String user, String pwd, 
+	public static int runTestsInDocker(File moduleDir, AuthToken token, 
 	        boolean skipValidation) throws Exception {
 	    DockerClientServerTester.correctDockerfile(moduleDir);
 	    File testCfgFile = new File(moduleDir, "test_local/test.cfg");
-	    String testCfgText = FileUtils.readFileToString(testCfgFile);
-	    testCfgText = testCfgText.replace("test_user=", "test_user=" + user);
-        testCfgText = testCfgText.replace("test_password=", "test_password=" + pwd);
-        testCfgText = testCfgText.replace("kbase_endpoint=https://appdev", 
-                "kbase_endpoint=https://ci");
+        String testCfgText = ""+
+                "test_token=" + token.getToken() + "\n" +
+                "kbase_endpoint=" + TestConfigHelper.getKBaseEndpoint() + "\n" +
+                "auth_service_url=" + TestConfigHelper.getAuthServiceUrl() + "\n" +
+                "auth_service_url_allow_insecure=" + 
+                TestConfigHelper.getAuthServiceUrlInsecure() + "\n";
         FileUtils.writeStringToFile(testCfgFile, testCfgText);
-	    int exitCode = new ModuleTester(moduleDir).runTests(ModuleBuilder.DEFAULT_METHOD_STORE_URL,
+        int exitCode = new ModuleTester(moduleDir).runTests(ModuleBuilder.DEFAULT_METHOD_STORE_URL,
 	            skipValidation, false);
 	    System.out.println("Exit code: " + exitCode);
 	    return exitCode;
@@ -229,7 +223,7 @@ public class ModuleTesterTest {
         File moduleDir = new File(moduleName);
         File implFile = new File(moduleDir, "lib/" + moduleName + "/" + 
                 moduleName + "Impl.py");
-        ModuleInitializer initer = new ModuleInitializer(moduleName, user, lang, false);
+        ModuleInitializer initer = new ModuleInitializer(moduleName, token.getUserName(), lang, false);
         initer.initialize(false);
         File specFile = new File(moduleDir, moduleName + ".spec");
         String specText = FileUtils.readFileToString(specFile).replace("};", 
@@ -244,7 +238,7 @@ public class ModuleTesterTest {
         FileUtils.writeStringToFile(specFile, specText);
         FileUtils.writeStringToFile(implFile, implInit);
         FileUtils.writeStringToFile(testFile, testCode);
-        int exitCode = runTestsInDocker(moduleDir, user, pwd, true);
+        int exitCode = runTestsInDocker(moduleDir, token, true);
         Assert.assertEquals(0, exitCode);
    }
 }

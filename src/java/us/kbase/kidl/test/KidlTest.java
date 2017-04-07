@@ -375,35 +375,27 @@ public class KidlTest {
 				"  /* Real comment for type1 */\n" +
 				"  typedef string test1;\n" +
 				"};",
-				"module RefCount {" +
-				"/* @id ws */" +
-				"typedef string reference;" +
-				"/* @optional ref */" + 
-				"typedef structure {" +
-				"reference ref;" +
-				"} RefType;" +
+				"module Test15 {" +
+				"  /* @id ws */" +
+				"  typedef string reference;" +
+				"  /* @optional ref */" + 
+				"  typedef structure {" +
+				"    reference ref;" +
+				"  } RefType;" +
 				"};"
 		};
 		boolean ok = true;
 		for (int testNum = 0; testNum < tests.length; testNum++) {
-			if (testNum + 1 == 14)
-				continue;
 			File workDir = prepareWorkDir();
 			File specFile = prepareSpec(workDir, tests[testNum]);
-			Map<String, Map<String, String>> schemas1 = new HashMap<String, Map<String, String>>();
-			Map<?,?> parse1 = KidlParser.parseSpecExt(specFile, workDir, schemas1, getTypecompDir());
+			Map<?,?> parse1 = loadMapFromJsonResource("spec.i" + (testNum + 1));
 			Map<String, Map<String, String>> schemas2 = new HashMap<String, Map<String, String>>();
 			Map<?,?> parse2 = KidlParser.parseSpecInt(specFile, schemas2);
 			ok = ok & compareJson(parse1, parse2, "Parsing result for test #" + (testNum + 1));
-			ok = ok & compareJsonSchemas(schemas1, schemas2, "Json schema for test #" + (testNum + 1));
 		}
 		Assert.assertTrue(ok);
 	}
 
-	private static File getTypecompDir() throws IOException {
-	    return new File("typecomp").getCanonicalFile();
-	}
-	
 	public static List<Integer> getTestSpecNumbers() {
 	    List<Integer> ret = new ArrayList<Integer>();
         for (int testNum = 1; testNum <= 22; testNum++) {
@@ -429,6 +421,8 @@ public class KidlTest {
 			try {
 				parseSpec(testNum, specFile, workDir);
 			} catch (Exception ex) {
+			    System.err.println("Error for test " + testNum);
+			    ex.printStackTrace();
 				ok = false;
 			}
 		}
@@ -439,12 +433,10 @@ public class KidlTest {
 			throws KidlParseException, IOException, InterruptedException,
 			ParserConfigurationException, SAXException, Exception,
 			JsonGenerationException, JsonMappingException, JsonParseException {
-		Map<String, Map<String, String>> schemas1 = new HashMap<String, Map<String, String>>();
-		Map<?,?> parse1 = KidlParser.parseSpecExt(specFile, workDir, schemas1, getTypecompDir());
+		Map<?,?> parse1 = loadMapFromJsonResource("spec." + testNum);
 		Map<String, Map<String, String>> schemas2 = new HashMap<String, Map<String, String>>();
 		Map<?, ?> parse = KidlParser.parseSpecInt(specFile, schemas2);
 		Assert.assertTrue(compareJson(parse1, parse, "Parsing result for test #" + (testNum + 1)));
-		Assert.assertTrue(compareJsonSchemas(schemas1, schemas2, "Json schema for test #" + (testNum + 1)));
 		return KidlParser.parseSpec(parse);
 	}
 
@@ -501,6 +493,18 @@ public class KidlTest {
 		return mapper.writeValueAsString(schemaMap);
 	}
 	
+	@SuppressWarnings("unchecked")
+    private static Map<String, Object> loadMapFromJsonResource(String resourceName)
+	        throws JsonParseException, JsonMappingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        InputStream is = KidlTest.class.getResourceAsStream(resourceName + ".json.properties");
+        try {
+            return mapper.readValue(is, Map.class);
+        } finally {
+            is.close();
+        }
+	}
+	
 	private static String writeJson(Object obj) 
 			throws JsonGenerationException, JsonMappingException, IOException {
 		StringWriter sw = new StringWriter();
@@ -548,7 +552,7 @@ public class KidlTest {
 				"    float val2;\n" +
 				"  } my_struct;\n" +
 				"};");
-		List<KbService> srvList = parseSpec(0, specFile, workDir);
+		List<KbService> srvList = parseSpec(23, specFile, workDir);
 		KbModule module = getModule(srvList);
 		List<KbModuleComp> cmpList = module.getModuleComponents();
 		Assert.assertEquals(1, cmpList.size());
@@ -583,22 +587,9 @@ public class KidlTest {
 				"    float val2;\n" +
 				"  } my_struct;\n" +
 				"};");
-		List<KbService> srvList = KidlParser.parseSpec(specFile, workDir, null, getTypecompDir(), false);
+		List<KbService> srvList = KidlParser.parseSpec(specFile, null);
 		KbModule module = getModule(srvList);
-		List<KbModuleComp> cmpList = module.getModuleComponents();
-		Assert.assertEquals(3, cmpList.size());
-		for (int i = 0; i < cmpList.size(); i++) {
-			Assert.assertEquals(KbTypedef.class, cmpList.get(i).getClass());
-			KbTypedef typedef = (KbTypedef)cmpList.get(i);
-			if (typedef.getName().endsWith("_ref")) {
-				String actualRefList = "" + typedef.getAnnotations().getIdReference().getAttributes();
-				String expectedRefList = typedef.getName().startsWith("full_") ? "[Test.my_struct]" : "[]";
-				Assert.assertEquals(expectedRefList, actualRefList);
-			}
-		}
-		srvList = KidlParser.parseSpec(specFile, workDir, null, null, true);
-		module = getModule(srvList);
-		cmpList = module.getModuleComponents();
+		List<KbModuleComp>cmpList = module.getModuleComponents();
 		Assert.assertEquals(3, cmpList.size());
 		for (int i = 0; i < cmpList.size(); i++) {
 			Assert.assertEquals(KbTypedef.class, cmpList.get(i).getClass());
@@ -619,7 +610,7 @@ public class KidlTest {
 				"  bebebe\n" +
 				"};");
 		try {
-			KidlParser.parseSpec(specFile, workDir, null);
+			KidlParser.parseSpec(specFile, null);
 			Assert.fail();
 		} catch (KidlParseException ex) {
 			Assert.assertTrue(ex.getMessage().contains("bebebe"));
@@ -742,7 +733,7 @@ public class KidlTest {
 		for (int testNum = 0; testNum < specAndResult.length; testNum++) {
 			specFile = prepareSpec(workDir, specAndResult[testNum][0]);
 			try {
-				KidlParser.parseSpec(specFile, workDir, null, null, true);
+				KidlParser.parseSpec(specFile, null);
 				Assert.fail();
 			} catch (Exception ex) {
 				boolean expectedError = ex.getMessage().contains(specAndResult[testNum][1]);
@@ -858,7 +849,7 @@ public class KidlTest {
         for (int testNum = 0; testNum < specAndResult2.length; testNum++) {
             specFile = prepareSpec(workDir, specAndResult2[testNum][0]);
             try {
-                KidlParser.parseSpec(specFile, workDir, null, null, true);
+                KidlParser.parseSpec(specFile, null);
                 if (specAndResult2[testNum].length > 1)
                     Assert.fail("Good for case: " + specAndResult2[testNum][0]);
             } catch (Exception ex) {
@@ -879,7 +870,7 @@ public class KidlTest {
 				"module Test {\n" +
 				"  typedef tuple<string fid, string fid, string fid> t;\n" +
 				"};");
-		List<KbService> srvList = parseSpec(0, specFile, workDir);
+		List<KbService> srvList = parseSpec(24, specFile, workDir);
 		KbModule module = getModule(srvList);
 		List<KbModuleComp> cmpList = module.getModuleComponents();
 		Assert.assertEquals(1, cmpList.size());
@@ -899,7 +890,7 @@ public class KidlTest {
 				"module Test {\n" +
 				"  typedef tuple<string, string, string> t;\n" +
 				"};");
-		List<KbService> srvList = parseSpec(0, specFile, workDir);
+		List<KbService> srvList = parseSpec(25, specFile, workDir);
 		KbModule module = getModule(srvList);
 		List<KbModuleComp> cmpList = module.getModuleComponents();
 		Assert.assertEquals(1, cmpList.size());

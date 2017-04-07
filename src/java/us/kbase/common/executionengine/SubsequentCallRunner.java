@@ -39,14 +39,14 @@ public abstract class SubsequentCallRunner {
     private final UUID jobId;
     private final String imageName;
     private final ModuleRunVersion mrv;
-    private CallbackServerConfig config;
+    private final CallbackServerConfig config;
     
     public SubsequentCallRunner(
             final AuthToken token,
             final CallbackServerConfig config,
             final UUID jobId,
             final ModuleMethod modmeth, 
-            String serviceVer)
+            final String serviceVer)
             throws IOException, JsonClientException {
         this.token = token;
         this.config = config;
@@ -61,7 +61,7 @@ public abstract class SubsequentCallRunner {
         config.writeJobConfigToFile(jobWorkDir.resolve(
                 JobRunnerConstants.JOB_CONFIG_FILE));
     }
-    
+
     protected ModuleVersion loadModuleVersion(ModuleMethod modmeth, 
             String serviceVer) throws IOException, JsonClientException {
         final CatalogClient catClient = new CatalogClient(
@@ -115,23 +115,39 @@ public abstract class SubsequentCallRunner {
         return mrv;
     }
     
-    public Map<String, Object> run(RpcCallData rpcCallData)
+    public Map<String, Object> run(RpcCallData rpcCallData, AuthToken callToken)
             throws IOException, InterruptedException {
+        if (callToken == null) {
+            callToken = token;
+        }
         final Path inputFile = getJobWorkDir(jobId, config, imageName)
                 .resolve("input.json");
         UObject.getMapper().writeValue(inputFile.toFile(), rpcCallData);
         final Path outputFile = runModule(jobId, inputFile, config,
-                imageName, moduleName, token);
+                imageName, moduleName, callToken);
         if (Files.exists(outputFile)) {
-            return UObject.getMapper().readValue(outputFile.toFile(),
-                    new TypeReference<Map<String, Object>>() {});
+            final Map<String, Object> jsonRpcResponse = UObject.getMapper().readValue(
+                    outputFile.toFile(), new TypeReference<Map<String, Object>>() {});
+            if (jsonRpcResponse.get("error") != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> error = (Map<String, Object>)jsonRpcResponse.get("error");
+                String errorName = (String)error.get("name");
+                Integer errorCode = (Integer)error.get("code");
+                String errorMessage = (String)error.get("message");
+                String errorData = (String)error.get("error");
+                logError(rpcCallData.getMethod(), errorName, errorCode, errorMessage, errorData);
+            }
+            return jsonRpcResponse;
         } else {
             final String errorMessage =
                     "Unknown server error (output data wasn't produced)";
             final Map<String, Object> error =
                     new LinkedHashMap<String, Object>();
-            error.put("name", "JSONRPCError");
-            error.put("code", -32601);
+            String errorName = "JSONRPCError";
+            int errorCode = -32601;
+            logError(rpcCallData.getMethod(), errorName, errorCode, errorMessage, null);
+            error.put("name", errorName);
+            error.put("code", errorCode);
             error.put("message", errorMessage);
             error.put("error", errorMessage);
             final Map<String, Object> jsonRpcResponse =
@@ -141,7 +157,36 @@ public abstract class SubsequentCallRunner {
             return jsonRpcResponse;
         }
     }
+    
+    private void logError(String method, String name, Integer code, String message, String data) {
+        String log = "\"" + method + "\" job threw an error";
+        String[] dataLines = null;
+        if (name != null) {
+            log += ", name=\"" + name + "\"";
+        }
+        if (code != null) {
+            log += ", code=" + code;
+        }
+        if (message != null) {
+            log += ", message=\"" + message + "\"";
+        }
+        if (data != null) {
+            log += ", data:";
+            dataLines = data.split("[\\r\\n]+");
+        }
+        logErrorLine(log);
+        if (dataLines != null) {
+            for (String line : dataLines) {
+                logErrorLine(line);
+            }
+        }
+    }
 
+    private void logErrorLine(String line) {
+        config.getLogger().logNextLine(String.format("%.2f - CallbackServer[%s]: %s",
+                (System.currentTimeMillis() / 1000.0), jobId, line), true);
+    }
+    
     protected abstract Path runModule(
             final UUID jobId,
             final Path inputFile,

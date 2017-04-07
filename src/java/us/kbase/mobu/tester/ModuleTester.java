@@ -29,10 +29,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.yaml.snakeyaml.Yaml;
 
-import us.kbase.auth.AuthService;
-import us.kbase.auth.AuthToken;
 import us.kbase.common.executionengine.CallbackServer;
-import us.kbase.common.executionengine.CallbackServerConfigBuilder;
 import us.kbase.common.executionengine.LineLogger;
 import us.kbase.common.executionengine.ModuleMethod;
 import us.kbase.common.executionengine.ModuleRunVersion;
@@ -109,25 +106,24 @@ public class ModuleTester {
         if (!tlDir.exists())
             tlDir.mkdir();
         if (!readmeFile.exists())
-            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext, true, 
+            TemplateFormatter.formatTemplate("module_readme_test_local", moduleContext,
                     readmeFile);
         if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
-                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, 
+                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, 
                         runTestsSh);
                 refDataDir.mkdir();
             }
         }
         if (!runTestsSh.exists())
-            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, true, runTestsSh);
+            TemplateFormatter.formatTemplate("module_run_tests", moduleContext, runTestsSh);
         if (!runBashSh.exists())
-            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, true, runBashSh);
+            TemplateFormatter.formatTemplate("module_run_bash", moduleContext, runBashSh);
         if (!runDockerSh.exists())
-            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, true, 
-                    runDockerSh);
+            TemplateFormatter.formatTemplate("module_run_docker", moduleContext, runDockerSh);
         if (!testCfg.exists()) {
-            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, true, testCfg);
+            TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, testCfg);
             System.out.println("Set KBase account credentials in test_local/test.cfg and then " +
             		"test again");
             return 1;
@@ -139,55 +135,24 @@ public class ModuleTester {
         } finally {
             is.close();
         }
-        String user = props.getProperty("test_user");
-        String password = props.getProperty("test_password");
-        if (user == null || user.trim().isEmpty()) {
-            throw new IllegalStateException("Error: KBase account credentials are not set in " +
-            		"test_local/test.cfg");
-        }
-        if (password == null || password.trim().isEmpty()) {
-            System.out.println("You haven't preset your password in test_local/test.cfg file. " +
-            		"Please enter it now.");
-            password = new String(System.console().readPassword("Password: "));
-        }
-        AuthToken token = AuthService.login(user.trim(), password.trim())
-                .getToken();
+        
+        ConfigLoader cfgLoader = new ConfigLoader(props, true, "test_local/test.cfg", true);
+        
+        
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
         FileWriter fw = new FileWriter(tokenFile);
         try {
-            fw.write(token.getToken());
+            fw.write(cfgLoader.getToken().getToken());
         } finally {
             fw.close();
         }
         File testCfgCopy = new File(workDir, "test.cfg");
         Files.copy(testCfg.toPath(), testCfgCopy.toPath(),
                 StandardCopyOption.REPLACE_EXISTING);
-        String endPoint = props.getProperty("kbase_endpoint");
-        if (endPoint == null)
-            throw new IllegalStateException("Error: KBase services end-point is not set in " +
-            		"test_local/test.cfg");
-        String jobSrvUrl = props.getProperty("job_service_url");
-        if (jobSrvUrl == null)
-            jobSrvUrl = endPoint + "/userandjobstate";
-        String wsUrl = props.getProperty("workspace_url");
-        if (wsUrl == null)
-            wsUrl = endPoint + "/ws";
-        String shockUrl = props.getProperty("shock_url");
-        if (shockUrl == null)
-            shockUrl = endPoint + "/shock-api";
         File configPropsFile = new File(workDir, "config.properties");
-        PrintWriter pw = new PrintWriter(configPropsFile);
-        try {
-            pw.println("[global]");
-            pw.println("job_service_url = " + jobSrvUrl);
-            pw.println("workspace_url = " + wsUrl);
-            pw.println("shock_url = " + shockUrl);
-            pw.println("kbase_endpoint = " + endPoint);
-        } finally {
-            pw.close();
-        }
+        cfgLoader.generateConfigProperties(configPropsFile);
         ProcessHelper.cmd("chmod", "+x", runBashSh.getCanonicalPath()).exec(tlDir);
         ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(tlDir);
         String moduleName = (String)kbaseYmlConfig.get("module-name");
@@ -217,18 +182,17 @@ public class ModuleTester {
                 JsonServerSyslog.setStaticUseSyslog(false);
                 JsonServerSyslog.setStaticMlogFile("callback.log");
             }
-            CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-                    new URL(endPoint), callbackUrl, tlDir.toPath(),
-                    new LineLogger() {
-                        @Override
-                        public void logNextLine(String line, boolean isError) {
-                            if (isError) {
-                                System.err.println(line);
-                            } else {
-                                System.out.println(line);
-                            }
-                        }
-                    }).build();
+            CallbackServerConfig cfg = cfgLoader.buildCallbackServerConfig(callbackUrl, 
+                    tlDir.toPath(), new LineLogger() {
+                @Override
+                public void logNextLine(String line, boolean isError) {
+                    if (isError) {
+                        System.err.println(line);
+                    } else {
+                        System.out.println(line);
+                    }
+                }
+            });
             ModuleRunVersion runver = new ModuleRunVersion(
                     new URL("https://localhost"),
                     new ModuleMethod(moduleName + ".run_local_tests"),
@@ -238,7 +202,7 @@ public class ModuleTester {
             Map<String, String> localModuleToImage = new LinkedHashMap<>();
             localModuleToImage.put(moduleName, imageName);
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    token, cfg, runver, new ArrayList<UObject>(),
+                    cfgLoader.getToken(), cfg, runver, new ArrayList<UObject>(),
                     new ArrayList<String>(), mounts, localModuleToImage);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
@@ -313,6 +277,13 @@ public class ModuleTester {
                 ret = parts[2];
                 break;
             }
+        }
+        if (ret == null) {
+            System.out.println("Can't find image [" + imageName + "]. Here is 'docker images' output:");
+            for (String line : lines) {
+                System.out.println("\t" + line);
+            }
+            System.out.println();
         }
         return ret;
     }

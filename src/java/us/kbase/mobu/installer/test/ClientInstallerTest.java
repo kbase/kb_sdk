@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.installer.ClientInstaller;
+import us.kbase.scripts.test.TestConfigHelper;
 
 public class ClientInstallerTest {
     private static File tempDir = null;
@@ -25,7 +26,7 @@ public class ClientInstallerTest {
     
     @AfterClass
     public static void teardownClass() throws Exception {
-        if (tempDir.exists()) {
+        if (tempDir != null && tempDir.exists()) {
             FileUtils.deleteQuietly(tempDir);
         }
     }
@@ -39,7 +40,7 @@ public class ClientInstallerTest {
         File moduleDir = new File(tempDir, moduleName);
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
-                "https://ci.kbase.us/services/catalog"));
+                TestConfigHelper.getKBaseEndpoint() + "/catalog"));
         ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);
@@ -47,6 +48,7 @@ public class ClientInstallerTest {
         //ProcessHelper.cmd("ls", "-l", dir.getAbsolutePath()).exec(moduleDir);
         Assert.assertTrue(new File(dir, "OnerepotestClient.java").exists());
         Assert.assertTrue(new File(dir, "OnerepotestServiceClient.java").exists());
+        checkDeps(moduleDir);
     }
     
     @Test
@@ -58,12 +60,29 @@ public class ClientInstallerTest {
         File moduleDir = new File(tempDir, moduleName);
         File sdkCfgFile = new File(moduleDir, "sdk.cfg");
         FileUtils.writeLines(sdkCfgFile, Arrays.asList("catalog_url=" +
-                "https://ci.kbase.us/services/catalog"));
+                TestConfigHelper.getKBaseEndpoint() + "/catalog"));
         ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);
         File dir = new File(moduleDir, "lib/" + module2);
         Assert.assertTrue(new File(dir, "onerepotestClient.py").exists());
         Assert.assertTrue(new File(dir, "onerepotestServiceClient.py").exists());
+        checkDeps(moduleDir);
+    }
+    
+    private static void checkDeps(File moduleDir) throws Exception {
+        File depsFile = new File(moduleDir, "dependencies.json");
+        Assert.assertTrue(depsFile.exists());
+        String expectedText = "" +
+                "[ {\n" +
+                "  \"module_name\" : \"onerepotest\",\n" +
+                "  \"type\" : \"sdk\",\n" +
+                "  \"version_tag\" : \"dev\"\n" +
+                "}, {\n" +
+                "  \"module_name\" : \"Workspace\",\n" +
+                "  \"type\" : \"core\",\n" +
+                "  \"file_path\" : \"https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec\"\n" +
+                "} ]";
+        Assert.assertEquals(expectedText, FileUtils.readFileToString(depsFile));
     }
 }
