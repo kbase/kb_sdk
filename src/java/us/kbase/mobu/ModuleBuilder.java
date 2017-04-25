@@ -49,7 +49,7 @@ public class ModuleBuilder {
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.14";
+    public static final String VERSION = "1.0.16";
     
     
     public static void main(String[] args) throws Exception {
@@ -296,7 +296,7 @@ public class ModuleBuilder {
                     a.pyServerSide, a.pyServerName, a.pyImplName, a.javaClientSide, 
                     a.javaServerSide, a.javaPackageParent, a.javaSrcDir, a.javaLibDir, 
                     a.javaBuildXml, a.javaGwtPackage, a.rClientSide, a.rClientName, 
-                    a.rServerSide, a.rServerName, a.rImplName, true, outDir, a.jsonSchema, 
+                    a.rServerSide, a.rServerName, a.rImplName, outDir, a.jsonSchema, 
                     a.makefile, a.clAsyncVer, a.dynservVer, a.html,
                     semanticVersion, gitUrl, gitCommitHash);
         } catch (Throwable e) {
@@ -343,17 +343,20 @@ public class ModuleBuilder {
     private static int runTestCommand(TestCommandArgs testArgs, JCommander jc) {
         // Figure out module name.
         // Join together spaced out names with underscores if necessary.
+        int returnCode = 1;
+
         try {
             ModuleTester tester = new ModuleTester();
-            tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
+            returnCode = tester.runTests(testArgs.methodStoreUrl, testArgs.skipValidation, testArgs.allowSyncMethods);
         }
         catch (Exception e) {
             if (testArgs.verbose)
                 e.printStackTrace();
             showError("Error while testing module", e.getMessage());
-            return 1;
+            return returnCode;
         }
-        return 0;
+
+        return returnCode;
     }
 
     private static void printVersion() {

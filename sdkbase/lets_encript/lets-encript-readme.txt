@@ -1,0 +1,1 @@
+Certificate was loaded from https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.der on 2016-12-19.

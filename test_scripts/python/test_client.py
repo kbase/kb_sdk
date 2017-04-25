@@ -13,26 +13,23 @@ def main(argv):
     sys.path.append('./')
     tests_filepath = None
     endpoint = None
-    user = None
-    password = None
+    token = None
     async_job_check_time_ms = None
     try:
-        opts, args = getopt.getopt(argv,"ht:e:u:p:a:",["help","tests=","endpoint=","user=","password=","asyncchecktime="])
+        opts, args = getopt.getopt(argv,"ht:e:o:a:",["help","tests=","endpoint=","token=","asyncchecktime="])
     except getopt.GetoptError:
         print('Please use "test_client.py -h" or "test_client.py --help" for help')
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print('test_client.py --tests <json_file> --endpoint <url> [--user <kbase_account> --password <password> [--asyncchecktime <ms>]]')
+            print('test_client.py --tests <json_file> --endpoint <url> [--token <kbase_token> [--asyncchecktime <ms>]]')
             sys.exit()
         elif opt in ("-t", "--tests"):
             tests_filepath = arg
         elif opt in ("-e", "--endpoint"):
             endpoint = arg
-        elif opt in ("-u", "--user"):
-            user = arg
-        elif opt in ("-p", "--password"):
-            password = arg
+        elif opt in ("-o", "--token"):
+            token = arg
         elif opt in ("-a", "--asyncchecktime"):
             try:
                 async_job_check_time_ms = long(arg)
@@ -48,9 +45,9 @@ def main(argv):
         client_instance = None
         if 'auth' in test and test['auth']:
             if async_job_check_time_ms:
-                client_instance = client_class(url = endpoint, user_id = user, password = password, async_job_check_time_ms = async_job_check_time_ms)
+                client_instance = client_class(url = endpoint, token = token, async_job_check_time_ms = async_job_check_time_ms)
             else:
-                client_instance = client_class(url = endpoint, user_id = user, password = password)
+                client_instance = client_class(url = endpoint, token = token)
         else:
             client_instance = client_class(url = endpoint, ignore_authrc = True)
         method_name = test['method']

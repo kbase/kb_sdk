@@ -19,9 +19,9 @@ import us.kbase.mobu.util.TextUtils;
 public class TemplateFormatter {
 
     public static boolean formatTemplate(String templateName, Map<?,?> context, 
-            boolean newStyle, File output) throws IOException {
+            File output) throws IOException {
         StringWriter sw = new StringWriter();
-        boolean ret = formatTemplate(templateName, context, newStyle, sw);
+        boolean ret = formatTemplate(templateName, context, sw);
         sw.close();
         StringReader sr = new StringReader(sw.toString());
         TextUtils.writeFileLines(TextUtils.readReaderLines(sr, true), output);
@@ -30,14 +30,14 @@ public class TemplateFormatter {
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static boolean formatTemplate(String templateName, Map<?,?> context, 
-            boolean newStyle, Writer output) {
+            Writer output) {
         try {
             if (!context.containsKey("esc")) {
                 Map untyped = (Map)context;
                 untyped.put("esc", new VelocityEscaper());
             }
             Reader input = new InputStreamReader(TemplateFormatter.class.getResourceAsStream(
-                    templateName + "." + (newStyle ? "vm" : "old") + ".properties"), Charset.forName("utf-8"));
+                    templateName + "." + "vm.properties"), Charset.forName("utf-8"));
             VelocityContext cntx = new VelocityContext(context);
             boolean ret = Velocity.evaluate(cntx, output, "Template " + templateName, input);
             input.close();

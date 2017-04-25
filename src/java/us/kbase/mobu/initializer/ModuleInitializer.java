@@ -238,6 +238,18 @@ public class ModuleInitializer {
 					);
 			}
 		}
+		// Let's install fresh workspace client in any cases (we need it at least in tests):
+		new ClientInstaller(new File(moduleDir), false).install(
+                this.language,
+                false, // async clients
+                true, // core or sync clients
+                false, // dynamic client
+                null, //tagVer
+                this.verbose,
+                "https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec",
+                null,
+                null // clientName
+            );
 
 		System.out.println("Done! Your module is available in the " + moduleDir + " directory.");
 		if (example) {
@@ -281,7 +293,7 @@ public class ModuleInitializer {
 	private void fillTemplate(Map<?,?> context, String templateName, Path outfilePath) throws IOException {
 		if (this.verbose) System.out.println("Building file \"" + outfilePath.toString() + "\"");
 		initDirectory(outfilePath.getParent(), false);
-		TemplateFormatter.formatTemplate(templateName, context, true, outfilePath.toFile());
+		TemplateFormatter.formatTemplate(templateName, context, outfilePath.toFile());
 	}
 	
 	/**
