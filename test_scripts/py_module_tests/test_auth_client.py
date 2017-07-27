@@ -59,20 +59,18 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(self.kba.get_user(self.token1), self.user1)
         self.assertEqual(self.kba.get_user(self.token2), self.user2)
 
-        # test default url
-        kba2 = KBaseAuth()
-        self.assertEqual(kba2.get_user(self.token1), self.user1)
-        self.assertEqual(kba2.get_user(self.token2), self.user2)
+        # Only test the default url manually, since it runs against production.
+        # kba2 = KBaseAuth()
+        # self.assertEqual(kba2.get_user(self.token1), self.user1)
+        # self.assertEqual(kba2.get_user(self.token2), self.user2)
 
     def test_bad_token(self):
         self.fail_get_user(None, 'Must supply token')
         self.fail_get_user(
-            'bleah', 'Error connecting to auth service: 500 ' +
-            'INTERNAL SERVER ERROR\nValueError: need more than 1 value to ' +
-            'unpack')
+            'bleah', 'Error connecting to auth service: 401 Unauthorized\n10020 Invalid token')
         self.fail_get_user(
-            self.token1 + 'a', 'Error connecting to auth service: 401 ' +
-            'UNAUTHORIZED\nLoginFailure: Invalid token')
+            self.token1 + 'a',
+            'Error connecting to auth service: 401 Unauthorized\n10020 Invalid token')
 
     def test_bad_url(self):
         kba2 = KBaseAuth('https://thisisasuperfakeurlihope.com')
