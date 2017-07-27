@@ -195,6 +195,7 @@ public class ModuleRunner {
         rpc.put("context", new LinkedHashMap<String, Object>());
         UObject.getMapper().writeValue(new File(workDir, "input.json"), rpc);
         ////////////////////////////////// Starting callback service //////////////////////////////
+        System.out.println("Info: getting callback url...");
         int callbackPort = NetUtils.findFreePort();
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
@@ -239,12 +240,9 @@ public class ModuleRunner {
             context.addServlet(new ServletHolder(catalogSrv),"/*");
             jettyServer.start();
         } else {
-            if (callbackNetworks != null && callbackNetworks.length > 0) {
-                throw new IllegalStateException("No proper callback IP was found, " +
-                        "please check callback_networks parameter in configuration");
-            }
-            System.out.println("WARNING: No callback URL was received " +
-                    "by the job runner. Local callbacks are disabled.");
+            throw new IllegalStateException("No callback URL was received " +
+                    "by the job runner. Local callbacks are disabled. " +
+                    "CallbackNetworks: "+Arrays.toString(callbackNetworks));
         }
         ////////////////////////////////// Running Docker /////////////////////////////////////////
         final String containerName = "local_" + moduleName.toLowerCase() + "_" + 
