@@ -178,9 +178,6 @@ public class ModuleTester {
         System.out.println("Info: getting callback url...");
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        callbackUrl = null;
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
                 JsonServerSyslog.setStaticUseSyslog(false);
