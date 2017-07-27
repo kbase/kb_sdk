@@ -57,7 +57,7 @@ class KBaseAuth(object):
     A very basic KBase auth client for the Python server.
     '''
 
-    _LOGIN_URL = 'https://kbase.us/services/authorization/Sessions/Login'
+    _LOGIN_URL = 'https://kbase.us/services/auth/api/legacy/KBase/Sessions/Login'
 
     def __init__(self, auth_url=None):
         '''
@@ -84,7 +84,7 @@ class KBaseAuth(object):
                 ret.raise_for_status()
             raise ValueError('Error connecting to auth service: {} {}\n{}'
                              .format(ret.status_code, ret.reason,
-                                     err['error_msg']))
+                                     err['error']['message']))
 
         user = ret.json()['user_id']
         self._cache.add_valid_token(token, user)
