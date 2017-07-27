@@ -178,10 +178,6 @@ public class ModuleTester {
         System.out.println("Info: getting callback url...");
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        System.out.println("Hacking callback url...");
-        callbackUrl = null;
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         if (callbackUrl != null) {
             if( System.getProperty("os.name").startsWith("Windows") ) {
                 JsonServerSyslog.setStaticUseSyslog(false);
@@ -217,7 +213,7 @@ public class ModuleTester {
             context.addServlet(new ServletHolder(catalogSrv),"/*");
             jettyServer.start();
         } else {
-            throw new IllegalStateException("ERROR: No callback URL was received " +
+            throw new IllegalStateException("No callback URL was received " +
                     "by the job runner. Local callbacks are disabled. CallbackNetworks: "+callbackNetworksText);
         }
         ///////////////////////////////////////////////////////////////////////////////////////////
