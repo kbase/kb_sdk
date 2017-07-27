@@ -214,7 +214,8 @@ public class ModuleTester {
             jettyServer.start();
         } else {
             throw new IllegalStateException("No callback URL was received " +
-                    "by the job runner. Local callbacks are disabled. CallbackNetworks: "+callbackNetworks);
+                    "by the job runner. Local callbacks are disabled. " +
+                    "CallbackNetworks: "+Arrays.toString(callbackNetworks));
         }
         ///////////////////////////////////////////////////////////////////////////////////////////
         try {
