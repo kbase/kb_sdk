@@ -605,7 +605,7 @@ public class CallbackServerTest {
         String methodName = "run";
         String release = "dev";
         String ver = "0.0.3";
-        String commit1 = "de445aa9c3404d68be3a87b03c1dbf2f3fccba24";
+        String commit1 = "03b9210ac825858c1ae6339786686cea5dac5929";
         final ModuleRunVersion runver = new ModuleRunVersion(
                 new URL("https://github.com/kbasetest/njs_sdk_test_1"),
                 new ModuleMethod(moduleName + "." + methodName),
@@ -618,7 +618,7 @@ public class CallbackServerTest {
         final CallbackStuff res = startCallBackServer(runver, params, wsobjs);
         System.out.println("Running multiCallProvenance in dir " + res.tempdir);
         String moduleName2 = "njs_sdk_test_2";
-        String commit2 = "3cd0ed213d8376349bdb0f454c5f5bc8b31ea650";
+        String commit2 = "284948a93524ba51e48b1c71693b269647c125c3";
         @SuppressWarnings("unchecked")
         Map<String, Object> methparams = UObject.transformStringToObject(
                 String.format(
