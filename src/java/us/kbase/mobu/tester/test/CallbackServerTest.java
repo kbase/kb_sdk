@@ -570,7 +570,7 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_2";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.8";
+        String ver = "0.0.9";
         Map<String, Object> methparams = new HashMap<String, Object>();
         methparams.put("id", "myid");
         Map<String, Object> results = res.callMethod(
