@@ -233,7 +233,8 @@ public class DockerClientServerTester {
     }
     
     protected static void testClients(File moduleDir, String clientEndpointUrl,
-            boolean async, boolean dynamic, String serverType) throws Exception { 
+            boolean async, boolean dynamic, String serverType) throws Exception {
+        TypeGeneratorTest.ensureCasperJsInstalled();
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
         ClientInstaller clInst = new ClientInstaller(moduleDir, true);
@@ -392,10 +393,6 @@ public class DockerClientServerTester {
             Assert.assertEquals("Perl client exit code should be 0", 0, exitCode);
         }
         // JavaScript
-        if (!TypeGeneratorTest.isCasperJsInstalled()) {
-            System.err.println("- JavaScript client tests are skipped");
-            return;
-        }
         System.out.print("JavaScript client -> " + serverType + " server ");
         clInst.install("javascript", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
@@ -428,6 +425,7 @@ public class DockerClientServerTester {
 
     protected static void testStatus(File moduleDir, String clientEndpointUrl,
             boolean async, boolean dynamic, String serverType) throws Exception {
+        TypeGeneratorTest.ensureCasperJsInstalled();
         String moduleName = moduleDir.getName();
         File specFile = new File(moduleDir, moduleName + ".spec");
         // Java client
@@ -558,14 +556,12 @@ public class DockerClientServerTester {
             }
         }
         // JavaScript
-        if (!TypeGeneratorTest.isCasperJsInstalled()) {
-            System.err.println("- JavaScript client tests are skipped");
-            return;
-        }
-        if (outputFile.exists())
+        if (outputFile.exists()) {
             outputFile.delete();
-        if (errorFile.exists())
+        }
+        if (errorFile.exists()) {
             errorFile.delete();
+        }
         System.out.println("JavaScript client (status) -> " + serverType + " server");
         clInst.install("javascript", async, false, dynamic, "dev", false, 
                 specFile.getCanonicalPath(), "lib2");
