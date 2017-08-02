@@ -1,7 +1,7 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install and Build SDK](kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
 4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
 5. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
