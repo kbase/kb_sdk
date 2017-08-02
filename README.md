@@ -17,7 +17,7 @@ You can use the SDK to develop and test Apps with a regular KBase user account (
 
 ## <A NAME="steps"></A>Steps in Using SDK
 1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
-2. [Install and Build SDK](doc/kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](doc/kb_sdk_dockerized_install.md)
 3. [Create Module](doc/kb_sdk_create_module.md)
 4. [Edit Module and Method(s)](doc/kb_sdk_edit_module.md)
 5. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
