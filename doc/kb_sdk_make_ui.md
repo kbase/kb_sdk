@@ -12,79 +12,18 @@
 10. [Complete Module Info](kb_sdk_complete_module_info.md)
 11. [Deploy](kb_sdk_deploy.md)
 
-#### <A NAME="ui-widget"></A>6. Specify User Interface
+### <A NAME="ui-widget"></A>6. Specify User Interface
 
 Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.
 
-##### A. Creating fields in the input widget cell
+#### A. Configure the input interface.
 
-Edit *display.yaml*:
-
-```
-name: MegaHit
-tooltip: |
-	Run megahit for metagenome assembly
-screenshots: []
-
-icon: kb_logo.png
-
-#
-# define a set of similar methods that might be useful to the user
-#
-suggestions:
-	apps:
-		related:
-			[]
-		next:
-			[]
-	methods:
-		related:
-			[]
-		next:
-			[]
-
-#
-# Configure the display and description of parameters
-#
-parameters :
-    read_library_name :
-        ui-name : Read Library
-        short-hint : Read library (only PairedEnd Libs supported now)
-    output_contigset_name:
-        ui-name : Output ContigSet name
-        short-hint : Enter a name for the assembled contigs data object
-
-description : |
-	<p>This is a KBase wrapper for MEGAHIT.</p>
-    <p>MEGAHIT is a single node assembler for large and complex metagenomics NGS reads, such as soil. It makes use of succinct de Bruijn graph (SdBG) to achieve low memory assembly.</p>
-publications :
-    -
-        pmid: 25609793
-        display-text : |
-            'Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033'
-        link: http://www.ncbi.nlm.nih.gov/pubmed/25609793
-    -
-        link: https://github.com/voutcn/megahit
-```
-
-##### B. Configure passing variables from Narrative Input to SDK method.
-
-Edit *spec.json*:
+The input options are specified in the "parameters" section of the spec.json file. In the following example, the user
+supplies two required parameters, an input name and an output name. By specifying a 'valid_ws_types' the user will
+be present a searchable dropdown of objects that match the specified type. By passing "is_output_name", the user is
+warned if a name with overwrite an existing object or if the name contains invalid characters.
 
 ```
-{
-	"ver": "1.0.0",
-	
-	"authors": [
-		"YourName"
-	],
-	"contact": "http://kbase.us/contact-us/",
-	"visible": true,
-	"categories": ["active","assembly","communities"],
-	"widgets": {
-		"input": null,
-		"output": "kbaseReportView"
-	},
 	"parameters": [ 
 		{
 			"id": "read_library_name",
@@ -110,6 +49,48 @@ Edit *spec.json*:
 		    }
 		}
 	],
+```
+Another common input is a dropdown which is demonstrated below. For each option, the "value" is what will be passed to
+the script while the UI Name and Display is what the user will see. In this example, the parameter is hidden be default 
+because "advanced" is true.
+```
+{
+            "id": "prune",
+            "optional": false,
+            "advanced": true,
+            "allow_multiple": false,
+            "default_values": [ "biochemistry" ],
+            "field_type": "dropdown",
+            "dropdown_options": {
+                "options": [
+                    {
+                        "value": "biochemistry",
+                        "display": "Known Biochemistry",
+                        "id": "biochemistry",
+                        "ui_name": "Known Biochemistry"
+                    },
+                    {
+                        "value": "model",
+                        "display": "Input Model",
+                        "id": "model",
+                        "ui_name": "Input Model"
+                    },
+                    {
+                        "value": "none",
+                        "display": "Do not prune",
+                        "id": "none",
+                        "ui_name": "Do not prune"
+                    }
+                ]
+            }
+        },
+```
+#### B . Configure passing variables from Narrative Input to SDK method.
+
+In the 'behavior' section of the spec.json, the output of the user interface is mapped to input to your function.
+If you have maintained a consistent naming though these mappings are pretty pro forma but you should make sure
+that you accept and return "workspace" as a narrative_system_variable as shown below.
+```
 	"behavior": {
 		"service-mapping": {
 			"url": "",
@@ -153,17 +134,12 @@ Edit *spec.json*:
 }
 ```
 
-Make sure you configure *workspace_name*
+#### C. Naming fields in the input widget cell
 
-```
-	"behavior": {
-		"service-mapping": {
-			"input_mapping": [
-				{
-					"narrative_system_variable": "workspace",
-					"target_property": "workspace_name"
-				}
-			]
-		}
-	}
-```
+The display.yml primarily contains text to explain the method in the narrative and especially in the app catalogue.
+Options in this file will be further explored in step 10: [Complete Module Info](kb_sdk_complete_module_info.md) but
+minimally this file should define:
+* A module name
+* A module tooltip
+* A ui-name for each parameter
+* A short hint for each parameter
