@@ -12,7 +12,8 @@ There are still some general restrictions on functionality that will gradually b
 
 If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
-You can use the SDK to develop and locally test Apps with a regular KBase user account (and a Git repository). However in order to deploy your app into a narrative you will need to <a href="http://kbase.us/contact-us">contact us</a>  to be added to the developer list.
+In order to use the SDK to test and deploy Apps you will need developer credentials. Please 
+<a href="http://kbase.us/contact-us">contact us</a> to be added to the developer list.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
