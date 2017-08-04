@@ -63,6 +63,14 @@ Final Note: Docker will rebuild everything from the first detected change in a d
 
 If you have already been approved as a KBase developer. A token may be generated from your [kbase account profile](https://narrative.kbase.us/#auth2/account) under the Developer Tokens tab.
 
+**But you haven't approved my developer request and I _really_ want to test!**
+
+You can use the use the narrative to generate a shorter term authentication token. Open a [Narrative](https://narrative.kbase.us/#dashboard) and open a code cell(that's the blue cursor icon in the lower right hand of the screen). Type the following lines and hit SHIFT+Enter
+```
+import os
+os.environ['KB_AUTH_TOKEN']
+```
+You will still need to <a href="http://kbase.us/contact-us">contact us</a> to be added to the developer list in order to register your app.
 
 #### <A NAME="build-tests"></A>5C. Build tests of your methods
 
