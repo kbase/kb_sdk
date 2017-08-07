@@ -14,9 +14,13 @@
 
 #### <A NAME="impl"></A>5. Edit Impl file
 
-In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
+In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods 
+available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  
+Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them 
+directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should 
+be collected into KBase data objects and stored back in the workspace.
 
-- 5.1. [Imports and Setup](#impl-setup)
+- 5.1. [Install Other KBase Packages](#install)
 - 5.2. [Using Data Types](#impl-data-types)
 - 5.3. [Logging](#impl-logging)
 - 5.4. [Provenance](#impl-provenance)
@@ -24,68 +28,47 @@ In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implem
 - 5.6. [Invoking Shell Tool](#impl-shell-tool)
 - 5.7. [Adding Data to Your Method](#impl-adding-data)
 
-##### <A NAME="impl-setup"></A>5.1. Imports and Setup
+##### <A NAME="install"></A>5.1. Install Other KBase Packages
 
-Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Impl file should start if you are working in Python (you may not need all of it, such as *Bio Phylo* if you're not working with Trees.  Feel free to comment out what you are not using).
+If you begin by altering an existing app (as this walkthough demonstrates) you will already have some KBase utility 
+modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal.
+Here's an sample of some of the modules that might be helpful for you app:
+* [Workspace](https://github.com/kbase/workspace_deluxe/blob/master/workspace.spec) - Contains functions to get data 
+from, and store data in the user's workspace
+* [DataFileUtil](https://github.com/kbaseapps/DataFileUtil/blob/master/DataFileUtil.spec) - A collection of tools to 
+get data directly from the web, from the user's computer (via the staging 
+area) and [SHOCK](https://github.com/MG-RAST/Shock)
+* [KBaseReport](https://github.com/kbaseapps/KBaseReport/blob/master/KBaseReport.spec) - Allows the creation of KBase 
+reports which can present text, html, and downloadable files to the user as output to your app.
+
+In python, you can import these installed modules like any other python package. Generally to access functionality, a
+client in initialized with the SDK_CALLBACK_URL. The module constructor is a good place to do this as in the following
+example. 
 
 ```python
 import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-import math
-import gzip
-from Bio import SeqIO
-from Bio import Phylo
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from requests_toolbelt import MultipartEncoder
-from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
-from biokbase.workspace.client import Workspace as workspaceService
-
-import requests
-requests.packages.urllib3.disable_warnings()  # silence whining
+from KBaseReport.KBaseReportClient import KBaseReport
+from Workspace.WorkspaceClient import Workspace
+from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 class <ModuleName>:
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
+    """Module Docs"""
     def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
+        #BEGIN_CONSTRUCTOR
+        self.config = config
+        self.scratch = config['scratch']
+        self.callback_url = os.environ['SDK_CALLBACK_URL']
+        self.ws_url = config['workspace-url']
+        self.ws_client = Workspace(self.ws_url)
+        self.dfu = DataFileUtil(self.callback_url)
+        #END_CONSTRUCTOR
+        pass
 ```
+Another important parameter commonly defined in the module constructor is the path to the scratch directory. Each called
+KBase module exists within it's own docker container and have distinct file systems but critically share a common
+scratch space. Therefore files written by other modules (for example DataFileUtils) or to be passed to other modules
+(such as KBaseReport) must be in the scratch folder.
+
 [\[Back to Edit Impl\]](#impl)
 
 
