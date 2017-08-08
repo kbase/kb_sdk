@@ -85,6 +85,9 @@ because "advanced" is true.
             }
         },
 ```
+
+There are many additional interface options available. One of the best ways to learn is to look at [this gallery](https://narrative.kbase.us/narrative/ws.23109.obj.1) which contains the a variety of KBase apps along with the spec file that generated the user interface.
+
 #### B . Configure passing variables from Narrative Input to SDK method.
 
 In the 'behavior' section of the spec.json, the output of the user interface is mapped to input to your function.
