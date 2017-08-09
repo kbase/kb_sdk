@@ -27,22 +27,12 @@ before_install:
     - env
 
 install:
-    #- pip install coveralls
-    #- pip install coverage
-    - git clone https://github.com/kbase/jars
-    - git clone https://github.com/kbase/kb_sdk
-    - cd kb_sdk
-    - make
-    - make sdkbase
-    - docker images
-    - export PATH=$(pwd)/bin:$PATH
-    - cd ../
-    # Insert your own module here
-    #- git clone https://github.com/kbase/kb_sdk.git
-    #- cd kb_sdk
-    # run the kb-sdk test command once to build test_local dir and populate the .ignore files
-    #- kb-sdk test -s || true
-    
+  - cd ..
+  - git clone https://github.com/kbase/jars
 script:
-  - kb-sdk validate
+  - make bin
+  - make sdkbase
+  - export PATH=$(pwd)/bin:$PATH
+  - source src/sh/sdk-completion.sh
+  - kb-sdk help
   
