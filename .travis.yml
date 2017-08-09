@@ -29,6 +29,8 @@ before_install:
 install:
   - cd ..
   - git clone https://github.com/kbase/jars
+  - cd ..
+
 script:
   - make bin
   - make sdkbase
