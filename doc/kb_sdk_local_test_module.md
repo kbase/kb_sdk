@@ -15,6 +15,9 @@
 
 ### 7. Locally Test Module and Method(s)
 
+Locally testing your module is a good way of detecting problems with your module's code more quickly (no execution 
+queue) and more directly (no UI) than the Narrative interface. Also, a suite of unit tests are required for any module
+that will be released to the public([Full list of release requirements](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)).
 
 #### <A NAME="dockerfile"></A>5A. Edit Dockerfile
 

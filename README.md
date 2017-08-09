@@ -10,7 +10,7 @@ There are still some general restrictions on functionality that will gradually b
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, R, or Perl
 
-If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
+In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
 You can use the SDK to develop and test Apps with a regular KBase user account (and a Git repository). When you’d like us to deploy your App publicly in KBase, please <a href="http://kbase.us/contact-us">contact us</a>  to be added to the developer list.
 
