@@ -57,17 +57,16 @@ RUN rm -rf tarball.tgz
 
 because the latter does not remove the previous bloating layers, despite the "rm" command.
 
-Final Note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from cache. This means that if you are pulling in external data using RUN and a command like `git clone` or `wget` changes in those sources will not automatically be reflected in a rebuilt docker image unless the docker file changes at or before that import
+Final Note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from cache. This means that if you are pulling in external data using RUN and a command like `git clone` or `wget` changes in those sources will not automatically be reflected in a rebuilt docker image unless the docker file changes at or before that import.
 
 #### <A NAME="get-token"></A>5B. Get a developer token
 
-If you have already been approved as a KBase developer. A token may be generated from your [kbase account profile](https://narrative.kbase.us/#auth2/account) under the Developer Tokens tab.
+If you have already been approved as a KBase developer, a token may be generated from your [kbase account profile](https://narrative.kbase.us/#auth2/account) under the Developer Tokens tab.
 
 #### <A NAME="build-tests"></A>5C. Build tests of your methods
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and token (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
+Edit the local test config file (`test_local/test.cfg`) with a developer token (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
 
-    test_user = TEST_USER_NAME
     test_token = TEST_TOKEN
 
 *In the Docker shell*, run tests:
