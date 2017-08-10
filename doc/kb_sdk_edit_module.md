@@ -46,39 +46,36 @@ use the name of your module as the name for your new repository.
 
 #### <A NAME="scope-module"></A>B. Scope Module & Methods
 
-At this point, it's necessary to make some design choices about the scope of your module and which individual methods it 
-will contain. For each method, it is important to consider not just the desired functionality but also the inputs and
-outputs.
+Open and edit the **kbase.yml** file to include a better description of your module. The default generated description 
+isn't very good. At this point, it's necessary to make some design choices about the scope of your module and which 
+individual methods it will contain. For each method, it is important to consider not just the desired functionality but 
+also the inputs and outputs.
 
 Potential Inputs:
-* **Function Parameters** - Short parameters in list, float, string, and boolean form can be accepted directly by the 
-function
-* **Reference data** - Modest sized reference data can be committed to the /data directory
+* **Function Parameters** - Short parameters in map, list, float, string, and boolean form can be accepted by the 
+function. See below for how to pass these these parameters as in input object.
+* **Reference data** - Modest sized reference data can be committed to the /data directory.
 * **KBase Typed Data** - If your function will work on one of [KBase's defined data types](https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_data_types.md),
-your method should accept the name of the objects as a string and access the data with the workspace service
+your method should accept a workspace reference to the objects as a string and access the data with DataFileUtil or a 
+utility specific to your data type.
 * **External web-assessable data** - You method may accept a URL as string and utilize the DataFileUtil to download the
 file.
 
 Potential Outputs:
-* **KBase Typed Data** - Your method will accept the name of the objects as a string and save the data with the workspace
-service
+* **KBase Typed Data** - Your method will accept the name of the objects as a string and save the data with DataFileUtils.
 * **Graphical/Tabular Output** - Your method can use KBaseReports to generate a HTML report displaying results.
 * **Data files for Download** - You method can use KBaseReports to save results to a file server for the user to download
-* **New Data Types** - This is beyond the scope of SDK. Please consider using KBaseReports or <a href="http://kbase.us/contact-us">contact us</a>
-so we can discuss your needs.
-
-
-Finally, you should also open and edit the **kbase.yml** file to include a better description of your module.  The 
-default generated description isn't very good.
+* **New Data Types** - This is beyond the scope of SDK. Please <a href="http://kbase.us/contact-us">contact us</a>
+so we can discuss your needs. 
 
 [\[Back to top\]](#top)
 
 
 #### <A NAME="kidl-spec"></A>C. Create KIDL specification for Module
 
-The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method 
-Spec".  This will include the parameters passed to the methods and the declaration of the methods.  **You must rerun 
-*make* after each change to the KIDL specification to [create or update the implementation stubs](#stubs).**
+You will define the programmatic interface to your code in a KIDL specification. This will include the parameters passed 
+to the methods and the declaration of the methods.  **You must rerun *make* after each change to the KIDL specification 
+to [create or update the implementation stubs](#stubs).**
 
 Open the `ContigFilter.spec` file in a text editor, and you will see this:
 
@@ -103,7 +100,7 @@ define that function and its inputs/outputs as:
     funcdef filter_contigs(string workspace_name, contigset_id contigset)
                 returns (FilterContigResults) authentication required;
 
-There a few things introduced here that are part of the KBase Interface Description Language (KIDL).  First, we use 
+There a few things introduced here that are part of the KBase Interface Description Language (KIDL).  First, use 
 `typedef` to define the structure of input/output parameters using the syntax:
 
     typedef [type definition] [TypeName]
@@ -112,32 +109,37 @@ The type definition can either be another previously defined type name, a primit
 container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure 
 named `FilterContigResults` with two integer fields named `contig_count` and `filtered_contig_count`.
 
-We can use any defined types as input/output parameters to functions.  We define functions using the `funcdef` keyword 
-in this syntax:
+You can use any defined types as input/output parameters to functions but it's wise to pass an parameter object. This
+allows additional parameters to be supplied in future implementations without breaking back-comparability. Functions 
+are defined using the `funcdef` keyword in this syntax:
 
-    funcdef method_name([input parameter list]]) returns ([output parameter list]);
+    funcdef method_name(input_parameter_object_type params) returns (output_parameter_object_type output) authentication required;
 
-Optionally, as we have shown in the example, your method can require authentication by adding that declaration at the 
-end of the method.  All methods that run in the Narrative will require authentication because they need to interact with
-a user's workpace).
+All methods that run in the Narrative will require authentication because they need to interact with a user's workspace).
+Your method can require authentication by adding that declaration at the end of the method.
 
-If you will be loading or saving any data from the workspace, make sure you pass in the *workspace_name* in the input 
-parameters.
+If you will be loading or saving any data from the workspace, make sure you accept a workspace reference in the input 
+parameters(You may have noticed example module KIDL spec uses workspace names. This gets the job done but can cause race
+conditions in rare cases so you are better off using references)
 
 ```
     typedef structure {
-    	string workspace_name;
+    	string workspace_ref;
     	...
     } <Module>Params;
 ```
 
-If you will be creating a KBase report, your method should return the report name and reference as shown below:
+If you will be creating a KBase report(and almost certainly will), your method should return the report name and 
+reference in it's output object as shown below:
 ```
     typedef structure {
         string report_name;
         string report_ref;
     } compoundset_results;
 ```
+
+Additional information on KIDL objects is available in the [workspace documentation](https://ci.kbase.us/services/ws/docs/typedobjects.html#typedobjects)
+
 [\[Back to top\]](#top)
 
 
