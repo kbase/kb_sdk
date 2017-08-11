@@ -340,7 +340,6 @@ public class TemplateBasedGenerator {
         
         copyResourceFile(relativePyPath, output, "authclient.py");
         copyResourceFile(relativePyPath, output, "baseclient.py");
-        copyResourceFile(relativePyPath, output, "tox.ini");
     }
 
     private static void copyResourceFile(

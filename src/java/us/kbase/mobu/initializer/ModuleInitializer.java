@@ -115,6 +115,7 @@ public class ModuleInitializer {
 		Map<String, Path> templateFiles = new HashMap<String, Path>();
 		templateFiles.put("module_typespec", Paths.get(moduleDir, specFile));
 		templateFiles.put("module_travis", Paths.get(moduleDir, ".travis.yml"));
+		templateFiles.put("module_tox", Paths.get(moduleDir, "tox.ini"));
 		templateFiles.put("module_dockerfile", Paths.get(moduleDir, "Dockerfile"));
 		templateFiles.put("module_readme", Paths.get(moduleDir, "README.md"));
 		templateFiles.put("module_makefile", Paths.get(moduleDir, "Makefile"));
