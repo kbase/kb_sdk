@@ -71,24 +71,27 @@ public class ModuleTesterTest {
 	public static int runTestsInDocker(File moduleDir, AuthToken token) throws Exception {
 	    return runTestsInDocker(moduleDir, token, false);
 	}
-
-	public static int runTestsInDocker(File moduleDir, AuthToken token, 
-	        boolean skipValidation) throws Exception {
-	    DockerClientServerTester.correctDockerfile(moduleDir);
-	    File testCfgFile = new File(moduleDir, "test_local/test.cfg");
+    
+    public static int runTestsInDocker(
+            final File moduleDir,
+            final AuthToken token, 
+            final boolean skipValidation)
+            throws Exception {
+        DockerClientServerTester.correctDockerfile(moduleDir);
+        File testCfgFile = new File(moduleDir, "test_local/test.cfg");
         String testCfgText = ""+
                 "test_token=" + token.getToken() + "\n" +
                 "kbase_endpoint=" + TestConfigHelper.getKBaseEndpoint() + "\n" +
                 "auth_service_url=" + TestConfigHelper.getAuthServiceUrl() + "\n" +
                 "auth_service_url_allow_insecure=" + 
-                TestConfigHelper.getAuthServiceUrlInsecure() + "\n";
+                    TestConfigHelper.getAuthServiceUrlInsecure() + "\n";
         FileUtils.writeStringToFile(testCfgFile, testCfgText);
         int exitCode = new ModuleTester(moduleDir).runTests(ModuleBuilder.DEFAULT_METHOD_STORE_URL,
-	            skipValidation, false);
-	    System.out.println("Exit code: " + exitCode);
-	    return exitCode;
-	}
-	
+                skipValidation, false);
+        System.out.println("Exit code: " + exitCode);
+        return exitCode;
+    }
+
 	@Test
 	public void testPerlModuleExample() throws Exception {
 	    System.out.println("Test [testPerlModuleExample]");

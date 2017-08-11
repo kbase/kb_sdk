@@ -10,8 +10,31 @@
 8. [Complete Module Info](kb_sdk_complete_module_info.md)
 9. [Deploy](kb_sdk_deploy.md)
 
+**Note: The recommended installation option is to run the [SDK as a Docker container.](kb_sdk_dockerized_install.md)**
 
 ### 2. Install and Build SDK
+
+#### Install additional dependencies
+
+##### Java JDK 7+
+http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+After downloading and installing the JDK, set your `JAVA_HOME` environment variable to point to your JDK installation.  If you're not sure where that is, on a Mac the command `/usr/libexec/java_home` should tell you and on Linux `readlink -f $(which javac)` will provide the installed location of the javac, which you can use to find the base directory of the installation.  On a Mac you can set the variable like so:
+
+    # for bash
+    export JAVA_HOME=`/usr/libexec/java_home`
+    # for tcsh/csh
+    setenv JAVA_HOME `/usr/libexec/java_home`  
+    
+You should probably add this command to the end of your `~/.bash_profile` or ~/.bashrc file so it is always set when you start a terminal.
+
+##### Apache Ant
+http://ant.apache.org
+
+http://ant.apache.org/manual/install.html
+
+The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH environment variable, which is generally handled for you if you use a package manager like HomeBrew.
+
 
 #### Fetch the code from GitHub:
 
