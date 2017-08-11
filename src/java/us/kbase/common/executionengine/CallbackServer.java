@@ -35,6 +35,7 @@ import com.google.common.cache.CacheBuilder;
 
 import us.kbase.auth.AuthException;
 import us.kbase.auth.AuthToken;
+import us.kbase.auth.ConfigurableAuthService;
 import us.kbase.common.executionengine.CallbackServerConfigBuilder.CallbackServerConfig;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonClientException;
@@ -108,6 +109,24 @@ public abstract class CallbackServer extends JsonServerServlet {
          * Might want to increase the cache lifetime or have a separate
          * cache for jobs that are done but haven't been checked by the user
          */
+    }
+    
+    @Override
+    public void startupFailed() {
+        /* This is a hack to avoid startup failures when the auth service isn't contactable.
+         * Since the callback server currently never contacts the auth service, and startupFailed()
+         * is only called when the auth client setup fails, it's safe to ignore. The callback
+         * server needs to be reworked to properly authenticate tokens in the longterm, see
+         * https://kbase-jira.atlassian.net/browse/TASK-881
+         */
+    }
+    
+    @Override
+    protected ConfigurableAuthService getAuth(final Map<String, String> config) {
+        /* see comments for startupFailed() above. Auth isn't needed, so we can skip trying to
+         * contact the auth server.
+         */
+        return null;
     }
     
     @Override
