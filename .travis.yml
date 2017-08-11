@@ -1,5 +1,4 @@
-language: python
-# Replace "python" with java if appropriate
+language: java
 
 python:
   - "2.7"
