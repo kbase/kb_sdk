@@ -71,7 +71,7 @@ class <ModuleName>:
 
 #### <A NAME="impl-adding-data"></A>C. Adding Data To Your Method
 
-Data that is supported by [KBase Data Types](doc/kb_sdk_data_types_table.md) should be added as a workspace object. 
+Data that is supported by [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes) should be added as a workspace object. 
 Other data that is used to configure a method may be added to the repo with the code.  Large data sets that exceed a 
 reasonable limit (> 1 GB) should be added to a shared mount point.  This can be accomplished by contacting kbase 
 administrators at http://kbase.us. 

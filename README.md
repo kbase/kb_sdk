@@ -34,9 +34,10 @@ You can use the SDK to develop and test Apps with a regular KBase user account (
 - [Troubleshooting](doc/kb_sdk_troubleshooting.md)
 - [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
-- [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
-- [Working with KBase Data Types](doc/kb_sdk_data_types.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
+- [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes)
+- [KIDL Specification](doc/KIDL%20Specification.pdf)
+- [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
 <!--NOT DONE
 
@@ -116,10 +117,9 @@ Enter your new module directory and do the initial build:
     cd MyContigFilter
     make
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
+Edit the local test config file (`test_local/test.cfg`) with a KBase developer token:
 
-    test_user = TEST_USER_NAME
-    test_password = TEST_PASSWORD
+    test_token = TEST_TOKEN
 
 Run tests:
 
@@ -169,4 +169,4 @@ There are a number of modules that we continually update and modify to demonstra
 <br>
 ## Need more?
 
-Browse through the [doc](doc/) directory of this repo for the latest avaialble documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
+Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us

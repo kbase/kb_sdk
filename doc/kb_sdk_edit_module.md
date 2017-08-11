@@ -55,7 +55,7 @@ Potential Inputs:
 * **Function Parameters** - Short parameters in map, list, float, string, and boolean form can be accepted by the 
 function. See below for how to pass these these parameters as in input object.
 * **Reference data** - Modest sized reference data can be committed to the /data directory.
-* **KBase Typed Data** - If your function will work on one of [KBase's defined data types](https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_data_types.md),
+* **KBase Typed Data** - If your function will work on one of [KBase's defined data types](https://narrative.kbase.us/#catalog/datatypes),
 your method should accept a workspace reference to the objects as a string and access the data with DataFileUtil or a 
 utility specific to your data type.
 * **External web-assessable data** - You method may accept a URL as string and utilize the DataFileUtil to download the
