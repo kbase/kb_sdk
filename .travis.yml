@@ -24,7 +24,7 @@ env:
 #    secure: "blahblahblah"
 
 before_install:
-    - env
+  - env
 
 install:
   - pushd ..
@@ -37,9 +37,10 @@ script:
   - export PATH=$(pwd)/bin:$PATH
   - source src/sh/sdk-completion.sh
   - kb-sdk help
+  - cd ..
   - kb-sdk init --example -l python -u sychan MyContigFilter
   - cd MyContigFilter
   - make
   - kb-sdk validate
-  
+
   
