@@ -157,7 +157,7 @@ public class ModuleInitializer {
             break;
 		case "python":
             templateFiles.put("module_test_python_client", Paths.get(moduleDir, "test", this.moduleName + "_server_test.py"));
-			templateFiles.put("module_tox", Paths.get(moduleDir, "tox.ini"));
+            templateFiles.put("module_tox", Paths.get(moduleDir, "tox.ini"));
             break;
         case "perl":
             templateFiles.put("module_test_perl_client", Paths.get(moduleDir, "test", this.moduleName + "_server_test.pl"));
