@@ -23,9 +23,11 @@ Result data should be collected into KBase data objects and stored back in the w
 
 - A. [Install Other KBase Modules](#install)
 - B. [Import and Initialise](#import)
-- C. [Adding Data to Your Method](#impl-adding-data)
-- D. [Invoking Shell Tool](#impl-shell-tool)
-- E. [Building Output Report](#impl-report)
+- C. [Validating user input](#validate)
+- D. [Adding Reference Data to Your Method](#impl-adding-data)
+- C. [E. Get and Save Date with KBase Workspaces](#get-save-data)
+- F. [Invoking Shell Tool](#impl-shell-tool)
+- G. [Building Output Report](#impl-report)
 
 #### <A NAME="install"></A>A. Install Other KBase Modules
 
@@ -33,16 +35,29 @@ If you begin by altering an existing app (as this walkthough demonstrates) you w
 modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal.
 Here's an sample of some of the modules that might be helpful for you app:
 
-* [DataFileUtil](https://github.com/kbaseapps/DataFileUtil/blob/master/DataFileUtil.spec) - A collection of tools to 
-get data directly from the web, from the user's computer (via the staging area) and KBase workspaces.
-* [KBaseReport](https://github.com/kbaseapps/KBaseReport/blob/master/KBaseReport.spec) - Allows the creation of KBase 
+* [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) - Allows the creation of KBase 
 reports which can present text, html, and downloadable files to the user as output to your app.
+* [ReadsUtils](https://appdev.kbase.us/#catalog/modules/ReadsUtils) - Utilities for validating, uploading, and 
+downloading reads files. Includes FASTA and FASTQ validators. 
+*[ExpressionUtils](https://appdev.kbase.us/#catalog/modules/ExpressionUtils) - A module to upload, download and 
+export RNASeq Expression data obtained by either StringTie or Cufflinks Apps.
+*[ReadsAlignmentUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Functions for uploading and 
+downloading KBase reads alignment files.
+*[DifferentialExpressionUtils](https://appdev.kbase.us/#catalog/modules/DifferentialExpressionUtils) - Module to 
+upload/download/export differential expression object and other related processing
+*[FeatureSetUtils](https://appdev.kbase.us/#catalog/modules/FeatureSetUtils) - A module to upload, download and 
+export Genomic Feature Set data
+*[CompoundSetUtils](https://appdev.kbase.us/#catalog/modules/CompoundSetUtils) - Module to upload/download/export 
+chemical compound sets
+* [DataFileUtil](https://appdev.kbase.us/#catalog/modules/DataFileUtil) - A collection of tools to 
+get data directly from the web, from the user's computer (via the staging area) and KBase workspaces.
 
 [\[Back to top\]](#top)
 
 #### <A NAME="import"></A>B. Import and Initialise
 In python, you can import these installed modules like any other python package. In the header, two important properties
-are defined. The first is the SDK_CALLBACK_URL which is passed to modules invoked by this modules and demonstrated by 
+are defined. The first is the SDK_CALLBACK_URL which is passed to modules invoked by this modules so they can report 
+their status and results to the callback server which coordinates module execution. This is demonstrated by 
 the instantiation of a DataFilesUtils client in the following example. The other parameter commonly defined in 
 the module constructor is the path to the scratch directory. This directory is a common space accessible by not only the 
 current module but also every module called by this module. Therefore files from other modules (for example 
@@ -68,26 +83,54 @@ class <ModuleName>:
 
 [\[Back to top\]](#top)
 
+#### <A NAME="validate"></A>C. Validating user input
 
-#### <A NAME="impl-adding-data"></A>C. Adding Data To Your Method
+While user interfaces for narrative apps are able to able to validate input to your app, it's wise not to rely on 
+this functionality because other developers may call your module directly (and incorrectly). The following function
+can be placed in the header to your method and called to verify the correct keys are present in an input parameter
+object.
+```python
+    @staticmethod
+    def _check_param(in_params, req_param, opt_param=list()):
+        """
+        Check if each of the params in the 'req_params' list are in 'in_params' and warn about unexpected params
+        """
+        for param in req_param:
+            if param not in in_params:
+                raise ValueError('{} parameter is required'.format(param))
+        defined_param = set(req_param+opt_param)
+        for param in in_params:
+            if param not in defined_param:
+                print("WARNING: received unexpected parameter {}".format(param))
+```
 
-Data that is supported by [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes) should be added as a workspace object. 
-Other data that is used to configure a method may be added to the repo with the code.  Large data sets that exceed a 
-reasonable limit (> 1 GB) should be added to a shared mount point.  This can be accomplished by contacting kbase 
-administrators at http://kbase.us. 
+[\[Back to top\]](#top)
+
+#### <A NAME="impl-adding-data"></A>D. Adding Reference Data To Your Method
+
+Reference data that is modest in size should be added to the github repository in the /data folder. At runtime, this
+data will be accessible at `kb/module/data`. Data sets that exceed GitHub's file size limits (> 100 MB) should be 
+added to a shared mount point.  This can be accomplished by contacting kbase administrators at http://kbase.us. 
+
+[\[Back to top\]](#top)
+
+#### <A NAME="get-save-data"></A>E. Get and Save Data with KBase Workspaces
+
+Your method may use one or more data objects the user has uploaded into a Narrative (visible in then data panel to
+on the right). Your method can access these objects by reference(preferred) or name using the [DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil)
+(DFU) module or a type specific module that uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil))
+to handle input and output of objects/files. While any object can be downloaded or uploaded in JSON form with DFU, 
+the specialized modules ofter are able to write or read data in type specific formats like FASTA or SBML.
 
 In order to support open and reproducible science, KBase data objects store a record of the source and methods applied 
-to data in an accompanying provenance object. A basic guideline for getting provenance right is to make use of the 
-[DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil)(DFU) module or a type specific module that 
-uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil)) to handle 
-input and output of objects/files. You may find examples of older KBase modules which generate 
+to data in an accompanying provenance object. You may find examples of older KBase modules which generate 
 [provenance objects](https://ci.kbase.us/services/ws/docs/Workspace.html#typedefWorkspace.ProvenanceAction) directly and
-use the workspace service to save objects but this approach has been deprecated in favor of the DFU utility module which
+use the workspace service to save objects but this approach has been deprecated in favor of the DFU module which
 handles provenance data automatically.
 
 [\[Back to top\]](#top)
 
-#### <A NAME="impl-shell-tool"></A>D. Invoking Shell Tool
+#### <A NAME="impl-shell-tool"></A>F. Invoking Shell Tool
 
 Many KBase apps wrap tools with commandline interfaces. The following example from the [kb_quast](https://github.com/kbaseapps/kb_quast) 
 repository demonstrates how to do (and document) this well with Python.
@@ -100,7 +143,7 @@ repository demonstrates how to do (and document) this well with Python.
         cmd = ['quast.py', '--threads', str(threads), '-o', outdir, '--labels', ','.join(labels),
                '--glimmer', '--contig-thresholds', '0,1000,10000,100000,1000000'] + filepaths
         self.log('running QUAST with command line ' + str(cmd))
-        retcode = _subprocess.call(cmd)
+        retcode = subprocess.call(cmd)
         self.log('QUAST return code: ' + str(retcode))
         if retcode:
             # can't actually figure out how to test this. Give quast garbage it skips the file.
@@ -109,7 +152,7 @@ repository demonstrates how to do (and document) this well with Python.
         # quast will ignore bad files and keep going, which is a disaster for
         # reproducibility and accuracy if you're not watching the logs like a hawk.
         # for now use this hack to check that all files were processed. Maybe there's a better way.
-        files_proc = len(_os.listdir(_os.path.join(outdir, 'predicted_genes'))) / 2
+        files_proc = len(os.listdir(os.path.join(outdir, 'predicted_genes'))) / 2
         files_exp = len(filepaths)
         if files_proc != files_exp:
             err = ('QUAST skipped some files - {} expected, {} processed.'
@@ -120,13 +163,13 @@ repository demonstrates how to do (and document) this well with Python.
 
 [\[Back to top\]](#top)
 
-#### <A NAME="impl-report"></A>E. Building Output Report
+#### <A NAME="impl-report"></A>G. Building Output Report
 
 The KBaseReports module is the preferred way to communicate results to users. The example module contains a minimal use
 case where a string is displayed to the user (supplied in the 'text_message' field) along with links to new objects 
 created by the app (supplied in the 'objects_created' field). However this module also contains functionality to create 
 and display HTML webpages and serve files directly for user download. A more typical and feature rich example can be
-found in KBase's implementation of [Ballgown](https://github.com/kbaseapps/kb_ballgown/blob/master/lib/kb_ballgown/core/ballgown_util.py#L66-L167)
+found in KBase's implementation of [Ballgown](https://github.com/kbaseapps/kb_ballgown/blob/1b77c87/lib/kb_ballgown/core/ballgown_util.py#L66-L167)
 
 To save space, an annotated copy of the master function is copied below:
 ```python
@@ -138,10 +181,10 @@ def _generate_report(self, params, result_directory, diff_expression_matrix_set_
         # Files to be presented directly to the user are copied to a output directory, zipped and returned as a list of paths
         output_files = self._generate_output_file_list(result_directory)
         
-        # A folder for the display web page is created(L74), reference data (could also be embedded images) for the page
-        # are copied in(L78), custom html is generated(L81-95), template is updated with custom html(L98-104), the 
-        # complete web page is saved to SHOCK which will serve the data(L106) and an object with that reference is 
-        # returned(L109)
+        # A folder for the display web page is created(L74 in ballgown repo linked above), reference data (could also be 
+        # embedded images) for the page are copied in(L78), custom html is generated(L81-95), template is updated with 
+        # custom html(L98-104), the complete web page is saved to SHOCK which will serve the data(L106) and an object with 
+        # that reference is returned(L109)
         output_html_files = self._generate_html_report(result_directory, params, diff_expression_matrix_set_ref)
 
         report_params = {

@@ -36,7 +36,7 @@ You can use the SDK to develop and test Apps with a regular KBase user account (
 - [Anatomy of a KBase Module](doc/module_overview.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 - [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes)
-- [KIDL Specification](doc/KIDL%20Specification.pdf)
+- [KIDL Specification](doc/KIDL_specification.md)
 - [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
 <!--NOT DONE
