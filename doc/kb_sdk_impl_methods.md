@@ -3,7 +3,7 @@
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
 5. **Implement Method(s)**
 6. [Specify User Interface](kb_sdk_make_ui.md)
 7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
@@ -12,7 +12,7 @@
 10. [Complete Module Info](kb_sdk_complete_module_info.md)
 11. [Deploy](kb_sdk_deploy.md)
 
-### <A NAME="impl"></A>5. Edit Implementation file
+### <A NAME="impl"></A>5. Implement Method(s)
 
 In the lib/\<MyModule> directory, edit the <MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
 defines the methods available in the module. The example module is very simple and implemented directly in this file

@@ -3,7 +3,7 @@
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
 5. [Implement Method(s)](kb_sdk_impl_methods.md)
 6. **Specify User Interface**
 7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
@@ -90,15 +90,19 @@ There are many additional interface options available. One of the best ways to d
 [this gallery](https://narrative.kbase.us/narrative/ws.23109.obj.1) which contains a variety of KBase apps along with 
 the spec file that generated the user interface.
 
+[\[Back to top\]](#top)
+
 #### B . Configure passing variables from Narrative Input to SDK method.
 
 In the 'behavior' section of the spec.json, the output of the user interface is mapped to input to your function.
 If you have maintained a consistent naming though these mappings can be pretty pro forma. However, transformations can 
-also be applied to input from the user interface. In the example below, the user-interface accepts the names of 
-assemblies from the user and transforms them into object references before passing them on to the method. (This prevents
-a race condition from occurring if multiple apps are writing to the same object name or if the object is renamed) In 
-the output mapping, the the output (a single object in this example) is unpacked into target properties. These output
-properties are used to visualize the result of the app (thus the need to return information about the report object).
+also be applied to input from the user interface. 
+
+In the example below, the user-interface accepts the names of assemblies from the user and transforms them into object
+references before passing them on to the method. (This prevents a race condition from occurring if multiple apps are 
+writing to the same object name or if the object is renamed) In the output mapping, the the output (a single object in
+this example) is unpacked into target properties. These output properties are used to visualize the result of the app 
+(thus the need to return information about the report object).
 ```
 "behavior" : {
     "service-mapping": {
@@ -146,6 +150,8 @@ properties are used to visualize the result of the app (thus the need to return 
     }
 ```
 
+[\[Back to top\]](#top)
+
 #### C. Naming fields in the input widget cell
 
 The display.yml primarily contains text to explain the method in the narrative and especially in the app catalogue.
@@ -159,3 +165,5 @@ minimally this file should define:
 #### Details on Narrative UI specification
 
 Further details on specification of Narrative app interfaces are available [here](https://docs.google.com/document/d/1CZ1GOKsRr1NsScG9E2EesJyk_ViOrM9OazrVFKCkyHs/edit)
+
+[\[Back to top\]](#top)

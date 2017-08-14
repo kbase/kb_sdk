@@ -3,7 +3,7 @@
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install and Build SDK](kb_sdk_install_and_build.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
 5. [Implement Method(s)](kb_sdk_impl_methods.md)
 6. [Specify User Interface](kb_sdk_make_ui.md)
 7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
@@ -24,14 +24,6 @@ Click on the 'R' in the method panel list until it switches to 'D' for methods s
 Explore the other SDK methods in the Narrative method panel
 
     https://appdev.kbase.us/#appcatalog/
-    
-For finer-grain control of the KBase Catalog registration process, use a code cell:
-
-    from biokbase.catalog.Client import Catalog
-    catalog = Catalog(url="https://appdev.kbase.us/services/catalog")
-    catalog.version()
-
-The KBase Catalog API is defined here: https://github.com/kbase/catalog/blob/master/catalog.spec
 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)

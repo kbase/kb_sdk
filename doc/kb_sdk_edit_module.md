@@ -13,7 +13,7 @@
 11. [Deploy](kb_sdk_deploy.md)
 
 
-### 4. Edit Module and create Method(s)
+### 4. Specify Module and Method(s)
 
 - A. [Creating a Git Repo](#create-repo)
 - B. [Scope Module & Methods](#scope-module)
@@ -119,8 +119,8 @@ All methods that run in the Narrative will require authentication because they n
 Your method can require authentication by adding that declaration at the end of the method.
 
 If you will be loading or saving any data from the workspace, make sure you accept a workspace reference in the input 
-parameters(You may have noticed example module KIDL spec uses workspace names. This gets the job done but can cause race
-conditions in rare cases so you are better off using references)
+parameters. (You may have noticed the example module KIDL spec uses workspace names. This gets the job done but can cause race
+conditions in rare cases which is why references are preferred)
 
 ```
     typedef structure {
@@ -129,7 +129,7 @@ conditions in rare cases so you are better off using references)
     } <Module>Params;
 ```
 
-If you will be creating a KBase report(and almost certainly will), your method should return the report name and 
+If you will be creating a KBase report(and you almost certainly will), your method should return the report name and 
 reference in it's output object as shown below:
 ```
     typedef structure {
@@ -138,7 +138,7 @@ reference in it's output object as shown below:
     } compoundset_results;
 ```
 
-Additional information on KIDL objects is available in the [workspace documentation](https://ci.kbase.us/services/ws/docs/typedobjects.html#typedobjects)
+Additional information on KIDL objects is available in the [here](KIDL_Specification.md)
 
 [\[Back to top\]](#top)
 

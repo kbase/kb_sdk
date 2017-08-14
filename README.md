@@ -19,14 +19,14 @@ You can use the SDK to develop and test Apps with a regular KBase user account (
 1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
 2. [Install and Build SDK](doc/kb_sdk_install_and_build.md)
 3. [Create Module](doc/kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](doc/kb_sdk_edit_module.md)
-5. [Implement Method(s)](kb_sdk_impl_methods.md)
-6. [Specify User Interface](kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-8. [Register Module](kb_sdk_register_module.md)
-9. [Test in KBase](kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kb_sdk_complete_module_info.md)
-11. [Deploy](kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](doc/kb_sdk_edit_module.md)
+5. [Implement Method(s)](doc/kb_sdk_impl_methods.md)
+6. [Specify User Interface](doc/kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
+8. [Register Module](doc/kb_sdk_register_module.md)
+9. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kdoc/b_sdk_complete_module_info.md)
+11. [Deploy](doc/kb_sdk_deploy.md)
 
 ### Additional Documentation
 - [Examples](#examples)
@@ -51,7 +51,6 @@ You can use the SDK to develop and test Apps with a regular KBase user account (
 -->
 
 
-<br>
 ## Quick Install Guide
 
 Below is a quick reference guide for standard installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
@@ -105,7 +104,7 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
     cd kb_sdk
     make
 
-<br>
+
 ## Quick Start Guide
 
 Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
@@ -155,7 +154,6 @@ Your App will now also be visible in the App Catalog when displaying Apps in dev
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 
-<br>
 ## <A NAME="examples"></A>Example Modules
 
 There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
@@ -166,7 +164,6 @@ There are a number of modules that we continually update and modify to demonstra
  - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
 
 
-<br>
 ## Need more?
 
 Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
