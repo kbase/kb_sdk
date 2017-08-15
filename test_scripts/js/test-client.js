@@ -101,7 +101,7 @@ casper.test.begin('JS Client Test Initialization', 9, function suite(test) {
                 });
             params.push(
                 function(err) {
-                    console.log('# receiving   error response for  '+trial+' : '+method);
+                    console.log('# receiving error response for '+trial+' : '+method);
 
                     casper.test.begin('Test Method Response: '+trial+' : '+method,1, function suite(test) {
                         if(outcome.status==='fail') {
@@ -115,9 +115,16 @@ casper.test.begin('JS Client Test Initialization', 9, function suite(test) {
 
                             if(outcome.error) {
                                 for(var k=0; k<outcome.error.length; k++) {
-                                    if(err.error.message.indexOf(outcome.error[k])<0) {
+                                    if (err && err.error && err.error.message) {
+                                        if(err.error.message.indexOf(outcome.error[k])<0) {
+                                            test.fail("error message should contain: '"+ outcome.error[k]+
+                                                "' but did not. \nError was:\n"+err.error.message);
+                                        }
+                                    } else {
                                         test.fail("error message should contain: '"+ outcome.error[k]+
-                                            "' but did not. \nError was:\n"+err.error.message);
+                                        "' but did not. \nError was: UNDEFINED");
+                                        console.log("Contents of err object :\n"+err);
+                                
                                     }
                                 }
                             }

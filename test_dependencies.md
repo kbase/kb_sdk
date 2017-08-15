@@ -15,5 +15,6 @@ cpan -f -i RPC::Any
 cpan Bio::KBase::Exceptions
 
 cpan Parse::Yapp Devel::StackTrace Lingua::EN::Inflect Template File::Slurp Cwd JSON Data::UUID XML::Dumper JSON::RPC::Client Exception::Class Config::Simple Digest::SHA1 Crypt::OpenSSL::RSA Convert::PEM DateTime MIME::Base64 URI Object::Tiny::RW Plack File::ShareDir::Install YAML TAP::Harness Plack::Middleware::CrossOrigin RPC::Any::Server::JSONRPC::PSGI
+cpan Plack::Request RPC::Any::Server::JSONRPC::HTTP arse::Yapp Devel::StackTrace Lingua::EN::Inflect Template File::Slurp Cwd JSON Data::UUID XML::Dumper JSON::RPC::Client Exception::Class Config::Simple Digest::SHA1 Crypt::OpenSSL::RSA Convert::PEM DateTime MIME::Base64 URI Object::Tiny::RW Plack File::ShareDir::Install YAML TAP::Harness Plack::Middleware::CrossOrigin RPC::Any::Server::JSONRPC::PSGI
 
 CasperJS must be installed, > 1.1.0. http://casperjs.org/
