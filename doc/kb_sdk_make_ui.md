@@ -14,14 +14,15 @@
 
 ### <A NAME="ui-widget"></A>6. Specify User Interface
 
-Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.
+Control of Narrative interaction is accomplished in files in the ui/narrative/methods/&lt;MyMethod&gt; directory.
 
 #### A. Configure the input interface.
 
 The input options are specified in the "parameters" section of the spec.json file. In the following example, the user
 supplies two required parameters, an input name and an output name. By specifying a 'valid_ws_types' the user will
-be present a searchable dropdown of objects that match the specified type. By passing "is_output_name", the user is
-warned if a name will overwrite an existing object or if the name contains invalid characters.
+be presented with a searchable dropdown of objects that match the specified type. By passing "is_output_name", the user is
+warned if a name will overwrite an existing object or if the name contains invalid characters and a widget displaying that
+object will appear beneath the app cell. 
 
 ```
 	"parameters": [ 
@@ -51,7 +52,7 @@ warned if a name will overwrite an existing object or if the name contains inval
 	],
 ```
 Another common input is a dropdown which is demonstrated below. For each option, the "value" is what will be passed to
-the script while the UI Name and Display is what the user will see. In this example, the parameter is hidden be default 
+the app while the "ui_name" is what the user will see. In this example, the parameter is hidden by default 
 because "advanced" is true.
 ```
 {
@@ -86,7 +87,7 @@ because "advanced" is true.
         },
 ```
 
-There are many additional interface options available. One of the best ways to discover them is to look at 
+There are many additional interface options available. One of the best ways to discover them is to explore 
 [this gallery](https://narrative.kbase.us/narrative/ws.23109.obj.1) which contains a variety of KBase apps along with 
 the spec file that generated the user interface.
 
@@ -148,6 +149,51 @@ this example) is unpacked into target properties. These output properties are us
             ]
         }
     }
+```
+In the above example the Narrative take an object looking like this from the App UI:
+```json
+{
+  "assemblies": [
+    "AssemblyA",
+    "AssemblyB"
+  ]
+}
+```
+and pass an object looking like this to the implementation function:
+```json
+{
+  "assemblies": [
+    "765/1/1",
+    "765/2/1"
+  ],
+  "Workspace_name": "<username>:narrative_<long_number>"
+}
+```
+Similarly, the narrative accepts an output object like this:
+```json
+[
+  {
+    "report_name": "QUAST_Report_<uuid>",
+    "report_ref": "765/3/1"
+  }
+]
+```
+And presents an object like this one to the report visualization:
+```json
+{
+    "report_name": "QUAST_Report_<uuid>",
+    "report_ref": "765/3/1",
+    "report_window_line_height": 5,
+    "QUAST_result": {
+        "report_name": "QUAST_Report_<uuid>",
+        "report_ref": "765/3/1"
+    },
+    "assemblies": [
+    "AssemblyA",
+    "AssemblyB"
+    ],
+    "Workspace_name": "<username>:narrative_<long_number>"   
+}
 ```
 
 [\[Back to top\]](#top)
