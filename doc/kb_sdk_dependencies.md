@@ -1,7 +1,7 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 1. **Install SDK Dependencies**
-2. [Install and Build SDK](kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
 4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
 5. [Implement Method(s)](kb_sdk_impl_methods.md)
@@ -23,32 +23,8 @@ System Dependencies:
 - Docker https://www.docker.com (for local testing)
 - At least 20 GB free on your hard drive to install Docker, Xcode, Java JRE, etc.
 
-(If you plan to build from source)
-- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
-- JAVA_HOME environment variable set to JDK installation path
-- Apache Ant http://ant.apache.org
-
 #### Mac OS X 10.8+ or Linux
 Windows development is not currently supported.  If you are running Windows or do not want to develop on your local machine, we recommend using [VirtualBox](https://www.virtualbox.org) and installing Ubuntu 14+.
-
-#### Java JDK 7+  (No longer required if you are using the Docker-based installation)
-http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-After downloading and installing the JDK, set your `JAVA_HOME` environment variable to point to your JDK installation.  If you're not sure where that is, on a Mac the command `/usr/libexec/java_home` should tell you and on Linux `readlink -f $(which javac)` will provide the installed location of the javac, which you can use to find the base directory of the installation.  On a Mac you can set the variable like so:
-
-    # for bash
-    export JAVA_HOME=`/usr/libexec/java_home`
-    # for tcsh/csh
-    setenv JAVA_HOME `/usr/libexec/java_home`  
-    
-You should probably add this command to the end of your `~/.bash_profile` or ~/.bashrc file so it is always set when you start a terminal.
-
-#### Apache Ant (Only required for building the SDK tools from source)
-http://ant.apache.org
-
-http://ant.apache.org/manual/install.html
-
-The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH environment variable, which is generally handled for you if you use a package manager like HomeBrew.
 
 #### (Mac only) Xcode
 https://developer.apple.com/xcode

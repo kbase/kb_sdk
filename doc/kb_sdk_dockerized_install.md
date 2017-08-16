@@ -56,5 +56,8 @@ The Image is fairly large, so this will take some time to download.  This step i
 should only be reqired during the initial installation.  However, KBsae staff may occasionally require the base image
 to be updated in order to match any changes in the base image running in the production KBase platform.
 
+#### Build from source
+While the preceding steps are the recommended approach, it's also possible to [build the SDK from source](kb_sdk_install_and_build.md)
+
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)

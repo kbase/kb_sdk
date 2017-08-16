@@ -1,7 +1,7 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install and Build SDK](kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
 4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
 5. [Implement Method(s)](kb_sdk_impl_methods.md)
@@ -62,12 +62,17 @@ RUN rm -rf tarball.tgz
 
 because the latter does not remove the previous bloating layers, despite the "rm" command.
 
-#### <A NAME="build-tests"></A>B. Build tests of your methods
+Final Note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from cache. This means that if you are pulling in external data using RUN and a command like `git clone` or `wget` changes in those sources will not automatically be reflected in a rebuilt docker image unless the docker file changes at or before that import.
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
+#### <A NAME="get-token"></A>B. Get a developer token
 
-    test_user = TEST_USER_NAME
-    test_password = TEST_PASSWORD
+If you have already been approved as a KBase developer, a token may be generated from your [kbase account profile](https://narrative.kbase.us/#auth2/account) under the Developer Tokens tab.
+
+#### <A NAME="build-tests"></A>C. Build tests of your methods
+
+Edit the local test config file (`test_local/test.cfg`) with a developer token (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
+
+    test_token = TEST_TOKEN
 
 *In the Docker shell*, run tests:
 
