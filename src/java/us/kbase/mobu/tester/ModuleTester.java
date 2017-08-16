@@ -175,6 +175,7 @@ public class ModuleTester {
             System.out.println("Custom network instarface list is defined: " + 
                     Arrays.asList(callbackNetworks));
         }
+        System.out.println("Info: getting callback url...");
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
         Server jettyServer = null;
         if (callbackUrl != null) {
@@ -212,12 +213,9 @@ public class ModuleTester {
             context.addServlet(new ServletHolder(catalogSrv),"/*");
             jettyServer.start();
         } else {
-            if (callbackNetworks != null && callbackNetworks.length > 0) {
-                throw new IllegalStateException("No proper callback IP was found, " +
-                		"please check callback_networks parameter in test.cfg");
-            }
-            System.out.println("WARNING: No callback URL was received " +
-                    "by the job runner. Local callbacks are disabled.");
+            throw new IllegalStateException("No callback URL was received " +
+                    "by the job runner. Local callbacks are disabled. " +
+                    "CallbackNetworks: "+Arrays.toString(callbackNetworks));
         }
         ///////////////////////////////////////////////////////////////////////////////////////////
         try {
