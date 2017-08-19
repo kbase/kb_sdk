@@ -79,24 +79,28 @@ Edit the local test config file (`test_local/test.cfg`) with a developer token (
     cd test_local
     kb-sdk test
 
-This will build your Docker container, run the method implementation running in the Docker 
-container that fetches example ContigSet data from the KBase CI database and generates output. 
-After tests are run for the first time, a new `workdir` directory will appear in `test_local`
-that contains the scratch directory which is helpful for inspecting intermediate files,
+This will build your Docker container and execute all test scripts in the test directory.
+The example module already has tests implemented in `test/python_server_test.py` which creates
+a testing workspace, uploads test data and runs the filter_contigs method. After tests are 
+run for the first time, a new `workdir/tmp` directory will appear in `test_local` which is
+the scratch directory from the preceding run. Inspecting these intermediate files can be very
+helpful for debugging.
 
-Additionally you can inspect the Docker container to see whether your wrapped tool was 
-installed properly, by opening a bash console.  From the `test_local` directory:
+Additionally, you can inspect the file structure of the Docker container to see whether your
+wrapped tool was installed properly, by opening a bash console.  From the `test_local` directory:
     
     ./run_bash.sh
 
 Unfortunately, you will have to rebuild the Docker image each time you change your module code 
 (e.g. KIDL \<MyModule\>.spec, \<MyModule\>Impl.py, and your testing code) but this happens 
-automatically for you when you run *kb-sdk test*, so it just slows you down rather than add 
-any extra effort.  However, if you change the KIDL \<MyModule\>.spec file, you will have to 
+automatically for you when you run *kb-sdk test*, so it just slows you down rather than adding 
+any extra effort. However, if you change the KIDL \<MyModule\>.spec file, you will have to 
 rerun *make* to propagate those changes to the \<MyModule\>Client and \<MyModule\>Impl code 
-(and likely will have some tweaks to apply to the Impl code to match the spec changes).  Happy debugging!
+(and likely will have some tweaks to apply to the Impl code to match the spec changes). 
+Following [Dockerfile Best Practices](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices)
+like leveraging layer caching can greatly speed up your test process. Happy debugging!
 
-**(don't forget to *git commit* and *git push* your edits to your github repo)**
+**(Don't forget to *git commit* and *git push* your edits to your github repo)**
 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)

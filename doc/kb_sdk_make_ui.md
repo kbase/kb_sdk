@@ -19,10 +19,10 @@ Control of Narrative interaction is accomplished in files in the ui/narrative/me
 #### A. Configure the input interface.
 
 The input options are specified in the "parameters" section of the spec.json file. In the following example, the user
-supplies two required parameters, an input name and an output name. By specifying a 'valid_ws_types' the user will
-be presented with a searchable dropdown of objects that match the specified type. By passing "is_output_name", the user is
-warned if a name will overwrite an existing object or if the name contains invalid characters and a widget displaying that
-object will appear beneath the app cell. 
+will supply two required parameters, an input name and an output name. If you specify 'valid_ws_types', the user will
+be presented with a searchable dropdown of objects that match the specified types. If you set "is_output_name" to true,
+the user will be warned if a name will overwrite an existing object or if the name contains invalid characters and a 
+widget displaying that object will appear beneath the app cell. 
 
 ```
 	"parameters": [ 

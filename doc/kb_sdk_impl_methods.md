@@ -17,15 +17,17 @@
 In the lib/\<MyModule> directory, edit the <MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
 defines the methods available in the module. The example module is very simple and implemented directly in this file
 but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
-containing more than one method. Basically, the process consists of obtaining data objects from the KBase workspace, and
-either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on. 
-Result data should be collected into KBase data objects and stored back in the workspace.
+containing more than one method. 
+
+The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd party 
+code or executables), storing resulting data in the data stores, and producing a report of the work accomplished for the user.
+This step of the guide will walk through this process and present some of the utility modules that help facilitate this work.
 
 - A. [Install Other KBase Modules](#install)
 - B. [Import and Initialise](#import)
 - C. [Validating user input](#validate)
 - D. [Adding Reference Data to Your Method](#impl-adding-data)
-- C. [E. Get and Save Date with KBase Workspaces](#get-save-data)
+- E. [Interacting with KBase data stores (Workspaces)](#get-save-data)
 - F. [Invoking Shell Tool](#impl-shell-tool)
 - G. [Building Output Report](#impl-report)
 
@@ -33,10 +35,14 @@ Result data should be collected into KBase data objects and stored back in the w
 
 If you begin by altering an existing app (as this walkthough demonstrates) you will already have some KBase utility 
 modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal.
-Here's an sample of some of the modules that might be helpful for you app:
+Here's an sample of some of the modules that might be helpful for your app:
 
 * [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) - Allows the creation of KBase 
 reports which can present text, html, and downloadable files to the user as output to your app.
+* [GenomeFileUtil](https://appdev.kbase.us/#catalog/modules/ReadsUtils) - Import/Export and Upload/Download 
+of Genome data
+*[AssemblyUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Provides tooling for interacting 
+with sequence assembly data in KBase.
 * [ReadsUtils](https://appdev.kbase.us/#catalog/modules/ReadsUtils) - Utilities for validating, uploading, and 
 downloading reads files. Includes FASTA and FASTQ validators. 
 *[ExpressionUtils](https://appdev.kbase.us/#catalog/modules/ExpressionUtils) - A module to upload, download and 
@@ -58,16 +64,16 @@ get data directly from the web, from the user's computer (via the staging area) 
 In python, you can import these installed modules like any other python package. In the header, two important properties
 are defined. The first is the SDK_CALLBACK_URL which is passed to modules invoked by this modules so they can report 
 their status and results to the callback server which coordinates module execution. This is demonstrated by 
-the instantiation of a DataFilesUtils client in the following example. The other parameter commonly defined in 
+the instantiation of a AssemblyUtil client in the following example. The other parameter commonly defined in 
 the module constructor is the path to the scratch directory. This directory is a common space accessible by not only the 
 current module but also every module called by this module. Therefore files from other modules (for example 
-DataFileUtils) will be written to the scratch folder and files to be used by other modules (such as KBaseReport) are 
+AssemblyUtil) will be written to the scratch folder and files to be used by other modules (such as KBaseReport) are 
 read from the scratch folder.
 
 ```python
 import os
+from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
 from KBaseReport.KBaseReportClient import KBaseReport
-from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 class <ModuleName>:
     """Module Docs"""
@@ -76,7 +82,7 @@ class <ModuleName>:
         self.config = config
         self.scratch = config['scratch']
         self.callback_url = os.environ['SDK_CALLBACK_URL']
-        self.dfu = DataFileUtil(self.callback_url)
+        self.dfu = AssemblyUtil(self.callback_url)
         #END_CONSTRUCTOR
         pass
 ```
@@ -88,7 +94,7 @@ class <ModuleName>:
 While user interfaces for narrative apps are able to able to validate input to your app, it's wise not to rely on 
 this functionality because other developers may call your module directly (and incorrectly). The following function
 can be placed in the header to your method and called to verify the correct keys are present in an input parameter
-object.
+object. You also should consider type checking and or deeper input validation, especially for long running apps.
 ```python
     @staticmethod
     def _check_param(in_params, req_param, opt_param=list()):
@@ -109,24 +115,37 @@ object.
 #### <A NAME="impl-adding-data"></A>D. Adding Reference Data To Your Method
 
 Reference data that is modest in size should be added to the github repository in the /data folder. At runtime, this
-data will be accessible at `kb/module/data`. Data sets that exceed GitHub's file size limits (> 100 MB) should be 
+data will be accessible at `/kb/module/data`. Data sets that exceed GitHub's file size limits (> 100 MB) should be 
 added to a shared mount point.  This can be accomplished by contacting kbase administrators at http://kbase.us. 
 
 [\[Back to top\]](#top)
 
-#### <A NAME="get-save-data"></A>E. Get and Save Data with KBase Workspaces
+#### <A NAME="get-save-data"></A>E. Interacting with KBase data stores (Workspaces)
 
-Your method may use one or more data objects the user has uploaded into a Narrative (visible in then data panel to
-on the right). Your method can access these objects by reference(preferred) or name using the [DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil)
-(DFU) module or a type specific module that uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil))
+Your method may use one or more data objects the user has available in a Narrative (visible in then data panel
+on the right) or data objects in public Narratives. Your method can access these objects by reference(preferred) or 
+name using the [DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil) (DFU) module or a type 
+specific module that uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil))
 to handle input and output of objects/files. While any object can be downloaded or uploaded in JSON form with DFU, 
-the specialized modules ofter are able to write or read data in type specific formats like FASTA or SBML.
+the specialized modules often are able to write or read data in type-specific formats like FASTA or SBML as the
+example module demonstrates:
+
+```
+fasta_file = assemblyUtil.get_assembly_as_fasta({'ref': assembly_input_ref})
+
+...
+
+new_assembly = assemblyUtil.save_assembly_from_fasta({'file': {'path': filtered_fasta_file},
+                                                      'workspace_name': workspace_name,
+                                                      'assembly_name': fasta_file['assembly_name']
+                                                      })
+```
 
 In order to support open and reproducible science, KBase data objects store a record of the source and methods applied 
 to data in an accompanying provenance object. You may find examples of older KBase modules which generate 
 [provenance objects](https://ci.kbase.us/services/ws/docs/Workspace.html#typedefWorkspace.ProvenanceAction) directly and
-use the workspace service to save objects but this approach has been deprecated in favor of the DFU module which
-handles provenance data automatically.
+use the workspace service to save objects but this approach has been deprecated in favor of the DFU or type-specific modules
+which handle provenance data automatically.
 
 [\[Back to top\]](#top)
 

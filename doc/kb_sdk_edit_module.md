@@ -52,12 +52,12 @@ individual methods it will contain. For each method, it is important to consider
 also the inputs and outputs.
 
 Potential Inputs:
-* **Function Parameters** - Short parameters in map, list, float, string, and boolean form can be accepted by the 
-function. See below for how to pass these these parameters as in input object.
+* **Function Parameters** - You method may accept an input object with parameters in map, list, float, string, and 
+boolean form.
 * **Reference data** - Modest sized reference data can be committed to the /data directory.
 * **KBase Typed Data** - If your function will work on one of [KBase's defined data types](https://narrative.kbase.us/#catalog/datatypes),
-your method should accept a workspace reference to the objects as a string and access the data with DataFileUtil or a 
-utility specific to your data type.
+your method should accept a object reference as a string and access the data an appropriate utility module for it's
+data type.
 * **External web-assessable data** - You method may accept a URL as string and utilize the DataFileUtil to download the
 file.
 
@@ -110,35 +110,35 @@ container type (list, mapping) or a structure.  In this example we define a stri
 named `FilterContigResults` with two integer fields named `contig_count` and `filtered_contig_count`.
 
 You can use any defined types as input/output parameters to functions but it's wise to pass an parameter object. This
-allows additional parameters to be supplied in future implementations without breaking back-comparability. Functions 
+allows additional parameters to be supplied in future implementations without breaking backwards compatibility. Functions 
 are defined using the `funcdef` keyword in this syntax:
 
     funcdef method_name(input_parameter_object_type params) returns (output_parameter_object_type output) authentication required;
 
-All methods that run in the Narrative will require authentication because they need to interact with a user's workspace).
+All methods that run in the Narrative will require authentication because they need to interact with a user's workspace.
 Your method can require authentication by adding that declaration at the end of the method.
 
-If you will be loading or saving any data from the workspace, make sure you accept a workspace reference in the input 
-parameters. (You may have noticed the example module KIDL spec uses workspace names. This gets the job done but can cause race
-conditions in rare cases which is why references are preferred)
+If you will be loading or saving any data from the workspace, make sure you accept object references in the input parameters.
+(You find examples of modules using workspace and object names. This gets the job done but can cause race conditions in rare 
+cases which is why references are preferred)
+
+If you will be creating a KBase report(and you almost certainly will), your method will need to accept a workspace_name which
+will ensure the report is in the right place to be viewed in the Narrative (This is the exception to the rule above). Your 
+method should also return the report name and reference in it's output object as shown below:
 
 ```
     typedef structure {
-    	string workspace_ref;
+    	string workspace_name;
     	...
-    } <Module>Params;
-```
-
-If you will be creating a KBase report(and you almost certainly will), your method should return the report name and 
-reference in it's output object as shown below:
-```
+    } <Module>Params
+    
     typedef structure {
         string report_name;
         string report_ref;
     } compoundset_results;
 ```
 
-Additional information on KIDL objects is available in the [here](KIDL_Specification.md)
+Additional information on KIDL specification is available in the [here](KIDL_Specification.md)
 
 [\[Back to top\]](#top)
 

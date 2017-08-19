@@ -40,17 +40,6 @@ In order to use the SDK to test and deploy Apps you will need developer credenti
 - [KIDL Specification](doc/KIDL_specification.md)
 - [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
-<!--NOT DONE
-
-- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
-- KBase SDK Coding Style Guide and Best Practices
-- Wrapping an Existing Command-Line Tool
-- Using Custom Reference Data 
-- Managing Your Module Release Cycle
-- KBase Interface Description Language (KIDL) Guide
-- Visualization Widget Development Guide
--->
-
 
 ## Quick Install Guide
 
