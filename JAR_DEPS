@@ -12,6 +12,7 @@ apache_commons/http/httpcore-4.3.jar
 apache_commons/http/httpmime-4.3.1.jar
 apache_commons/velocity-1.7.jar
 codemodel/codemodel-2.4.1.jar
+cglib/cglib-nodep-2.2.jar
 google/guava-18.0.jar
 google/jsonschema2pojo-core-0.3.6.jar
 ini4j/ini4j-0.5.2.jar
@@ -19,6 +20,7 @@ j2html/j2html-0.7.jar
 jackson/jackson-annotations-2.2.3.jar
 jackson/jackson-core-2.2.3.jar
 jackson/jackson-databind-2.2.3.jar
+javassist/javassist-3.20.0-GA.jar
 jcommander/jcommander-1.48.jar
 jetty/jetty-all-7.0.0.jar
 jna/jna-3.4.0.jar
@@ -32,6 +34,9 @@ kbase/workspace/WorkspaceClient-0.6.0.jar
 kohsuke/args4j-2.0.21.jar
 logback/logback-classic-1.1.2.jar
 logback/logback-core-1.1.2.jar
+mockito/mockito-all-2.0.2-beta.jar
+objenesis/objenesis-2.5.1.jar
+powermock-full/powermock-mockito2-1.7.0-full.jar
 servlet/servlet-api-2.5.jar
 slf4j/slf4j-api-1.7.7.jar
 snakeyaml/snakeyaml-1.11.jar
