@@ -1,7 +1,7 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install and Build SDK](kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
 4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
 5. **Locally Test Module and Method(s)**
@@ -56,29 +56,18 @@ RUN rm -rf tarball.tgz
 ```
 
 because the latter does not remove the previous bloating layers, despite the "rm" command.
-<!--
-    RUN git clone https://github.com/torognes/vsearch
-    WORKDIR vsearch
-    RUN ./configure 
-    RUN make
-    RUN make install
-    WORKDIR ../
 
-You will also need to add your KBase SDK module, and any necessary data, to the Dockerfile.  For example:
+Final Note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from cache. This means that if you are pulling in external data using RUN and a command like `git clone` or `wget` changes in those sources will not automatically be reflected in a rebuilt docker image unless the docker file changes at or before that import.
 
-    RUN mkdir -p /kb/module/test
-    WORKDIR test
-    RUN git clone https://github.com/dcchivian/kb_vsearch
-    RUN git clone https://github.com/dcchivian/kb_vsearch_test_data
-    WORKDIR ../
--->
+#### <A NAME="get-token"></A>5B. Get a developer token
 
-#### <A NAME="build-tests"></A>5B. Build tests of your methods
+If you have already been approved as a KBase developer, a token may be generated from your [kbase account profile](https://narrative.kbase.us/#auth2/account) under the Developer Tokens tab.
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
+#### <A NAME="build-tests"></A>5C. Build tests of your methods
 
-    test_user = TEST_USER_NAME
-    test_password = TEST_PASSWORD
+Edit the local test config file (`test_local/test.cfg`) with a developer token (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
+
+    test_token = TEST_TOKEN
 
 *In the Docker shell*, run tests:
 

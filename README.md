@@ -10,14 +10,15 @@ There are still some general restrictions on functionality that will gradually b
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, R, or Perl
 
-If you have a tool you would like to register with KBase that cannot meet these requirements, please contact us to discuss possible solutions.
+If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
-In order to register your Apps with KBase, you have to be an approved developer.  To become approved, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us at http://kbase.us/contact-us with your username and we will help with the next steps.
+In order to use the SDK to test and deploy Apps you will need developer credentials. Please 
+<a href="http://kbase.us/contact-us">contact us</a> to be added to the developer list.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
 1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
-2. [Install and Build SDK](doc/kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](doc/kb_sdk_dockerized_install.md)
 3. [Create Module](doc/kb_sdk_create_module.md)
 4. [Edit Module and Method(s)](doc/kb_sdk_edit_module.md)
 5. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
@@ -146,9 +147,9 @@ Add your repo to [GitHub](http://github.com) (or any other public git repository
 
 Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and submit.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
-Your method is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us and start a new narrative.  Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to filter some contigs.
+Your app is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us, sign in and start a new Narrative.  Click on the small 'R' in the upper right of the Apps panel until it switches to 'D' to show Apps that are still in development.  Find your new App by searching for your module, and run it to filter some contigs.
 
-Your method will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog/browse/dev and https://narrative.kbase.us/#appcatalog/browse/dev.  From your module page (e.g. https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
+Your App will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog/browse/dev and https://narrative.kbase.us/#appcatalog/browse/dev.  From your module page (e.g., https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
 
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 

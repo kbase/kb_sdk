@@ -44,6 +44,7 @@ import us.kbase.common.service.JsonServerMethod;
 import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.ServerException;
 import us.kbase.common.service.UObject;
+import us.kbase.common.test.TestException;
 import us.kbase.kbasejobservice.KBaseJobServiceServer;
 import us.kbase.kidl.KbFuncdef;
 import us.kbase.kidl.KbService;
@@ -78,7 +79,6 @@ public class TypeGeneratorTest extends Assert {
 	public static final String rootPackageName = "us.kbase";
     public static final String tempDirName = "temp_test";
     
-    private static Boolean isCasperJsInstalled = null;
     private static AuthToken authToken = null;
     public static boolean debugClientTimes = false;
 	
@@ -992,6 +992,7 @@ public class TypeGeneratorTest extends Assert {
 	private static void runClientTest(int testNum, String testPackage, JavaData parsingData, 
 			File libDir, File binDir, int portNum, boolean needClientServer, File outDir,
 			String serverType) throws Exception {
+	    ensureCasperJsInstalled();
 	    System.out.println("- Java client -> " + serverType + " server");
 	    runJavaClientTest(testNum, testPackage, parsingData, libDir, binDir, portNum, needClientServer);
 	    if (outDir != null) {
@@ -1193,10 +1194,6 @@ public class TypeGeneratorTest extends Assert {
             int portNum, boolean needClientServer, File outDir) throws Exception {
         if (!needClientServer)
             return;
-        if (!isCasperJsInstalled()) {
-            System.err.println("- JavaScript client tests are skipped");
-            return;
-        }
         long time = System.currentTimeMillis();
         String resourceName = "Test" + testNum + ".config.properties";
         File shellFile = null;
@@ -1412,44 +1409,46 @@ public class TypeGeneratorTest extends Assert {
 		return TextUtils.capitalize(module.getModuleName()) + "Server";
 	}
 
-	private static void addLib(File libFile, File libDir, StringBuilder classPath, List<URL> libUrls) throws Exception {
+    private static void addLib(File libFile, File libDir, StringBuilder classPath, List<URL> libUrls) throws Exception {
         if (classPath.length() > 0)
-        	classPath.append(':');
+            classPath.append(':');
         classPath.append("lib/").append(libFile.getName());
         libUrls.add(libFile.toURI().toURL());
-	}
-	
-	public static boolean isCasperJsInstalled() {
-	    if (isCasperJsInstalled != null)
-	        return isCasperJsInstalled;
-	    try {
-	        ProcessHelper ph = ProcessHelper.cmd("casperjs", "--version").exec(new File("."), null, true, true);
-	        isCasperJsInstalled = false;
-	        String out = ph.getSavedOutput().trim();
-	        if (out.startsWith("Warning") && out.indexOf('\n') > 0)
-	            out = out.substring(out.indexOf('\n')).trim();
-	        if (out.contains("-"))
-	            out = out.substring(0, out.indexOf('-'));
-	        String[] parts = out.split(Pattern.quote("."));
-	        if (parts.length == 3) {
-	            int major = Integer.parseInt(parts[0]);
-	            int minor = Integer.parseInt(parts[1]);
-	            isCasperJsInstalled = (major > 1) || (major == 1 && minor >= 1);
-	        }
+    }
+    
+    /** Throws an exception if CasperJS is not installed or is < version 1.1.0 */
+    public static void ensureCasperJsInstalled() {
+        try {
+            ProcessHelper ph = ProcessHelper.cmd("casperjs", "--version").exec(new File("."), null, true, true);
+            boolean isCasperJsInstalled = false;
+            String out = ph.getSavedOutput().trim();
+            if (out.startsWith("Warning") && out.indexOf('\n') > 0)
+                out = out.substring(out.indexOf('\n')).trim();
+            if (out.contains("-"))
+                out = out.substring(0, out.indexOf('-'));
+            String[] parts = out.split(Pattern.quote("."));
+            if (parts.length == 3) {
+                int major = Integer.parseInt(parts[0]);
+                int minor = Integer.parseInt(parts[1]);
+                isCasperJsInstalled = (major > 1) || (major == 1 && minor >= 1);
+            }
             if (!isCasperJsInstalled) {
-                System.err.println("Unexpected CastperJS version output (it must be 1.1.0 or higher):");
+                System.err.println("Unexpected CasperJS version output (it must be 1.1.0 or higher):");
                 System.err.println(ph.getSavedOutput().trim());
                 if (ph.getSavedErrors().trim().length() > 0) {
-                    System.err.println("CastperJS errors:");
+                    System.err.println("CasperJS errors:");
                     System.err.println(ph.getSavedErrors().trim());
                 }
+                throw new TestException(
+                        "CasperJS must be available on the path and version 1.1.0 or higher.");
             }
-	    } catch (Throwable ex) {
-	        System.err.println("CasperJS is not installed (" + ex.getMessage() + ")");
-	        isCasperJsInstalled = false;
-	    }
-	    return isCasperJsInstalled;
-	}
+        } catch (Throwable ex) {
+            System.err.println("CasperJS is not installed (" + ex.getMessage() + ")");
+            throw new TestException(
+                    "CasperJS must be available on the path and version 1.1.0 or higher: " +
+                            ex.getMessage(), ex);
+        }
+    }
 	
 	private static AuthToken getAuthToken() {
         return authToken;
