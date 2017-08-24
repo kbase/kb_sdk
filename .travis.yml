@@ -31,7 +31,7 @@ install:
   - popd
 
 script:
-  - make bin
+  - make
   - make sdkbase
   - export PATH=$(pwd)/bin:$PATH
   - source src/sh/sdk-completion.sh

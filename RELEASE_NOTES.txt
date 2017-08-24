@@ -6,7 +6,7 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods 
 in the KBase Narrative interface.
 
-VERSION: 0.1.17 (Released 08/11/2017)
+VERSION: 0.1.17 (Released TBD)
 ------------------------------------------
 NEW FEATURES:
 - Travis-CI support in the base kb-sdk and in modules generated using the
