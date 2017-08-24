@@ -122,9 +122,7 @@ casper.test.begin('JS Client Test Initialization', 9, function suite(test) {
                                         }
                                     } else {
                                         test.fail("error message should contain: '"+ outcome.error[k]+
-                                        "' but did not. \nError was: UNDEFINED");
-                                        console.log("Contents of err object :\n"+err);
-                                
+                                        "' but did not. \nError was: UNDEFINED\nErr object:\n"+err);
                                     }
                                 }
                             }
