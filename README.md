@@ -10,7 +10,7 @@ There are still some general restrictions on functionality that will gradually b
 - Does not require new uploaders/downloaders
 - Wrapper written in Python, Java, R, or Perl
 
-If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
+In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
 In order to use the SDK to test and deploy Apps you will need developer credentials. Please 
 <a href="http://kbase.us/contact-us">contact us</a> to be added to the developer list.
@@ -20,12 +20,14 @@ In order to use the SDK to test and deploy Apps you will need developer credenti
 1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
 2. [Install SDK with Docker](doc/kb_sdk_dockerized_install.md)
 3. [Create Module](doc/kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](doc/kb_sdk_edit_module.md)
-5. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
-6. [Register Module](doc/kb_sdk_register_module.md)
-7. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
-8. [Complete Module Info](doc/kb_sdk_complete_module_info.md)
-9. [Deploy](doc/kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](doc/kb_sdk_edit_module.md)
+5. [Implement Method(s)](doc/kb_sdk_impl_methods.md)
+6. [Specify User Interface](doc/kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
+8. [Register Module](doc/kb_sdk_register_module.md)
+9. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kdoc/b_sdk_complete_module_info.md)
+11. [Deploy](doc/kb_sdk_deploy.md)
 
 ### Additional Documentation
 - [Examples](#examples)
@@ -33,23 +35,12 @@ In order to use the SDK to test and deploy Apps you will need developer credenti
 - [Troubleshooting](doc/kb_sdk_troubleshooting.md)
 - [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
-- [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
-- [Working with KBase Data Types](doc/kb_sdk_data_types.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
-
-<!--NOT DONE
-
-- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
-- KBase SDK Coding Style Guide and Best Practices
-- Wrapping an Existing Command-Line Tool
-- Using Custom Reference Data 
-- Managing Your Module Release Cycle
-- KBase Interface Description Language (KIDL) Guide
-- Visualization Widget Development Guide
--->
+- [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes)
+- [KIDL Specification](doc/KIDL_specification.md)
+- [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
 
-<br>
 ## Quick Install Guide
 
 Below is a quick reference guide for standard installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
@@ -103,7 +94,7 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
     cd kb_sdk
     make
 
-<br>
+
 ## Quick Start Guide
 
 Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
@@ -115,10 +106,9 @@ Enter your new module directory and do the initial build:
     cd MyContigFilter
     make
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
+Edit the local test config file (`test_local/test.cfg`) with a KBase developer token:
 
-    test_user = TEST_USER_NAME
-    test_password = TEST_PASSWORD
+    test_token = TEST_TOKEN
 
 Run tests:
 
@@ -154,7 +144,6 @@ Your App will now also be visible in the App Catalog when displaying Apps in dev
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 
-<br>
 ## <A NAME="examples"></A>Example Modules
 
 There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
@@ -165,7 +154,6 @@ There are a number of modules that we continually update and modify to demonstra
  - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
 
 
-<br>
 ## Need more?
 
-Browse through the [doc](doc/) directory of this repo for the latest avaialble documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
+Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us

@@ -26,13 +26,13 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 
 
 #### <A NAME="installed"></A>Q: What's already installed in the base KBase Docker image and how do I call it?
-**A:**  The base KBase Docker image contains an Ubuntu Linux image with kbase tools for connecting to KBase services and data installed.  Please see the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples) for how to access these services and data.
+**A:**  The base KBase Docker image contains an Ubuntu Linux image with kbase tools for connecting to KBase services and data installed.  Please see the SDK Module implementation [examples](https://github.com/kbase/kb_sdk/README.md#examples) for how to access these services and data.
 
 [back to top](#top)
 
 
 #### <A NAME="data"></A>Q: How do I find and access data?
-**A:** There are both public reference data sets and individual user data sets (both public and private).  Public reference data can be found with [KBase Data Search](https://narrative.kbase.us/search/#/search/?q=*), and should be copied into your Narrative to be used.  Accessing Data Objects from your SDK Methods is explained in [Working with KBase Data Types](https://github.com/kbase/kb_sdk/doc/kb_sdk_data_types.md) and illustrated in the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples).
+**A:** There are both public reference data sets and individual user data sets (both public and private).  Public reference data can be found with [KBase Data Search](https://narrative.kbase.us/search/#/search/?q=*), and should be copied into your Narrative to be used.  Accessing Data Objects from your SDK Methods is explained in [Working with KBase Data Types](https://narrative.kbase.us/#catalog/datatypes) and illustrated in the SDK Module implementation [examples](https://github.com/kbase/kb_sdk/README.md#examples).
 
 [back to top](#top)
 
@@ -111,6 +111,6 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 [back to top](#top)
 
 #### <A NAME="cheatsheet"></A>Q: Is there a cheatsheet?
-**A:** Yes, there is a _living_ document that provides a lot of hints about the SDK [SDK Cheatsheet](https://docs.google.com/document/d/1J6HJGtIoAY9yDI6N9xDyarH8vT7tCao2ZBzvVwLEOdw/edit).
+**A:** Yes, there is a document that provides a lot of hints about the SDK [SDK Cheatsheet](SDK_AdvancedFeaturesCheatSheet.pdf).
 
 [back to top](#top)
