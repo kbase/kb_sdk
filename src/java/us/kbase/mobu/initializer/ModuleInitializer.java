@@ -117,6 +117,7 @@ public class ModuleInitializer {
 		templateFiles.put("module_travis", Paths.get(moduleDir, ".travis.yml"));
 		templateFiles.put("module_dockerfile", Paths.get(moduleDir, "Dockerfile"));
 		templateFiles.put("module_readme", Paths.get(moduleDir, "README.md"));
+		templateFiles.put("module_release_notes", Paths.get(moduleDir, "RELEASE_NOTES.md"));
 		templateFiles.put("module_makefile", Paths.get(moduleDir, "Makefile"));
 		templateFiles.put("module_deploy_cfg", Paths.get(moduleDir, "deploy.cfg"));
 		templateFiles.put("module_license", Paths.get(moduleDir, "LICENSE"));
