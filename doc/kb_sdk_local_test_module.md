@@ -3,18 +3,23 @@
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
-5. **Locally Test Module and Method(s)**
-6. [Register Module](kb_sdk_register_module.md)
-7. [Test in KBase](kb_sdk_test_in_kbase.md)
-8. [Complete Module Info](kb_sdk_complete_module_info.md)
-9. [Deploy](kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
+5. [Implement Method(s)](kb_sdk_impl_methods.md)
+6. [Specify User Interface](kb_sdk_make_ui.md)
+7. **Locally Test Module and Method(s)**
+8. [Register Module](kb_sdk_register_module.md)
+9. [Test in KBase](kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kb_sdk_complete_module_info.md)
+11. [Deploy](kb_sdk_deploy.md)
 
 
-### 5. Locally Test Module and Method(s)
+### 7. Locally Test Module and Method(s)
 
+Locally testing your module is a good way of detecting problems with your module's code more quickly (no execution 
+queue) and more directly (no UI) than the Narrative interface. Also, a suite of unit tests are required for any module
+that will be released to the public([Full list of release requirements](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)).
 
-#### <A NAME="dockerfile"></A>5A. Edit Dockerfile
+#### <A NAME="dockerfile"></A>A. Edit Dockerfile
 
 The base KBase Docker image contains a KBase Ubuntu image, but not much else.  You will need to add whatever dependencies, including the installation of whatever tool you are wrapping, to the Dockerfile that is executed to build a custom Docker image that can run your Module.
 
@@ -59,11 +64,11 @@ because the latter does not remove the previous bloating layers, despite the "rm
 
 Final Note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from cache. This means that if you are pulling in external data using RUN and a command like `git clone` or `wget` changes in those sources will not automatically be reflected in a rebuilt docker image unless the docker file changes at or before that import.
 
-#### <A NAME="get-token"></A>5B. Get a developer token
+#### <A NAME="get-token"></A>B. Get a developer token
 
 If you have already been approved as a KBase developer, a token may be generated from your [kbase account profile](https://narrative.kbase.us/#auth2/account) under the Developer Tokens tab.
 
-#### <A NAME="build-tests"></A>5C. Build tests of your methods
+#### <A NAME="build-tests"></A>C. Build tests of your methods
 
 Edit the local test config file (`test_local/test.cfg`) with a developer token (note that this directory is in .gitignore so will not be copied to github.  You're safe!):
 
@@ -74,16 +79,28 @@ Edit the local test config file (`test_local/test.cfg`) with a developer token (
     cd test_local
     kb-sdk test
 
-This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.  
+This will build your Docker container and execute all test scripts in the test directory.
+The example module already has tests implemented in `test/python_server_test.py` which creates
+a testing workspace, uploads test data and runs the filter_contigs method. After tests are 
+run for the first time, a new `workdir/tmp` directory will appear in `test_local` which is
+the scratch directory from the preceding run. Inspecting these intermediate files can be very
+helpful for debugging.
 
-Inspect the Docker container, such as seeing whether your wrapped tool was installed properly, by dropping into a bash console and poke around.  From the `test_local` directory:
+Additionally, you can inspect the file structure of the Docker container to see whether your
+wrapped tool was installed properly, by opening a bash console.  From the `test_local` directory:
     
     ./run_bash.sh
 
-Unfortunately, you will have to rebuild the Docker image each time you change your module code (e.g. KIDL \<MyModule\>.spec, \<MyModule\>Impl.py, and your testing code) but this happens automatically for you when you run *kb-sdk test*, so it just slows you down rather than add any extra effort.  However, if you change the KIDL \<MyModule\>.spec file, you will have to rerun *make* to propagate those changes to the \<MyModule\>Client and \<MyModule\>Impl code (and likely will have some tweaks to apply to the Impl code to match the spec changes).  Happy debugging!
+Unfortunately, you will have to rebuild the Docker image each time you change your module code 
+(e.g. KIDL \<MyModule\>.spec, \<MyModule\>Impl.py, and your testing code) but this happens 
+automatically for you when you run *kb-sdk test*, so it just slows you down rather than adding 
+any extra effort. However, if you change the KIDL \<MyModule\>.spec file, you will have to 
+rerun *make* to propagate those changes to the \<MyModule\>Client and \<MyModule\>Impl code 
+(and likely will have some tweaks to apply to the Impl code to match the spec changes). 
+Following [Dockerfile Best Practices](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices)
+like leveraging layer caching can greatly speed up your test process. Happy debugging!
 
-**(don't forget to *git commit* and *git push* your edits to your github repo)**
-
+**(Don't forget to *git commit* and *git push* your edits to your github repo)**
 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)

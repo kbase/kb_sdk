@@ -3,18 +3,20 @@
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
-5. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-6. **Register Module**
-7. [Test in KBase](kb_sdk_test_in_kbase.md)
-8. [Complete Module Info](kb_sdk_complete_module_info.md)
-9. [Deploy](kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
+5. [Implement Method(s)](kb_sdk_impl_methods.md)
+6. [Specify User Interface](kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
+8. **Register Module**
+9. [Test in KBase](kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kb_sdk_complete_module_info.md)
+11. [Deploy](kb_sdk_deploy.md)
 
 
-### 6. Register Module
+### 8. Register Module
 
 
-#### 6A. Create Git Repo
+#### 8A. Create Git Repo
 
 If you haven't already, add your repo to [GitHub](http://github.com) (or any other public git repository), from the ContigCount base directory:
 
@@ -27,7 +29,7 @@ If you haven't already, add your repo to [GitHub](http://github.com) (or any oth
     git push -u origin master
 
 
-#### 6B. Register with KBase
+#### 8B. Register with KBase
 
 Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo url:
 

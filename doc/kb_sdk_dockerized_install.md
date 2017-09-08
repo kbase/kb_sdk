@@ -6,12 +6,14 @@ and Linux.
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. **Install SDK with Docker**
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
-5. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-6. [Register Module](kb_sdk_register_module.md)
-7. [Test in KBase](kb_sdk_test_in_kbase.md)
-8. [Complete Module Info](kb_sdk_complete_module_info.md)
-9. [Deploy](kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
+5. [Implement Method(s)](kb_sdk_impl_methods.md)
+6. [Specify User Interface](kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
+8. [Register Module](kb_sdk_register_module.md)
+9. [Test in KBase](kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kb_sdk_complete_module_info.md)
+11. [Deploy](kb_sdk_deploy.md)
 
 
 ### 2. Install SDK with Docker
