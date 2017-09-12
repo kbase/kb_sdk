@@ -12,8 +12,9 @@ There are still some general restrictions on functionality that will gradually b
 
 In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
-In order to use the SDK to test and deploy Apps you will need developer credentials. Please 
-<a href="http://kbase.us/contact-us">contact us</a> to be added to the developer list.
+You can use the SDK to develop and test Apps with a regular KBase user account (and a Git repository).
+When you'd like us to deploy your App publicly in KBase, fill out the <a href="https://accounts.kbase.us/index.php?tpl=request_identity.tpl">developer account request form</a>.
+Once your account is approved, <a href="http://kbase.us/contact-us/">contact us</a> with your username and request to be added to the developer list.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
