@@ -14,7 +14,7 @@
 
 ### <A NAME="impl"></A>5. Implement Method(s)
 
-In the lib/\<MyModule> directory, edit the <MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
+In the lib/\<MyModule> directory, edit the \<MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
 defines the methods available in the module. The example module is very simple and implemented directly in this file
 but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
 containing more than one method. 
