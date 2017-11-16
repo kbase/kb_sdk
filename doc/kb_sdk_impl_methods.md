@@ -3,21 +3,21 @@
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
 2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
-5. **Implement Method(s)**
+4. [Specify Module and App(s)](kb_sdk_edit_module.md)
+5. **Implement App(s)**
 6. [Specify User Interface](kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
+7. [Locally Test Module and App(s)](kb_sdk_local_test_module.md)
 8. [Register Module](kb_sdk_register_module.md)
 9. [Test in KBase](kb_sdk_test_in_kbase.md)
 10. [Complete Module Info](kb_sdk_complete_module_info.md)
 11. [Deploy](kb_sdk_deploy.md)
 
-### <A NAME="impl"></A>5. Implement Method(s)
+### <A NAME="impl"></A>5. Implement App(s)
 
 In the lib/\<MyModule> directory, edit the <MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
-defines the methods available in the module. The example module is very simple and implemented directly in this file
+defines the apps available in the module. The example module is very simple and implemented directly in this file
 but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
-containing more than one method. 
+that include more than one app. 
 
 The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd party 
 code or executables), storing resulting data in the data stores, and producing a report of the work accomplished for the user.
@@ -26,7 +26,7 @@ This step of the guide will walk through this process and present some of the ut
 - A. [Install Other KBase Modules](#install)
 - B. [Import and Initialise](#import)
 - C. [Validating user input](#validate)
-- D. [Adding Reference Data to Your Method](#impl-adding-data)
+- D. [Adding Reference Data to Your App](#impl-adding-data)
 - E. [Interacting with KBase data stores (Workspaces)](#get-save-data)
 - F. [Invoking Shell Tool](#impl-shell-tool)
 - G. [Building Output Report](#impl-report)
@@ -93,7 +93,7 @@ class <ModuleName>:
 
 While user interfaces for narrative apps are able to able to validate input to your app, it's wise not to rely on 
 this functionality because other developers may call your module directly (and incorrectly). The following function
-can be placed in the header to your method and called to verify the correct keys are present in an input parameter
+can be placed in the header to your app and called to verify the correct keys are present in an input parameter
 object. You also should consider type checking and or deeper input validation, especially for long running apps.
 ```python
     @staticmethod
@@ -112,7 +112,7 @@ object. You also should consider type checking and or deeper input validation, e
 
 [\[Back to top\]](#top)
 
-#### <A NAME="impl-adding-data"></A>D. Adding Reference Data To Your Method
+#### <A NAME="impl-adding-data"></A>D. Adding Reference Data To Your App
 
 Reference data that is modest in size should be added to the github repository in the /data folder. At runtime, this
 data will be accessible at `/kb/module/data`. Data sets that exceed GitHub's file size limits (> 100 MB) should be 
@@ -122,10 +122,8 @@ added to a shared mount point.  This can be accomplished by contacting kbase adm
 
 #### <A NAME="get-save-data"></A>E. Interacting with KBase data stores (Workspaces)
 
-Your method may use one or more data objects the user has available in a Narrative (visible in then data panel
-on the right) or data objects in public Narratives. Your method can access these objects by reference(preferred) or 
-name using the [DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil) (DFU) module or a type 
-specific module that uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil))
+Your app may use one or more data objects the user has available in a Narrative (visible in the Data Panel) or data objects in public Narratives. Your app can access these objects by reference (preferred) or 
+name using the [DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil) (DFU) module or a type-specific module that uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil))
 to handle input and output of objects/files. While any object can be downloaded or uploaded in JSON form with DFU, 
 the specialized modules often are able to write or read data in type-specific formats like FASTA or SBML as the
 example module demonstrates:
@@ -188,21 +186,21 @@ The [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) module a
 
 *Why do I need to make a report?*
 
-Reports in KBase allow a developer to present visualizations, generate human readable text strings, present warnings, contain output files that do not correspond to typed objects, and in general display information that is useful to a user without having to utilize kbase-ui widgets. 
+Reports in KBase allow a developer to present visualizations, generate human readable text strings, present warnings, provide links to output files that do not correspond to typed objects, and in general display information that is useful to a user without having to utilize kbase-ui widgets. 
 
 *What kinds of reports can I make?*
 
-Developers can use the KBaseReports module to display and contain a wide variety of content. It's up to each developer to determine how to creatively and effectively integrate this module with their Apps. Reports can be configured in a variety of ways, depending on how the parameters to parse and display the outputs of an App are configured. We will cover an example and some sample code, but exploring the variety of existing Apps and their output reports within the KBase Narratives will best demonstrate the richness of this module. Many  developers have used the ability to contain and display HTML files within the reports for visualization of and interaction with data. 
+Developers can use the KBaseReports module to display and contain a wide variety of content. It's up to each developer to determine how to creatively and effectively integrate this module with their Apps. Reports can be configured in a variety of ways, depending on how the parameters to parse and display the outputs of an App are configured. We will cover an example and some sample code, but exploring the variety of existing Apps and their output reports within the KBase Narratives will best demonstrate the capabilities of this module. Many developers have used the ability to contain and display HTML files within the reports for visualization of and interaction with data. 
 
 *What do reports look like in KBase?*
 
-Reports are contained in the output cells generated by KBase Apps. A typical and feature rich example can be found in KBase's implementation of [DESeq2](https://github.com/kbaseapps/kb_deseq/blob/add70f879a93f060c2b37de914dab7d0c02731c1/lib/kb_deseq/Utils/DESeqUtil.py#L241-L285). 
+Reports are contained in the output cells generated by KBase Apps. A typical and feature-rich example can be found in KBase's implementation of [DESeq2](https://github.com/kbaseapps/kb_deseq/blob/add70f879a93f060c2b37de914dab7d0c02731c1/lib/kb_deseq/Utils/DESeqUtil.py#L241-L285). 
 
 ![DESeq2 Report](http://kbase.us/wp-content/uploads/2017/11/DeSEQ-Capture.png)
 
 *Where do I start with making a report?*
 
-The first step in setting up KBase reports for an App is determining what the outputs of the program are in order to figure out how to best display results or give access to files to users. By understanding what kinds files, HTML reports, warnings, and other outputs are generated by the program outside of KBase, you can develop a strategy for adequately representing all these within the output cell for your App. The following annotated example code contains all of the parameters that can be set to configure the output:
+The first step in setting up KBase reports for an App is determining what the outputs of the program are in order to figure out how to best display results or give access to files to users. By understanding what kinds of files, HTML reports, warnings, and other outputs are generated by the program outside of KBase, you can develop a strategy for adequately representing all these within the output cell for your App. The following annotated example code contains all of the parameters that can be set to configure the output:
 
 ```python
 def _generate_report (self, params, other_stuff):
