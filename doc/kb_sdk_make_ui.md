@@ -20,8 +20,8 @@ Control of Narrative interaction is accomplished in files in the ui/narrative/me
 
 The input options are specified in the "parameters" section of the spec.json file. In the following example, the user
 will supply two required parameters, an input name and an output name. If you specify 'valid_ws_types', the user will
-be presented with a searchable dropdown of objects that match the specified types. If you set "is_output_name" to true,
-the user will be warned if a name will overwrite an existing object or if the name contains invalid characters and a 
+be presented with a searchable dropdown of objects that match the specified types. If "is_output_name" is set to true,
+the user will be warned if a name will overwrite an existing object or if the name contains invalid characters, and a 
 widget displaying that object will appear beneath the app cell. 
 
 ```
@@ -51,9 +51,9 @@ widget displaying that object will appear beneath the app cell.
 		}
 	],
 ```
-Another common input is a dropdown which is demonstrated below. For each option, the "value" is what will be passed to
+Another common input type is a dropdown, which is demonstrated below. For each option, the "value" is what will be passed to
 the app while the "ui_name" is what the user will see. In this example, the parameter is hidden by default 
-because "advanced" is true.
+because "advanced" is true (meaning the parameter will be hidden in the "Advanced options" section of the input widget).
 ```
 {
             "id": "prune",
@@ -66,15 +66,15 @@ because "advanced" is true.
                 "options": [
                     {
                         "value": "biochemistry",
-                        "display": "Known Biochemistry",
+                        "display": "Known biochemistry",
                         "id": "biochemistry",
-                        "ui_name": "Known Biochemistry"
+                        "ui_name": "Known biochemistry"
                     },
                     {
                         "value": "model",
-                        "display": "Input Model",
+                        "display": "Input model",
                         "id": "model",
-                        "ui_name": "Input Model"
+                        "ui_name": "Input model"
                     },
                     {
                         "value": "none",
@@ -93,15 +93,15 @@ the spec file that generated the user interface.
 
 [\[Back to top\]](#top)
 
-#### B . Configure passing variables from Narrative Input to SDK method.
+#### B. Configure passing variables from Narrative Input to SDK method.
 
 In the 'behavior' section of the spec.json, the output of the user interface is mapped to input to your function.
 If you have maintained a consistent naming though these mappings can be pretty pro forma. However, transformations can 
 also be applied to input from the user interface. 
 
-In the example below, the user-interface accepts the names of assemblies from the user and transforms them into object
+In the example below, the user interface accepts the names of assemblies from the user and transforms them into object
 references before passing them on to the method. (This prevents a race condition from occurring if multiple apps are 
-writing to the same object name or if the object is renamed) In the output mapping, the the output (a single object in
+writing to the same object name or if the object is renamed.) In the output mapping, the output (a single object in
 this example) is unpacked into target properties. These output properties are used to visualize the result of the app 
 (thus the need to return information about the report object).
 ```
@@ -159,7 +159,7 @@ In the above example the Narrative take an object looking like this from the App
   ]
 }
 ```
-and pass an object looking like this to the implementation function:
+and passes an object looking like this to the implementation function:
 ```json
 {
   "assemblies": [
@@ -169,7 +169,7 @@ and pass an object looking like this to the implementation function:
   "Workspace_name": "<username>:narrative_<long_number>"
 }
 ```
-Similarly, the narrative accepts an output object like this:
+Similarly, the Narrative accepts an output object like this:
 ```json
 [
   {
@@ -200,8 +200,8 @@ And presents an object like this one to the report visualization:
 
 #### C. Naming fields in the input widget cell
 
-The display.yml primarily contains text to explain the method in the narrative and especially in the app catalogue.
-Options in this file will be further explored in step 10: [Complete Module Info](kb_sdk_complete_module_info.md) but
+The display.yml primarily contains text to describe the app (in the Narrative and in the App Catalog).
+Options in this file will be further explored in step 10 ([Complete Module Info](kb_sdk_complete_module_info.md)) but
 minimally this file should define:
 * A module name
 * A module tooltip
