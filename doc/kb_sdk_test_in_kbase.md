@@ -19,7 +19,7 @@
 
 Go to https://appdev.kbase.us, log in, and start a new Narrative.
 
-Click on the 'R' in the Apps Panel until it switches to 'D' to show apps still in development.  Find your new app by searching for your module, add it to your Narrative by clicking on it, and run it. If you encounter errors, make the appropriate edits or add debugging statements to your code, commit those changes, push it to your SDK Module git (or other open-source) repo, reregister with the "SDK Register" App, and rerun to see if your fixes did the trick.  You must push your edits to your repo and reregister for each test for the Docker image to contain those changes.  We recommend getting as many bugs out in the [Local Testing](kb_sdk_local_test_module.md) stage as possible.
+Click on the 'R' in the Apps Panel until it switches to 'D' to show apps still in development.  Find your new app by searching for your module, add it to your Narrative by clicking on it, and run it. If you encounter errors, make the appropriate edits or add debugging statements to your code, commit those changes, push it to your SDK Module git (or other open-source) repo, reregister your app via the catalog service (https://narrative.kbase.us/#catalog/modules -- see [Register Module](kb_sdk_register_module.md) more info), and rerun to see if your fixes did the trick.  You must push your edits to your repo and reregister for each test for the Docker image to contain those changes.  We recommend getting as many bugs out in the [Local Testing](kb_sdk_local_test_module.md) stage as possible.
 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)
