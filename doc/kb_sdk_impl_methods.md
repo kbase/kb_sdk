@@ -34,7 +34,7 @@ This step of the guide will walk through this process and present some of the ut
 #### <A NAME="install"></A>A. Install Other KBase Modules
 
 If you begin by altering an existing app (as this walkthough demonstrates) you will already have some KBase utility 
-modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal.
+modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal. This operation is case sensitive so make sure to type the module name with the correct uppercase and lowercase letters.
 Here's an sample of some of the modules that might be helpful for your app:
 
 * [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) - Allows the creation of KBase 
