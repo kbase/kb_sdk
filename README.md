@@ -151,9 +151,9 @@ Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 Here are a few modules that demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
 
  - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet). This is a very simple app that is a good first example to look at if you're new to the KBase SDK.
- - [MEGAHIT](https://github.com/msneddon/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
- - [Trimmomatic](https://github.com/psdehal/Trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
- - [OrthoMCL](https://github.com/rsutormin/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
+ - [MEGAHIT](https://github.com/kbaseapps/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
+ - [Trimmomatic](https://github.com/kbaseapps/kb_trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
+ - [OrthoMCL](https://github.com/kbaseapps/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
 
 
 ## Need more?
