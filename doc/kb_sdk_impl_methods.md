@@ -14,8 +14,8 @@
 
 ### <A NAME="impl"></A>5. Implement App(s)
 
-In the lib/\<MyModule> directory, edit the <MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
-defines the apps available in the module. The example module is very simple and implemented directly in this file
+In the lib/\<MyModule> directory, edit the \<MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
+defines the methods available in the module. The example module is very simple and implemented directly in this file
 but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
 that include more than one app. 
 
@@ -34,7 +34,7 @@ This step of the guide will walk through this process and present some of the ut
 #### <A NAME="install"></A>A. Install Other KBase Modules
 
 If you begin by altering an existing app (as this walkthough demonstrates) you will already have some KBase utility 
-modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal.
+modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal. This operation is case sensitive (but will accept any case of letters and potentially cause errors) so make sure to type the module name with the correct uppercase and lowercase letters.
 Here's an sample of some of the modules that might be helpful for your app:
 
 * [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) - Allows the creation of KBase 
@@ -254,7 +254,6 @@ def _generate_report (self, params, other_stuff):
          
          # To see a working example
          # https://github.com/kbaseapps/kb_deseq/blob/586714d/lib/kb_deseq/Utils/DESeqUtil.py#L205-L239
-
 
 
          'file_links': output_files_in_app,
