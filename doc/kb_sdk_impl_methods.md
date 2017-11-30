@@ -73,7 +73,7 @@ read from the scratch folder.
 ```python
 import os
 from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
-from kbaseReport.kbaseReportClient import KBaseReport
+from KBaseReport.KBaseReportClient import KBaseReport
 
 class <ModuleName>:
     """Module Docs"""
