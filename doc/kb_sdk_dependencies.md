@@ -45,11 +45,11 @@ https://www.docker.com
 
 This is *highly* recommended for KBase module development and is required if you will use the Docker-based installation of the SDK tools. KBase module code is run in KBase using Docker, which allows you to easily install all system tools and dependencies your module requires. Installing Docker locally allows you to test your build and run tests on your own computer before registering your module with KBase, significantly accelerating development.
 
-### Docker Installation and Daemon Starting
+### Docker Installation
 
-https://www.docker.com/mac
+Instructions for installing on Mac: https://www.docker.com/mac
 
-https://www.docker.com/linux
+Instructions for installing on Linux: https://www.docker.com/linux
 
 On Linux Docker is fairly easy to install, although note that the service runs as the root user. As such, all Docker commands require root permissions and any KB_SDK commands that interact with Docker (such as `make sdkbase`) will require root permissions. An alterative to this is to create a docker group for Docker users as described in the Docker installation instructions.
 
