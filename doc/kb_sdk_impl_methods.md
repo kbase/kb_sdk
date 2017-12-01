@@ -14,13 +14,13 @@
 
 ### <A NAME="impl"></A>5. Implement App(s)
 
-In the lib/\<MyModule> directory, edit the \<MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
-defines the methods available in the module. The example module is very simple and implemented directly in this file
+In the directory lib/\<MyModule>, edit the \<MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
+defines the methods (apps) available in the module. The example module is very simple and is implemented directly in this file
 but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
 that include more than one app. 
 
-The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd party 
-code or executables), storing resulting data in the data stores, and producing a report of the work accomplished for the user.
+The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd-party 
+code or executables), storing resulting data in the data stores, and producing a report for the user summarizing the work accomplished.
 This step of the guide will walk through this process and present some of the utility modules that help facilitate this work.
 
 - A. [Install Other KBase Modules](#install)
@@ -35,7 +35,8 @@ This step of the guide will walk through this process and present some of the ut
 
 If you begin by altering an existing app (as this walkthough demonstrates) you will already have some KBase utility 
 modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal. This operation is case sensitive (but will accept any case of letters and potentially cause errors) so make sure to type the module name with the correct uppercase and lowercase letters.
-Here's an sample of some of the modules that might be helpful for your app:
+
+Here are some of the modules that might be helpful for your app:
 
 * [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) - Allows the creation of KBase 
 reports which can present text, html, and downloadable files to the user as output to your app.
@@ -45,26 +46,26 @@ of Genome data
 with sequence assembly data in KBase.
 * [ReadsUtils](https://appdev.kbase.us/#catalog/modules/ReadsUtils) - Utilities for validating, uploading, and 
 downloading reads files. Includes FASTA and FASTQ validators. 
-*[ExpressionUtils](https://appdev.kbase.us/#catalog/modules/ExpressionUtils) - A module to upload, download and 
-export RNASeq Expression data obtained by either StringTie or Cufflinks Apps.
-*[ReadsAlignmentUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Functions for uploading and 
-downloading KBase reads alignment files.
-*[DifferentialExpressionUtils](https://appdev.kbase.us/#catalog/modules/DifferentialExpressionUtils) - Module to 
-upload/download/export differential expression object and other related processing
-*[FeatureSetUtils](https://appdev.kbase.us/#catalog/modules/FeatureSetUtils) - A module to upload, download and 
+*[ExpressionUtils](https://appdev.kbase.us/#catalog/modules/ExpressionUtils) - Upload, download and 
+export RNASeq Expression data gemerated by either StringTie or Cufflinks apps.
+*[ReadsAlignmentUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Upload and download KBase reads alignment files.
+*[DifferentialExpressionUtils](https://appdev.kbase.us/#catalog/modules/DifferentialExpressionUtils) - Upload/download/export differential expression objects and other related processing
+*[FeatureSetUtils](https://appdev.kbase.us/#catalog/modules/FeatureSetUtils) - Upload, download and 
 export Genomic Feature Set data
-*[CompoundSetUtils](https://appdev.kbase.us/#catalog/modules/CompoundSetUtils) - Module to upload/download/export 
+*[CompoundSetUtils](https://appdev.kbase.us/#catalog/modules/CompoundSetUtils) - Upload/download/export 
 chemical compound sets
 * [DataFileUtil](https://appdev.kbase.us/#catalog/modules/DataFileUtil) - A collection of tools to 
-get data directly from the web, from the user's computer (via the staging area) and KBase workspaces.
+get data directly from the web, from the user's computer (via the staging area) or from KBase workspaces.
 
 [\[Back to top\]](#top)
 
-#### <A NAME="import"></A>B. Import and Initialise
-In python, you can import these installed modules like any other python package. In the header, two important properties
-are defined. The first is the SDK_CALLBACK_URL which is passed to modules invoked by this modules so they can report 
+#### <A NAME="import"></A>B. Import and Initialize
+In Python, you can import these installed modules like any other Python package. In the header, two important properties
+are defined. The first is the SDK_CALLBACK_URL which is passed to modules invoked by this module so they can report 
 their status and results to the callback server which coordinates module execution. This is demonstrated by 
-the instantiation of a AssemblyUtil client in the following example. The other parameter commonly defined in 
+the instantiation of an AssemblyUtil client in the following example.
+
+The other parameter commonly defined in 
 the module constructor is the path to the scratch directory. This directory is a common space accessible by not only the 
 current module but also every module called by this module. Therefore files from other modules (for example 
 AssemblyUtil) will be written to the scratch folder and files to be used by other modules (such as KBaseReport) are 
@@ -91,10 +92,10 @@ class <ModuleName>:
 
 #### <A NAME="validate"></A>C. Validating user input
 
-While user interfaces for narrative apps are able to able to validate input to your app, it's wise not to rely on 
-this functionality because other developers may call your module directly (and incorrectly). The following function
+While user interfaces for Narrative apps are able to able to validate input to your app, it's wise not to rely on 
+this functionality because other developers may call your module directly (and possibly incorrectly). The following function
 can be placed in the header to your app and called to verify the correct keys are present in an input parameter
-object. You also should consider type checking and or deeper input validation, especially for long running apps.
+object. You also should consider type checking and/or deeper input validation, especially for long running apps.
 ```python
     @staticmethod
     def _check_param(in_params, req_param, opt_param=list()):
@@ -114,9 +115,9 @@ object. You also should consider type checking and or deeper input validation, e
 
 #### <A NAME="impl-adding-data"></A>D. Adding Reference Data To Your App
 
-Reference data that is modest in size should be added to the github repository in the /data folder. At runtime, this
+Reference data that is modest in size should be added to the GitHub repository in the /data folder. At runtime, this
 data will be accessible at `/kb/module/data`. Data sets that exceed GitHub's file size limits (> 100 MB) should be 
-added to a shared mount point.  This can be accomplished by contacting kbase administrators at http://kbase.us. 
+added to a shared mount point.  This can be accomplished by contacting KBase administrators (http://kbase.us/contact-us). 
 
 [\[Back to top\]](#top)
 
@@ -125,7 +126,7 @@ added to a shared mount point.  This can be accomplished by contacting kbase adm
 Your app may use one or more data objects the user has available in a Narrative (visible in the Data Panel) or data objects in public Narratives. Your app can access these objects by reference (preferred) or 
 name using the [DataFileUtils](https://narrative.kbase.us/#catalog/modules/DataFileUtil) (DFU) module or a type-specific module that uses DFU under the hood (such as [AssemblyUtil](https://narrative.kbase.us/#catalog/modules/AssemblyUtil))
 to handle input and output of objects/files. While any object can be downloaded or uploaded in JSON form with DFU, 
-the specialized modules often are able to write or read data in type-specific formats like FASTA or SBML as the
+the specialized modules often are able to write or read data in type-specific formats like FASTA or SBML, as the
 example module demonstrates:
 
 ```
@@ -186,7 +187,7 @@ The [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) module a
 
 *Why do I need to make a report?*
 
-Reports in KBase allow a developer to present visualizations, generate human readable text strings, present warnings, provide links to output files that do not correspond to typed objects, and in general display information that is useful to a user without having to utilize kbase-ui widgets. 
+Reports in KBase allow a developer to present visualizations, generate human-readable text strings, show warnings, provide links to output files that do not correspond to typed objects, and in general display information that is useful to a user without having to utilize kbase-ui widgets. 
 
 *What kinds of reports can I make?*
 
@@ -205,7 +206,7 @@ The first step in setting up KBase reports for an App is determining what the ou
 ```python
 def _generate_report (self, params, other_stuff):
 
-    # A working example of a method that generates report for DESEQ app
+    # A working example of an app that generates a report for DESeq2
     # https://github.com/kbaseapps/kb_deseq/blob/586714d/lib/kb_deseq/Utils/DESeqUtil.py#L241-L285
     
     report_params = {
@@ -215,7 +216,7 @@ def _generate_report (self, params, other_stuff):
          'message': message_in_app,
 
          #objects_created: List of typed objects created during
-         #the execution of the App.This can only be used to refer
+         #the execution of the App. This can only be used to refer
          #to typed objects in the workspace and is separate 
          #from any files generated by the app.
 
@@ -239,7 +240,7 @@ def _generate_report (self, params, other_stuff):
 
          'workspace_name': ws_name,
 
-         #file_links: list of paths or shock node IDs pointing to 
+         #file_links: list of paths or SHOCK node IDs pointing to 
          #a single flat file. They appear in Files section 
          #as list of downloadable files. 
          
