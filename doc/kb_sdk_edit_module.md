@@ -23,7 +23,7 @@
 
 #### <A NAME="create-repo"></A>A. Creating a Git Repo
 
-You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Since functionality in KBase is pulled into KBase from public git repositories, you will need to put your module code into a public git repository.  Here we'll show a brief example using [GitHub](http://github.com).  First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
+You will need to put your SDK module code into a public git repository in order for it to be available for building into a custom Docker Image.  Here we'll show a brief example using [GitHub](http://github.com).  First, you can commit your module code into a local git repository. Go into the directory where your module code is, "git add" all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
 
     cd MyModule
     git init
@@ -39,7 +39,7 @@ use the name of your module as the name for your new repository.
     git remote add origin https://github.com/[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
     git push -u origin master
 
-*Remember to update the code in the Git Repo as you change it via "git commit / pull / push" cycles.*
+*Remember to update the code in the Git repo as you change it via "git commit / pull / push" cycles.*
 
 [\[Back to top\]](#top)
 
@@ -48,7 +48,7 @@ use the name of your module as the name for your new repository.
 
 Open and edit the **kbase.yml** file to include a better description of your module. The default generated description 
 isn't very good. At this point, it's necessary to make some design choices about the scope of your module and which 
-individual methods it will contain. For each method, it is important to consider not just the desired functionality but 
+individual methods (apps) it will contain. For each method, it is important to consider not just the desired functionality but 
 also the inputs and outputs.
 
 Potential Inputs:
@@ -56,9 +56,8 @@ Potential Inputs:
 boolean form.
 * **Reference data** - Modest sized reference data can be committed to the /data directory.
 * **KBase Typed Data** - If your function will work on one of [KBase's defined data types](https://narrative.kbase.us/#catalog/datatypes),
-your method should accept a object reference as a string and access the data an appropriate utility module for it's
-data type.
-* **External web-assessable data** - You method may accept a URL as string and utilize the DataFileUtil to download the
+your method should accept an object reference as a string and access the data via an appropriate utility module.
+* **External web-assessable data** - Your method may accept a URL as string and utilize the DataFileUtil to download the
 file.
 
 Potential Outputs:
@@ -73,11 +72,11 @@ so we can discuss your needs.
 
 #### <A NAME="kidl-spec"></A>C. Create KIDL specification for Module
 
-You will define the programmatic interface to your code in a KIDL specification. This will include the parameters passed 
+You  define the programmatic interface to your code in a KIDL specification. This includes the parameters passed 
 to the methods and the declaration of the methods.  **You must rerun *make* after each change to the KIDL specification 
 to [create or update the implementation stubs](#stubs).**
 
-Open the `ContigFilter.spec` file in a text editor, and you will see this:
+Open the `ContigFilter.spec` file in a text editor, and you will see something like this:
 
     /*
     A KBase module: MikeContigFilter
@@ -88,7 +87,7 @@ Open the `ContigFilter.spec` file in a text editor, and you will see this:
         */
     };
 
-Comments are enclosed in `/* comment */`.  In this module, we want to define a function that counts contigs, so let's 
+Comments are enclosed in `/* comment */`.  In our example module, we want to define a function that counts contigs, so let's 
 define that function and its inputs/outputs as:
 
     typedef string contigset_id;
@@ -115,16 +114,16 @@ are defined using the `funcdef` keyword in this syntax:
 
     funcdef method_name(input_parameter_object_type params) returns (output_parameter_object_type output) authentication required;
 
-All methods that run in the Narrative will require authentication because they need to interact with a user's workspace.
+All methods (apps) that run in the Narrative will require authentication because they need to interact with a user's workspace.
 Your method can require authentication by adding that declaration at the end of the method.
 
 If you will be loading or saving any data from the workspace, make sure you accept object references in the input parameters.
-(You find examples of modules using workspace and object names. This gets the job done but can cause race conditions in rare 
-cases which is why references are preferred)
+(Some modules use workspace and object names--this gets the job done but can cause race conditions in rare 
+cases, which is why references are preferred.)
 
-If you will be creating a KBase report(and you almost certainly will), your method will need to accept a workspace_name which
-will ensure the report is in the right place to be viewed in the Narrative (This is the exception to the rule above). Your 
-method should also return the report name and reference in it's output object as shown below:
+If you will be creating a KBase report (and you almost certainly will), your method will need to accept a workspace_name which
+will ensure the report is in the right place to be viewed in the Narrative (this is the exception to the rule above). Your 
+method should also return the report name and reference in its output object as shown below:
 
 ```
     typedef structure {
@@ -138,7 +137,7 @@ method should also return the report name and reference in it's output object as
     } compoundset_results;
 ```
 
-Additional information on KIDL specification is available in the [here](KIDL_Specification.md)
+Additional information on KIDL specification is available [here](KIDL_Specification.md)
 
 [\[Back to top\]](#top)
 
@@ -155,7 +154,7 @@ directory of your module:
 
 #### <A NAME="stubs"></A>E. Create stubs for methods
 
-After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs (e.g. the 
+After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs (e.g., the 
 \<MyModule\>Impl.py file) by running
 
     make
