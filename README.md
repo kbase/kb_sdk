@@ -4,6 +4,7 @@ The KBase SDK is a set of tools for developing KBase Apps that can be dynamicall
 
 There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
 
+- Is licensed under one of the OSI-approved licenses listed at: https://opensource.org/licenses
 - Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
 - Uses existing data visualization widgets
