@@ -4,6 +4,7 @@ The KBase SDK is a set of tools for developing KBase Apps that can be dynamicall
 
 There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
 
+- Is licensed under one of the OSI-approved licenses listed at: https://opensource.org/licenses
 - Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
 - Uses existing data visualization widgets
@@ -12,8 +13,9 @@ There are still some general restrictions on functionality that will gradually b
 
 In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
-In order to use the SDK to test and deploy Apps you will need developer credentials. Please 
-<a href="http://kbase.us/contact-us">contact us</a> to be added to the developer list.
+If you want to develop apps using the SDK, please apply for a KBase developer account by going to https://accounts.kbase.us/index.php?tpl=request_identity.tpl.
+If you are a US citizen, your account can be created within a few days. For foreign nationals, it may take several weeks (and, in a few cases, you may not be able to get a developer account). Non-US citizens will be asked for additional information in order to process their application.
+Once your account is approved, contact us with your username and ask to be added to the developer list.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
@@ -38,6 +40,7 @@ In order to use the SDK to test and deploy Apps you will need developer credenti
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 - [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes)
 - [KIDL Specification](doc/KIDL_specification.md)
+- [KBase DataFileUtil SDK module](https://github.com/kbaseapps/DataFileUtil/blob/master/README.md)
 - [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
 
@@ -135,7 +138,7 @@ Add your repo to [GitHub](http://github.com) (or any other public git repository
     git remote add origin https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME].git
     git push -u origin master
 
-Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and submit.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
+Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo URL (e.g., https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and submit.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
 Your app is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us, sign in and start a new Narrative.  Click on the small 'R' in the upper right of the Apps panel until it switches to 'D' to show Apps that are still in development.  Find your new App by searching for your module, and run it to filter some contigs.
 
@@ -146,14 +149,14 @@ Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 ## <A NAME="examples"></A>Example Modules
 
-There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
+Here are a few modules that demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
 
- - [MegaHit](https://github.com/msneddon/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
- - [Trimmomatic](https://github.com/psdehal/Trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
- - [OrthoMCL](https://github.com/rsutormin/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
- - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
+ - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet). This is a very simple app that is a good first example to look at if you're new to the KBase SDK.
+ - [MEGAHIT](https://github.com/kbaseapps/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
+ - [Trimmomatic](https://github.com/kbaseapps/kb_trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
+ - [OrthoMCL](https://github.com/kbaseapps/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
 
 
 ## Need more?
 
-Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
+Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us.

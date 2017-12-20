@@ -35,7 +35,7 @@ http://ant.apache.org
 
 http://ant.apache.org/manual/install.html
 
-The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows to install simply by `brew install ant`.  Make sure that Ant install location is added to your PATH environment variable, which is generally handled for you if you use a package manager like HomeBrew.
+The easist way to install Ant on a Mac is probably to use a package manager like [HomeBrew](http://brew.sh/), which allows you to install simply by `brew install ant`.  Make sure the Ant install location is added to your PATH environment variable, which is generally handled for you if you use a package manager like HomeBrew.
 
 
 #### Fetch the code from GitHub:
@@ -58,19 +58,20 @@ Optionally, you can also install command completion with:
 
 Like `JAVA_HOME`, you should consider adding these last two commands to your `~/.bash_profile` or `~/.bashrc` file so the SDK is always available in the terminal with command completion.
 
-#### Test installation:
+#### Test installation
 
+To make sure you installed the SDK successfully, type
     kb-sdk help
 
 #### Download the KBase SDK base Docker image
 
-KBase modules run in Docker containers.  Docker containers are built on top of existing base images.  KBase has a public base image that includes a number of installed runtimes, some basic Bioinformatics tools, and other KBase specific tools.  To run this locally, you will need to download and build the KBase SDK base image.  There is a Makefile target that does most of the work for you:
+KBase modules run in Docker containers.  Docker containers are built on top of existing base images.  KBase has a public base image that includes a number of installed runtimes, some basic bioinformatics tools, and other KBase specific tools.  To run this locally, you will need to download and build the KBase SDK base image.  There is a Makefile target that does most of the work for you:
 
     make sdkbase
 
 You will get a failure if the Docker daemon is not running when you invoke the above command.  See  [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance.
 
-The Image currently is fairly large, so this will take some time to run and build the image.  This step is required for running tests locally.
+The image is fairly large, so it will take some time to run and build the image.
 
 
 [\[Back to top\]](#top)<br>
