@@ -27,11 +27,14 @@ tag.
 entrypoint.sh script in the scripts directory.  The data should be placed in
 /data and any apps that use the dated should be configured to look for the data
 in this location.
-3. Create a \__READ\__ file in /data to indicate that the reference data volume
+3. Create a \_\_READY\_\_ file in /data to indicate that the reference data volume
 was successfully created.  Ideally, some sanity tests should be performed to confirm
 things ran correctly by testing for the presence of expected files.  If the
-\__READY\__ file is not present, the registration will fail and the reference data
+\_\_READY\_\_ file is not present, the registration will fail and the reference data
 area will be removed.
+
+You can see an example in the RAST application:
+https://github.com/kbaseapps/RAST_SDK/blob/master/scripts/entrypoint.sh#L18-L28
 
 
 ## Updating Reference Data
@@ -47,6 +50,6 @@ There a few things to watch out for with reference data.
 
 * The reference data area (/data) is mounted at init and runtime and replaces /data from the Docker image.  Any modifications made by the
 Dockerfile to this space will not be visible.  Changes must be done in the init block in entrypoint.sh.
-* The reference data is only writeable at init time.  This is to ensure that the data is accidentally
-changed at execution time which could break reproducibility.  If some changes are needed at run-time,
-then copy or link to the data into the writeable work area.
+* The reference data is only writeable at registration time.  This is to ensure that the data is not accidentally
+changed during execution which could break reproducibility.  If the app requires the reference data to be writeable when it executes,
+then you add code to the execution that copies the data into the writeable work area prior to running the underlying application.
