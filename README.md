@@ -9,7 +9,7 @@ There are still some general restrictions on functionality that will gradually b
 - Operates only on supported KBase data types
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
-- Wrapper written in Python, Java, R, or Perl
+- Wrapper written in Python, Java, or Perl
 
 In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
@@ -55,7 +55,7 @@ For the adventurous, there is an experimental Dockerized installation that only 
 System Dependencies:
 
 - Mac OS X 10.8+ or Linux. kb-sdk does not run natively in Windows, but see [here](doc/FAQ.md#windows) for more details.
-- Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- Java JRE 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
@@ -88,7 +88,7 @@ Test installation:
 
 Additional System Dependencies:
 
-- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- Java JDK 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - JAVA_HOME environment variable set to JDK installation path
 - Apache Ant http://ant.apache.org
 
@@ -102,6 +102,7 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
 
 Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
 
+    cd ~ # or wherever you wish to place your module directory
     kb-sdk init --example -l python -u [your_kbase_user_name] MyContigFilter
 
 Enter your new module directory and do the initial build:

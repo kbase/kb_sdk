@@ -49,7 +49,7 @@ public class ModuleBuilder {
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.17";
+    public static final String VERSION = "1.0.18";
     
     
     public static void main(String[] args) throws Exception {
@@ -192,9 +192,9 @@ public class ModuleBuilder {
 		
 		// Get chosen language
 		String language = ModuleInitializer.DEFAULT_LANGUAGE;
-		if (initArgs.language != null)
+		if (initArgs.language != null) {
 			language = initArgs.language;
-		
+		}
 		try {
 			ModuleInitializer initer = new ModuleInitializer(moduleName, userName, language, initArgs.verbose);
 			initer.initialize(initArgs.example);
@@ -470,7 +470,7 @@ public class ModuleBuilder {
     	boolean example = false;
     	
     	@Parameter(names={"-l","--language"}, description="Choose a language for developing " + 
-    			" code in your module. You can currently choose from Python, Perl, R and Java " + 
+    			" code in your module. You can currently choose from Python, Perl, and Java " + 
     			"(default=Python)")
     	String language = ModuleInitializer.DEFAULT_LANGUAGE;
     	
@@ -585,26 +585,26 @@ public class ModuleBuilder {
         		"copies of generated classes for GWT clients)")//, metaVar="<java-gwt-pckg>")     
         String javaGwtPackage = null;
 
-        @Parameter(names="--r", description="Generate a Python client with a standard default name")
+        @Parameter(names="--r", description="DEPRECATED Generate a R client with a standard default name")
         boolean rClientSide = false;
 
-        @Parameter(names="--rclname", description="Generate an R client with with the " +
+        @Parameter(names="--rclname", description="DEPRECATED Generate an R client with with the " +
                 "name provided, optionally prefixed by subdirectories separated by '/' as "+
                 "in the standard file path syntax (e.g. biokbase/mymodule/client,"+
                 "overrides the --r option).")
         String rClientName = null;
 
-        @Parameter(names="--rsrv", description="Generate an R server with a " +
+        @Parameter(names="--rsrv", description="DEPRECATED Generate an R server with a " +
                 "standard default name.  If set, Python clients will automatically be generated too.")
         boolean rServerSide = false;
 
-        @Parameter(names="--rsrvname", description="Generate an R server with the " +
+        @Parameter(names="--rsrvname", description="DEPRECATED Generate an R server with the " +
                 "name provided, optionally prefixed by subdirectories separated by '/' as "+
                 "in the standard file path syntax (e.g. biokbase/mymodule/server,"+
                 "overrides the --rsrv option).")
         String rServerName = null;
 
-        @Parameter(names="--rimplname", description="Generate an R server implementation with the " +
+        @Parameter(names="--rimplname", description="DEPRECATED Generate an R server implementation with the " +
                 "name provided, optionally prefixed by subdirectories separated by '/' as "+
                 "in the standard file path syntax (e.g. biokbase/mymodule/impl)." +
                 " If set, R server and client code will be generated too.")
