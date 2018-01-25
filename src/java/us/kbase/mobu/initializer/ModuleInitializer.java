@@ -302,11 +302,11 @@ public class ModuleInitializer {
 	 * Takes a language string and returns a "qualified" form. E.g. "perl", "Perl", "pl", ".pl", should all 
 	 * return "perl", "Python", "python", ".py", and "py" should all return Python, etc.
 	 * 
-	 * Right now, we support Perl, Python, R and Java for implementation languages (nodejs next? Nope, R is first...)
+	 * Right now, we support Perl, Python and Java for implementation languages
 	 * @param language
 	 * @return
 	 */
-	private String qualifyLanguage(String language) {
+	public static String qualifyLanguage(String language) {
 		String lang = language.toLowerCase();
 		
 		String[] perlNames = {"perl", ".pl", "pl"};
@@ -321,11 +321,16 @@ public class ModuleInitializer {
 		if (Arrays.asList(javaNames).contains(lang))
 			return "java";
 		
-        String[] rNames = {"r", ".r"};
-        if (Arrays.asList(rNames).contains(lang))
-            return "r";
+		String[] rNames = {"r", ".r"};
+		if (Arrays.asList(rNames).contains(lang)) {
+			System.out.println(
+					"************************************************************************\n" +
+					"WARNING: R support is deprecated and will be removed in a future release\n" +
+					"************************************************************************");
+			return "r";
+		}
 		
 		// If we get here, then we don't recognize it! throw a runtime exception
-		throw new RuntimeException("Unrecognized language: " + language + "\n\tWe currently only support Python, Perl, R and Java.");
+		throw new RuntimeException("Unrecognized language: " + language + "\n\tWe currently only support Python, Perl, and Java.");
 	}
 }

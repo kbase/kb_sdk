@@ -172,16 +172,6 @@ public class ModuleTesterTest {
 	}
 
     @Test
-    public void testRModuleExample() throws Exception {
-        System.out.println("Test [testRModuleExample]");
-        String lang = "r";
-        String moduleName = SIMPLE_MODULE_NAME + "R";
-        init(lang, moduleName);
-        int exitCode = runTestsInDocker(moduleName);
-        Assert.assertEquals(0, exitCode);
-    }
-
-    @Test
     public void testRModuleError() throws Exception {
         System.out.println("Test [testRModuleError]");
         String lang = "r";
