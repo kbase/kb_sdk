@@ -24,8 +24,8 @@ To make use of this feature, the app developer needs to do a few simple things.
 1. Add the data-version tag to the kbase.yaml file and give it a semantic version
 tag.
 2. Add any downloading and data preparation steps to the init section of the
-entrypoint.sh script in the scripts directory.  The data should be placed in
-/data and any apps that use the dated should be configured to look for the data
+entrypoint.sh script in the scripts directory.  The init script should place the data in
+/data and any apps that use the data should be configured to look for the data
 in this location.
 3. Create a \_\_READY\_\_ file in /data to indicate that the reference data volume
 was successfully created.  Ideally, some sanity tests should be performed to confirm
@@ -34,7 +34,7 @@ things ran correctly by testing for the presence of expected files.  If the
 area will be removed.
 
 You can see an example in the RAST application:
-https://github.com/kbaseapps/RAST_SDK/blob/master/scripts/entrypoint.sh#L18-L28
+https://github.com/kbaseapps/RAST_SDK/blob/a975436d9c0af4f772bd7235b467180860f64060/scripts/entrypoint.sh#L18-L28
 
 
 ## Updating Reference Data
@@ -48,7 +48,7 @@ reference data specified in that versions kbase.yaml file.  This helps to ensure
 
 There a few things to watch out for with reference data.
 
-* The reference data area (/data) is mounted at init and runtime and replaces /data from the Docker image.  Any modifications made by the
+* The reference data area (/data) is mounted during initialization (module registration) and durinng app execution and replaces /data from the Docker image.  Any modifications made by the
 Dockerfile to this space will not be visible.  Changes must be done in the init block in entrypoint.sh.
 * The reference data is only writeable at registration time.  This is to ensure that the data is not accidentally
 changed during execution which could break reproducibility.  If the app requires the reference data to be writeable when it executes,
