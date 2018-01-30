@@ -161,5 +161,26 @@ After editing the <MyModule>.spec KIDL file, generate the Python (or other langu
 
 This will call `kb-sdk compile` with a set of parameters predefined for you.
 
+## Some Useful SDK Modules
+#### DataFileUtil
+- Upload & download files to and from Shock (the KBase file storage system)
+    - Make handles
+- Save objects to workspace (the KBase object storage system)
+    - Automatically handles provenance
+- Get objects from workspace
+    - Simplifies interface
+- Pack and unpack files with gzip, targz, and zip
+- Package data for a downloader
+- Copy and own Shock nodes
+    - Make handles
+
+### WsLargeDataIO
+- Save and get objects to and from the workspace from files
+    - I.e. doesn’t load the object into memory
+
+### KBaseReport
+- Aids in creating report objects returned by SDK methods.
+
+
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)
