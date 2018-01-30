@@ -1,0 +1,24 @@
+# Dynamic services vs SDK Methods
+There are two flavors of SDK Module: dynamic services and SDK Methods, a subset of which are known to users of the Narrative interface as Applications or Apps.
+
+SDK Methods are run asynchronously in a queue and are expected to have longer running times.
+SDK Methods can also call other SDK Methods (see Call one SDK module from another).
+SDK Methods are typically used for wrapping functionality from 3rd party code, uploaders and downloaders, and other long-running tasks.
+Almost all narrative applications are implemented as SDK Methods.
+
+Dynamic services (DS) are SDK Modules designed to respond quickly to requests.
+As such, the module runs as an always-on service.
+DSs cannot call SDK Methods, but can call other services, dynamic or otherwise, as normal.
+DSs are typically used as the backend for UI elements (such as Narrative widgets) to enable those elements to be displayed and updated quickly.
+The function of a DS is often, for a specific workspace type (such as a KBaseGenome.Genome), to pull the data for an object and process the data into a form that the UI element can understand.
+The DS will often cache the processed form of the data and return parts of the processed form as the UI needs those parts.
+Thus,  the UI doesn’t need to keep the entire data, processed or otherwise, in memory.
+
+== Creating a dynamic service
+By default, all SDK modules are SDK Methods that run asynchronously. To mark a module as a DS, add the following to the kbase.yml file (example):
+
+service-config:
+    dynamic-service: true
+
+You can then register your module as usual and start and stop it using the catalog interface.
+Other than that one configuration setting, development of a dynamic service module is identical to a Method module.
