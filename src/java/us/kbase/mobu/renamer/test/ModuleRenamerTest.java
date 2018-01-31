@@ -80,15 +80,6 @@ public class ModuleRenamerTest {
     }
     
     @Test
-    public void testR() throws Exception {
-        String newModuleName = TARGET_MODULE_NAME + "_r";
-        File moduleDir = initRepo("r");
-        new ModuleRenamer(moduleDir).rename(newModuleName);
-        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, token);
-        Assert.assertEquals(0, exitCode);
-    }
-    
-    @Test
     public void testWindowsEOFs() throws Exception {
         String oldModuleName = "a_SimpleModule_for_unit_testing";
         String newModuleName = "a_SimpleModule_for_UnitTesting";

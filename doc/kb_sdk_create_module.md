@@ -27,7 +27,7 @@ The basic options of the command are:
 
     kb-sdk init --example -l python -u <your_kbase_user_name> <user_name>ContigFilter
 
-This command will create a new module with the specified name `ModuleName`, configured based on the options provided.  You should always provide a username option so that the kbase.yml configuration file for your module includes you as a module owner.  The other key option is to set the programming language that you want to write your implementation in.  You can select either Python, Perl, R, or Java.
+This command will create a new module with the specified name `ModuleName`, configured based on the options provided.  You should always provide a username option so that the kbase.yml configuration file for your module includes you as a module owner.  The other key option is to set the programming language that you want to write your implementation in.  You can select either Python, Perl, or Java.
 
 The other **kb-sdk** options are:
 
@@ -37,7 +37,7 @@ The other **kb-sdk** options are:
     -e, --example    Populate your repo with an example module in the language
                      set by -l
     -l, --language   Choose a programming language to base your repo on.
-                     Currently, we support Perl, R, Python, and Java. Default is
+                     Currently, we support Perl, Python, and Java. Default is
                      Python
 
 For a simple example, let's create a new module to count the number of contigs in a KBase ContigSet object.  This is the same function that is defined in the basic example generated when you run `kbase init` with the `-e` flag, so you can always generate those files and compare.  In this example, we will instead put together the various pieces by hand.

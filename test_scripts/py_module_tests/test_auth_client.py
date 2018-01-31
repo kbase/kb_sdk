@@ -38,6 +38,7 @@ class TestAuth(unittest.TestCase):
             raise ValueError('Missing {} from test config'.format(cls.TOKEN1))
         if not cls.token2:
             raise ValueError('Missing {} from test config'.format(cls.TOKEN2))
+        print('Authorization url: ' + authurl)
         cls.user1 = cls.get_user(authurl, cls.token1)
         cls.user2 = cls.get_user(authurl, cls.token2)
         if cls.user1 == cls.user2:
@@ -49,6 +50,10 @@ class TestAuth(unittest.TestCase):
     def get_user(cls, authurl, token):
         d = {'token': token, 'fields': 'user_id'}
         ret = requests.post(authurl, data=d)
+        if ret.status_code != 200:
+            print('Failed getting token: ' + str(ret.status_code))
+            print(ret.text)
+            raise Exception('Failed getting token: ' + str(ret.status_code))
         return ret.json()['user_id']
 
     def test_get_user(self):
