@@ -2,9 +2,9 @@
 
 The KBase SDK is a set of tools for developing KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase App Catalog, you can build and run a new "Hello World!" App in KBase in minutes.
 
-There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
-
-- Is licensed under one of the OSI-approved licenses listed at: https://opensource.org/licenses
+There are still some general restrictions that will gradually be lifted as the SDK and KBase platform are refined.  The current requirements for KBase apps are:
+  		  
+- Tool is licensed under one of the OSI-approved licenses listed at: https://opensource.org/licenses
 - Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
 - Uses existing data visualization widgets
@@ -13,8 +13,8 @@ There are still some general restrictions on functionality that will gradually b
 
 In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
-If you want to develop apps using the SDK, please apply for a KBase developer account by going to https://accounts.kbase.us/index.php?tpl=request_identity.tpl.
-If you are a US citizen, your account can be created within a few days. For foreign nationals, it may take several weeks (and, in a few cases, you may not be able to get a developer account). Non-US citizens will be asked for additional information in order to process their application.
+If you want to develop apps using the SDK, please obtain a free [KBase user account](http://kbase.us/sign-up-for-a-kbase-account/) and then apply for a KBase developer account by going to https://accounts.kbase.us/index.php?tpl=request_identity.tpl.
+If you are a US citizen, your account should be created within a few days. For foreign nationals, it may take several weeks (and, in a few cases, you may not be able to get a developer account). Non-US citizens will be asked for additional information in order to process their application.
 Once your account is approved, contact us with your username and ask to be added to the developer list.
 
 
@@ -40,7 +40,7 @@ Once your account is approved, contact us with your username and ask to be added
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
 - [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes)
 - [KIDL Specification](doc/KIDL_specification.md)
-- [KBase DataFileUtil SDK module](https://github.com/kbaseapps/DataFileUtil/blob/master/README.md)
+- [KBase DataFileUtil SDK Module](https://github.com/kbaseapps/DataFileUtil/blob/master/README.md)
 - [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
 
