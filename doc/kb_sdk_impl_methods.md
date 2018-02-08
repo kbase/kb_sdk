@@ -15,9 +15,7 @@
 ### <A NAME="impl"></A>5. Implement App(s)
 
 In the directory lib/\<MyModule>, edit the \<MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
-defines the methods (apps) available in the module. The example module is very simple and is implemented directly in this file
-but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
-that include more than one app. 
+defines the methods (apps) available in the module. It is important to notice that only the code that is written **in between the comments** in the implementation file will be kept, and the rest will be discarded. The example module is very simple, so its logic is located exclusively in one file; However it is better practice and more readable to separate implementation logic into multiple files, especially for modules that include more than one app.
 
 The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd-party 
 code or executables), storing resulting data in the data stores, and producing a report for the user summarizing the work accomplished.
