@@ -1,4 +1,4 @@
-Known test dependencies listed below. Please add more if discovered.
+Known dependencies for testing kb_sdk itself (not modules) listed below. Please add more if discovered.
 
 Must force RPC::Any, Moose updates cause XML tests to fail.
 
