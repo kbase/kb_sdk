@@ -6,6 +6,8 @@ New versions of paramiko complain about being unable to import SSH2_AGENTC_REQUE
 
 With the new auth2 clients and server we may no longer need rsa, paramiko, Crypt::OpenSSL::RSA, Convert::PEM
 
+Make sure nose2 is using python2.
+
 pip install requests nose2 jsonrpcbase rsa paramiko==1.10.2
 
 cpan Moose
