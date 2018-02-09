@@ -20,17 +20,30 @@ public class CallbackServerConfigBuilder {
     private static final  String EP_SHOCK = "shock-api";
     private static final  String EP_CAT = "catalog";
     private static final  String EP_UJS = "userandjobstate";
+    private static final  String EP_HANDLE = "handle_service";
+    private static final  String EP_SRV_WIZ = "service_wizard";
+    private static final  String EP_NJSW = "njs_wrapper";
     
     private static final String KBASE_EP = "kbase_endpoint";
     private static final String UJS_URL = "job_service_url";
     private static final String WS_URL = "workspace_url";
     private static final String SHOCK_URL = "shock_url";
+    private static final String HANDLE_URL = "handle_url";
+    private static final String SRV_WIZ_URL = "srv_wiz_url";
+    private static final String NJSW_URL = "njsw_url";
+    private static final String AUTH_URL = "auth_service_url";
+    private static final String AUTH_ALLOW_INSECURE = "auth_service_url_allow_insecure";
     
     final private URL kbaseEndpointURL;
-    private URL workspaceURL;
-    private URL shockURL;
-    private URL userJobStateURL;
-    private URL catalogURL;
+    final private URL workspaceURL;
+    final private URL shockURL;
+    final private URL userJobStateURL;
+    final private URL handleURL;
+    final private URL srvWizURL;
+    final private URL njswURL;
+    final private URL authServiceURL;
+    final private String authAllowInsecure;
+    final private URL catalogURL;
     private URI dockerURI = null;
     final private URL callbackURL;
     final private Path workDir;
@@ -38,23 +51,36 @@ public class CallbackServerConfigBuilder {
     
     public CallbackServerConfigBuilder(
             final URL kbaseEndpointURL,
+            final URL workspaceURL,
+            final URL shockURL,
+            final URL userJobStateURL,
+            final URL handleURL,
+            final URL srvWizURL,
+            final URL njswURL,
+            final URL authServiceURL,
+            final String authAllowInsecure,
+            final URL catalogURL,
             final URL callbackURL,
             final Path workDir,
             final LineLogger logger) {
         super();
-        checkNulls(kbaseEndpointURL, callbackURL, workDir, logger);
+        checkNulls(kbaseEndpointURL, authServiceURL, callbackURL, workDir, logger);
         this.kbaseEndpointURL = kbaseEndpointURL;
         
-        this.workspaceURL = resolveURL(kbaseEndpointURL, EP_WS);
-        this.shockURL = resolveURL(kbaseEndpointURL, EP_SHOCK);
-        this.userJobStateURL = resolveURL(kbaseEndpointURL, EP_UJS);
-        this.catalogURL = resolveURL(kbaseEndpointURL, EP_CAT);
-        
+        this.workspaceURL = optionalURL(workspaceURL, kbaseEndpointURL, EP_WS);
+        this.shockURL = optionalURL(shockURL, kbaseEndpointURL, EP_SHOCK);
+        this.userJobStateURL = optionalURL(userJobStateURL, kbaseEndpointURL, EP_UJS);
+        this.handleURL = optionalURL(handleURL, kbaseEndpointURL, EP_HANDLE);
+        this.srvWizURL = optionalURL(srvWizURL, kbaseEndpointURL, EP_SRV_WIZ);
+        this.njswURL = optionalURL(njswURL, kbaseEndpointURL, EP_NJSW);
+        this.authServiceURL = authServiceURL;
+        this.authAllowInsecure = authAllowInsecure == null ? "false" : authAllowInsecure;
+        this.catalogURL = optionalURL(catalogURL, kbaseEndpointURL, EP_CAT);
         this.callbackURL = callbackURL;
         this.workDir = workDir;
         this.logger = logger;
     }
-
+    
     public CallbackServerConfigBuilder(
             final Map<String, String> config,
             final URL callbackURL,
@@ -65,23 +91,31 @@ public class CallbackServerConfigBuilder {
         this.kbaseEndpointURL = getURL(config,
                 JobRunnerConstants.CFG_PROP_KBASE_ENDPOINT);
         
-        this.workspaceURL = resolveURL(kbaseEndpointURL, EP_WS);
-        this.shockURL = resolveURL(kbaseEndpointURL, EP_SHOCK);
-        this.userJobStateURL = resolveURL(kbaseEndpointURL, EP_UJS);
-        this.catalogURL = resolveURL(kbaseEndpointURL, EP_CAT);
-        
         this.workspaceURL = optionallyGetURLfromConfig(config,
                 JobRunnerConstants.CFG_PROP_WORKSPACE_SRV_URL,
-                this.workspaceURL);
+                resolveURL(kbaseEndpointURL, EP_WS));
         this.shockURL = optionallyGetURLfromConfig(config,
                 JobRunnerConstants.CFG_PROP_SHOCK_URL,
-                this.shockURL);
+                resolveURL(kbaseEndpointURL, EP_SHOCK));
         this.userJobStateURL = optionallyGetURLfromConfig(config,
                 JobRunnerConstants.CFG_PROP_JOBSTATUS_SRV_URL,
-                this.userJobStateURL);
+                resolveURL(kbaseEndpointURL, EP_UJS));
+        this.handleURL = optionallyGetURLfromConfig(config,
+                JobRunnerConstants.CFG_PROP_HANDLE_SRV_URL,
+                resolveURL(kbaseEndpointURL, EP_HANDLE));
+        this.srvWizURL = optionallyGetURLfromConfig(config,
+                JobRunnerConstants.CFG_PROP_SRV_WIZ_URL,
+                resolveURL(kbaseEndpointURL, EP_SRV_WIZ));
+        this.njswURL = optionallyGetURLfromConfig(config,
+                JobRunnerConstants.CFG_PROP_NJSW_URL,
+                resolveURL(kbaseEndpointURL, EP_NJSW));
+        this.authServiceURL = getURL(config,
+                JobRunnerConstants.CFG_PROP_AUTH_SERVICE_URL);
+        this.authAllowInsecure = optionallyGetParamfromConfig(config,
+                JobRunnerConstants.CFG_PROP_AUTH_SERVICE_ALLOW_INSECURE_URL_PARAM, "false");
         this.catalogURL = optionallyGetURLfromConfig(config,
                 JobRunnerConstants.CFG_PROP_CATALOG_SRV_URL,
-                this.catalogURL);
+                resolveURL(kbaseEndpointURL, EP_CAT));
         
         this.dockerURI = getURI(config,
                 JobRunnerConstants.CFG_PROP_AWE_CLIENT_DOCKER_URI,
@@ -89,32 +123,6 @@ public class CallbackServerConfigBuilder {
         this.callbackURL = callbackURL;
         this.workDir = workDir;
         this.logger = logger;
-    }
-    
-    public CallbackServerConfigBuilder withWorkspaceURL(
-            final URL workspaceURL) {
-        checkNulls(workspaceURL);
-        this.workspaceURL = workspaceURL;
-        return this;
-    }
-
-    public CallbackServerConfigBuilder withShockURL(final URL shockURL) {
-        checkNulls(shockURL);
-        this.shockURL = shockURL;
-        return this;
-    }
-
-    public CallbackServerConfigBuilder withUserJobStateURL(
-            final URL userJobStateURL) {
-        checkNulls(userJobStateURL);
-        this.userJobStateURL = userJobStateURL;
-        return this;
-    }
-
-    public CallbackServerConfigBuilder withCatalogURL(final URL catalogURL) {
-        checkNulls(catalogURL);
-        this.catalogURL = catalogURL;
-        return this;
     }
     
     public CallbackServerConfigBuilder withDockerURI(final URI dockerURI) {
@@ -125,7 +133,8 @@ public class CallbackServerConfigBuilder {
 
     public CallbackServerConfig build() {
         return new CallbackServerConfig(
-                kbaseEndpointURL, workspaceURL, shockURL, userJobStateURL,
+                kbaseEndpointURL, workspaceURL, shockURL, userJobStateURL, 
+                handleURL, srvWizURL, njswURL, authServiceURL, authAllowInsecure,
                 catalogURL, dockerURI, callbackURL, workDir, logger);
     }
 
@@ -150,6 +159,9 @@ public class CallbackServerConfigBuilder {
         }
     }
 
+    private static URL optionalURL(URL url, URL defaultBase, final String ext) {
+        return url == null ? resolveURL(defaultBase, ext) : url;
+    }
     
     private static URL resolveURL(URL url, final String ext) {
         try {
@@ -172,6 +184,17 @@ public class CallbackServerConfigBuilder {
             throw new IllegalStateException("The configuration parameter '" +
                     param + " = " + urlStr + "' is not a valid URL");
         }
+    }
+
+    private static String optionallyGetParamfromConfig(
+            final Map<String, String> config,
+            final String param,
+            final String default_) {
+        final String pval = config.get(param);
+        if (pval == null || pval.isEmpty()) {
+            return default_;
+        }
+        return getParam(config, param, false);
     }
 
     private static String getParam(
@@ -205,26 +228,36 @@ public class CallbackServerConfigBuilder {
         }
     }
     
-    public class CallbackServerConfig {
+    public static class CallbackServerConfig {
         final private URL kbaseEndpointURL;
         final private URL workspaceURL;
         final private URL shockURL;
         final private URL userJobStateURL;
+        final private URL handleURL;
+        final private URL srvWizURL;
+        final private URL njswURL;
+        final private URL authServiceURL;
+        final private String authAllowInsecure;
         final private URL catalogURL;
         final private URI dockerURI;
         final private URL callbackURL;
         final private Path workDir;
         final private LineLogger logger;
 
-        private CallbackServerConfig(URL kbaseEndpointURL, URL workspaceURL,
-                URL shockURL, URL userJobStateURL, URL catalogURL,
-                URI dockerURI, URL callbackURL, Path workDir,
-                LineLogger logger) {
+        private CallbackServerConfig(URL kbaseEndpointURL, URL workspaceURL, URL shockURL, 
+                URL userJobStateURL, URL handleURL, URL srvWizURL, URL njswURL, URL authServiceURL,
+                String authAllowInsecure, URL catalogURL, URI dockerURI, URL callbackURL, 
+                Path workDir, LineLogger logger) {
             super();
             this.kbaseEndpointURL = kbaseEndpointURL;
             this.workspaceURL = workspaceURL;
             this.shockURL = shockURL;
             this.userJobStateURL = userJobStateURL;
+            this.handleURL = handleURL;
+            this.srvWizURL = srvWizURL;
+            this.njswURL = njswURL;
+            this.authServiceURL = authServiceURL;
+            this.authAllowInsecure = authAllowInsecure;
             this.catalogURL = catalogURL;
             this.dockerURI = dockerURI;
             this.callbackURL = callbackURL;
@@ -260,6 +293,41 @@ public class CallbackServerConfigBuilder {
             return userJobStateURL;
         }
 
+        /**
+         * @return the handleURL
+         */
+        public URL getHandleURL() {
+            return handleURL;
+        }
+        
+        /**
+         * @return the srvWizURL
+         */
+        public URL getSrvWizURL() {
+            return srvWizURL;
+        }
+        
+        /**
+         * @return the njswURL
+         */
+        public URL getNjswURL() {
+            return njswURL;
+        }
+        
+        /**
+         * @return the authServiceURL
+         */
+        public URL getAuthServiceURL() {
+            return authServiceURL;
+        }
+        
+        /**
+         * @return the authAllowInsecure
+         */
+        public String getAuthAllowInsecure() {
+            return authAllowInsecure;
+        }
+        
         /**
          * @return the catalogURL
          */
@@ -303,7 +371,12 @@ public class CallbackServerConfigBuilder {
                     KBASE_EP  + "=" + kbaseEndpointURL,
                     UJS_URL   + "=" + userJobStateURL,
                     WS_URL    + "=" + workspaceURL,
-                    SHOCK_URL + "=" + shockURL),
+                    SHOCK_URL + "=" + shockURL,
+                    HANDLE_URL + "=" + handleURL,
+                    SRV_WIZ_URL + "=" + srvWizURL,
+                    NJSW_URL + "=" + njswURL,
+                    AUTH_URL + "=" + authServiceURL,
+                    AUTH_ALLOW_INSECURE + "=" + authAllowInsecure),
                     StandardCharsets.UTF_8);
         }
 
@@ -321,6 +394,16 @@ public class CallbackServerConfigBuilder {
             builder.append(shockURL);
             builder.append(", userJobStateURL=");
             builder.append(userJobStateURL);
+            builder.append(", handleURL=");
+            builder.append(handleURL);
+            builder.append(", srvWizURL=");
+            builder.append(srvWizURL);
+            builder.append(", njswURL=");
+            builder.append(njswURL);
+            builder.append(", authServiceURL=");
+            builder.append(authServiceURL);
+            builder.append(", authAllowInsecure=");
+            builder.append(authAllowInsecure);
             builder.append(", catalogURL=");
             builder.append(catalogURL);
             builder.append(", dockerURI=");

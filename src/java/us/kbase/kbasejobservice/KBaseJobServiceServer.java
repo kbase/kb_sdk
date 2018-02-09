@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonServerMethod;
@@ -88,7 +87,7 @@ public class KBaseJobServiceServer extends JsonServerServlet {
             Exception exc = null;
             try {
                 //TODO AUTH make configurable?
-                final AuthToken t = AuthService.validateToken(token);
+                final AuthToken t = new AuthToken(token, "<unknown>");
                 if (rpcName.endsWith("_submit")) {
                     String origRpcName = rpcName.substring(0, rpcName.lastIndexOf('_'));
                     String[] parts = origRpcName.split(Pattern.quote("."));

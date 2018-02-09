@@ -28,11 +28,11 @@ jetty/jetty-all-7.0.0.jar
 jna/jna-3.4.0.jar
 joda/joda-time-2.2.jar
 junit/junit-4.9.jar
-kbase/auth/kbase-auth-0.4.1.jar
+kbase/auth/kbase-auth-0.4.4.jar
 kbase/handle/HandleManagerClient-141020-ff26a5d.jar
 kbase/handle/HandleServiceClient-141020-5eda76e.jar
-kbase/shock/shock-client-0.0.14.jar
-kbase/workspace/WorkspaceClient-0.4.1.jar
+kbase/shock/shock-client-0.0.15.jar
+kbase/workspace/WorkspaceClient-0.6.0.jar
 kohsuke/args4j-2.0.21.jar
 logback/logback-classic-1.1.2.jar
 logback/logback-core-1.1.2.jar

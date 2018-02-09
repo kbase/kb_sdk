@@ -26,19 +26,19 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 
 
 #### <A NAME="installed"></A>Q: What's already installed in the base KBase Docker image and how do I call it?
-**A:**  The base KBase Docker image contains an Ubuntu Linux image with kbase tools for connecting to KBase services and data installed.  Please see the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples) for how to access these services and data.
+**A:**  The base KBase Docker image contains an Ubuntu Linux image with kbase tools for connecting to KBase services and data installed.  Please see the SDK Module implementation [examples](https://github.com/kbase/kb_sdk/README.md#examples) for how to access these services and data.
 
 [back to top](#top)
 
 
 #### <A NAME="data"></A>Q: How do I find and access data?
-**A:** There are both public reference data sets and individual user data sets (both public and private).  Public reference data can be found with [KBase Data Search](https://narrative.kbase.us/search/#/search/?q=*), and should be copied into your Narrative to be used.  Accessing Data Objects from your SDK Methods is explained in [Working with KBase Data Types](https://github.com/kbase/kb_sdk/doc/kb_sdk_data_types.md) and illustrated in the SDK Module implemntation [examples](https://github.com/kbase/kb_sdk/README.md#examples).
+**A:** There are both public reference data sets and individual user data sets (both public and private).  Public reference data can be found with [KBase Data Search](https://narrative.kbase.us/search/#/search/?q=*), and should be copied into your Narrative to be used.  Accessing Data Objects from your SDK Methods is explained in [Working with KBase Data Types](https://narrative.kbase.us/#catalog/datatypes) and illustrated in the SDK Module implementation [examples](https://github.com/kbase/kb_sdk/README.md#examples).
 
 [back to top](#top)
 
 
 #### <A NAME="sys-req-dev"></A>Q: What are system requirements for development workstation?
-**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, Java, or R).  You will need about 1-2 GB free to install the [dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
+**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, or Java).  You will need about 1-2 GB free to install the [dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
 
 [back to top](#top)
 
@@ -50,7 +50,7 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 - Requires either no or fairly limited amounts of reference data
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
-- Wrapper written in Python, Java, R, or Perl
+- Wrapper written in Python, Java, or Perl
 
 [back to top](#top)
 
@@ -82,7 +82,7 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="windows"></A>Q: Can I develop on Windows?
-**A:**  Sort of.  Your best option right now is to install [VirtualBox](https://www.virtualbox.org) with [Ubuntu Linux](https://www.ubuntu.com/desktop) and work in the Linux VM.  Many developers use this approach in KBase, and we know it works well.  Although the KBase SDK tools do not run natively in Windows, with the release of [Docker for Windows](https://docs.docker.com/docker-for-windows/) and our new experimental [Dockerized kb-sdk](kb_sdk_dockerized_install.md) we plan to fully support Windows very soon.
+**A:**  Sort of.  Your best option right now is to install [VirtualBox](https://www.virtualbox.org) with [Ubuntu Linux](https://www.ubuntu.com/desktop) and work in the Linux VM.  Many developers use this approach in KBase, and we know it works well.
 
 [back to top](#top)
 
@@ -111,6 +111,6 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 [back to top](#top)
 
 #### <A NAME="cheatsheet"></A>Q: Is there a cheatsheet?
-**A:** Yes, there is a _living_ document that provides a lot of hints about the SDK [SDK Cheatsheet](https://docs.google.com/document/d/1J6HJGtIoAY9yDI6N9xDyarH8vT7tCao2ZBzvVwLEOdw/edit).
+**A:** Yes, there is a document that provides a lot of hints about the SDK [SDK Cheatsheet](SDK_AdvancedFeaturesCheatSheet.pdf).
 
 [back to top](#top)

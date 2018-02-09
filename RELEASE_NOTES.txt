@@ -6,6 +6,44 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods 
 in the KBase Narrative interface.
 
+VERSION: 0.1.18 (Released 1/24/2018)
+------------------------------------
+
+BACKWARDS INCOMPATIBILITES:
+
+- R support is now deprecated.
+
+BUGFIXES:
+
+- Fixed Python builds for new modules. make sdkbase is required prior to build.
+
+VERSION: 0.1.17 (Released 8/29/2017)
+------------------------------------------
+NEW FEATURES:
+- Travis-CI support in the base kb-sdk and in modules generated using the
+  kb-sdk init command
+- Updated instructions for developer account
+- Updated documentation extensively, as well as Auth2 documentation
+- Updates to the testing environment
+- "kb-sdk init" now generates a RELEASE_NOTES.md file in new module
+
+VERSION: 0.1.1 through 0.1.16 ( 11/19-2015 through 5/17/2017)
+------------------------------------------
+SUMMARY of git commit log:
+
+- Updated for Auth2
+- Secure configuration parameters
+- Improved test coverage
+- Submodule cleanup
+- Remove dependencies on old typecompiler
+- Many fixes to tests
+- Updates to perl templates
+- Many fixes to error handling
+- Many fixes to example module
+- Java8 support
+- Tests for dynamic services
+- Python3 client compatibility
+- Docker support for callback service
 
 
 VERSION: 0.1.0 (Released 11/19/2015)
@@ -18,3 +56,5 @@ NEW FEATURES:
 
 UPDATED FEATURES / MAJOR BUG FIXES:
 - none
+
+

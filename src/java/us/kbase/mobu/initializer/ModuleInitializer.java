@@ -117,6 +117,7 @@ public class ModuleInitializer {
 		templateFiles.put("module_travis", Paths.get(moduleDir, ".travis.yml"));
 		templateFiles.put("module_dockerfile", Paths.get(moduleDir, "Dockerfile"));
 		templateFiles.put("module_readme", Paths.get(moduleDir, "README.md"));
+		templateFiles.put("module_release_notes", Paths.get(moduleDir, "RELEASE_NOTES.md"));
 		templateFiles.put("module_makefile", Paths.get(moduleDir, "Makefile"));
 		templateFiles.put("module_deploy_cfg", Paths.get(moduleDir, "deploy.cfg"));
 		templateFiles.put("module_license", Paths.get(moduleDir, "LICENSE"));
@@ -157,6 +158,7 @@ public class ModuleInitializer {
             break;
 		case "python":
             templateFiles.put("module_test_python_client", Paths.get(moduleDir, "test", this.moduleName + "_server_test.py"));
+            templateFiles.put("module_tox", Paths.get(moduleDir, "tox.ini"));
             break;
         case "perl":
             templateFiles.put("module_test_perl_client", Paths.get(moduleDir, "test", this.moduleName + "_server_test.pl"));
@@ -238,6 +240,18 @@ public class ModuleInitializer {
 					);
 			}
 		}
+		// Let's install fresh workspace client in any cases (we need it at least in tests):
+		new ClientInstaller(new File(moduleDir), false).install(
+                this.language,
+                false, // async clients
+                true, // core or sync clients
+                false, // dynamic client
+                null, //tagVer
+                this.verbose,
+                "https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec",
+                null,
+                null // clientName
+            );
 
 		System.out.println("Done! Your module is available in the " + moduleDir + " directory.");
 		if (example) {
@@ -281,18 +295,18 @@ public class ModuleInitializer {
 	private void fillTemplate(Map<?,?> context, String templateName, Path outfilePath) throws IOException {
 		if (this.verbose) System.out.println("Building file \"" + outfilePath.toString() + "\"");
 		initDirectory(outfilePath.getParent(), false);
-		TemplateFormatter.formatTemplate(templateName, context, true, outfilePath.toFile());
+		TemplateFormatter.formatTemplate(templateName, context, outfilePath.toFile());
 	}
 	
 	/**
 	 * Takes a language string and returns a "qualified" form. E.g. "perl", "Perl", "pl", ".pl", should all 
 	 * return "perl", "Python", "python", ".py", and "py" should all return Python, etc.
 	 * 
-	 * Right now, we support Perl, Python, R and Java for implementation languages (nodejs next? Nope, R is first...)
+	 * Right now, we support Perl, Python and Java for implementation languages
 	 * @param language
 	 * @return
 	 */
-	private String qualifyLanguage(String language) {
+	public static String qualifyLanguage(String language) {
 		String lang = language.toLowerCase();
 		
 		String[] perlNames = {"perl", ".pl", "pl"};
@@ -307,11 +321,16 @@ public class ModuleInitializer {
 		if (Arrays.asList(javaNames).contains(lang))
 			return "java";
 		
-        String[] rNames = {"r", ".r"};
-        if (Arrays.asList(rNames).contains(lang))
-            return "r";
+		String[] rNames = {"r", ".r"};
+		if (Arrays.asList(rNames).contains(lang)) {
+			System.out.println(
+					"************************************************************************\n" +
+					"WARNING: R support is deprecated and will be removed in a future release\n" +
+					"************************************************************************");
+			return "r";
+		}
 		
 		// If we get here, then we don't recognize it! throw a runtime exception
-		throw new RuntimeException("Unrecognized language: " + language + "\n\tWe currently only support Python, Perl, R and Java.");
+		throw new RuntimeException("Unrecognized language: " + language + "\n\tWe currently only support Python, Perl, and Java.");
 	}
 }

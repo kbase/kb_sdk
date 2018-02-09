@@ -2,29 +2,34 @@
 
 The KBase SDK is a set of tools for developing KBase Apps that can be dynamically registered and run on the KBase platform.  Apps are grouped into modules that include all code, dependencies, specification files, and documentation needed to define and run Apps in the KBase Narrative interface.  By using [Docker](https://www.docker.com) combined with the KBase App Catalog, you can build and run a new "Hello World!" App in KBase in minutes.
 
-There are still some general restrictions on functionality that will gradually be lifted as the SDK and KBase platform are refined.  The current restrictions are:
-
+There are still some general restrictions that will gradually be lifted as the SDK and KBase platform are refined.  The current requirements for KBase apps are:
+  		  
+- Licensed under one of the OSI-approved licenses listed at: https://opensource.org/licenses
 - Runs completely on a standard KBase worker node (at least 2 cores and 22GB memory)
 - Operates only on supported KBase data types
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
-- Wrapper written in Python, Java, R, or Perl
+- Wrapper written in Python, Java, or Perl
 
-If you have a tool you would like to register with KBase that cannot meet these requirements, please contact us to discuss possible solutions.
+In addition to these technical restrictions, tools in KBase are subject to a [review process](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) prior to public release. If you have a tool you would like to register with KBase that cannot meet these requirements, please <a href="http://kbase.us/contact-us">contact us</a> to discuss possible solutions.
 
-In order to register your Apps with KBase, you have to be an approved developer.  To become approved, first create a standard KBase user account through http://kbase.us and apply for a developer account.  Once you have submitted the forms, please contact us at http://kbase.us/contact-us with your username and we will help with the next steps.
+If you want to develop apps using the SDK, please obtain a free [KBase user account](http://kbase.us/sign-up-for-a-kbase-account/) and then apply for a KBase developer account by going to https://accounts.kbase.us/index.php?tpl=request_identity.tpl.
+If you are a US citizen, your account should be created within a few days. For foreign nationals, it may take several weeks (and, in a few cases, you may not be able to get a developer account). Non-US citizens will be asked for additional information in order to process their application.
+Once your account is approved, contact us with your username and ask to be added to the developer list.
 
 
 ## <A NAME="steps"></A>Steps in Using SDK
 1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
-2. [Install and Build SDK](doc/kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](doc/kb_sdk_dockerized_install.md)
 3. [Create Module](doc/kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](doc/kb_sdk_edit_module.md)
-5. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
-6. [Register Module](doc/kb_sdk_register_module.md)
-7. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
-8. [Complete Module Info](doc/kb_sdk_complete_module_info.md)
-9. [Deploy](doc/kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](doc/kb_sdk_edit_module.md)
+5. [Implement Method(s)](doc/kb_sdk_impl_methods.md)
+6. [Specify User Interface](doc/kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
+8. [Register Module](doc/kb_sdk_register_module.md)
+9. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kdoc/b_sdk_complete_module_info.md)
+11. [Deploy](doc/kb_sdk_deploy.md)
 
 ### Additional Documentation
 - [Examples](#examples)
@@ -32,23 +37,13 @@ In order to register your Apps with KBase, you have to be an approved developer.
 - [Troubleshooting](doc/kb_sdk_troubleshooting.md)
 - [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
-- [KBase Data Types Table](doc/kb_sdk_data_types_table.md)
-- [Working with KBase Data Types](doc/kb_sdk_data_types.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
-
-<!--NOT DONE
-
-- (Combine [Module Testing Framework](doc/testing.md) with [Debugging Your Module](doc/Docker_deployment.md))
-- KBase SDK Coding Style Guide and Best Practices
-- Wrapping an Existing Command-Line Tool
-- Using Custom Reference Data 
-- Managing Your Module Release Cycle
-- KBase Interface Description Language (KIDL) Guide
-- Visualization Widget Development Guide
--->
+- [KBase Data Types](https://narrative.kbase.us/#catalog/datatypes)
+- [KIDL Specification](doc/KIDL_specification.md)
+- [KBase DataFileUtil SDK Module](https://github.com/kbaseapps/DataFileUtil/blob/master/README.md)
+- [Narrative UI Specification](doc/NarrativeUIAppSpecification.pdf)
 
 
-<br>
 ## Quick Install Guide
 
 Below is a quick reference guide for standard installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
@@ -60,7 +55,7 @@ For the adventurous, there is an experimental Dockerized installation that only 
 System Dependencies:
 
 - Mac OS X 10.8+ or Linux. kb-sdk does not run natively in Windows, but see [here](doc/FAQ.md#windows) for more details.
-- Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- Java JRE 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
@@ -93,7 +88,7 @@ Test installation:
 
 Additional System Dependencies:
 
-- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- Java JDK 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - JAVA_HOME environment variable set to JDK installation path
 - Apache Ant http://ant.apache.org
 
@@ -102,11 +97,12 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
     cd kb_sdk
     make
 
-<br>
+
 ## Quick Start Guide
 
 Initialize a new module populated with the ContigFilter example (module names need to be unique in KBase, so you should pick a different name):
 
+    cd ~ # or wherever you wish to place your module directory
     kb-sdk init --example -l python -u [your_kbase_user_name] MyContigFilter
 
 Enter your new module directory and do the initial build:
@@ -114,10 +110,9 @@ Enter your new module directory and do the initial build:
     cd MyContigFilter
     make
 
-Edit the local test config file (`test_local/test.cfg`) with a KBase user account name and password:
+Edit the local test config file (`test_local/test.cfg`) with a KBase developer token:
 
-    test_user = TEST_USER_NAME
-    test_password = TEST_PASSWORD
+    test_token = TEST_TOKEN
 
 Run tests:
 
@@ -144,27 +139,25 @@ Add your repo to [GitHub](http://github.com) (or any other public git repository
     git remote add origin https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME].git
     git push -u origin master
 
-Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo url (e.g. https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and submit.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
+Now go to https://appdev.kbase.us/#appcatalog/register.  Enter your public git repo URL (e.g., https://github.com/[GITHUB_USER_NAME]/[GITHUB_REPO_NAME]) and submit.  Wait for the registration to complete.  Note that you must be an approved developer to register a new module.
 
-Your method is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us and start a new narrative.  Click on the 'R' in the method panel list until it switches to 'D' for methods still in development.  Find your new method by searching for your module, and run it to filter some contigs.
+Your app is now available in the AppDev environment in KBase. Go to https://appdev.kbase.us, sign in and start a new Narrative.  Click on the small 'R' in the upper right of the Apps panel until it switches to 'D' to show Apps that are still in development.  Find your new App by searching for your module, and run it to filter some contigs.
 
-Your method will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog/browse/dev and https://narrative.kbase.us/#appcatalog/browse/dev.  From your module page (e.g. https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
+Your App will now also be visible in the App Catalog when displaying Apps in development: https://appdev.kbase.us/#appcatalog/browse/dev and https://narrative.kbase.us/#appcatalog/browse/dev.  From your module page (e.g., https://narrative.kbase.us/#appcatalog/module/[MODULE_NAME]) you'll be able to register any update and manage release of your module to the production KBase environment for anyone to use.
 
 Now, dive into [Making your own Module](doc/kb_sdk_dependencies.md).
 
 
-<br>
 ## <A NAME="examples"></A>Example Modules
 
-There are a number of modules that we continually update and modify to demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
+Here are a few modules that demonstrate best practices in code and documentation and present working examples of how to interact with the KBase API and data models.
 
- - [MegaHit](https://github.com/msneddon/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
- - [Trimmomatic](https://github.com/psdehal/Trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
- - [OrthoMCL](https://github.com/rsutormin/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
- - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet)
+ - [ContigFilter](https://github.com/msneddon/ContigFilter) (Python) - filters contigs based on length (ContigSet -> ContigSet). This is a very simple app that is a good first example to look at if you're new to the KBase SDK.
+ - [MEGAHIT](https://github.com/kbaseapps/kb_megahit) (Python) - assembles short metagenomic read data (Read Data -> Contigs)
+ - [Trimmomatic](https://github.com/kbaseapps/kb_trimmomatic) (Python) - filters/trims short read data (Read Data -> Read Data)
+ - [OrthoMCL](https://github.com/kbaseapps/PangenomeOrthomcl) (Python) - identifies orthologous groups of protein sequences from a set of genomes (Annotated Genomes / GenomeSet -> Pangenome)
 
 
-<br>
 ## Need more?
 
-Browse through the [doc](doc/) directory of this repo for the latest avaialble documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us
+Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us.

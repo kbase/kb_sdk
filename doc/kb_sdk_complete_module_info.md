@@ -1,31 +1,32 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install and Build SDK](kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. [Edit Module and Method(s)](kb_sdk_edit_module.md)
-5. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-6. [Register Module](kb_sdk_register_module.md)
-7. [Test in KBase](kb_sdk_test_in_kbase.md)
-8. **Complete Module Info**
-9. [Deploy](kb_sdk_deploy.md)
+4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
+5. [Implement Method(s)](kb_sdk_impl_methods.md)
+6. [Specify User Interface](kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
+8. [Register Module](kb_sdk_register_module.md)
+9. [Test in KBase](kb_sdk_test_in_kbase.md)
+10. **Complete Module Info**
+11. [Deploy](kb_sdk_deploy.md)
 
 
-### 8. Complete Module Info
+### 10. Complete Module Info
 
 
-Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog Browser.
-
+Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog:
     https://appdev.kbase.us/#appcatalog/
     
-Please be aware that your module implementation and information must conform to our [Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) before it will be accepted for public deployment.  Fortunately, most of these are common sense (sufficient content on the App Info page for a user to run your method and understand what it's really doing, proper arguments and explanation of their use on the input widget, etc.), but please take the time to familiarize yourself with these requirements before requesting public deployment.
+Please be aware that your module implementation and information must conform to our [Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) before it will be accepted for public deployment. Fortunately, most of these are common sense (for example, sufficient content on the App Info page for a user to run your app and understand what it's  doing, proper arguments and explanation of their use on the input widget, etc.), but please take the time to familiarize yourself with these requirements before requesting public deployment.
 
 
-#### 8A. Adding an Icon
+#### 10A. Adding an Icon
 
-You can make a custom icon for each method in your module, or use an existing one that corresponds the tool that you have wrapped.  Feel free to repurpose the examples from KBase methods, or make your own.  Your icon can be PNG, GIF, or JPEG (the KBase ones are PNG) and should fit in a square 200x200 pixels.  We think rounded corner squares look best and ours used a 40 pixel rounding on the corner on the 200x200 image (you can do this in Adobe Illustrator).  If you want to match our font, it's Futura Condensed Medium, 72 point height and line spacing, white face with a 1pt white border.  If you use Adobe Illustrator, export as PDF and convert to a 72dpi PNG with Adobe Photoshop.  PDF vector and PNG bitmap versions that we used for our icons are available at https://github.com/kbase/kb_sdk/img/ if you would like to use them as a starting point.
+You can make a custom icon for each app in your module, or use an existing one that corresponds to the tool that you have wrapped. Feel free to repurpose the icons from existing KBase apps, or make your own. Your icon can be PNG, GIF, or JPEG (the KBase ones are PNG) and should fit in a square 200x200 pixels. We think rounded-corner squares look best; ours use a 40 pixel rounding on the corner on the 200x200 image (you can do this in Adobe Illustrator). If you want to match our font, it's Futura Condensed Medium, 72 point height and line spacing, white face with a 1pt white border. If you use Adobe Illustrator, export your icon as PDF and convert to a 72dpi PNG with Adobe Photoshop. PDF vector and PNG bitmap versions that we used for our icons are available at https://github.com/kbase/kb_sdk/img/ in case you would like to use them as a starting point.
 
-This image should then be added to your KBase SDK module github repo in the **img** image folder for each method at:
+Your icons should  be added to your KBase SDK module GitHub repo in the **img** image folder for each app at:
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/img/
 
@@ -33,50 +34,53 @@ Then edit the **display.yaml** file found at:
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/display.yaml
 
-and add an **icon:** configuration (NOTE: just add the name of the image file and do not include the path, so *not* "img/foo.png").  For an example:
-
-in the file:
-
+and add an **icon:** configuration (NOTE: just add the name of the image file and do not include the path, so *not* "img/foo.png").  For  example, in the file:
     https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
 
 the **icon:** is configured by the line:
-
     icon: trimmomatic-orange.png
 
 
-#### 8B. Naming and Categorizing
+#### 10B. Naming and Categorizing
 
-Each method should be have a unique display name.  The display name is configured in the **display.yaml** file at:
+Each app should have a unique display name. The display name is configured in the **display.yaml** file at:
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/display.yaml
 
-and add a **name:** configuration.  If you are wrapping an existing tool with a known name, please include that name in all CAPS to make it easier for people to find it, such as
+and add a **name:** configuration. If you are wrapping an existing tool with a known name, please include that name to make it easier for people to find it, such as
 
-    name: TRIMMOMATIC - Read Trimming
+    name: Trimmomatic - Read Trimming
 
-You should tag your method with one (or multiple) "categories" to your method.  This is done in the **spec.json** file at:
+You should tag your app with one (or multiple) "categories". (If you don't, it will appear in the "Uncategorized" section and users will be less likely to find it.)
+
+The categories are set in the **spec.json** file at:
 
     https://github.com/<MyUserName>/<MyModule>/ui/narrative/methods/<MyMethod>/spec.json
+    
+The recognized categories can be found in https://github.com/kbase/kbase-ui/blob/master/src/client/modules/plugins/catalog/modules/data/categories.yml.
 
-Currently, we offer the following categories (please contact us via http://kbase.us/contact-us if you have suggestions for more... we expect to at least be adding subcategories in the near future):
+Currently, the following categories are recognized. The tag before the : on each line is the internal label for the category, used in the spec.json. The phrase after the : is the display name for the category that is used in the App Catalog.
 
-- **assembly** (Assembly)
-- **annotation** (Annotation)
-- **sequence** (Sequence Alignment & Search)
-- **comparative_genomics** (Comparative Genomics)
-- **metabolic_modeling** (Metabolic Modeling)
-- **expression** (Expression)
-- **communities** (Communities)
-- **util** (Utilities)
+    annotation: Genome Annotation
+    assembly: Genome Assembly
+    communities: Microbial Communities
+    comparative_genomics: Comparative Genomics
+    expression: Expression
+    metabolic_modeling: Metabolic Modeling
+    reads: Read Processing
+    sequence: Sequence Analysis
+    util: Utilities
 
+(Please contact us via http://kbase.us/contact-us if you have suggestions for more... we expect to add more categories and possibly subcategories in the near future.)
+ 
 An example of a category configuration line is:
 
     "categories": ["active","assembly","util"],
 
-Please leave the category "active" at the beginning of the tags as this is a special category that indicates whether your method should be shown at all in the App Catalog.  The rest of the categories are treated as normal tags.
+Please leave the category "active" at the beginning of the list of categories, as this is a special category that indicates whether your app should be shown at all in the App Catalog. The rest of the categories are treated as normal tags.
 
 
-#### 8C. Writing your App Info page
+#### 10C. Writing your App Info page
 
 Information for the App Info page is configured in the **display.yaml** file at:
 
@@ -92,12 +96,13 @@ The fields that should be configured are
 - screenshots
 
 ##### Name, Icon, Tooltip, Description
-**name:** and **icon:** are explained above.  You must also add a **tooltip:** as a secondary short description.
+**name:** and **icon:** are explained above.  You must also add a **tooltip:** as a secondary short description (usually one sentence summarizing the purpose of the app).
 
-The **description:** field is for a more detailed description, as well as including several recommended pieces of information.  For example, the exemplar Narrative showing the correct use of the SDK method should be linked here.  If you are wrapping an existing tool, please add links to the open-source repo for that tool in both the **description:** field and the **publications:** field.  If there is a home page for the tool, please also add a link to that.
+The **description:** field is for a more detailed description, which can include several recommended pieces of information. For example, the URL of an exemplar Narrative that demonstrates how to use the app should be included in the description.
+If you are wrapping an existing tool, please add links to the open-source repo for that tool in both the **description:** field and the **publications:** field. If there is a home page for the tool, please also add a link to that.
 
 ##### Links and Publications
-Relevant publications, especially if you are wrapping an existing tool, are added with subfields.  Each publication should start with a "-" on a blank line, followed by the fields **pmid:** for PubMed ID, **display-text:** for the publication (please include the DOI), and a **link:** to the publication.  Additional entries for tool home pages and open source repos should also be included as **link:** fields.
+Relevant publications, especially if you are wrapping an existing tool, are added with subfields. Each publication should start with a "-" on a blank line, followed by the fields **pmid:** for PubMed ID, **display-text:** for the publication (please include the DOI), and a **link:** to the publication.  Additional entries for tool home pages and open source repos should also be included as **link:** fields.
 
 An example:
 
@@ -113,7 +118,7 @@ publications :
 ```
 
 ##### Screenshots
-You can add screenshots (or other relevant images) to the "img/" folder in the same fashion as the icon image.  These screenshots should be configured in the **display.yaml** file as a list with hyphens for each element, such as
+You can add screenshots (or other relevant images) to the "img/" folder in the same fashion as the icon image. These screenshots should be configured in the **display.yaml** file as a list with one filename on each line, preceded by a hyphen, e.g.,
 
 ```
 screenshots:
@@ -121,7 +126,7 @@ screenshots:
     - screenshot_2.png
 ```
 
-If you do not want to have any screenshots, leave the **screenshots:** list configuration blank
+If you do not want to have any screenshots, leave the **screenshots:** list blank.
 
 ```
 screenshots: []

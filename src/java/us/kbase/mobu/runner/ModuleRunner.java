@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
@@ -27,13 +26,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import us.kbase.auth.AuthService;
-import us.kbase.auth.AuthToken;
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleVersion;
 import us.kbase.catalog.SelectModuleVersion;
 import us.kbase.common.executionengine.CallbackServer;
-import us.kbase.common.executionengine.CallbackServerConfigBuilder;
 import us.kbase.common.executionengine.LineLogger;
 import us.kbase.common.executionengine.ModuleMethod;
 import us.kbase.common.executionengine.ModuleRunVersion;
@@ -44,6 +40,7 @@ import us.kbase.common.service.UObject;
 import us.kbase.common.utils.NetUtils;
 import us.kbase.kbasejobservice.FinishJobParams;
 import us.kbase.mobu.ModuleBuilder;
+import us.kbase.mobu.tester.ConfigLoader;
 import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
 import us.kbase.mobu.util.DirUtils;
@@ -52,11 +49,9 @@ import us.kbase.mobu.util.TextUtils;
 
 public class ModuleRunner {
     private final URL catalogUrl;
-    private final String kbaseEndpoint;
     private final File runDir;
-    private String user;
-    private String password;
     private String[] callbackNetworks = null;
+    private final ConfigLoader cfgLoader;
     
     public ModuleRunner(String sdkHome) throws Exception {
         if (sdkHome == null) {
@@ -88,52 +83,26 @@ public class ModuleRunner {
         try (InputStream is = new FileInputStream(sdkCfgFile)) {
             sdkConfig.load(is);
         }
-        kbaseEndpoint = sdkConfig.getProperty("kbase_endpoint");
-        if (kbaseEndpoint == null) {
-            throw new IllegalStateException("Couldn't find 'kbase_endpoint' parameter in " + 
-                    sdkCfgFile);
-        }
-        String catalogUrlText = sdkConfig.getProperty("catalog_url");
-        if (catalogUrlText == null) {
-            throw new IllegalStateException("Couldn't find 'catalog_url' parameter in " + 
-                    sdkCfgFile);
-        }
-        catalogUrl = new URL(catalogUrlText);
+        cfgLoader = new ConfigLoader(sdkConfig, false, sdkCfgPath, true);
+        catalogUrl = new URL(cfgLoader.getCatalogUrl());
         runDir = new File(sdkHomeDir, "run_local");
-        user = sdkConfig.getProperty("user");
-        password = sdkConfig.getProperty("password");
-        if (user == null || user.trim().isEmpty()) {
-            System.out.println("You haven't preset your user/password in " + sdkCfgPath + ". " +
-            		"Please enter it now.");
-            user = new String(System.console().readLine("User: "));
-            password = new String(System.console().readPassword("Password: "));
-        } else {
-            if (password == null || password.trim().isEmpty()) {
-                System.out.println("You haven't preset your password in " + sdkCfgPath + ". " +
-                		"Please enter it now.");
-                password = new String(System.console().readPassword("Password: "));
-            }
-        }
         String callbackNetworksText = sdkConfig.getProperty("callback_networks");
         if (callbackNetworksText != null) {
             callbackNetworks = callbackNetworksText.trim().split("\\s*,\\s*");
         }
     }
     
-    public ModuleRunner(URL catalogUrl, String kbaseEndpoint, File runDir, String user, 
-            String password, String[] callbackNetworks) {
+    public ModuleRunner(URL catalogUrl, File runDir, String[] callbackNetworks,
+            ConfigLoader cfgLoader) {
         this.catalogUrl = catalogUrl;
-        this.kbaseEndpoint = kbaseEndpoint;
         this.runDir = runDir;
-        this.user = user;
-        this.password = password;
         this.callbackNetworks = callbackNetworks;
+        this.cfgLoader = cfgLoader;
     }
     
     public int run(String methodName, File inputFile, boolean stdin, String inputJson, 
             File output, String tagVer, boolean verbose, boolean keepTempFiles,
             String provRefs, String mountPoints) throws Exception {
-        AuthToken auth = AuthService.login(user, password).getToken();
         ////////////////////////////////// Loading image name /////////////////////////////////////
         CatalogClient client = new CatalogClient(catalogUrl);
         String moduleName = methodName.split(Pattern.quote("."))[0];
@@ -191,22 +160,10 @@ public class ModuleRunner {
             FileUtils.deleteDirectory(subjobsDir);
         File tokenFile = new File(workDir, "token");
         try (FileWriter fw = new FileWriter(tokenFile)) {
-            fw.write(auth.getToken());
+            fw.write(cfgLoader.getToken().getToken());
         }
-        String jobSrvUrl = kbaseEndpoint + "/userandjobstate";
-        String wsUrl = kbaseEndpoint + "/ws";
-        String shockUrl = kbaseEndpoint + "/shock-api";
         File configPropsFile = new File(workDir, "config.properties");
-        PrintWriter pw = new PrintWriter(configPropsFile);
-        try {
-            pw.println("[global]");
-            pw.println("job_service_url = " + jobSrvUrl);
-            pw.println("workspace_url = " + wsUrl);
-            pw.println("shock_url = " + shockUrl);
-            pw.println("kbase_endpoint = " + kbaseEndpoint);
-        } finally {
-            pw.close();
-        }
+        cfgLoader.generateConfigProperties(configPropsFile);
         File scratchDir = new File(workDir, "tmp");
         if (scratchDir.exists())
             TextUtils.deleteRecursively(scratchDir);
@@ -247,18 +204,18 @@ public class ModuleRunner {
                 JsonServerSyslog.setStaticMlogFile(
                         new File(workDir, "callback.log").getCanonicalPath());
             }
-            CallbackServerConfig cfg = new CallbackServerConfigBuilder(
-                    new URL(kbaseEndpoint), callbackUrl, runDir.toPath(),
-                    new LineLogger() {
-                        @Override
-                        public void logNextLine(String line, boolean isError) {
-                            if (isError) {
-                                System.err.println(line);
-                            } else {
-                                System.out.println(line);
-                            }
-                        }
-                    }).build();
+            // TODO: It will though an error because at least authUrl is required.
+            CallbackServerConfig cfg = cfgLoader.buildCallbackServerConfig(callbackUrl, 
+                    runDir.toPath(),new LineLogger() {
+                @Override
+                public void logNextLine(String line, boolean isError) {
+                    if (isError) {
+                        System.err.println(line);
+                    } else {
+                        System.out.println(line);
+                    }
+                }
+            });
             Set<String> releaseTags = new TreeSet<String>();
             if (mv.getReleaseTags() != null)
                 releaseTags.addAll(mv.getReleaseTags());
@@ -273,7 +230,7 @@ public class ModuleRunner {
                 inputWsObjects.addAll(Arrays.asList(provRefs.split(Pattern.quote(","))));
             }
             JsonServerServlet catalogSrv = new SDKCallbackServer(
-                    auth, cfg, runver, params, inputWsObjects, mounts, null);
+                    cfgLoader.getToken(), cfg, runver, params, inputWsObjects, mounts, null);
             jettyServer = new Server(callbackPort);
             ServletContextHandler context = new ServletContextHandler(
                     ServletContextHandler.SESSIONS);

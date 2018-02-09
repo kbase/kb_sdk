@@ -8,15 +8,15 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.ini4j.Ini;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import us.kbase.common.test.TestException;
+import us.kbase.auth.AuthToken;
 import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.renamer.ModuleRenamer;
 import us.kbase.mobu.tester.test.ModuleTesterTest;
+import us.kbase.scripts.test.TestConfigHelper;
 
 public class ModuleRenamerTest {
     private static final String SIMPLE_MODULE_NAME = "a_SimpleModule_for_unit_testing";
@@ -24,18 +24,11 @@ public class ModuleRenamerTest {
     private static final List<File> dirsToRemove = new ArrayList<File>();
     private static final boolean deleteTempDirs = true;
 
-    private static final String TEST_CFG = "kb_sdk_test";
-    private static String user;
-    private static String pwd;
+    private static AuthToken token = null;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        final Ini testini = new Ini(new File("test_scripts/test.cfg"));
-        user = testini.get(TEST_CFG, "test.user");
-        pwd = testini.get(TEST_CFG, "test.pwd");
-        if (user == null || user.isEmpty() || pwd == null || pwd.isEmpty()) {
-            throw new TestException("missing user and / or pws from test cfg");
-        }
+        token = TestConfigHelper.getToken();
     }
 
     @AfterClass
@@ -53,7 +46,8 @@ public class ModuleRenamerTest {
         if (ret.exists())
             FileUtils.deleteDirectory(ret);
         dirsToRemove.add(ret);
-        ModuleInitializer initer = new ModuleInitializer(moduleName, user, lang, false);
+        ModuleInitializer initer = new ModuleInitializer(moduleName, 
+                token.getUserName(), lang, false);
         initer.initialize(true);
         return ret;
     }
@@ -63,7 +57,7 @@ public class ModuleRenamerTest {
         String newModuleName = TARGET_MODULE_NAME + "_java";
         File moduleDir = initRepo("java");
         new ModuleRenamer(moduleDir).rename(newModuleName);
-        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, user, pwd);
+        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, token);
         Assert.assertEquals(0, exitCode);
     }
 
@@ -72,7 +66,7 @@ public class ModuleRenamerTest {
         String newModuleName = TARGET_MODULE_NAME + "_python";
         File moduleDir = initRepo("python");
         new ModuleRenamer(moduleDir).rename(newModuleName);
-        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, user, pwd);
+        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, token);
         Assert.assertEquals(0, exitCode);
     }
     
@@ -81,16 +75,7 @@ public class ModuleRenamerTest {
         String newModuleName = TARGET_MODULE_NAME + "_perl";
         File moduleDir = initRepo("perl");
         new ModuleRenamer(moduleDir).rename(newModuleName);
-        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, user, pwd);
-        Assert.assertEquals(0, exitCode);
-    }
-    
-    @Test
-    public void testR() throws Exception {
-        String newModuleName = TARGET_MODULE_NAME + "_r";
-        File moduleDir = initRepo("r");
-        new ModuleRenamer(moduleDir).rename(newModuleName);
-        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, user, pwd);
+        int exitCode = ModuleTesterTest.runTestsInDocker(moduleDir, token);
         Assert.assertEquals(0, exitCode);
     }
     

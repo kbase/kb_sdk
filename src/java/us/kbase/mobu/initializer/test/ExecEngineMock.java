@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JacksonTupleModule;
 import us.kbase.common.service.JsonServerMethod;
@@ -39,6 +38,7 @@ import us.kbase.kbasejobservice.RpcContext;
 import us.kbase.kbasejobservice.RunJobParams;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
+import us.kbase.scripts.test.TestConfigHelper;
 
 //END_HEADER
 
@@ -87,8 +87,7 @@ public class ExecEngineMock extends JsonServerServlet {
                             RpcContext.class);
             Exception exc = null;
             try {
-                //TODO AUTH make configurable?
-                final AuthToken t = AuthService.validateToken(token);
+                final AuthToken t = new AuthToken(token, "<unknown>");
                 if (rpcName.endsWith("_submit")) {
                     String origRpcName = rpcName.substring(0, rpcName.lastIndexOf('_'));
                     String[] parts = origRpcName.split(Pattern.quote("."));
@@ -268,9 +267,13 @@ public class ExecEngineMock extends JsonServerServlet {
             public void run() {
                 try {
                     ProcessHelper.cmd("bash", runDockerPath, "run", "-v", 
-                            jobDir.getCanonicalPath() + ":/kb/module/work", "--name", containerName, 
-                            "-e", "KBASE_ENDPOINT=" + kbaseEndpoint, dockerImage, "async").exec(jobDir, 
-                                    null, (PrintWriter)null, null);
+                            jobDir.getCanonicalPath() + ":/kb/module/work", 
+                            "--name", containerName, "-e", "KBASE_ENDPOINT=" + kbaseEndpoint,
+                            "-e", "AUTH_SERVICE_URL=" + TestConfigHelper.getAuthServiceUrl(),
+                            "-e", "AUTH_SERVICE_URL_ALLOW_INSECURE=" + 
+                                    TestConfigHelper.getAuthServiceUrlInsecure(),
+                                    dockerImage, "async").exec(jobDir, 
+                                            null, (PrintWriter)null, null);
                     if (!outputFile.exists()) {
                         ProcessHelper.cmd("bash", runDockerPath, "logs", containerName).exec(jobDir);
                         throw new IllegalStateException("Output file wasn't created");

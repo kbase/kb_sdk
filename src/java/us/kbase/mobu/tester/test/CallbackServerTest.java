@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,7 +43,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
-import us.kbase.auth.AuthService;
 import us.kbase.auth.AuthToken;
 import us.kbase.catalog.CatalogClient;
 import us.kbase.catalog.ModuleInfo;
@@ -63,16 +61,13 @@ import us.kbase.common.service.UObject;
 import us.kbase.common.test.controllers.ControllerCommon;
 import us.kbase.mobu.tester.DockerMountPoints;
 import us.kbase.mobu.tester.SDKCallbackServer;
+import us.kbase.scripts.test.TestConfigHelper;
 import us.kbase.workspace.ProvenanceAction;
 import us.kbase.workspace.SubAction;
 
 public class CallbackServerTest {
 
     private static final Path TEST_DIR = Paths.get("temp_test_callback");
-    private static final String KBASE_ENDPOINT =
-            "https://ci.kbase.us/services/";
-    
-    private static final Path CREDS_LOC = Paths.get("test_scripts/test.cfg");
     
     private static AuthToken token;
     private static CatalogClient CAT_CLI;
@@ -110,21 +105,9 @@ public class CallbackServerTest {
         Files.deleteIfExists(TEST_DIR);
         Files.createDirectories(TEST_DIR);
         
-        Properties props = new Properties();
-        props.load(Files.newBufferedReader(CREDS_LOC, StandardCharsets.UTF_8));
-        
-        String user = props.getProperty("test.user");
-        String password = props.getProperty("test.pwd");
-        if (user == null || user.trim().isEmpty()) {
-            throw new IllegalStateException(
-                    "Missing test.user from config file " + CREDS_LOC);
-        }
-        if (password == null || password.isEmpty()) {
-            throw new IllegalStateException(
-                    "Missing test.pwd from config file " + CREDS_LOC);
-        }
-        token =  AuthService.login(user, password).getToken();
-        CAT_CLI = new CatalogClient(new URL(KBASE_ENDPOINT + "catalog"), token);
+        token = TestConfigHelper.getToken();
+        CAT_CLI = new CatalogClient(new URL(TestConfigHelper.getKBaseEndpoint() + 
+                "/catalog"), token);
     }
 
     private static CallbackStuff startCallBackServer()
@@ -158,8 +141,11 @@ public class CallbackServerTest {
         Files.write(rundocker, Arrays.asList("#!/bin/bash", "docker $@"),
                 StandardCharsets.UTF_8);
         Files.setPosixFilePermissions(rundocker, perms);
+        URL authUrl = new URL(TestConfigHelper.getAuthServiceUrl());
+        String authUrlInsecure = TestConfigHelper.getAuthServiceUrlInsecure();
         final CallbackServerConfig cbcfg =
-                new CallbackServerConfigBuilder(new URL(KBASE_ENDPOINT),
+                new CallbackServerConfigBuilder(new URL(TestConfigHelper.getKBaseEndpoint()),
+                        null, null, null, null, null, null, authUrl, authUrlInsecure, null,
                         callbackUrl, temp, log).build();
         final DockerMountPoints mounts = new DockerMountPoints(
                 Paths.get("/kb/module/work"), Paths.get("tmp"));
@@ -584,7 +570,7 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_2";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.7";
+        String ver = "0.0.9";
         Map<String, Object> methparams = new HashMap<String, Object>();
         methparams.put("id", "myid");
         Map<String, Object> results = res.callMethod(
@@ -618,11 +604,12 @@ public class CallbackServerTest {
         String moduleName = "njs_sdk_test_1";
         String methodName = "run";
         String release = "dev";
-        String ver = "0.0.2";
+        String ver = "0.0.3";
+        String commit1 = "03b9210ac825858c1ae6339786686cea5dac5929";
         final ModuleRunVersion runver = new ModuleRunVersion(
                 new URL("https://github.com/kbasetest/njs_sdk_test_1"),
                 new ModuleMethod(moduleName + "." + methodName),
-                "d0a452d6194cf4289df03585912ab1c7d8ee180c", ver, release);
+                commit1, ver, release);
         List<String> wsobjs = Arrays.asList("foo", "bar", "baz");
         List<UObject> params = new ArrayList<UObject>();
         params.add(new UObject(Arrays.asList("foo", "bar")));
@@ -631,6 +618,7 @@ public class CallbackServerTest {
         final CallbackStuff res = startCallBackServer(runver, params, wsobjs);
         System.out.println("Running multiCallProvenance in dir " + res.tempdir);
         String moduleName2 = "njs_sdk_test_2";
+        String commit2 = "284948a93524ba51e48b1c71693b269647c125c3";
         @SuppressWarnings("unchecked")
         Map<String, Object> methparams = UObject.transformStringToObject(
                 String.format(
@@ -651,23 +639,23 @@ public class CallbackServerTest {
              "}",
              moduleName2 + "." + methodName,
              // dev is on this commit
-             "07366d715b697b6f9eac9eaba3ec0993c361b71a",
+             commit2,
              moduleName + "." + methodName,
              // this is the latest commit, but a prior commit is registered
              //for dev
-             "5178356a8a7f63be055cc581e9ea90dd53d6aed3",
+             commit1,
              moduleName2 + "." + methodName,
              "dev"), Map.class);
         List<SubActionSpec> expsas = new LinkedList<SubActionSpec>();
         expsas.add(new SubActionSpec()
             .withMod(moduleName)
-            .withVer("0.0.2")
+            .withVer("0.0.3")
             .withRel("dev")
         );
         expsas.add(new SubActionSpec()
             .withMod(moduleName2)
-            .withVer("0.0.7")
-            .withCommit("07366d715b697b6f9eac9eaba3ec0993c361b71a")
+            .withVer("0.0.8")
+            .withCommit(commit2)
         );
         Map<String, Object> results = res.callMethod(
                 moduleName + '.' + methodName, methparams, "dev");

@@ -1,30 +1,29 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
 1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install and Build SDK](kb_sdk_install_and_build.md)
+2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
 3. [Create Module](kb_sdk_create_module.md)
-4. **Edit Module and Method(s)**
-5. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-6. [Register Module](kb_sdk_register_module.md)
-7. [Test in KBase](kb_sdk_test_in_kbase.md)
-8. [Complete Module Info](kb_sdk_complete_module_info.md)
-9. [Deploy](kb_sdk_deploy.md)
+4. **Specify Module and Method(s)**
+5. [Implement Method(s)](kb_sdk_impl_methods.md)
+6. [Specify User Interface](kb_sdk_make_ui.md)
+7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
+8. [Register Module](kb_sdk_register_module.md)
+9. [Test in KBase](kb_sdk_test_in_kbase.md)
+10. [Complete Module Info](kb_sdk_complete_module_info.md)
+11. [Deploy](kb_sdk_deploy.md)
 
 
-### 4. Edit Module and create Method(s)
+### 4. Specify Module and Method(s)
 
 - A. [Creating a Git Repo](#create-repo)
-- B. [Edit Module Description](#edit-desc)
+- B. [Scope Module & Methods](#scope-module)
 - C. [Create KIDL specification for Module](#kidl-spec)
 - D. [Validate](#validate)
 - E. [Create stubs for methods](#stubs)
-- F. [Edit Impl file](#impl)
-- G. [Creating Narrative UI Input Widget](#ui-widget)
-
 
 #### <A NAME="create-repo"></A>A. Creating a Git Repo
 
-You will need to check your SDK Module into Git in order for it to be available for building into a custom Docker Image.  Since functionality in KBase is pulled into KBase from public git repositories, you will need to put your module code into a public git repository.  Here we'll show a brief example using [GitHub](http://github.com).  First you can commit your module code into a local git repository. Go into the directory where your module code is, git add all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
+You will need to put your SDK module code into a public git repository in order for it to be available for building into a custom Docker Image.  Here we'll show a brief example using [GitHub](http://github.com).  First, you can commit your module code into a local git repository. Go into the directory where your module code is, "git add" all files created by kb-sdk, and commit with some commit message. This creates a git repository locally.
 
     cd MyModule
     git init
@@ -40,23 +39,44 @@ use the name of your module as the name for your new repository.
     git remote add origin https://github.com/[GITHUB_USER_OR_ORG_NAME]/[GITHUB_MODULE_NAME].git
     git push -u origin master
 
-*Remember to update the code in the Git Repo as you change it via "git commit / pull / push" cycles.*
+*Remember to update the code in the Git repo as you change it via "git commit / pull / push" cycles.*
 
 [\[Back to top\]](#top)
 
 
-#### <A NAME="edit-desc"></A>B. Edit Module Description
+#### <A NAME="scope-module"></A>B. Scope Module & Methods
 
-Open and edit the **kbase.yml** file to include a better description of your module.  The default generated description isn't very good.
+Open and edit the **kbase.yml** file to include a better description of your module. The default generated description 
+isn't very good. At this point, it's necessary to make some design choices about the scope of your module and which 
+individual methods (apps) it will contain. For each method, it is important to consider not just the desired functionality but 
+also the inputs and outputs.
+
+Potential Inputs:
+* **Function Parameters** - You method may accept an input object with parameters in map, list, float, string, and 
+boolean form.
+* **Reference data** - Modest sized reference data can be committed to the /data directory.
+* **KBase Typed Data** - If your function will work on one of [KBase's defined data types](https://narrative.kbase.us/#catalog/datatypes),
+your method should accept an object reference as a string and access the data via an appropriate utility module.
+* **External web-assessable data** - Your method may accept a URL as string and utilize the DataFileUtil to download the
+file.
+
+Potential Outputs:
+* **KBase Typed Data** - Your method will accept the name of the objects as a string and save the data with DataFileUtils.
+* **Graphical/Tabular Output** - Your method can use KBaseReports to generate a HTML report displaying results.
+* **Data files for Download** - You method can use KBaseReports to save results to a file server for the user to download
+* **New Data Types** - This is beyond the scope of SDK. Please <a href="http://kbase.us/contact-us">contact us</a>
+so we can discuss your needs. 
 
 [\[Back to top\]](#top)
 
 
 #### <A NAME="kidl-spec"></A>C. Create KIDL specification for Module
 
-The first step is to define the interface to your code in a KIDL specification, sometimes called the "Narrative Method Spec".  This will include the parameters passed to the methods and the declaration of the methods.  **You must rerun *make* after each change to the KIDL specification to [create or update the implementation stubs](#stubs).**
+You  define the programmatic interface to your code in a KIDL specification. This includes the parameters passed 
+to the methods and the declaration of the methods.  **You must rerun *make* after each change to the KIDL specification 
+to [create or update the implementation stubs](#stubs).**
 
-Open the `ContigFilter.spec` file in a text editor, and you will see this:
+Open the `ContigFilter.spec` file in a text editor, and you will see something like this:
 
     /*
     A KBase module: MikeContigFilter
@@ -67,7 +87,8 @@ Open the `ContigFilter.spec` file in a text editor, and you will see this:
         */
     };
 
-Comments are enclosed in `/* comment */`.  In this module, we want to define a function that counts contigs, so let's define that function and its inputs/outputs as:
+Comments are enclosed in `/* comment */`.  In our example module, we want to define a function that counts contigs, so let's 
+define that function and its inputs/outputs as:
 
     typedef string contigset_id;
     typedef structure {
@@ -78,32 +99,53 @@ Comments are enclosed in `/* comment */`.  In this module, we want to define a f
     funcdef filter_contigs(string workspace_name, contigset_id contigset)
                 returns (FilterContigResults) authentication required;
 
-There a few things introduced here that are part of the KBase Interface Description Language (KIDL).  First, we use `typedef` to define the structure of input/output parameters using the syntax:
+There a few things introduced here that are part of the KBase Interface Description Language (KIDL).  First, use 
+`typedef` to define the structure of input/output parameters using the syntax:
 
     typedef [type definition] [TypeName]
 
-The type definition can either be another previously defined type name, a primitive type (string, int, float), a container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure named `FilterContigResults` with two integer fields named `contig_count` and `filtered_contig_count`.
+The type definition can either be another previously defined type name, a primitive type (string, int, float), a 
+container type (list, mapping) or a structure.  In this example we define a string named `contigset_id` and a structure 
+named `FilterContigResults` with two integer fields named `contig_count` and `filtered_contig_count`.
 
-We can use any defined types as input/output parameters to functions.  We define functions using the `funcdef` keyword in this syntax:
+You can use any defined types as input/output parameters to functions but it's wise to pass an parameter object. This
+allows additional parameters to be supplied in future implementations without breaking backwards compatibility. Functions 
+are defined using the `funcdef` keyword in this syntax:
 
-    funcdef method_name([input parameter list]]) returns ([output parameter list]);
+    funcdef method_name(input_parameter_object_type params) returns (output_parameter_object_type output) authentication required;
 
-Optionally, as we have shown in the example, your method can require authentication by adding that declaration at the end of the method.  In general, all your methods will require authentication.
+All methods (apps) that run in the Narrative will require authentication because they need to interact with a user's workspace.
+Your method can require authentication by adding that declaration at the end of the method.
 
-Make sure you pass in the *workspace_name* in the input parameters.
+If you will be loading or saving any data from the workspace, make sure you accept object references in the input parameters.
+(Some modules use workspace and object names--this gets the job done but can cause race conditions in rare 
+cases, which is why references are preferred.)
+
+If you will be creating a KBase report (and you almost certainly will), your method will need to accept a workspace_name which
+will ensure the report is in the right place to be viewed in the Narrative (this is the exception to the rule above). Your 
+method should also return the report name and reference in its output object as shown below:
 
 ```
     typedef structure {
     	string workspace_name;
     	...
-    } <Module>Params;
+    } <Module>Params
+    
+    typedef structure {
+        string report_name;
+        string report_ref;
+    } compoundset_results;
 ```
+
+Additional information on KIDL specification is available [here](KIDL_Specification.md)
+
 [\[Back to top\]](#top)
 
 
 #### <A NAME="validate"></A>D. Validate
 
-When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base directory of your module:
+When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base 
+directory of your module:
 
     kb-sdk validate
 
@@ -112,376 +154,12 @@ When you make changes to the Narrative method specifications, you can validate t
 
 #### <A NAME="stubs"></A>E. Create stubs for methods
 
-After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs (e.g. the \<MyModule\>Impl.py file) by running
+After editing the <MyModule>.spec KIDL file, generate the Python (or other language) implementation stubs (e.g., the 
+\<MyModule\>Impl.py file) by running
 
     make
 
 This will call `kb-sdk compile` with a set of parameters predefined for you.
-
-[\[Back to top\]](#top)
-
-
-#### <A NAME="impl"></A>F. Edit Impl file
-
-In the lib/\<MyModule\>/ directory, edit the <MyModule>Impl.py (or *.pl) "Implementation" file that defines the methods available in the module.  You can follow this guide for interacting with [KBase Data Types](doc/kb_sdk_data_types.md).  Basically, the process consists of obtaining data objects from the KBase workspace, and either operating on them directly in code or writing them to scratch files that the tool you are wrapping will operate on.  Result data should be collected into KBase data objects and stored back in the workspace.
-
-- F.1. [Imports and Setup](#impl-setup)
-- F.2. [Using Data Types](#impl-data-types)
-- F.3. [Logging](#impl-logging)
-- F.4. [Provenance](#impl-provenance)
-- F.5. [Building Output Report](#impl-report)
-- F.6. [Invoking Shell Tool](#impl-shell-tool)
-- F.7. [Adding Data to Your Method](#impl-adding-data)
-
-##### <A NAME="impl-setup"></A>F.1. Imports and Setup
-
-Your Impl file should import certain libraries and otherwise setup and define initialization and other basic functions.  Much of this will be created in the Impl stub for you, but it's best to double-check and make sure everything you will need is present.  Here's an example of how your Impl file should start if you are working in Python (you may not need all of it, such as *Bio Phylo* if you're not working with Trees.  Feel free to comment out what you are not using).
-
-```python
-import os
-import sys
-import shutil
-import hashlib
-import subprocess
-import requests
-import re
-import traceback
-import uuid
-from datetime import datetime
-from pprint import pprint, pformat
-import numpy as np
-import math
-import gzip
-from Bio import SeqIO
-from Bio import Phylo
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import generic_protein
-from requests_toolbelt import MultipartEncoder
-from biokbase.AbstractHandle.Client import AbstractHandle as HandleService
-from biokbase.workspace.client import Workspace as workspaceService
-
-import requests
-requests.packages.urllib3.disable_warnings()  # silence whining
-
-class <ModuleName>:
-    workspaceURL = None
-    shockURL = None
-    handleURL = None
-    
-    def __init__(self, config):
-        self.workspaceURL = config['workspace-url']
-        self.shockURL = config['shock-url']
-        self.handleURL = config['handle-service-url']
-
-        self.scratch = os.path.abspath(config['scratch'])
-        if not os.path.exists(self.scratch):
-            os.makedirs(self.scratch)
-           
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-        
-    def run_<method_name> (self, ctx, params):
-        console = []
-        self.log(console,'Running run_<method_name> with params=')
-        self.log(console, pformat(params))
-
-        token = ctx['token']
-        ws = workspaceService(self.workspaceURL, token=token)
-        
-    	...
-```
-[\[Back to Edit Impl\]](#impl)
-
-
-##### <A NAME="impl-data-types"></A>F.2. Using Data Types
-
-Data objects are typed and structured in KBase.  You may write code that takes advantage of these structures, or extract the data from them to create files that the external tool you are wrapping requires (e.g. FASTA).  Please take advantage of the code snippets in the [KBase Data Types](kb_sdk_data_types.md), you can also look at the [Examples](#examples) for syntax and style guidance.
-
-Please see:
-
-    https://github.com/kbase/kb_sdk/blob/master/doc/kb_sdk_data_types.md
-
-[\[Back to Edit Impl\]](#impl)
-
-
-##### <A NAME="impl-logging"></A>F.3. Logging
-
-Logging where you are is key to tracking progress and debugging.  Our recommended style is to log to a "console" list.  Here is some example code for accomplishing this.
-
-```python
-    from pprint import pprint, pformat
-
-    # target is a list for collecting log messages
-    def log(self, target, message):
-        # we should do something better here...
-        if target is not None:
-            target.append(message)
-        print(message)
-        sys.stdout.flush()
-
-    def run_<MyMethod>(self, ctx, params):
-        console = []
-        self.log(console,'Running run_<MyMethod> with params=')
-        self.log(console, pformat(params))
-```    
-
-[\[Back to Edit Impl\]](#impl)
-
-##### <A NAME="impl-provenance"></A>F.4. Provenance
-
-Data objects in KBase contain provenance (historical information of their creation and objects from which they are derived).  When you create new objects, you must carry forward and add provenance information to them.  Additionally, Report objects should receive that provenance data (see below).  Examples of adding provenance to objects can be found in the [KBase Data Types](docs/kb_sdk_data_types.md).
-
-```python
-        # load the method provenance from the context object
-        provenance = [{}]
-        if 'provenance' in ctx:
-            provenance = ctx['provenance']
-        # add additional info to provenance here, in this case the input data object reference
-        provenance[0]['input_ws_objects']=[]
-        provenance[0]['input_ws_objects'].append(params['workspace_name']+'/'+params['read_library_name'])
-```
-
-[\[Back to Edit Impl\]](#impl)
-
-##### <A NAME="impl-report"></A>F.5. Building Output Report
-
-```python
-        # create a Report
-        report = ''
-        report += 'ContigSet saved to: '+params['workspace_name']+'/'+params['output_contigset_name']+'\n'
-        report += 'Assembled into '+str(len(contigset_data['contigs'])) + ' contigs.\n'
-        report += 'Avg Length: '+str(sum(lengths)/float(len(lengths))) + ' bp.\n'
-
-        # compute a simple contig length distribution
-        bins = 10
-        counts, edges = np.histogram(lengths, bins)
-        report += 'Contig Length Distribution (# of contigs -- min to max basepairs):\n'
-        for c in range(bins):
-            report += '   '+str(counts[c]) + '\t--\t' + str(edges[c]) + ' to ' + str(edges[c+1]) + ' bp\n'
-
-        reportObj = {
-            'objects_created':[{'ref':params['workspace_name']+'/'+params['output_contigset_name'], 'description':'Assembled contigs'}],
-            'text_message':report
-        }
-
-        reportName = 'megahit_report_'+str(uuid.uuid4())   # uuid4() instead of getnode() to ensure uniqueness
-        report_obj_info = ws.save_objects({
-                'id':info[6],
-                'objects':[
-                    {
-                        'type':'KBaseReport.Report',
-                        'data':reportObj,
-                        'name':reportName,
-                        'meta':{},
-                        'hidden':1,
-                        'provenance':provenance
-                    }
-                ]
-            })[0]
-
-        output = { 'report_name': reportName, 'report_ref': str(report_obj_info[6]) + '/' + str(report_obj_info[0]) + '/' + str(report_obj_info[4]) }
-```
-
-[\[Back to Edit Impl\]](#impl)
-
-##### <A NAME="impl-shell-tool"></A>F.6. Invoking Shell Tool
-
-```python
-        command_line_tool_params_str = " ".join(command_line_tool_params)
-        command_line_tool_cmd_str = " ".join(command_line_tool_path, command_line_tool_params_str)
-        
-        # run <command_line_tool>, capture output as it happens
-        self.log(console, 'running <command_line_tool>:')
-        self.log(console, '    '+command_line_tool_cmd_str))
-        p = subprocess.Popen(command_line_tool_cmd_str,
-                    cwd = self.scratch,
-                    stdout = subprocess.PIPE, 
-                    stderr = subprocess.STDOUT, shell = False)
-
-        while True:
-            line = p.stdout.readline()
-            if not line: break
-            self.log(console, line.replace('\n', ''))
-
-        p.stdout.close()
-        p.wait()
-        self.log(console, 'return code: ' + str(p.returncode))
-        if p.returncode != 0:
-            raise ValueError('Error running <command_line_tool>, return code: '+str(p.returncode) + 
-                '\n\n'+ '\n'.join(console))
- ```
-
-[\[Back to Edit Impl\]](#impl)
-
-##### <A NAME="impl-adding-data"></A>F.7. Adding Data To Your Method
-
-Data that is supported by [KBase Data Types](doc/kb_sdk_data_types_table.md) should be added as a workspace object.  Other data that is used to configure a method may be added to the repo with the code.  Large data sets that exceed a reasonable limit (> 1 GB) should be added to a shared mount point.  This can be accomplished by contacting kbase administrators at http://kbase.us.
-
-[\[Back to Edit Impl\]](#impl)
-
-[\[Back to top\]](#top)
-
-
-#### <A NAME="ui-widget"></A>G. Creating Narrative UI Input Widget
-
-Control of Narrative interaction is accomplished in files in the ui/narrative/methods/<MyMethod> directory.
-
-##### G.1. Creating fields in the input widget cell
-
-Edit *display.yaml*:
-
-```
-name: MegaHit
-tooltip: |
-	Run megahit for metagenome assembly
-screenshots: []
-
-icon: kb_logo.png
-
-#
-# define a set of similar methods that might be useful to the user
-#
-suggestions:
-	apps:
-		related:
-			[]
-		next:
-			[]
-	methods:
-		related:
-			[]
-		next:
-			[]
-
-#
-# Configure the display and description of parameters
-#
-parameters :
-    read_library_name :
-        ui-name : Read Library
-        short-hint : Read library (only PairedEnd Libs supported now)
-    output_contigset_name:
-        ui-name : Output ContigSet name
-        short-hint : Enter a name for the assembled contigs data object
-
-description : |
-	<p>This is a KBase wrapper for MEGAHIT.</p>
-    <p>MEGAHIT is a single node assembler for large and complex metagenomics NGS reads, such as soil. It makes use of succinct de Bruijn graph (SdBG) to achieve low memory assembly.</p>
-publications :
-    -
-        pmid: 25609793
-        display-text : |
-            'Li, D., Liu, C-M., Luo, R., Sadakane, K., and Lam, T-W., (2015) MEGAHIT: An ultra-fast single-node solution for large and complex metagenomics assembly via succinct de Bruijn graph. Bioinformatics, doi: 10.1093/bioinformatics/btv033'
-        link: http://www.ncbi.nlm.nih.gov/pubmed/25609793
-    -
-        link: https://github.com/voutcn/megahit
-```
-
-##### G.2. Configure passing variables from Narrative Input to SDK method.
-
-Edit *spec.json*:
-
-```
-{
-	"ver": "1.0.0",
-	
-	"authors": [
-		"YourName"
-	],
-	"contact": "http://kbase.us/contact-us/",
-	"visible": true,
-	"categories": ["active","assembly","communities"],
-	"widgets": {
-		"input": null,
-		"output": "kbaseReportView"
-	},
-	"parameters": [ 
-		{
-			"id": "read_library_name",
-			"optional": false,
-			"advanced": false,
-			"allow_multiple": false,
-			"default_values": [ "" ],
-			"field_type": "text",
-			"text_options": {
-				"valid_ws_types": ["KBaseAssembly.PairedEndLibrary","KBaseFile.PairedEndLibrary"]
-			}
-		},
-		{
-		    "id" : "output_contigset_name",
-		    "optional" : false,
-		    "advanced" : false,
-		    "allow_multiple" : false,
-		    "default_values" : [ "MegaHit.contigs" ],
-		    "field_type" : "text",
-		    "text_options" : {
-		     	"valid_ws_types" : [ "KBaseGenomes.ContigSet" ],
-		    	"is_output_name":true
-		    }
-		}
-	],
-	"behavior": {
-		"service-mapping": {
-			"url": "",
-			"name": "MegaHit",
-			"method": "run_megahit",
-			"input_mapping": [
-				{
-					"narrative_system_variable": "workspace",
-					"target_property": "workspace_name"
-				},
-				{
-					"input_parameter": "read_library_name",
-          			"target_property": "read_library_name"
-				},
-				{
-					"input_parameter": "output_contigset_name",
-          			"target_property": "output_contigset_name"
-				}
-			],
-			"output_mapping": [
-				{
-					"narrative_system_variable": "workspace",
-					"target_property": "workspace_name"
-				},
-				{
-					"service_method_output_path": [0,"report_name"],
-					"target_property": "report_name"
-				},
-				{
-					"service_method_output_path": [0,"report_ref"],
-					"target_property": "report_ref"
-				},
-				{
-					"constant_value": "16",
-					"target_property": "report_window_line_height"
-				}
-			]
-		}
-	},
-	"job_id_output_field": "docker"
-}
-```
-
-Make sure you configure *workspace_name*
-
-```
-	"behavior": {
-		"service-mapping": {
-			"input_mapping": [
-				{
-					"narrative_system_variable": "workspace",
-					"target_property": "workspace_name"
-				}
-			]
-		}
-	}
-```
 
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](../README.md#steps)

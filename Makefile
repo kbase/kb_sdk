@@ -14,7 +14,7 @@ DIR = $(shell pwd)
 
 ANT ?= ant
 ANT_OPTIONS =
-KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.22.jar
+KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works
@@ -104,7 +104,7 @@ deploy-scripts:
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
 sdkbase:
-	- docker rmi -f kbase/deplbase:latest
+	# docker rmi -f kbase/deplbase:latest
 	cd sdkbase && ./makeconfig
 	docker build --no-cache -t kbase/kbase:sdkbase.latest sdkbase
 

@@ -16,8 +16,8 @@ from requests import ConnectionError
 
 class TestAuth(unittest.TestCase):
 
-    AUTHURL = 'test.auth.url'
-    TOKEN1 = 'test.token1'
+    AUTHURL = 'test.auth-service-url'
+    TOKEN1 = 'test.token'
     TOKEN2 = 'test.token2'
 
     CFG_SEC = 'kb_sdk_test'
@@ -38,6 +38,7 @@ class TestAuth(unittest.TestCase):
             raise ValueError('Missing {} from test config'.format(cls.TOKEN1))
         if not cls.token2:
             raise ValueError('Missing {} from test config'.format(cls.TOKEN2))
+        print('Authorization url: ' + authurl)
         cls.user1 = cls.get_user(authurl, cls.token1)
         cls.user2 = cls.get_user(authurl, cls.token2)
         if cls.user1 == cls.user2:
@@ -49,6 +50,10 @@ class TestAuth(unittest.TestCase):
     def get_user(cls, authurl, token):
         d = {'token': token, 'fields': 'user_id'}
         ret = requests.post(authurl, data=d)
+        if ret.status_code != 200:
+            print('Failed getting token: ' + str(ret.status_code))
+            print(ret.text)
+            raise Exception('Failed getting token: ' + str(ret.status_code))
         return ret.json()['user_id']
 
     def test_get_user(self):
@@ -59,20 +64,18 @@ class TestAuth(unittest.TestCase):
         self.assertEqual(self.kba.get_user(self.token1), self.user1)
         self.assertEqual(self.kba.get_user(self.token2), self.user2)
 
-        # test default url
-        kba2 = KBaseAuth()
-        self.assertEqual(kba2.get_user(self.token1), self.user1)
-        self.assertEqual(kba2.get_user(self.token2), self.user2)
+        # Only test the default url manually, since it runs against production.
+        # kba2 = KBaseAuth()
+        # self.assertEqual(kba2.get_user(self.token1), self.user1)
+        # self.assertEqual(kba2.get_user(self.token2), self.user2)
 
     def test_bad_token(self):
         self.fail_get_user(None, 'Must supply token')
         self.fail_get_user(
-            'bleah', 'Error connecting to auth service: 500 ' +
-            'INTERNAL SERVER ERROR\nValueError: need more than 1 value to ' +
-            'unpack')
+            'bleah', 'Error connecting to auth service: 401 Unauthorized\n10020 Invalid token')
         self.fail_get_user(
-            self.token1 + 'a', 'Error connecting to auth service: 401 ' +
-            'UNAUTHORIZED\nLoginFailure: Invalid token')
+            self.token1 + 'a',
+            'Error connecting to auth service: 401 Unauthorized\n10020 Invalid token')
 
     def test_bad_url(self):
         kba2 = KBaseAuth('https://thisisasuperfakeurlihope.com')
