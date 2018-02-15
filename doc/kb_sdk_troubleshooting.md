@@ -14,7 +14,7 @@
 When you try to run *make sdkbase*, if you see a message like:
 
 ```
-docker build -t kbase/kbase:sdkbase.latest sdkbase
+docker build -t kbase/kbase:sdkbase2.latest sdkbase
 Post http:///var/run/docker.sock/v1.20/build?cgroupparent=&cpuperiod=0&cpuquota=0&cpusetcpus=&cpusetmems=&cpushares=0&dockerfile=Dockerfile&memory=0&memswap=0&rm=1&t=kbase%2Fkbase%3Asdkbase.latest&ulimits=null: dial unix /var/run/docker.sock: no such file or directory.
 * Are you trying to connect to a TLS-enabled daemon without TLS?
 * Is your docker daemon up and running?

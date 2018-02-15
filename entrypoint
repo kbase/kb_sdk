@@ -21,7 +21,7 @@ EOF
 elif [ "z$1" = "zsdkbase" ] ; then
     echo "Pulling and tagging the base image"
     docker pull kbase/sdkbase
-    docker tag kbase/sdkbase kbase/kbase:sdkbase.latest
+    docker tag kbase/sdkbase kbase/kbase:sdkbase2.latest
 elif [ "z$1" = "zprune" ] ; then
   echo "Used during build to shrink image.  Not needed by the user."
   for f in $(find /src/submodules/jars/lib/jars -type f -name '*.jar') ; do
