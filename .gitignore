@@ -10,6 +10,7 @@
 /TestAsyncPerl/
 /reports/
 /test_scripts/ee_mock_service/
+/test_scripts/test.cfg
 /*/*.pyc
 /*/*/*.pyc
 /*/*/*/*.pyc

@@ -36,10 +36,7 @@ def main(argv):
         elif opt in ("-t", "--token"):
             token = arg
         elif opt in ("-a", "--asyncchecktime"):
-            try:
-                async_job_check_time_ms = long(arg)
-            except NameError:
-                async_job_check_time_ms = int(arg)
+            async_job_check_time_ms = int(arg)
         elif opt in ("-g", "--package"):
             module_file = arg
         elif opt in ("-c", "--class"):

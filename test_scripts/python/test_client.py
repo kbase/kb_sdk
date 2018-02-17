@@ -2,12 +2,14 @@ import sys
 import getopt
 import json
 
+
 def getErrorMessage(error):
     error_type = type(error).__name__
     message = error.__str__()
     if error_type == 'ServerError':
         message = error.data
     return message
+
 
 def main(argv):
     sys.path.append('./')
@@ -31,10 +33,7 @@ def main(argv):
         elif opt in ("-o", "--token"):
             token = arg
         elif opt in ("-a", "--asyncchecktime"):
-            try:
-                async_job_check_time_ms = long(arg)
-            except NameError:
-                async_job_check_time_ms = int(arg)
+            async_job_check_time_ms = int(arg)
     fh = open(tests_filepath)
     tests_json = json.load(fh)
     module_file = tests_json['package']
@@ -100,6 +99,7 @@ def main(argv):
         else:
             print('Unsupported outcome status: ' + expected_status)
             sys.exit(1)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

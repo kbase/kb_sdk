@@ -24,7 +24,7 @@ class TokenCache(object):
         self._halfmax = maxsize / 2  # int division to round down
 
     def get_user(self, token):
-        token = hashlib.sha256(token).hexdigest()
+        token = hashlib.sha256(token.encode('utf-8')).hexdigest()
         with self._lock:
             usertime = self._cache.get(token)
         if not usertime:
@@ -40,12 +40,12 @@ class TokenCache(object):
             raise ValueError('Must supply token')
         if not user:
             raise ValueError('Must supply user')
-        token = hashlib.sha256(token).hexdigest()
+        token = hashlib.sha256(token.encode('utf-8')).hexdigest()
         with self._lock:
             self._cache[token] = [user, _time.time()]
             if len(self._cache) > self._maxsize:
                 for i, (t, _) in enumerate(sorted(self._cache.items(),
-                                                  key=lambda (_, v): v[1])):
+                                                  key=lambda it: it[1][1])):
                     if i <= self._halfmax:
                         del self._cache[t]
                     else:
