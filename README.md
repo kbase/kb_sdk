@@ -48,54 +48,34 @@ Once your account is approved, contact us with your username and ask to be added
 
 Below is a quick reference guide for standard installation.  For more complete details and troubleshooting, see the [Full Installation Guide](doc/kb_sdk_dependencies.md).
 
-For the adventurous, there is an experimental Dockerized installation that only requires Docker.  It is known to work on at least Mac and Linux, but has not been extensively tested yet.  For details, see [Dockerized Installation](doc/kb_sdk_dockerized_install.md)
-
 #### Installation Only
 
 System Dependencies:
 
 - Mac OS X 10.8+ or Linux. kb-sdk does not run natively in Windows, but see [here](doc/FAQ.md#windows) for more details.
-- Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
 
-Get the SDK:
 
-    git clone https://github.com/kbase/kb_sdk
+Pull the KBase SDK image.
 
-Pull dependencies and configure the SDK:
+    docker pull kbase/kb-sdk
 
-    cd kb_sdk
-    make bin
+Create a wrapper script to call the SDK.  This script can be placed anywhere you wish, but it should be
+on your path.  In this example, we will install it in $HOME/bin/.  To use this approach on Windows, you may need to install the Windows for Linux (WSL).
+
+    docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
+    chmod 755 $HOME/bin/kb-sdk
+    export PATH=$PATH:$HOME/bin/kb-sdk
 
 Download the local KBase SDK base Docker image:
 
-    make sdkbase 
-
-Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk directory:
-
-    # for bash
-    export PATH=$(pwd)/bin:$PATH
-    source src/sh/sdk-completion.sh
+    kb-sdk sdkbase
 
 Test installation:
 
     kb-sdk help
-
-
-#### Build from source
-
-Additional System Dependencies:
-
-- Java JDK 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
-- JAVA_HOME environment variable set to JDK installation path
-- Apache Ant http://ant.apache.org
-
-Follow basic instructions above.  Instead of running `make bin` you can run `make` to compile the SDK:
-
-    cd kb_sdk
-    make
 
 
 ## Quick Start Guide
@@ -121,7 +101,7 @@ Run tests:
 This will build your Docker container, run the method implementation running in the Docker container that fetches example ContigSet data from the KBase CI database and generates output.
 
 Inspect the Docker container by dropping into a bash console and poke around, from the `test_local` directory:
-    
+
     ./run_bash.sh
 
 When you make changes to the Narrative method specifications, you can validate them for syntax locally.  From the base directory of your module:
