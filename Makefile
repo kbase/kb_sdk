@@ -103,10 +103,12 @@ deploy-scripts:
 	fi;
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
-sdkbase:
+# The SDK base image has been decoupled from this repo and is pulled from dockerhub or built from
+# the kbase/sdkbase repo
+#sdkbase:
 	# docker rmi -f kbase/deplbase:latest
-	cd sdkbase && ./makeconfig
-	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
+#	cd sdkbase && ./makeconfig
+#	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
 
 test: submodule-init
 	@echo "Running unit tests"

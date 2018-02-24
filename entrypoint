@@ -20,7 +20,7 @@ exec docker run -it --rm -v \$HOME:\$HOME -u \$(id -u) -w \$(pwd) -v /run/docker
 EOF
 elif [ "z$1" = "zsdkbase" ] ; then
     echo "Pulling and tagging the base image"
-    docker pull kbase/kbase:sdkbase2.latest
+    docker pull kbase/sdkbase2:v1.0
 elif [ "z$1" = "zprune" ] ; then
   echo "Used during build to shrink image.  Not needed by the user."
   for f in $(find /src/submodules/jars/lib/jars -type f -name '*.jar') ; do
