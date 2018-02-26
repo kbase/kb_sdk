@@ -19,7 +19,7 @@ This document describes how to set up your computer to start using the KBase SDK
 
 System Dependencies:
 - Mac OS X 10.8+ (Docker requires this) or Linux.  kb-sdk does not run natively in Windows, but see [here](FAQ.md#windows) for more details.
-- (Not required for Docker-based installation) Java JRE 7+ http://www.oracle.com/technetwork/java/javase/downloads/index.html
+- (Not required for Docker-based installation) Java JRE 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - (Mac only) Xcode https://developer.apple.com/xcode
 - git https://git-scm.com
 - Docker https://www.docker.com (for local testing)
