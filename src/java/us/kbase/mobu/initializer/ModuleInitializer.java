@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.ini4j.Ini;
+import us.kbase.mobu.initializer.ModuleInitializerException;
 
 import us.kbase.mobu.compiler.JavaData;
 import us.kbase.mobu.compiler.JavaModule;
@@ -18,13 +20,25 @@ import us.kbase.templates.TemplateFormatter;
 
 public class ModuleInitializer {
 	public static final String DEFAULT_LANGUAGE = "python";
+	private static final String KB_DEP = "KB_SDK_CONFIG";
 
 	private String moduleName;
 	private String userName;
 	private String language;
-	private boolean verbose;
 	private File dir;
-	
+	private static final String CFG_LOC ="kb-sdk";
+	private boolean verbose;
+
+	// Setup a default configuration in case no config file is present
+	private static final Map<String,String> default_cfg;
+	static {
+		default_cfg = new HashMap<String,String>();
+		default_cfg.put("docker_image","kbase/sdkbase2"); // Base image name for use in module init Dockerfile
+		default_cfg.put("image_tag","v1.0"); // tag to use on the base image
+	}
+	// String array of required entries in the configuration object. Will throw exception if not found
+	static String[] required_configs = {"docker_image", "image_tag"};
+
 	private static String[] subdirs = {"data",
 										"docs",
 										"scripts",
@@ -58,6 +72,13 @@ public class ModuleInitializer {
 	 * @throws IOException
 	 */
 	public void initialize(boolean example) throws Exception {
+
+		Map<String, String> cfg;
+		final String file = System.getProperty(KB_DEP) == null ?
+		System.getenv(KB_DEP) : System.getProperty(KB_DEP);
+		cfg = getConfig(file);
+
+
 		if (this.moduleName == null) {
 			throw new RuntimeException("Unable to create a null directory!");
 		}
@@ -109,7 +130,11 @@ public class ModuleInitializer {
 		moduleContext.put("module_root_path", Paths.get(moduleDir).toAbsolutePath());
 		moduleContext.put("example", example);
 		moduleContext.put("dollar_sign", "$");
-        moduleContext.put("os_name", System.getProperty("os.name"));
+		moduleContext.put("os_name", System.getProperty("os.name"));
+		// add support for parameterized dockerfile. 
+		moduleContext.put("docker_image", cfg.get("docker_image"));
+		moduleContext.put("image_tag", cfg.get("image_tag"));
+		
 
 
 		Map<String, Path> templateFiles = new HashMap<String, Path>();
@@ -262,7 +287,37 @@ public class ModuleInitializer {
 			System.out.println();
 		}
 	}
-	
+
+	private Map<String, String> getConfig(String config_path) throws ModuleInitializerException {
+		final Map<String, String> config;
+		if (config_path == null || config_path.trim().isEmpty()) {
+			config = default_cfg;
+		} else {
+			final Path file = Paths.get(config_path);
+			final File deploy = file.normalize().toAbsolutePath().toFile();
+			final Ini ini;
+			try {
+				ini = new Ini(deploy);
+			} catch (IOException ioe) {
+				throw new ModuleInitializerException(String.format(
+						"Could not read configuration file %s: %s",
+						deploy, ioe.getMessage()), ioe);
+			}
+			config = ini.get(CFG_LOC);
+			if (config == null) {
+				throw new ModuleInitializerException(String.format(
+						"No section %s in config file %s", CFG_LOC, deploy));
+			}
+		}
+		for (String directive: required_configs) {
+			if ( config.get(directive) == null) {
+				throw new ModuleInitializerException(String.format(
+					"Configuration must contain %s directive", directive));
+			}
+		}
+		return config;
+	}
+
 	/**
 	 * 
 	 * @param dirPath
