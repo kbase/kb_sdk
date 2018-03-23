@@ -72,7 +72,7 @@ on your path.  In this example, we will install it in $HOME/bin/.  To use this a
 
 Download the local KBase SDK base Docker image:
 
-    kb-sdk sdkbase
+    kb-sdk pull-base-image
 
 Test installation:
 

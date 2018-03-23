@@ -32,7 +32,6 @@ Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk
 
 Additional System Dependencies:
 
-- Java JDK 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
 - JAVA_HOME environment variable set to JDK installation path
 - Apache Ant http://ant.apache.org
 
