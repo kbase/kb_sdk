@@ -35,6 +35,7 @@ Once your account is approved, contact us with your username and ask to be added
 - [Examples](#examples)
 - [FAQ](doc/FAQ.md)
 - [Troubleshooting](doc/kb_sdk_troubleshooting.md)
+- [Building SDK](doc/building_sdk.md)
 - [KBase Developer Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md)
 - [Anatomy of a KBase Module](doc/module_overview.md)
 - [KBase Catalog API](https://github.com/kbase/catalog/blob/master/catalog.spec)
@@ -63,7 +64,7 @@ Pull the KBase SDK image.
     docker pull kbase/kb-sdk
 
 Create a wrapper script to call the SDK.  This script can be placed anywhere you wish, but it should be
-on your path.  In this example, we will install it in $HOME/bin/.  To use this approach on Windows, you may need to install the Windows for Linux (WSL).
+on your path.  In this example, we will install it in $HOME/bin/.  To use this approach on Windows, you may need to install Windows for Linux (WSL).
 
     docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
     chmod 755 $HOME/bin/kb-sdk
