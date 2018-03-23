@@ -74,9 +74,8 @@ Edit the local test config file (`test_local/test.cfg`) with a developer token (
 
     test_token = TEST_TOKEN
 
-*In the Docker shell*, run tests:
+In the module directory, run tests:
 
-    cd test_local
     kb-sdk test
 
 This will build your Docker container and execute all test scripts in the test directory.

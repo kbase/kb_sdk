@@ -118,6 +118,10 @@ public class TemplateBasedGenerator {
             pythonClientName = service.getName() + "Client";
         genRServer = genPythonServer(genRServer, rServerName, rImplName);
         if (genRServer) {
+            System.out.println(
+                    "************************************************************************\n" +
+                    "WARNING: R support is deprecated and will be removed in a future release\n" +
+                    "************************************************************************");
             genR = true;
             if (rServerName == null)
                 rServerName = service.getName() + "Server";

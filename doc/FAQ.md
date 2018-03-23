@@ -38,7 +38,7 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 
 
 #### <A NAME="sys-req-dev"></A>Q: What are system requirements for development workstation?
-**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, Java, or R).  You will need about 1-2 GB free to install the [dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
+**A:** You will need to be able to run Docker, which if you're on a Mac means you must be running Mac OS X 10.8 or later.  Other operating systems, such as the various flavors of Linux, are fine too.  Really anywhere you can run Docker, Java, and your preferred development language (among Python, Perl, or Java).  You will need about 1-2 GB free to install the [dependencies](https://github.com/kbase/kb_sdk/docs/kb_sdk_dependencies.md) and the [KBase SDK](https://https://github.com/kbase/kb_sdk/doc/kb_sdk_install_and_build.md).
 
 [back to top](#top)
 
@@ -50,7 +50,7 @@ It may be the case that someone is wrapping a tool, but is doing so in a way tha
 - Requires either no or fairly limited amounts of reference data
 - Uses existing data visualization widgets
 - Does not require new uploaders/downloaders
-- Wrapper written in Python, Java, R, or Perl
+- Wrapper written in Python, Java, or Perl
 
 [back to top](#top)
 
@@ -82,7 +82,7 @@ As for processing, once it's uploaded to the system (which can take awhile for l
 
 
 #### <A NAME="windows"></A>Q: Can I develop on Windows?
-**A:**  Sort of.  Your best option right now is to install [VirtualBox](https://www.virtualbox.org) with [Ubuntu Linux](https://www.ubuntu.com/desktop) and work in the Linux VM.  Many developers use this approach in KBase, and we know it works well.  Although the KBase SDK tools do not run natively in Windows, with the release of [Docker for Windows](https://docs.docker.com/docker-for-windows/) and our new experimental [Dockerized kb-sdk](kb_sdk_dockerized_install.md) we plan to fully support Windows very soon.
+**A:**  Sort of.  Your best option right now is to install [VirtualBox](https://www.virtualbox.org) with [Ubuntu Linux](https://www.ubuntu.com/desktop) and work in the Linux VM.  Many developers use this approach in KBase, and we know it works well.
 
 [back to top](#top)
 

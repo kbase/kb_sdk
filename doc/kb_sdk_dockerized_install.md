@@ -33,9 +33,10 @@ able to invoke kb-sdk from make (and not running in a docker build), then it is 
 The kb-sdk docker image can generate this script.  This script can be placed anywhere you wish, but it should be
 on your path.  In this example, we will install it in $HOME/bin/.
 
+    mkdir $HOME/bin/
     docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
     chmod 755 $HOME/bin/kb-sdk
-    export PATH=$PATH:$HOME/bin/kb-sdk
+    export PATH=$PATH:$HOME/bin/
 
 #### Test installation
 

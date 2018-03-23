@@ -106,7 +106,7 @@ deploy-scripts:
 sdkbase:
 	# docker rmi -f kbase/deplbase:latest
 	cd sdkbase && ./makeconfig
-	docker build --no-cache -t kbase/kbase:sdkbase.latest sdkbase
+	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
 
 test: submodule-init
 	@echo "Running unit tests"

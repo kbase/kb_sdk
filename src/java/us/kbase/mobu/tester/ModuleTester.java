@@ -38,6 +38,7 @@ import us.kbase.common.service.JsonServerServlet;
 import us.kbase.common.service.JsonServerSyslog;
 import us.kbase.common.service.UObject;
 import us.kbase.common.utils.NetUtils;
+import us.kbase.mobu.initializer.ModuleInitializer;
 import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
@@ -65,6 +66,8 @@ public class ModuleTester {
         if (kbaseYmlConfig.get("data-version") != null) {
             moduleContext.put("data_version", kbaseYmlConfig.get("data-version"));
         }
+        // this next line will throw an exception if the language is unsupported
+        ModuleInitializer.qualifyLanguage((String) kbaseYmlConfig.get("service-language"));
         moduleContext.put("os_name", System.getProperty("os.name"));
     }
     

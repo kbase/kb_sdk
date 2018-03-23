@@ -24,7 +24,7 @@ code or executables), storing resulting data in the data stores, and producing a
 This step of the guide will walk through this process and present some of the utility modules that help facilitate this work.
 
 - A. [Install Other KBase Modules](#install)
-- B. [Import and Initialise](#import)
+- B. [Import and Initialize](#import)
 - C. [Validating user input](#validate)
 - D. [Adding Reference Data to Your App](#impl-adding-data)
 - E. [Interacting with KBase data stores (Workspaces)](#get-save-data)
@@ -39,20 +39,20 @@ modules in your lib directory. To install additional packages run `kb-sdk instal
 Here are some of the modules that might be helpful for your app:
 
 * [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) - Allows the creation of KBase 
-reports which can present text, html, and downloadable files to the user as output to your app.
+reports, which can present text, html, and downloadable files to the user as output to your app.
 * [GenomeFileUtil](https://appdev.kbase.us/#catalog/modules/ReadsUtils) - Import/Export and Upload/Download 
 of Genome data
-*[AssemblyUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Provides tooling for interacting 
+* [AssemblyUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Provides tooling for interacting 
 with sequence assembly data in KBase.
 * [ReadsUtils](https://appdev.kbase.us/#catalog/modules/ReadsUtils) - Utilities for validating, uploading, and 
 downloading reads files. Includes FASTA and FASTQ validators. 
-*[ExpressionUtils](https://appdev.kbase.us/#catalog/modules/ExpressionUtils) - Upload, download and 
+* [ExpressionUtils](https://appdev.kbase.us/#catalog/modules/ExpressionUtils) - Upload, download and 
 export RNASeq Expression data gemerated by either StringTie or Cufflinks apps.
-*[ReadsAlignmentUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Upload and download KBase reads alignment files.
-*[DifferentialExpressionUtils](https://appdev.kbase.us/#catalog/modules/DifferentialExpressionUtils) - Upload/download/export differential expression objects and other related processing
-*[FeatureSetUtils](https://appdev.kbase.us/#catalog/modules/FeatureSetUtils) - Upload, download and 
+* [ReadsAlignmentUtils](https://appdev.kbase.us/#catalog/modules/ReadsAlignmentUtils) - Upload and download KBase reads alignment files.
+* [DifferentialExpressionUtils](https://appdev.kbase.us/#catalog/modules/DifferentialExpressionUtils) - Upload/download/export differential expression objects and other related processing
+* [FeatureSetUtils](https://appdev.kbase.us/#catalog/modules/FeatureSetUtils) - Upload, download and 
 export Genomic Feature Set data
-*[CompoundSetUtils](https://appdev.kbase.us/#catalog/modules/CompoundSetUtils) - Upload/download/export 
+* [CompoundSetUtils](https://appdev.kbase.us/#catalog/modules/CompoundSetUtils) - Upload/download/export 
 chemical compound sets
 * [DataFileUtil](https://appdev.kbase.us/#catalog/modules/DataFileUtil) - A collection of tools to 
 get data directly from the web, from the user's computer (via the staging area) or from KBase workspaces.
@@ -291,7 +291,6 @@ def _generate_report (self, params, other_stuff):
          #The width is fixed. 
 
          'html_window_height': 333,
-
 
 
          'report_object_name': 'kb_app_name_report_' + str(uuid.uuid4())}

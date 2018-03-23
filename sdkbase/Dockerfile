@@ -2,13 +2,17 @@ FROM kbase/deplbase:latest
 
 COPY ./sdkbase.build.tag /tmp/
 
-# Fix Python SSL warnings
-RUN apt-get install python-dev libffi-dev libssl-dev \
-    && pip install pyopenssl ndg-httpsclient pyasn1 \
-    && pip install requests --upgrade \
-    && pip install requests_toolbelt --upgrade \
-    && pip install 'requests[security]' --upgrade \
-    && pip install coverage
+# Update certs
+RUN apt-get update
+RUN apt-get install ca-certificates
+
+# Fix Python SSL warnings for python < 2.7.9 (system python on Trusty is 2.7.6)
+# https://github.com/pypa/pip/issues/4098
+RUN pip install pip==8.1.2
+RUN pip install --disable-pip-version-check requests requests_toolbelt pyopenssl --upgrade
+
+#install coverage tool
+RUN pip install coverage
 
 RUN \
   . /kb/dev_container/user-env.sh && \
