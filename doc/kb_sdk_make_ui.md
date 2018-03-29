@@ -200,7 +200,7 @@ And presents an object like this one to the report visualization:
 
 #### C. Naming fields in the input widget cell
 
-The display.yml primarily contains text to describe the app (in the Narrative and in the App Catalog).
+The display.yaml primarily contains text to describe the app (in the Narrative and in the App Catalog).
 Options in this file will be further explored in step 10 ([Complete Module Info](kb_sdk_complete_module_info.md)) but
 minimally this file should define:
 * A module name
