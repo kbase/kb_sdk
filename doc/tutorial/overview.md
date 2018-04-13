@@ -12,13 +12,13 @@
 
 Let's start with a high-level overview of how the SDK works and the general concepts involved in making SDK apps.
 
-When a python SDK app runs in a narrative, it typically follows this work flow and data path (click to enlarge):
+When a python SDK app runs in a narrative, it typically follows this work flow and data path (to enlarge, click the image and select "Download"):
 
 [![sdk concept map](concept-map.png)](concept-map.png)
 
 ## The Basics
 
-Apps on KBase, such as gene assemblers and annotators that run on narrative pages, are created using the KBase SDK.
+Apps on KBase, such as genome assemblers and annotators that run on narrative pages, are created using the KBase SDK.
 
 When you run an app in a narrative, it runs in a docker container on KBase's servers. Learn more about docker containers [here](https://www.docker.com/what-container). Docker containers allow you to run compiled programs, such as [MEGAHIT](https://github.com/voutcn/megahit), on any machine.
 

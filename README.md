@@ -27,14 +27,14 @@ Once your account is approved, contact us with your username and ask to be added
 5. [Implement Method(s)](doc/tutorial/impl_methods.md)
 6. [Publish and Test on Appdev](doc/tutorial/publish.md)
 
-### HOWTO articles
+### How-to articles
 * [How to add UI elements](doc/howto/add_ui_elements.md)
-* [How to create reports](create_a_report.md)
-* [How to edit your Dockerfile](edit_your_dockerfile.md)
-* [How to complete all your app's information and metadata](out_app_information.md)
-* [How to build the SDK manually](manual_build.md)
-* [How to run a shell command in your app](run_a_shell_command.md)
-* [How to work with reference data](work_with_reference_data.md)
+* [How to create reports](doc/howto/create_a_report.md)
+* [How to edit your Dockerfile](doc/howto/edit_your_dockerfile.md)
+* [How to complete all your app's information and metadata](doc/howto/out_app_information.md)
+* [How to build the SDK manually](doc/howto/manual_build.md)
+* [How to run a shell command in your app](doc/howto/run_a_shell_command.md)
+* [How to work with reference data](doc/howto/work_with_reference_data.md)
 
 ### Additional Documentation
 - [Examples](#examples)
