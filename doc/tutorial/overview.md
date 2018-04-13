@@ -19,7 +19,7 @@ Let's start with a high-level overview of how the SDK works and the general conc
 
 When a python SDK app runs in a narrative, we typically follow this data path (click to enlarge):
 
-[![sdk concept map](concept-map.svg)](concept-map.svg)
+[![sdk concept map](concept-map.png)](concept-map.svg)
 
 ## The Basics
 
