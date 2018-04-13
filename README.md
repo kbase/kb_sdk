@@ -18,19 +18,23 @@ If you are a US citizen, your account should be created within a few days. For f
 Once your account is approved, contact us with your username and ask to be added to the developer list.
 
 
-## <A NAME="steps"></A>SDK Detailed Tutorial
+## <A NAME="steps"></A>SDK Step-by-step Tutorial
 0. [Overview and Concepts](doc/tutorial/overview.md)
 1. [Install SDK Dependencies](doc/tutorial/dependencies.md)
 2. [Install SDK with Docker](doc/tutorial/dockerized_install.md)
 3. [Create Module](doc/tutorial/create_module.md)
 4. [Specify Module and Method(s)](doc/tutorial/edit_module.md)
 5. [Implement Method(s)](doc/tutorial/impl_methods.md)
-6. [Specify User Interface](doc/tutorial/make_ui.md)
-7. [Locally Test Module and Method(s)](doc/tutorial/local_test_module.md)
-8. [Register Module](doc/tutorial/register_module.md)
-9. [Test in KBase](doc/tutorial/test_in_kbase.md)
-10. [Complete Module Info](kdoc/tutorial/complete_module_info.md)
-11. [Deploy](doc/tutorial/deploy.md)
+6. [Publish and Test on Appdev](doc/tutorial/publish.md)
+
+### HOWTO articles
+* [How to add UI elements](doc/howto/add_ui_elements.md)
+* [How to create reports](create_a_report.md)
+* [How to edit your Dockerfile](edit_your_dockerfile.md)
+* [How to complete all your app's information and metadata](out_app_information.md)
+* [How to build the SDK manually](manual_build.md)
+* [How to run a shell command in your app](run_a_shell_command.md)
+* [How to work with reference data](work_with_reference_data.md)
 
 ### Additional Documentation
 - [Examples](#examples)

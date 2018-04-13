@@ -6,24 +6,19 @@
 3. [Create Module](create_module.md)
 4. [Specify Module and Method(s)](edit_module.md)
 5. [Implement Method(s)](impl_methods.md)
-6. [Specify User Interface](make_ui.md)
-7. [Locally Test Module and Method(s)](local_test_module.md)
-8. [Register Module](register_module.md)
-9. [Test in KBase](test_in_kbase.md)
-10. [Complete Module Info](complete_module_info.md)
-11. [Deploy](deploy.md)
+6. [Publish and Test on Appdev](publish.md)
 
 The SDK can be installed and used purely as a Docker container. This removes the need to install the dependencies for running the SDK such as Java and ant. This has been tested on Docker for Mac and Linux. Currently this method is only supported with a bash shell.
 
 ### Install SDK with Docker
 
-Now that Docker is installed, you can pull down the KBase SDK image.
+Now that Docker is installed, pull down the KBase SDK image.
 
 ```sh
 $ docker pull kbase/kb-sdk
 ```
 
-Add the `kb-sdk` as a global command by linking it in your `$PATH`. You can place the script in a directory like `~/bin`:
+Add the `kb-sdk` as a global command by linking it in your `$PATH`. Place the script in a directory like `~/bin`:
 
 ```sh
 $ mkdir $HOME/bin/

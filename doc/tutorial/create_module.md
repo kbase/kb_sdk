@@ -6,12 +6,7 @@
 3. **Create Module**
 4. [Specify Module and Method(s)](edit_module.md)
 5. [Implement Method(s)](impl_methods.md)
-6. [Specify User Interface](make_ui.md)
-7. [Locally Test Module and Method(s)](local_test_module.md)
-8. [Register Module](register_module.md)
-9. [Test in KBase](test_in_kbase.md)
-10. [Complete Module Info](complete_module_info.md)
-11. [Deploy](deploy.md)
+6. [Publish and Test on Appdev](publish.md)
 
 
 ### Create Module

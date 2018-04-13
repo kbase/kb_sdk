@@ -1,20 +1,6 @@
-# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+# How to fill out your app's information for publishing
 
-1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
-3. [Create Module](kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
-5. [Implement Method(s)](kb_sdk_impl_methods.md)
-6. [Specify User Interface](kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-8. [Register Module](kb_sdk_register_module.md)
-9. [Test in KBase](kb_sdk_test_in_kbase.md)
-10. **Complete Module Info**
-11. [Deploy](kb_sdk_deploy.md)
-
-
-### 10. Complete Module Info
-
+### Complete Module Info
 
 Icons, Publications, Original tool authors, Institutional Affiliations, Contact Information, and most importantly, Method Documentation must be added to your module before it can be deployed.  This information will show up in the App Catalog:
     https://appdev.kbase.us/#appcatalog/
@@ -22,7 +8,7 @@ Icons, Publications, Original tool authors, Institutional Affiliations, Contact 
 Please be aware that your module implementation and information must conform to our [Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md) before it will be accepted for public deployment. Fortunately, most of these are common sense (for example, sufficient content on the App Info page for a user to run your app and understand what it's  doing, proper arguments and explanation of their use on the input widget, etc.), but please take the time to familiarize yourself with these requirements before requesting public deployment.
 
 
-#### 10A. Adding an Icon
+#### Adding an Icon
 
 You can make a custom icon for each app in your module, or use an existing one that corresponds to the tool that you have wrapped. Feel free to repurpose the icons from existing KBase apps, or make your own. Your icon can be PNG, GIF, or JPEG (the KBase ones are PNG) and should fit in a square 200x200 pixels. We think rounded-corner squares look best; ours use a 40 pixel rounding on the corner on the 200x200 image (you can do this in Adobe Illustrator). If you want to match our font, it's Futura Condensed Medium, 72 point height and line spacing, white face with a 1pt white border. If you use Adobe Illustrator, export your icon as PDF and convert to a 72dpi PNG with Adobe Photoshop. PDF vector and PNG bitmap versions that we used for our icons are available at https://github.com/kbase/kb_sdk/img/ in case you would like to use them as a starting point.
 
@@ -41,7 +27,7 @@ the **icon:** is configured by the line:
     icon: trimmomatic-orange.png
 
 
-#### 10B. Naming and Categorizing
+#### Naming and Categorizing
 
 Each app should have a unique display name. The display name is configured in the **display.yaml** file at:
 
@@ -80,7 +66,7 @@ An example of a category configuration line is:
 Please leave the category "active" at the beginning of the list of categories, as this is a special category that indicates whether your app should be shown at all in the App Catalog. The rest of the categories are treated as normal tags.
 
 
-#### 10C. Writing your App Info page
+#### Writing your App Info page
 
 Information for the App Info page is configured in the **display.yaml** file at:
 
@@ -133,11 +119,12 @@ screenshots: []
 ```
 
 ##### Example
-For an example of a complete App Info page that would be acceptable for public deployment, please see:
 
-    https://appdev.kbase.us/#appcatalog/app/kb_trimmomatic/run_trimmomatic/dev
-    https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
+For an example of a complete App Info page that would be acceptable for public deployment, please see examples in the Trimmomatic app:
+
+* https://appdev.kbase.us/#appcatalog/app/kb_trimmomatic/run_trimmomatic/dev
+* https://github.com/psdehal/kb_trimmomatic/blob/master/ui/narrative/methods/run_trimmomatic/display.yaml
     
 
-[\[Back to top\]](#top)<br>
-[\[Back to steps\]](../README.md#steps)
+
+Please bear in mind that for public release, your Module **MUST** meet all the requirements laid out in the [KBase SDK Policies](https://github.com/kbase/project_guides/blob/master/SDK_Guidelines.md). We reserve the right to delay public release of SDK Modules until all requirements are met. Please take the time to familiarize yourself with these policies to avoid delay in releasing your Module.

@@ -6,30 +6,396 @@
 3. [Create Module](create_module.md)
 4. [Specify Module and App(s)](edit_module.md)
 5. **Implement Method(s)**
-6. [Specify User Interface](make_ui.md)
-7. [Locally Test Module and App(s)](local_test_module.md)
-8. [Register Module](register_module.md)
-9. [Test in KBase](test_in_kbase.md)
-10. [Complete Module Info](complete_module_info.md)
-11. [Deploy](deploy.md)
+6. [Publish and Test on Appdev](publish.md)
 
 ### Implement your app
 
-The actual code for your app will live in `lib/MyContigFilter`.
+The actual code for your app will live in the python package under `lib/MyContigFilter`. The entry point, where your code is initially called, lives in the file: `lib/MyContigFilter/MyContigFilterImpl.py`. This is the file where you will start entering your own Python code.
 
-The entry point, where your code is initially called, lives in the file: `lib/MyContigFilter/MyContigFilterImpl.py`
+This "Implementation" file defines the methods available in the module. Since we defined a method named `filter_contigs` in our KIDL .spec file and our `spec.json` file, then we will have a `filter_contigs` method in the class inside `MyContigFilterImpl.py`.
 
-This "Implementation" file defines the methods available in the module. Since we defined a method named `filter_contigs` in our KIDL .spec file and our `spec.json` file, then we should define a `filter_contigs` method in the class inside `MyContigFilterImpl.py`.
+In order to keep your codebase organized, you can also create sub-modules inside the above folder, such as in a directory like `lib/MyContigFilter/utils`.
 
-In order to keep our codebase organized, you can create sub-modules inside the above folder, such as `lib/MyContigFilter/utils`.
+#### Set up your developer credentials
+
+To use KBase's file storage services, we need to generate a dev token for authentication.
+
+Go to [https://narrative.kbase.us/#auth2/account](https://narrative.kbase.us/#auth2/account), click Developer Tokens, and generate a new token.
+
+Copy and paste that token into `test_local/test.cfg` in the value for `test_token`
 
 #### Receive some parameters
 
 Our first goal is to receive and print the method's parameters. Open `MyContigFilterImpl.py` and find the `filter_contigs` method, which should have some auto-generated boilerplate code and docstrings.
 
-You want to edit code between the comments `#BEGIN filter_contigs` and `#END filter_contigs`. These are special SDK-generated annotations that we have to keep in the code to get everything to compile correctly.
+You want to edit code between the comments `#BEGIN filter_contigs` and `#END filter_contigs`. These are special SDK-generated annotations that we have to keep in the code to get everything to compile correctly. If you run `make` again in the future, it will edit code outside these comments, but will not change the code you put between the comments.
 
 Between the above comments, let's add a simple print statement; something like: `print(params['assembly_ref'], params['min_length'])` so we can see what is getting passed into our method.
+
+
+```py
+def filter_contigs(self, ctx, workspace_name, params):
+    """
+    :param workspace_name: instance of String
+    :param params: instance of type "ContigFilterParams" (Input
+       parameters) -> structure: parameter "min_length" of Long,
+       parameter "assembly_ref" of String
+    :returns: instance of type "ContigFilterResults" (Output results) ->
+       structure:
+    """
+    # ctx is the context object
+    # return variables are: returnVal
+    #BEGIN filter_contigs
+    print(params['min_length'], params['assembly_ref'])
+    returnVal = {}
+    #END filter_contigs
+    return [returnVal]
+```
+
+Don't try to change the docstring, or anything else outside the `BEGIN filter_contigs` and `END filter_contigs` comments, as your change will get overwritten by the `make` command.
+
+#### Initialize a test
+
+Your `MyModuleImpl.py` file is tested using `test/MyModuleImpl_server_test.py`. This file also has a variety of auto-generated boilerplate code; you will want to add your own test by replacing the `test_your_method(self)` method at the bottom of the test class.
+
+```py
+def test_filter_contigs(self):
+    ref = "14672/2/1"
+    result = self.getImpl().filter_contigs(self.getContext(), {
+        'assembly_ref': ref,
+        'min_length': 100
+    })
+    print result
+    # TODO -- assert some things (later)
+```
+
+We need to provide two parameters to our function: an assembly reference string and a min length integer. For the reference string, we can use this sample reference to a Shewanella Oneidensis assembly on AppDev: `"14672/2/1"`.
+
+Run `kb-sdk test` and, if everything works, you'll see the docker container boot up, the `filter_contig` method will get called, and you will see some printed output.
+
+#### Set the callback URL and scratch path
+
+
+The callback URL points to a server that is used to spin up other SDK apps that we will need to use in our own app. In our case, we want to use [AssemblyUtil](https://github.com/kbaseapps/AssemblyUtil) to download genome data. When we use that app, our app makes a request to the callback server, which spins up a separate docker container that runs AssemblyUtil.
+
+The other parameter commonly defined in the module constructor is the path to the scratch directory. This directory is a common space accessible by not only the 
+current app but also every app called by this app. Therefore files from other apps (eg. AssemblyUtil) will be written to the scratch folder and files to be used by other modules (such as KBaseReport) are read from the scratch folder.
+
+Scratch is a temp directory that only stores ephemeral data for your app. Keep in mind that this data disappears when your app stops running.
+
+Add this into your `__init__` method in your `MyModuleImpl.py`, between the `#BEGIN_CONSTRUCTOR` and `#END_CONSTRUCTOR` comments:
+
+```py
+   ...
+   # Inside your __init__ function:
+   #BEGIN_CONSTRUCTOR
+   self.callback_url = os.environ['SDK_CALLBACK_URL']
+   self.scratch = config['scratch']
+   #END_CONSTRUCTOR
+   ...
+```
+
+In order to use `os` package, add this import line at the top of your `MyModuleImpl.py`, between the `#BEGIN_HEADER` and `#END_HEADER` comments:
+
+```py
+import os
+```
+
+Run the `kb-sdk test` command again to make sure you have no errors.
+
+#### Download the FASTA file
+
+We need to convert the reference to a bacterial genome -- `14672/2/1` -- into an actual FASTA file of genome data that our app can access. For that, we can use the [AssemblyUtil](https://github.com/kbaseapps/AssemblyUtil) app.
+
+Install the app with:
+
+```sh
+$ kb-sdk install AssemblyUtil
+```
+
+That will add an entry for `AssemblyUtil` in your `dependencies.json` file. It also adds a python package under `lib/AssemblyUtil`.
+
+Import the module at the top of your `MyModuleImpl.py` file
+
+```py
+from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
+```
+
+Inside your `filter_contigs` method, initialize the utility and use it to download `assembly_ref`:
+
+```py
+    ...
+    # Inside filter_contigs()
+    assembly_util = AssemblyUtil(self.callback_url)
+    file = assembly_util.get_assembly_as_fasta({'ref': params['assembly_ref']})
+    print(file)
+    ...
+```
+
+* We have to initialize AssemblyUtil and pass in `self.callback_url`
+* The `get_assembly_as_fasta` method downloads a file from a ref
+
+Run `kb-sdk test` again and you should see the file download along with its path in the container.
+
+#### Add some basic param validations
+
+It's good practice to make some run-time checks of the parameters passed into your `MyModuleImpl#filter_contigs` method. While params will get checked in the Narrative UI, if your app ever gets called from another codebase, it will bypass any UI typechecks.
+
+Make sure your user passes in a workspace, an assembly reference, and a minimum length greater than zero:
+
+```py
+  ...
+  # Inside filter_contigs(), after #BEGIN fast_ani, before any other code
+  # Check that the parameters are valid
+  for name in ['min_length', 'assembly_ref']:
+      if name not in params:
+          raise ValueError('Parameter "' + name + '" is required but missing')
+  if not isinstance(params['min_length'], int) or (params['min_length'] < 0):
+      raise ValueError('Min length must be a non-negative integer')
+  if not isinstance(params['assembly_ref'], basestring) or not len(params['assembly_ref']):
+      raise ValueError('Pass in a valid assembly reference string')
+  ...
+```
+
+Re-run `kb-sdk test` to make sure everything still works.
+
+We can add some additional tests to make sure we raise ValueErrors for invalid parameters:
+
+```py
+...
+# Inside test/MyModuleImpl_server_test.py
+# At the end of the test class
+def test_invalid_params(self):
+    impl = self.getImpl()
+    ctx = self.getContext()
+    ws = self.getWsName()
+    # Missing assembly ref
+    with self.assertRaises(ValueError):
+        impl.filter_contigs(ctx, ws, {'min_length': 100})
+    # Missing min length
+    with self.assertRaises(ValueError):
+        impl.filter_contigs(ctx, ws, {'assembly_ref': 'x'})
+    # Min length is negative
+    with self.assertRaises(ValueError):
+        impl.filter_contigs(ctx, ws, {'assembly_ref': 'x', 'min_length': -1})
+    # Min length is wrong type
+    with self.assertRaises(ValueError):
+        impl.filter_contigs(ctx, ws, {'assembly_ref': 'x', 'min_length': 'x'})
+    # Assembly ref is wrong type
+    with self.assertRaises(ValueError):
+        impl.filter_contigs(ctx, ws, {'assembly_ref': 1, 'min_length': 1})
+...
+```
+
+#### Filter out contigs based on length
+
+Now we can finally start to implement the real functionality of the app!
+
+The biopython package (called [`Bio`](http://biopython.org/)), included in the SDK build, has a module called [`SeqIO`](http://biopython.org/wiki/SeqIO) that can help us read and filter genome sequence data.
+
+Import this module in your `MyModuleImpl.py` between the header comments like so:
+
+```py
+... # other imports
+from Bio import SeqIO
+...
+```
+
+Now, inside `filter_contigs`, enter code to filter out contigs less than the given min_length:
+
+```py
+...
+# Inside MyModuleImpl#filter_contigs, after you have fetched the fasta file:
+# Parse the downloaded file in FASTA format
+parsed_assembly = SeqIO.parse(file['path'], 'fasta')
+min_length = params['min_length']
+# Keep a list of contigs greater than min_length
+good_contigs = []
+# total contigs regardless of length
+n_total = 0
+# total contigs over the min_length
+n_remaining = 0
+for record in parsed_assembly:
+    n_total += 1
+    if len(record.seq) >= min_length:
+        good_contigs.append(record)
+        n_remaining += 1
+returnVal = {
+    'n_total': n_total,
+    'n_remaining': n_remaining
+}
+...
+```
+
+Run `kb-sdk test` again and check the output.
+
+#### Add real tests
+
+Return to `test/MyModuleImpl_server_test.py` and add tests for the functionality we just added above.
+
+Set `min_length` to a value that filters out some contigs but not others. In our case, our FASTA only has 2 sequences of lenths 4969811 and 161613. An in-between minimum could be 200000.
+
+We would expect to keep 1 contig and filter out the other.
+
+```py
+...
+# Inside MyModuleImpl_server_test:
+def test_filter_contigs(self):
+    ref = "14672/2/1"
+    params = {
+        'assembly_ref': ref,
+        'min_length': 200000
+    }
+    result = self.getImpl().filter_contigs(self.getContext(), self.getWsName(), params)
+    self.assertEqual(result[0]['n_total'], 2)
+    self.assertEqual(result[0]['n_remaining'], 1)
+...
+```
+
+Run `kb-sdk test` again to make sure it all passes.
+
+#### Output the filtered assembly
+
+Next, we want to save and upload a new version of our genome assembly data with the contigs filtered out.
+
+Beneath the code that we wrote to filter the assembly, add this file saving and uploading code.
+
+```py
+...
+# Underneath your loop that filters contigs:
+# Create a file to hold the filtered data
+filtered_path = os.path.join(self.scratch, 'filtered.fasta')
+SeqIO.write(good_contigs, filtered_path, 'fasta')
+# Upload the filtered data to the workspace
+new_ref = assembly_util.save_assembly_from_fasta({
+    'file': {'path': filtered_path},
+    'workspace_name': workspace_name,
+    'assembly_name': file['assembly_name']
+})
+returnVal = {
+    'n_total': n_total,
+    'n_remaining': n_remaining,
+    'filtered_assembly_ref': new_ref
+}
+#END filter_contigs
+...
+```
+
+Add a simple assertion into your `test_fast_ani` method to check for the `filtered_assembly_ref`. Something like:
+
+```py
+self.assertTrue(len(result[0]['filtered_assembly_ref']))
+```
+
+Run `kb-sdk test` again to make sure you have no errors
+
+#### Build a report object
+
+In order to output data into the UI inside a narrative, your app needs to build and return a [KBaseReport](https://github.com/kbaseapps/KBaseReport).
+
+Install the KBaseReport app with:
+
+```sh
+$ kb-sdk install KBaseReport
+```
+
+Import the report module between the `#BEGIN_HEADER` and `#END_HEADER` section of your `MyModuleImpl.py` file:
+
+```py
+from KBaseReport.KBaseReportClient import KBaseReport
+```
+
+The KBaseReport takes a series of dictionary objects that can have text messages, object references, and more. Add the report initialization code inside your `filter_contigs` method:
+
+```py
+# Inside the filter_contigs method, below where we uploaded the new file:
+# Create an output summary message for the report
+text_message = "".join([
+    'Filtered assembly to ',
+    str(n_remaining),
+    ' contigs out of ',
+    str(n_total)
+])
+# Data for creating the report, referencing the assembly we uploaded
+report_data = {
+    'objects_created': [
+        {'ref': new_ref, 'description': 'Filtered contigs'}
+    ],
+    'text_message': text_message
+}
+# Initialize the report
+kbase_report = KBaseReport(self.callback_url)
+report = kbase_report.create({
+    'report': report_data,
+    'workspace_name': workspace_name
+})
+# Return the report reference and name in our results
+returnVal = {
+    'report_ref': report['ref'],
+    'report_name': report['name'],
+    'n_total': n_total,
+    'n_remaining': n_remaining,
+    'filtered_assembly_ref': new_ref
+}
+#END filter_contigs
+```
+
+Add a couple assertions in our `test_filter_contigs` method inside `test/MyModuleImpl_server_test.py` to check for the report name and ref:
+
+```py
+...
+self.assertTrue(len(result[0]['report_name']))
+self.assertTrue(len(result[0]['report_ref']))
+...
+```
+
+Run `kb-sdk test` again to make sure it all works.
+
+#### Configure your app's output data
+
+We nearly have a complete app. The last step is to take all the result data we defined in `MyModuleImpl#filter_contigs` and add entries for them in our `MyModule.spec` KIDL type file as well as our `spec.json` UI config file.
+
+Add a type entry for our result data in our KIDL file:
+
+```
+    /* Output results */
+    typedef structure {
+        string report_name;
+        string report_ref;
+        string filtered_assembly_ref;
+        int n_total;
+        int n_remaining;
+    } ContigFilterResults;
+```
+
+Run `make` and `kb-sdk test` again to make sure everything works.
+
+In your `ui/narrative/methods/filter_contigs/spec.json` file, add entries for this output data:
+
+```json
+...
+"output_mapping": [
+    {
+        "service_method_output_path": [0,"report_name"],
+        "target_property": "report_name"
+    },
+    {
+        "service_method_output_path": [0,"report_ref"],
+        "target_property": "report_ref"
+    },
+    {
+        "narrative_system_variable": "workspace",
+        "target_property": "workspace_name"
+    }
+]
+...
+```
+
+Now we have some output entries that point to our report and workspace, which will show up when the job finishes in the narrative.
+
+Finally, under `widgets/output` in the JSON (around line 10), set `"output"` to `"no-display"`. This prevents our app from creating a separate output cell.
+
+We've added an entry for everything we put in the `returnVal` dictionary that gets returned from `MyModuleImpl#filter_contigs`.
 
 The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd-party code or executables), storing resulting data in the data stores, and producing a report for the user summarizing the work accomplished.
 
@@ -72,17 +438,6 @@ get data directly from the web, from the user's computer (via the staging area) 
 [\[Back to top\]](#top)
 
 #### <A NAME="import"></A>B. Import and Initialize
-In Python, you can import these installed modules like any other Python package. In the header, two important properties
-are defined. The first is the SDK_CALLBACK_URL which is passed to modules invoked by this module so they can report 
-their status and results to the callback server which coordinates module execution. This is demonstrated by 
-the instantiation of an AssemblyUtil client in the following example.
-
-The other parameter commonly defined in 
-the module constructor is the path to the scratch directory. This directory is a common space accessible by not only the 
-current module but also every module called by this module. Therefore files from other modules (for example 
-AssemblyUtil) will be written to the scratch folder and files to be used by other modules (such as KBaseReport) are 
-read from the scratch folder.
-
 ```python
 import os
 from AssemblyUtil.AssemblyUtilClient import AssemblyUtil
@@ -159,173 +514,6 @@ use the workspace service to save objects but this approach has been deprecated 
 which handle provenance data automatically.
 
 [\[Back to top\]](#top)
-
-#### <A NAME="impl-shell-tool"></A>F. Invoking Shell Tool
-
-Many KBase apps wrap tools with commandline interfaces. The following example from the [kb_quast](https://github.com/kbaseapps/kb_quast) 
-repository demonstrates how to do (and document) this well with Python.
-
-```python
-    def run_quast_exec(self, outdir, filepaths, labels):
-        threads = psutil.cpu_count() * self.THREADS_PER_CORE
-        # DO NOT use genemark instead of glimmer, not open source
-        # DO NOT use metaQUAST, uses SILVA DB which is not open source
-        cmd = ['quast.py', '--threads', str(threads), '-o', outdir, '--labels', ','.join(labels),
-               '--glimmer', '--contig-thresholds', '0,1000,10000,100000,1000000'] + filepaths
-        self.log('running QUAST with command line ' + str(cmd))
-        retcode = subprocess.call(cmd)
-        self.log('QUAST return code: ' + str(retcode))
-        if retcode:
-            # can't actually figure out how to test this. Give quast garbage it skips the file.
-            # Give quast a file with a missing sequence it acts completely normally.
-            raise ValueError('QUAST reported an error, return code was ' + str(retcode))
-        # quast will ignore bad files and keep going, which is a disaster for
-        # reproducibility and accuracy if you're not watching the logs like a hawk.
-        # for now use this hack to check that all files were processed. Maybe there's a better way.
-        files_proc = len(os.listdir(os.path.join(outdir, 'predicted_genes'))) / 2
-        files_exp = len(filepaths)
-        if files_proc != files_exp:
-            err = ('QUAST skipped some files - {} expected, {} processed.'
-                   .format(files_exp, files_proc))
-            self.log(err)
-            raise ValueError(err)
- ```
-
-[\[Back to top\]](#top)
-
-#### <A NAME="impl-report"></A>G. Building Output Report
-
-The [KBaseReport](https://appdev.kbase.us/#catalog/modules/KBaseReport) module allows the creation of KBase reports which can present text, HTML, and downloadable files to the user as output to your app. The KBaseReports module is the preferred way to communicate results to users.
-
-*Why do I need to make a report?*
-
-Reports in KBase allow a developer to present visualizations, generate human-readable text strings, show warnings, provide links to output files that do not correspond to typed objects, and in general display information that is useful to a user without having to utilize kbase-ui widgets. 
-
-*What kinds of reports can I make?*
-
-Developers can use the KBaseReports module to display and contain a wide variety of content. It's up to each developer to determine how to creatively and effectively integrate this module with their Apps. Reports can be configured in a variety of ways, depending on how the parameters to parse and display the outputs of an App are configured. We will cover an example and some sample code, but exploring the variety of existing Apps and their output reports within the KBase Narratives will best demonstrate the capabilities of this module. Many developers have used the ability to contain and display HTML files within the reports for visualization of and interaction with data. 
-
-*What do reports look like in KBase?*
-
-Reports are contained in the output cells generated by KBase Apps. A typical and feature-rich example can be found in KBase's implementation of [DESeq2](https://github.com/kbaseapps/kb_deseq/blob/add70f879a93f060c2b37de914dab7d0c02731c1/lib/kb_deseq/Utils/DESeqUtil.py#L241-L285). 
-
-![DESeq2 Report](http://kbase.us/wp-content/uploads/2017/11/DeSEQ-Capture.png)
-
-*Where do I start with making a report?*
-
-The first step in setting up KBase reports for an App is determining what the outputs of the program are in order to figure out how to best display results or give access to files to users. By understanding what kinds of files, HTML reports, warnings, and other outputs are generated by the program outside of KBase, you can develop a strategy for adequately representing all these within the output cell for your App. The following annotated example code contains all of the parameters that can be set to configure the output:
-
-```python
-def _generate_report (self, params, other_stuff):
-
-    # A working example of an app that generates a report for DESeq2
-    # https://github.com/kbaseapps/kb_deseq/blob/586714d/lib/kb_deseq/Utils/DESeqUtil.py#L241-L285
-    
-    report_params = {
-         #message is an optional field. It is string that appears in the summary section of the result page
-         #eg. message = “This is a message string”
-
-         'message': message_in_app,
-
-         #objects_created: List of typed objects created during
-         #the execution of the App. This can only be used to refer
-         #to typed objects in the workspace and is separate 
-         #from any files generated by the app.
-
-         #eg. 
-         #objects_created_in_app = list()
-         #objects_created_in_app.append(obj1)
-         #objects_created_in_app.append(obj2)
-         # See a working example here
-         # https://github.com/kbaseapps/kb_deseq/blob/586714d/lib/kb_deseq/Utils/DESeqUtil.py#L262-L264
-
-         'objects_created': objects_created_in_app,
-
-         #warnings: list of strings that can be used to alert the user
-         #eg. 
-         # warnings_in_app = list()
-         # warnings_in_app.append (‘This is warning 1’)
-         # warnings_in_app.append (‘This is warning 2’)
-
-         'warnings': warnings_in_app,
-
-
-         'workspace_name': ws_name,
-
-         #file_links: list of paths or SHOCK node IDs pointing to 
-         #a single flat file. They appear in Files section 
-         #as list of downloadable files. 
-         
-         #eg. 
-         #  output_files_in_app = list()
-         #  output_files_in_app.append({
-         #      ‘path’: ‘path to file1 or shock id’,
-         #      ‘name’: ‘name of file’,
-         #      ‘label’: ‘label of file’,
-         #      ‘description’ : ‘Description of file’
-         #  }
-         
-         # To see a working example
-         # https://github.com/kbaseapps/kb_deseq/blob/586714d/lib/kb_deseq/Utils/DESeqUtil.py#L205-L239
-
-
-         'file_links': output_files_in_app,
-
-
-         #html_links: HTML files that appear in “Links” section. 
-         #List of paths or shock node IDs pointing to a single 
-         #flat html file or to the top level directory of a website. 
-         #The report widget can render one html view directly. 
-         #Set one of the following fields to decide which view to render:
-         #direct_html - A string with simple html text that will
-         #be rendered within the report widget:
-         #direct_html_link_index - Integer to specify the index of
-         #the page in html_links to view directly in the report widget
-
-
-         # html_files_in_app = list()
-         # html_files_in_app.append({
-         #    ‘path’: ‘path to file1 or shock id’,
-         #    ‘name’: ‘name of html file1’,
-         #    ‘label’: ‘label of html file1’,
-         #    ‘description’ : ‘Description of html file1’
-         # }
-         
-         # To see a working example 
-         # https://github.com/kbaseapps/kb_deseq/blob/586714d/lib/kb_deseq/Utils/DESeqUtil.py#L86-L194
-         
-
-         'html_links': html_files_in_app,
-         'direct_html_link_index': 0,
-
-         #html_window_height : Window height - This sets the height
-         #of the HTML window displayed under the “Reports” section. 
-         #The width is fixed. 
-
-         'html_window_height': 333,
-
-
-         'report_object_name': 'kb_app_name_report_' + str(uuid.uuid4())}
-
-          # Make the client, generate the report
-          
-          kbase_report_client = KBaseReport(self.callback_url)
-          output = kbase_report_client.create_extended_report(report_params)
-          
-          # Return references which will allow inline display of
-          #the report in the Narrative
-          
-          report_output = {'report_name': output['name'], 
-                            'report_ref': output['ref']}
-          
-          return report_output
-  }
-  ```
-
-Here's the same example image from above annotated with the parameters used in the creation of the DESeq2 report.
-
-![DESeq2 Report](http://kbase.us/wp-content/uploads/2017/11/DESeq2-Annotate.png)
-
 
 [\[Next tutorial page\]](make_ui.md)<br>
 [\[Back to top\]](#top)<br>

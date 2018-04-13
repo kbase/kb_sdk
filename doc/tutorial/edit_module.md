@@ -6,12 +6,7 @@
 3. [Create Module](create_module.md)
 4. **Specify Module and Method(s)**
 5. [Implement Method(s)](impl_methods.md)
-6. [Specify User Interface](make_ui.md)
-7. [Locally Test Module and Method(s)](local_test_module.md)
-8. [Register Module](register_module.md)
-9. [Test in KBase](test_in_kbase.md)
-10. [Complete Module Info](complete_module_info.md)
-11. [Deploy](deploy.md)
+6. [Publish and Test on Appdev](publish.md)
 
 
 #### Basic app config
@@ -24,8 +19,12 @@ To start, we can consider our inputs and outputs. Our tutorial app will do the f
 
 * Take a reference to an assembly file as input
 * Take `min_length` as input (the minimum contig length that the user wants)
+* Download their assembly file from the KBase servers using the reference
 * Filter out the contigs in the assembly file that are below `min_length`
-* Return a new, filtered assembly file
+* Upload the filtered assembly file
+* Return a reference to the new assembly, plus some data about what we filtered
+
+#### Create input parameters
 
 In SDK apps, we can have input parameters in the form of maps (dicts/hashes/objects), lists (arrays), floats, integers, strings, or booleans.
 
@@ -37,8 +36,6 @@ SDK apps can output the following data:
 * **HTML Pages** - Your method can use KBaseReports to generate an HTML report displaying results.
 * **Misc. files for download** - You method can use KBaseReports to save results to a file server for the user to download
 
-#### Create input parameters
-
 Let's start by defining our input parameters. We need a `min_length` parameter (an integer), and an `assembly_ref` parameter (a string reference to an assembly file in the workspace).
 
 To add an input parameter to your app, you need to update three configuration files:
@@ -47,9 +44,11 @@ To add an input parameter to your app, you need to update three configuration fi
 1. `ui/narrative/example_method/spec.json` -- a UI configuration file
 1. `ui/narrative/example_method/display.yaml` -- a text content file
 
+We'll start with the `module_name.spec` file.
+
 #### Add some KIDL type definitions
 
-First, let's add the input parameter types to your app's KIDL specification, which lives in `<module_name>.spec` in your codebase.
+First, add the input parameter types to your app's KIDL specification, which lives in `<module_name>.spec` in the root directory of your codebase. 
 
 Open your KIDL spec file, and you will see something like this:
 
@@ -64,7 +63,7 @@ module MyContigFilter {
 };
 ```
 
-The above syntax comes from a custom type language that is similar to languages like C++, but is specific to KBase.
+The above syntax comes from a custom type language called KIDL that is similar to languages like C++, but is specific to KBase. KIDL is used as a common interface definition language, allowing different apps to communicate with one another, regardless of programming languages.
 
 [View the KIDL tutorial and reference](/doc/KIDL_specification.md)
 
@@ -86,7 +85,7 @@ Above, we've added a couple input parameters: an `int` for the minimum length th
 
 We also added a placeholder type structure for our output results, which we will return to later. For now, it can be blank.
 
-Now we insert a function type for our app's main function, which we can call `filter_contigs`. Refer to the [KIDL specification](/doc/KIDL_specification.md) for details about function types.
+Now insert a function type for our app's main method, which we can call `filter_contigs`. Refer to the [KIDL specification](/doc/KIDL_specification.md) for details about function types.
 
 ```
 funcdef filter_contigs(string workspace, ContigFilterParams params)
@@ -97,17 +96,17 @@ In SDK apps, we want to set the function as `authentication required` because al
 
 Now return to your app's root directory and run `make`
 
- **You must rerun *make* after each change to the KIDL specification to [create or update the implementation stubs](#stubs).**
+ **You must rerun *make* after each change to the KIDL specification to regenerate client and server code used in the codebase**
 
 #### Validate your app
 
-When you make changes to your KIDL `.spec` file, you can validate the syntax of your changes. From the KBase directory of your module, run:
+When you make changes to your KIDL `.spec` file, validate the syntax of your changes by running:
 
 ```
 $ kb-sdk validate
 ```
 
-You will get an error that looks something like this:
+For now, you will get an error that looks something like this:
 
 ```
 **ERROR** - unknown method "your_method" defined within path [behavior/service-mapping/method] in spec.json
@@ -117,7 +116,7 @@ That's because we need to set up some things in our `/ui/narrative` directory in
 
 #### Update spec.json
 
-The directory named `/ui/narrative/methods/example_method` is a placeholder. Let's rename it to the name of the actual function we defined in our KIDL .spec file:
+The directory named `/ui/narrative/methods/example_method` is a placeholder. Rename it to the name of the actual function we defined in our KIDL .spec file:
 
 ```sh
 # From your app's root directory:
@@ -201,11 +200,11 @@ When you run `kb-sdk validate` again, you will get an error about your `display.
 
 #### Update display.yaml
 
-The YAML file found in `ui/narrative/methods/filter_contigs/display.yaml` holds some text content for your app.
+The YAML file found in `ui/narrative/methods/filter_contigs/display.yaml` holds text content for your app.
 
-Open it and update its default fields to match your app. Change `name` and `tooltip` to say something related to filtering assembly files based on contig length.
+Open it and update its default fields to match the purpose your app. Change `name` and `tooltip` to say something related to filtering assembly files based on contig length.
 
-You can leave the tooltip, screenshots, and icon fields as their default. For now, set empty lists as the values in the "suggestions" section.
+You can leave the "screenshots" and "icon" fields to their default values. For now, set empty lists as the values in the "suggestions" section.
 
 Moving down to the "parameters" section, add parameter entries for "assembly_ref" and "min_length" with some helpful descriptions of each.
 
@@ -230,7 +229,7 @@ parameters:
 
 Finally, run `kb-sdk validate` again and it should pass! Now we can start to actually work on the functionality of the app.
 
-For a more exhaustive overview of the `spec.json` and `display.yaml` files, visit their [specification PDF](https://github.com/kbase/kb_sdk/blob/master/doc/NarrativeUIAppSpecification.pdf).
+**For a more exhaustive overview of the `spec.json` and `display.yaml` files, visit their [specification PDF](https://github.com/kbase/kb_sdk/blob/master/doc/NarrativeUIAppSpecification.pdf).**
 
 [\[Next tutorial page\]](impl_methods.md)<br>
 [\[Back to top\]](#top)<br>
