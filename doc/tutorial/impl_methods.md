@@ -1,4 +1,4 @@
-# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](/README.md)
 
 0. [Overview and Concepts](overview.md)
 1. [Install SDK Dependencies](dependencies.md)
@@ -513,8 +513,6 @@ to data in an accompanying provenance object. You may find examples of older KBa
 use the workspace service to save objects but this approach has been deprecated in favor of the DFU or type-specific modules
 which handle provenance data automatically.
 
-[\[Back to top\]](#top)
-
-[\[Next tutorial page\]](make_ui.md)<br>
+[\[Next tutorial page\]](publish.md)<br>
 [\[Back to top\]](#top)<br>
 [\[Back to steps\]](/README.md#steps)

@@ -1,4 +1,4 @@
-# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](/README.md)
 
 0. **Overview and Concepts**
 1. [Install SDK Dependencies](dependencies.md)
