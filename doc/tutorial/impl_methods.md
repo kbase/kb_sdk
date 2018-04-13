@@ -1,26 +1,38 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
-1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
-3. [Create Module](kb_sdk_create_module.md)
-4. [Specify Module and App(s)](kb_sdk_edit_module.md)
-5. **Implement App(s)**
-6. [Specify User Interface](kb_sdk_make_ui.md)
-7. [Locally Test Module and App(s)](kb_sdk_local_test_module.md)
-8. [Register Module](kb_sdk_register_module.md)
-9. [Test in KBase](kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kb_sdk_complete_module_info.md)
-11. [Deploy](kb_sdk_deploy.md)
+0. [Overview and Concepts](overview.md)
+1. [Install SDK Dependencies](dependencies.md)
+2. [Install SDK with Docker](dockerized_install.md)
+3. [Create Module](create_module.md)
+4. [Specify Module and App(s)](edit_module.md)
+5. **Implement Method(s)**
+6. [Specify User Interface](make_ui.md)
+7. [Locally Test Module and App(s)](local_test_module.md)
+8. [Register Module](register_module.md)
+9. [Test in KBase](test_in_kbase.md)
+10. [Complete Module Info](complete_module_info.md)
+11. [Deploy](deploy.md)
 
-### <A NAME="impl"></A>5. Implement App(s)
+### Implement your app
 
-In the directory lib/\<MyModule>, edit the \<MyModule>Impl.py (or *Impl.pl or *Server.java) "Implementation" file that 
-defines the methods (apps) available in the module. The example module is very simple and is implemented directly in this file
-but it is better practice and more readable to separate implementation logic into multiple files, especially for modules 
-that include more than one app. 
+The actual code for your app will live in `lib/MyContigFilter`.
 
-The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd-party 
-code or executables), storing resulting data in the data stores, and producing a report for the user summarizing the work accomplished.
+The entry point, where your code is initially called, lives in the file: `lib/MyContigFilter/MyContigFilterImpl.py`
+
+This "Implementation" file defines the methods available in the module. Since we defined a method named `filter_contigs` in our KIDL .spec file and our `spec.json` file, then we should define a `filter_contigs` method in the class inside `MyContigFilterImpl.py`.
+
+In order to keep our codebase organized, you can create sub-modules inside the above folder, such as `lib/MyContigFilter/utils`.
+
+#### Receive some parameters
+
+Our first goal is to receive and print the method's parameters. Open `MyContigFilterImpl.py` and find the `filter_contigs` method, which should have some auto-generated boilerplate code and docstrings.
+
+You want to edit code between the comments `#BEGIN filter_contigs` and `#END filter_contigs`. These are special SDK-generated annotations that we have to keep in the code to get everything to compile correctly.
+
+Between the above comments, let's add a simple print statement; something like: `print(params['assembly_ref'], params['min_length'])` so we can see what is getting passed into our method.
+
+The workflow of most modules involves obtaining data from the KBase data stores, operating on that data (possibly with 3rd-party code or executables), storing resulting data in the data stores, and producing a report for the user summarizing the work accomplished.
+
 This step of the guide will walk through this process and present some of the utility modules that help facilitate this work.
 
 - A. [Install Other KBase Modules](#install)
@@ -34,7 +46,7 @@ This step of the guide will walk through this process and present some of the ut
 #### <A NAME="install"></A>A. Install Other KBase Modules
 
 If you begin by altering an existing app (as this walkthough demonstrates) you will already have some KBase utility 
-modules in your lib directory. To install additional packages run `kb-sdk install <module name>` from the terminal. This operation is case sensitive (but will accept any case of letters and potentially cause errors) so make sure to type the module name with the correct uppercase and lowercase letters.
+modules in your lib directory. To install additional packages, run `kb-sdk install <module name>` from the terminal. This operation is case sensitive (but will accept any case of letters and potentially cause errors) so make sure to type the module name with the correct uppercase and lowercase letters.
 
 Here are some of the modules that might be helpful for your app:
 
@@ -315,4 +327,6 @@ Here's the same example image from above annotated with the parameters used in t
 ![DESeq2 Report](http://kbase.us/wp-content/uploads/2017/11/DESeq2-Annotate.png)
 
 
-[\[Back to top\]](#top)
+[\[Next tutorial page\]](make_ui.md)<br>
+[\[Back to top\]](#top)<br>
+[\[Back to steps\]](/README.md#steps)

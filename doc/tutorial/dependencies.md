@@ -1,21 +1,21 @@
 # <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
 
+0. [Overview and Concepts](overview.md)
 1. **Install SDK Dependencies**
-2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
-3. [Create Module](kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
-5. [Implement Method(s)](kb_sdk_impl_methods.md)
-6. [Specify User Interface](kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-8. [Register Module](kb_sdk_register_module.md)
-9. [Test in KBase](kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kb_sdk_complete_module_info.md)
-11. [Deploy](kb_sdk_deploy.md)
-
+2. [Install SDK with Docker](dockerized_install.md)
+3. [Create Module](create_module.md)
+4. [Specify Module and Method(s)](edit_module.md)
+5. [Implement Method(s)](impl_methods.md)
+6. [Specify User Interface](make_ui.md)
+7. [Locally Test Module and Method(s)](local_test_module.md)
+8. [Register Module](register_module.md)
+9. [Test in KBase](test_in_kbase.md)
+10. [Complete Module Info](complete_module_info.md)
+11. [Deploy](deploy.md)
 
 This document describes how to set up your computer to start using the KBase SDK. Please see the [SDK README](https://github.com/kbase/kb_sdk/blob/master/README.md) for general information about the SDK.
 
-### 1. Install SDK Dependencies
+### Install SDK Dependencies
 
 System Dependencies:
 - Mac OS X 10.8+ (Docker requires this) or Linux.  kb-sdk does not run natively in Windows, but see [here](FAQ.md#windows) for more details.
@@ -51,11 +51,12 @@ Instructions for installing on Mac: https://www.docker.com/mac
 
 Instructions for installing on Linux: https://www.docker.com/linux
 
-On Linux Docker is fairly easy to install, although note that the service runs as the root user. As such, all Docker commands require root permissions and any KB_SDK commands that interact with Docker (such as `make sdkbase`) will require root permissions. An alterative to this is to create a docker group for Docker users as described in the Docker installation instructions.
+On Linux, be sure to follow these **[Post installation steps](https://docs.docker.com/install/linux/linux-postinstall/)** so you can run docker and `kb-sdk` as a non-root user.
 
 Docker provides an installation for Mac that runs in a lightweight virtual machine but is integrated to provide a seamless experience.  After installation, the
 Docker CLI tools should be available from a terminal window.
 
 
+[\[Next tutorial page\]](dockerized_install.md)<br>
 [\[Back to top\]](#top)<br>
-[\[Back to steps\]](../README.md#steps)
+[\[Back to steps\]](/README.md#steps)

@@ -18,18 +18,19 @@ If you are a US citizen, your account should be created within a few days. For f
 Once your account is approved, contact us with your username and ask to be added to the developer list.
 
 
-## <A NAME="steps"></A>Steps in Using SDK
-1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
-2. [Install SDK with Docker](doc/kb_sdk_dockerized_install.md)
-3. [Create Module](doc/kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](doc/kb_sdk_edit_module.md)
-5. [Implement Method(s)](doc/kb_sdk_impl_methods.md)
-6. [Specify User Interface](doc/kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
-8. [Register Module](doc/kb_sdk_register_module.md)
-9. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kdoc/b_sdk_complete_module_info.md)
-11. [Deploy](doc/kb_sdk_deploy.md)
+## <A NAME="steps"></A>SDK Detailed Tutorial
+0. [Overview and Concepts](doc/tutorial/overview.md)
+1. [Install SDK Dependencies](doc/tutorial/dependencies.md)
+2. [Install SDK with Docker](doc/tutorial/dockerized_install.md)
+3. [Create Module](doc/tutorial/create_module.md)
+4. [Specify Module and Method(s)](doc/tutorial/edit_module.md)
+5. [Implement Method(s)](doc/tutorial/impl_methods.md)
+6. [Specify User Interface](doc/tutorial/make_ui.md)
+7. [Locally Test Module and Method(s)](doc/tutorial/local_test_module.md)
+8. [Register Module](doc/tutorial/register_module.md)
+9. [Test in KBase](doc/tutorial/test_in_kbase.md)
+10. [Complete Module Info](kdoc/tutorial/complete_module_info.md)
+11. [Deploy](doc/tutorial/deploy.md)
 
 ### Additional Documentation
 - [Examples](#examples)
