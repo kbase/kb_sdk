@@ -1,18 +1,6 @@
-# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+# How to manually build the SDK
 
-1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. **Install and Build SDK**
-3. [Create Module](kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
-5. [Implement Method(s)](kb_sdk_impl_methods.md)
-6. [Specify User Interface](kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-8. [Register Module](kb_sdk_register_module.md)
-9. [Test in KBase](kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kb_sdk_complete_module_info.md)
-11. [Deploy](kb_sdk_deploy.md)
-
-**Note: The recommended installation option is to run the [SDK as a Docker container.](kb_sdk_dockerized_install.md)**
+**Note: The recommended installation option is to run the [SDK as a Docker container.](/doc/tutorial/dependencies.md)**
 
 ### 2. Install and Build SDK
 
@@ -72,7 +60,3 @@ KBase modules run in Docker containers.  Docker containers are built on top of e
 You will get a failure if the Docker daemon is not running when you invoke the above command.  See  [Install SDK Dependencies - Docker](kb_sdk_dependencies.md#docker) for guidance.
 
 The image is fairly large, so it will take some time to run and build the image.
-
-
-[\[Back to top\]](#top)<br>
-[\[Back to steps\]](../README.md#steps)

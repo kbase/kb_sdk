@@ -18,18 +18,23 @@ If you are a US citizen, your account should be created within a few days. For f
 Once your account is approved, contact us with your username and ask to be added to the developer list.
 
 
-## <A NAME="steps"></A>Steps in Using SDK
-1. [Install SDK Dependencies](doc/kb_sdk_dependencies.md)
-2. [Install SDK with Docker](doc/kb_sdk_dockerized_install.md)
-3. [Create Module](doc/kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](doc/kb_sdk_edit_module.md)
-5. [Implement Method(s)](doc/kb_sdk_impl_methods.md)
-6. [Specify User Interface](doc/kb_sdk_make_ui.md)
-7. [Locally Test Module and Method(s)](doc/kb_sdk_local_test_module.md)
-8. [Register Module](doc/kb_sdk_register_module.md)
-9. [Test in KBase](doc/kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kdoc/b_sdk_complete_module_info.md)
-11. [Deploy](doc/kb_sdk_deploy.md)
+## <A NAME="steps"></A>SDK Step-by-step Tutorial
+0. [Overview and Concepts](doc/tutorial/overview.md)
+1. [Install SDK Dependencies](doc/tutorial/dependencies.md)
+2. [Install SDK with Docker](doc/tutorial/dockerized_install.md)
+3. [Create Module](doc/tutorial/create_module.md)
+4. [Specify Module and Method(s)](doc/tutorial/edit_module.md)
+5. [Implement Method(s)](doc/tutorial/impl_methods.md)
+6. [Publish and Test on Appdev](doc/tutorial/publish.md)
+
+### How-to articles
+* [How to add UI elements](doc/howto/add_ui_elements.md)
+* [How to create reports](doc/howto/create_a_report.md)
+* [How to edit your Dockerfile](doc/howto/edit_your_dockerfile.md)
+* [How to complete all your app's information and metadata](doc/howto/fill_out_app_information.md)
+* [How to build the SDK manually](doc/howto/manual_build.md)
+* [How to run a shell command in your app](doc/howto/run_a_shell_command.md)
+* [How to work with reference data](doc/howto/work_with_reference_data.md)
 
 ### Additional Documentation
 - [Examples](#examples)

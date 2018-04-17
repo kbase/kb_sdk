@@ -1,25 +1,11 @@
-# <A NAME="top"></A>![alt text](https://avatars2.githubusercontent.com/u/1263946?v=3&s=84 "KBase") [KBase SDK](../README.md)
+# How to add UI elements to your app
 
-1. [Install SDK Dependencies](kb_sdk_dependencies.md)
-2. [Install SDK with Docker](kb_sdk_dockerized_install.md)
-3. [Create Module](kb_sdk_create_module.md)
-4. [Specify Module and Method(s)](kb_sdk_edit_module.md)
-5. [Implement Method(s)](kb_sdk_impl_methods.md)
-6. **Specify User Interface**
-7. [Locally Test Module and Method(s)](kb_sdk_local_test_module.md)
-8. [Register Module](kb_sdk_register_module.md)
-9. [Test in KBase](kb_sdk_test_in_kbase.md)
-10. [Complete Module Info](kb_sdk_complete_module_info.md)
-11. [Deploy](kb_sdk_deploy.md)
+Control of Narrative interaction is accomplished in files in the `ui/narrative/methods/<MyMethod>` directory.
 
-### <A NAME="ui-widget"></A>6. Specify User Interface
-
-Control of Narrative interaction is accomplished in files in the ui/narrative/methods/&lt;MyMethod&gt; directory.
-
-#### A. Configure the input interface.
+#### Configure the input interface.
 
 The input options are specified in the "parameters" section of the spec.json file. In the following example, the user
-will supply two required parameters, an input name and an output name. If you specify 'valid_ws_types', the user will
+will supply two required parameters: an input name and an output name. If you specify 'valid_ws_types', the user will
 be presented with a searchable dropdown of objects that match the specified types. If "is_output_name" is set to true,
 the user will be warned if a name will overwrite an existing object or if the name contains invalid characters, and a 
 widget displaying that object will appear beneath the app cell. 
@@ -93,7 +79,7 @@ the spec file that generated the user interface.
 
 [\[Back to top\]](#top)
 
-#### B. Configure passing variables from Narrative Input to SDK method.
+#### Configure passing variables from Narrative Input to SDK method.
 
 In the 'behavior' section of the spec.json, the output of the user interface is mapped to input to your function.
 If you have maintained a consistent naming though these mappings can be pretty pro forma. However, transformations can 
@@ -198,9 +184,9 @@ And presents an object like this one to the report visualization:
 
 [\[Back to top\]](#top)
 
-#### C. Naming fields in the input widget cell
+#### Naming fields in the input widget cell
 
-The display.yml primarily contains text to describe the app (in the Narrative and in the App Catalog).
+The `display.yaml` file primarily contains text to describe the app (in the Narrative and in the App Catalog).
 Options in this file will be further explored in step 10 ([Complete Module Info](kb_sdk_complete_module_info.md)) but
 minimally this file should define:
 * A module name
@@ -211,5 +197,3 @@ minimally this file should define:
 #### Details on Narrative UI specification
 
 Further details on specification of Narrative app interfaces are available [here](https://docs.google.com/document/d/1CZ1GOKsRr1NsScG9E2EesJyk_ViOrM9OazrVFKCkyHs/edit)
-
-[\[Back to top\]](#top)
