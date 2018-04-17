@@ -4,7 +4,7 @@ To set up custom programs for your app, such as third-party tools, you can edit 
 
 A helpful resource is the [Dockerfile Best Practices](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices) guide.
 
-The base KBase Docker image contains a KBase Ubuntu image, but not much else. You will need to include any dependencies, including the installation of whatever tool you are wrapping, to build a custom Docker image that can run your Module.
+The base KBase Docker image contains a KBase Ubuntu image with the dependencies necessary JSON-RPC server in the supported language, as well as a core set of KBase API Clients. You will need to include any dependencies, including the installation of whatever tool you are wrapping, to build a custom Docker image that can run your Module.
 
 For example:
 
@@ -32,7 +32,9 @@ RUN \
   rm -rf tarball.tgz
 ```
 
-instead of this (**Bad**):
+Where each `&&` lets you chain together multiple bash commands, and the backslash continues the same, single-line command over multiple lines.
+
+Avoid this:
 
 ```
 RUN wget blah.com/tarball.tgz
@@ -42,8 +44,6 @@ RUN make
 RUN cd ..
 RUN rm -rf tarball.tgz
 ```
+Each call to `RUN` creates a separate Docker image layer that sits on top of the previous one. Previous layers are read-only, so you can't modify their content if you wanted to clean up files. In general, you will want one `RUN` command for each discrete service that you set up in your container.
 
-because the latter does not remove the previous bloating layers, despite the "rm" command.
-
-Final note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from cache. This means that if you are pulling in external data using RUN and a command like `git clone` or `wget` changes in those sources will not automatically be reflected in a rebuilt Docker image unless the Docker file changes at or before that import.
-
+Final note: Docker will rebuild everything from the first detected change in a dockerfile but pull everything upstream of that from its cache. If you are pulling in external data using `RUN` and a command like `git clone` or `wget`, then changes in those sources will not automatically be reflected in a rebuilt Docker image unless the Docker file changes at or before that import.
