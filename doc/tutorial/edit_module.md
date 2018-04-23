@@ -72,8 +72,9 @@ Our input and output types need to be in `structure` types. Add these type struc
 ```
     /* Input parameter types */
     typedef structure {
-        int min_length;
+        string workspace_name;
         string assembly_ref;
+        int min_length;
     } ContigFilterParams;
 
     /* Output result types */
@@ -81,22 +82,20 @@ Our input and output types need to be in `structure` types. Add these type struc
     } ContigFilterResults;
 ```
 
-Above, we've added a couple input parameters: an `int` for the minimum length that the user wants, and a `string` that will reference an assembly data file on KBase's servers.
+Above, we've added a few input parameters: a workspace name (always needed to work with data), an `int` for the minimum contig length that the user wants, and a `string` that will reference an assembly data file on KBase's servers.
 
 We also added a placeholder type structure for our output results, which we will return to later. For now, it can be blank.
 
 Now insert a function type for our app's main method, which we can call `filter_contigs`. Refer to the [KIDL specification](/doc/KIDL_specification.md) for details about function types.
 
 ```
-funcdef filter_contigs(string workspace, ContigFilterParams params)
+funcdef filter_contigs(ContigFilterParams params)
     returns (ContigFilterResults) authentication required;
 ```
 
 In SDK apps, we want to set the function as `authentication required` because all SDK apps that run in the Narrative will require authentication since they need to interact with a user's workspace.
 
-Now return to your app's root directory and run `make`
-
- **You must rerun *make* after each change to the KIDL specification to regenerate client and server code used in the codebase**
+Now return to your app's root directory and run `make`. **You must rerun *make* after each change to the KIDL specification to regenerate client and server code used in the codebase**
 
 #### Validate your app
 
@@ -116,7 +115,7 @@ That's because we need to set up some things in our `/ui/narrative` directory in
 
 #### Update spec.json
 
-The directory named `/ui/narrative/methods/example_method` is a placeholder. Rename it to the name of the actual function we defined in our KIDL .spec file:
+The directory named `/ui/narrative/methods/example_method` is a placeholder. Rename it to the name of the actual function we defined in our KIDL `.spec` file:
 
 ```sh
 # From your app's root directory:
@@ -127,11 +126,11 @@ $ mv ui/narrative/methods/example_method ui/narrative/methods/filter_contigs
 
 Now open up `ui/narrative/methods/filter_contigs/spec.json`.
 
-This file defines a mapping between our KIDL .spec file and how our parameters will show up in the app's user interface.
+This file defines a mapping between our KIDL `.spec` file and how our parameters will show up in the app's user interface.
 
 Find line 29 where it says `"your_method"` -- change that to say `"filter_contigs"` instead.
 
-In the section under `"parameters"`, add an entry for each of our input parameters:
+In the section under `"parameters"`, add an entry for two of our input parameters:
 
 ```json
 ...
@@ -163,31 +162,31 @@ In the section under `"parameters"`, add an entry for each of our input paramete
 ...
 ```
 
-We created an entry for each type that we defined in the `ContigFilterParams` structure in our KIDL file.
+These options will generate UI form elements in the narrative that allow the user to input data into your app. We leave out `workspace_name` parameter because it will automatically be provided by the system, not the user, so we don't need a form element for it.
 
 Each parameter object has a number of options. 
 
 * We want both parameters to be required (`"optional": false`)
-* We want the "assembly_ref" to be a reference to either an Assembly or ContigSet object (view the [type catalog](https://narrative.kbase.us/#catalog/datatypes) to see all KBase tjypes)
-* We want the "min_length" parameter to be validated as an integer, and we don't want to allow negative numbers.
+* We want the `"assembly_ref"` to be a reference to either an Assembly or ContigSet object (view the [type catalog](https://narrative.kbase.us/#catalog/datatypes) to see all KBase types)
+* We want the `"min_length"` parameter to be validated as an integer, and we don't want to allow negative numbers.
 
-Below that section, you will see some default `"input_mapping"` options. Change that section so that it contains entries for each of your input parameters, and for now we can leave the output section empty:
+Below that section, you will see some default `"input_mapping"` options. Change that section so that it contains entries for each of your input parameters. For now we can leave the output section empty:
 
 ```json
 ...
 "input_mapping": [
     {
         "narrative_system_variable": "workspace",
-        "target_argument_position": 0
+        "target_property": "workspace_name"
     },
     {
         "input_parameter": "assembly_ref",
-        "target_type_transform": "resolved-ref",
-        "target_argument_position": 1
+        "target_property": "assembly_ref",
+        "target_type_transform": "resolved-ref"
     },
     {
         "input_parameter": "min_length",
-        "target_argument_position": 1
+        "target_property": "min_length"
     }
 ],
 "output_mapping": [ ]
@@ -226,6 +225,8 @@ parameters:
         long-hint: |
             All contigs will be filtered out of the assembly that are shorter than the given length
 ```
+
+This text will show up on the actual narrative page for your app, in the help areas for each form element. You only need to set this text for parameters that actually display in the form.
 
 Finally, run `kb-sdk validate` again and it should pass! Now we can start to actually work on the functionality of the app.
 

@@ -58,7 +58,7 @@ The [KBaseReport](https://github.com/kbaseapps/KBaseReport) app is used to gener
 
 ## Publishing and testing in the browser
 
-For an app to show up in a real narrative, you need to register it on https://appdev.kbase.us. You can then view and test it in the "Dev" catalog while browsing apps on KBase. Details around this whole process are be described further along in this tutorial.
+For an app to show up in a real narrative, you need to register it on https://appdev.kbase.us. You can then view and test it in the "Dev" catalog while browsing apps on KBase. Details around this whole process are described further along in this tutorial.
 
 At this point, you cannot run your app inside a narrative on your own machine; you have to commit changes, publish to github, and re-register your app on https://appdev.kbase.us to test updates on the KBase servers.
 
