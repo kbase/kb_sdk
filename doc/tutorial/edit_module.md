@@ -162,7 +162,7 @@ In the section under `"parameters"`, add an entry for two of our input parameter
 ...
 ```
 
-These options will generate UI form elements in the narrative that allow the user to input data into your app. We leave out `workspace_name` parameter because it will automatically be provided by the system, not the user, so we don't need a form element for it.
+These options will generate UI form elements in the narrative that allow the user to input data into your app. We leave out the `workspace_name` parameter because it will automatically be provided by the system, not the user, so we don't need a form element for it.
 
 Each parameter object has a number of options. 
 
@@ -226,7 +226,7 @@ parameters:
             All contigs will be filtered out of the assembly that are shorter than the given length
 ```
 
-This text will show up on the actual narrative page for your app, in the help areas for each form element. You only need to set this text for parameters that actually display in the form.
+This text will show up on the actual narrative page for your app in the help areas for each form element. You only need to set this text for parameters that actually display in the form.
 
 Finally, run `kb-sdk validate` again and it should pass! Now we can start to actually work on the functionality of the app.
 
