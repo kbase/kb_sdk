@@ -34,7 +34,7 @@ Between the above comments, let's add a simple print statement; something like: 
 
 
 ```py
-def filter_contigs(self, ctx, workspace_name, params):
+def filter_contigs(self, ctx, params):
     """
     :param workspace_name: instance of String
     :param params: instance of type "ContigFilterParams" (Input
@@ -62,6 +62,7 @@ Your `MyModuleImpl.py` file is tested using `test/MyModuleImpl_server_test.py`. 
 def test_filter_contigs(self):
     ref = "14672/2/1"
     result = self.getImpl().filter_contigs(self.getContext(), {
+        'workspace_name': self.getWsName(),
         'assembly_ref': ref,
         'min_length': 100
     })
@@ -69,14 +70,14 @@ def test_filter_contigs(self):
     # TODO -- assert some things (later)
 ```
 
-We need to provide two parameters to our function: an assembly reference string and a min length integer. For the reference string, we can use this sample reference to a Shewanella Oneidensis assembly on AppDev: `"14672/2/1"`.
+We need to provide three parameters to our function: a workspace name, an assembly reference string, and a min length integer. For the reference string, we can use this sample reference to a Shewanella Oneidensis assembly on AppDev: `"14672/2/1"`. You can always get a workspace name from the test class by using `self.getWsName()`.
 
-Run `kb-sdk test` and, if everything works, you'll see the docker container boot up, the `filter_contig` method will get called, and you will see some printed output.
+Run `kb-sdk test` and, if everything works, you'll see the docker container boot up, the `filter_contigs` method will get called, and you will see some printed output.
 
 #### Set the callback URL and scratch path
 
 
-The callback URL points to a server that is used to spin up other SDK apps that we will need to use in our own app. In our case, we want to use [AssemblyUtil](https://github.com/kbaseapps/AssemblyUtil) to download genome data. When we use that app, our app makes a request to the callback server, which spins up a separate docker container that runs AssemblyUtil.
+The callback URL points to a server that is used to spin up other SDK apps that we will need to use in our own app. In our case, we want to use [AssemblyUtil](https://github.com/kbaseapps/AssemblyUtil) to validate and download genome data. When we use that app, our app makes a request to the callback server, which spins up a separate docker container that runs AssemblyUtil.
 
 The other parameter commonly defined in the module constructor is the path to the scratch directory. This directory is a common space accessible by not only the 
 current app but also every app called by this app. Therefore files from other apps (eg. AssemblyUtil) will be written to the scratch folder and files to be used by other modules (such as KBaseReport) are read from the scratch folder.
@@ -133,7 +134,7 @@ Inside your `filter_contigs` method, initialize the utility and use it to downlo
 ```
 
 * We have to initialize AssemblyUtil and pass in `self.callback_url`
-* The `get_assembly_as_fasta` method downloads a file from a ref
+* The `get_assembly_as_fasta` method downloads a file from a workspace ref
 
 Run `kb-sdk test` again and you should see the file download along with its path in the container.
 
@@ -147,7 +148,7 @@ Make sure your user passes in a workspace, an assembly reference, and a minimum 
   ...
   # Inside filter_contigs(), after #BEGIN fast_ani, before any other code
   # Check that the parameters are valid
-  for name in ['min_length', 'assembly_ref']:
+  for name in ['min_length', 'assembly_ref', 'workspace_name']:
       if name not in params:
           raise ValueError('Parameter "' + name + '" is required but missing')
   if not isinstance(params['min_length'], int) or (params['min_length'] < 0):
