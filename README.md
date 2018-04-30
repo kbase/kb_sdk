@@ -17,6 +17,7 @@ If you want to develop apps using the SDK, please obtain a free [KBase user acco
 If you are a US citizen, your account should be created within a few days. For foreign nationals, it may take several weeks (and, in a few cases, you may not be able to get a developer account). Non-US citizens will be asked for additional information in order to process their application.
 Once your account is approved, contact us with your username and ask to be added to the developer list.
 
+A [new video](https://www.youtube.com/watch?v=Q6qt7gqaVnM&feature=youtu.be) helps you get started using the SDK to wrap tools as SDK apps, or you can read the tutorial below.
 
 ## <A NAME="steps"></A>SDK Step-by-step Tutorial
 0. [Overview and Concepts](doc/tutorial/overview.md)
