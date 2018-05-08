@@ -18,10 +18,9 @@ fi
 
 exec docker run -it --rm -v \$HOME:\$HOME -u \$(id -u) -w \$(pwd) -v /run/docker.sock:/run/docker.sock  -e DUSER=\$USER -e DSHELL=\$SHELL --group-add \$(cat \$HOME/.kbsdk.cache) kbase/kb-sdk \$@
 EOF
-elif [ "z$1" = "zsdkbase" ] ; then
+elif [ "z$1" = "zsdkbase" ] || [ "z$1" = "zpull-base-image" ] ; then
     echo "Pulling and tagging the base image"
-    docker pull kbase/sdkbase
-    docker tag kbase/sdkbase kbase/kbase:sdkbase.latest
+    docker pull kbase/kbase:sdkbase2.latest
 elif [ "z$1" = "zprune" ] ; then
   echo "Used during build to shrink image.  Not needed by the user."
   for f in $(find /src/submodules/jars/lib/jars -type f -name '*.jar') ; do
