@@ -29,6 +29,7 @@ import us.kbase.mobu.tester.ModuleTester;
 import us.kbase.mobu.util.ProcessHelper;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.validator.ModuleValidator;
+import us.kbase.mobu.shell_launcher.ShellLauncher;
 
 public class ModuleBuilder {
 	
@@ -44,6 +45,7 @@ public class ModuleBuilder {
     private static final String RENAME_COMMAND   = "rename";
     private static final String INSTALL_COMMAND  = "install";
     private static final String RUN_COMMAND      = "run";
+    private static final String SHELL_COMMAND    = "shell";
     //private static final String SUBMIT_COMMAND   = "submit";
     
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
@@ -96,6 +98,10 @@ public class ModuleBuilder {
         RunCommandArgs runArgs = new RunCommandArgs();
         jc.addCommand(RUN_COMMAND, runArgs);
 
+        // add the 'shell' command
+        ShellCommandArgs shellArgs = new ShellCommandArgs();
+        jc.addCommand(SHELL_COMMAND, shellArgs);
+
     	// parse the arguments and gracefully catch any errors
     	try {
     		jc.parse(args);
@@ -137,7 +143,9 @@ public class ModuleBuilder {
 	        returnCode = runInstallCommand(installArgs, jc);
 	    } else if (jc.getParsedCommand().equals(RUN_COMMAND)) {
 	        returnCode = runRunCommand(runArgs, jc);
-	    }
+	    } else if (jc.getParsedCommand().equals(SHELL_COMMAND)) {
+            returnCode = runShellCommand(shellArgs, jc);
+        }
 	    
 	    if(returnCode!=0) {
 	    	System.exit(returnCode);
@@ -433,6 +441,18 @@ public class ModuleBuilder {
             if (runArgs.verbose)
                 e.printStackTrace();
             showError("Error while installing client", e.getMessage());
+            return 1;
+        }
+    }
+
+    private static int runShellCommand(ShellCommandArgs shellArgs, JCommander jc) {
+        try {
+            ShellLauncher launcher = new ShellLauncher();
+            launcher.exec();
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error trying to run shell for Docker", e.getMessage());
             return 1;
         }
     }
@@ -761,6 +781,10 @@ public class ModuleBuilder {
         @Parameter(required=true, description="<fully qualified method name " +
         		"(with SDK module prefix followed by '.')>")
         List<String> methodName;
+    }
+
+    @Parameters(commandDescription = "Open a shell inside your app's Docker container")
+    private static class ShellCommandArgs {
     }
 
     private static void showBriefHelp(JCommander jc, PrintStream out) {
