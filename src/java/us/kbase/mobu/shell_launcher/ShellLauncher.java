@@ -29,7 +29,8 @@ public class ShellLauncher {
     }
 
     public Process exec() throws IOException, InterruptedException {
-        // Returns status code
+        // This command looks like:
+        // `docker run -i -t -v WORKDIR:/kb/module/work test/module:latest bash`
         String[] command = {
             "docker", "run", "-i", "-t", "-v",
             workDir + ":/kb/module/work", // Mount scratch
@@ -37,6 +38,7 @@ public class ShellLauncher {
             "bash" // Command to run
         };
         ProcessBuilder pb = new ProcessBuilder(command);
+        // Redirecting input and output streams allows the process to be interactive
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
         pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         Process proc = pb.start();
