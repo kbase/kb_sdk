@@ -39,10 +39,13 @@ public class ModuleInfo {
         workDir = Paths.get(moduleDir.toString(), "test_local", "workdir");
     }
 
+    /**
+     * Load the kbase.yml file into a Map
+     */
     private Map<String, Object> loadYaml() throws IOException {
         final Yaml yaml = new Yaml();
         final Path yamlPath = Paths.get(moduleDir.toString(), "kbase.yml");
-        InputStream input = Files.newInputStream(yamlPath);
+        final InputStream input = Files.newInputStream(yamlPath);
         final Map<String, Object> config;
         try {
             config = (Map<String, Object>) yaml.load(input);

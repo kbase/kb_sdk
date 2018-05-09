@@ -15,7 +15,7 @@ public class ShellLauncher {
     private final ModuleInfo moduleInfo;
 
     /**
-     * Set some basic configuration, such as module name and work directory
+     * Load the module information.
      */
     public ShellLauncher() throws IOException {
         moduleInfo = new ModuleInfo();
@@ -26,24 +26,22 @@ public class ShellLauncher {
      */
     public void exec() throws IOException, InterruptedException {
         // This command looks like:
-        // docker run
-        //   --interactive
-        //   --tty=true
-        //   --volume=WORKDIR:/kb/module/work test/module:latest
-        //   bash
-        String[] command = {
-            "docker", "run",
-            "--interactive",
-            "--tty=true",
+        //   docker run \
+        //     --interactive \
+        //     --tty=true \
+        //     --volume=WORKDIR:/kb/module/work test/module:latest \
+        //     bash
+        final String[] command = {
+            "docker", "run", "--interactive", "--tty=true",
             "--volume=" + moduleInfo.workDir + ":/kb/module/work", // Mount scratch
             "test/" + moduleInfo.moduleName.toLowerCase() + ":latest", // Image to run
             "bash" // Command to run
         };
-        ProcessBuilder pb = new ProcessBuilder(command);
+        final ProcessBuilder pb = new ProcessBuilder(command);
         // Redirecting input and output streams allows the process to be interactive
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
         pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        Process proc = pb.start();
+        final Process proc = pb.start();
         proc.waitFor();
     }
 }
