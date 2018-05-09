@@ -144,8 +144,8 @@ public class ModuleBuilder {
 	    } else if (jc.getParsedCommand().equals(RUN_COMMAND)) {
 	        returnCode = runRunCommand(runArgs, jc);
 	    } else if (jc.getParsedCommand().equals(SHELL_COMMAND)) {
-            returnCode = runShellCommand(shellArgs, jc);
-        }
+	        returnCode = runShellCommand(shellArgs, jc);
+	    }
 	    
 	    if(returnCode!=0) {
 	    	System.exit(returnCode);
