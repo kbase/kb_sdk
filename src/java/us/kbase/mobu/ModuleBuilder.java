@@ -99,7 +99,7 @@ public class ModuleBuilder {
         jc.addCommand(RUN_COMMAND, runArgs);
 
         // add the 'shell' command
-        ShellCommandArgs shellArgs = new ShellCommandArgs();
+        final ShellCommandArgs shellArgs = new ShellCommandArgs();
         jc.addCommand(SHELL_COMMAND, shellArgs);
 
     	// parse the arguments and gracefully catch any errors
@@ -445,13 +445,15 @@ public class ModuleBuilder {
         }
     }
 
-    private static int runShellCommand(ShellCommandArgs shellArgs, JCommander jc) {
+    private static int runShellCommand(final ShellCommandArgs shellArgs, final JCommander jc) {
         try {
-            ShellLauncher launcher = new ShellLauncher();
+            final ShellLauncher launcher = new ShellLauncher();
             launcher.exec();
             return 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            if (shellArgs.verbose) {
+                e.printStackTrace();
+            }
             showError("Error trying to run shell for Docker", e.getMessage());
             return 1;
         }
@@ -785,6 +787,9 @@ public class ModuleBuilder {
 
     @Parameters(commandDescription = "Open a shell inside your app's Docker container")
     private static class ShellCommandArgs {
+        @Parameter(names={"-v", "--verbose"}, description="Print more details including error " +
+                "stack traces")
+        private boolean verbose = false;
     }
 
     private static void showBriefHelp(JCommander jc, PrintStream out) {
