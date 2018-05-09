@@ -32,6 +32,9 @@ public class ModuleInfo {
     public ModuleInfo() throws IOException {
         moduleDir = DirUtils.findModuleDir().toPath();
         final Map<String, Object> config = loadYaml();
+        if (!config.containsKey("module-name")) {
+            throw new IOException("The 'module-name' key must be set in kbase.yml");
+        }
         moduleName = (String) config.get("module-name");
         workDir = Paths.get(moduleDir.toString(), "test_local", "workdir");
     }
