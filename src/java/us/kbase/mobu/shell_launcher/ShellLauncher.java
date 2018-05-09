@@ -14,11 +14,18 @@ import us.kbase.mobu.util.DirUtils;
 import us.kbase.mobu.util.TextUtils;
 import us.kbase.mobu.ModuleBuilder;
 
+/**
+ * Launches the bash shell in a running docker instance.
+ */
 public class ShellLauncher {
-    File moduleDir;
-    String moduleName;
-    String workDir;
 
+    private final File moduleDir;
+    private final String moduleName;
+    private final String workDir;
+
+    /**
+     * Set some basic configuration, such as module name and work directory
+     */
     public ShellLauncher() throws IOException {
         moduleDir = DirUtils.findModuleDir();
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
@@ -28,12 +35,21 @@ public class ShellLauncher {
         workDir = Paths.get(moduleDir.toPath().toString(), "test_local", "workdir").toString();
     }
 
-    public Process exec() throws IOException, InterruptedException {
+    /**
+     * Execute the docker command to launch the shell interactively.
+     */
+    public void exec() throws IOException, InterruptedException {
         // This command looks like:
-        // `docker run -i -t -v WORKDIR:/kb/module/work test/module:latest bash`
+        // docker run
+        //   --interactive
+        //   --tty=true
+        //   --volume=WORKDIR:/kb/module/work test/module:latest
+        //   bash
         String[] command = {
-            "docker", "run", "-i", "-t", "-v",
-            workDir + ":/kb/module/work", // Mount scratch
+            "docker", "run",
+            "--interactive",
+            "--tty=true",
+            "--volume=" + workDir + ":/kb/module/work", // Mount scratch
             "test/" + moduleName.toLowerCase() + ":latest", // Image to run
             "bash" // Command to run
         };
@@ -43,6 +59,5 @@ public class ShellLauncher {
         pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         Process proc = pb.start();
         proc.waitFor();
-        return proc;
     }
 }
