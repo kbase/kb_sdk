@@ -50,7 +50,7 @@ public class ModuleInfo {
         try {
             config = (Map<String, Object>) yaml.load(input);
         } catch (Exception e) {
-            throw new IOException("Invalid YAML configuration file in 'kbase.yml'");
+            throw new IOException("Invalid formatting in the YAML configuration file (kbase.yml)");
         }
         return config;
     }
