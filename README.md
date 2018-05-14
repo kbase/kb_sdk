@@ -150,11 +150,19 @@ Browse through the [doc](doc/) directory of this repo for the latest available d
 To install python dependencies, do:
 
 ```sh
-$ pip install pipenv
+$ pip3 install pipenv
 # In the project's root:
-$ pipenv install
-# To run the tests:
-$ pipenv run make test
+$ pipenv install --dev
+# To run the python tests:
+$ make test-python
 # To run the linter
 $ pipenv run flake8
+```
+
+You can reset and re-install your environment with:
+
+```sh
+$ pipenv --python 3.5
+$ pipenv clean
+$ pipenv install --dev
 ```
