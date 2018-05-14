@@ -6,6 +6,12 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods 
 in the KBase Narrative interface.
 
+VERSION 0.1.19 (Released TBD)
+-----------------------------
+NEW FEATURES:
+- Added CLI command to run bash in a running docker container (kb-sdk shell)
+- Added a ModuleInfo utility class that can be used to fetch common module data
+
 VERSION: 0.1.18 (Released 1/24/2018)
 ------------------------------------
 
