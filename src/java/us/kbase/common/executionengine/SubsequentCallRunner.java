@@ -40,6 +40,7 @@ public abstract class SubsequentCallRunner {
     private final String imageName;
     private final ModuleRunVersion mrv;
     private final CallbackServerConfig config;
+    private final ModuleVersion moduleVersion;
     
     public SubsequentCallRunner(
             final AuthToken token,
@@ -52,9 +53,9 @@ public abstract class SubsequentCallRunner {
         this.config = config;
         this.moduleName = modmeth.getModule();
         this.jobId = jobId;
-        final ModuleVersion mv = loadModuleVersion(modmeth, serviceVer);
-        mrv =  this.createModuleRunVersion(modmeth, serviceVer, mv);
-        imageName = this.getImageName(mv);
+        moduleVersion = loadModuleVersion(modmeth, serviceVer);
+        mrv =  this.createModuleRunVersion(modmeth, serviceVer, moduleVersion);
+        imageName = this.getImageName(moduleVersion);
         Files.createDirectories(getSharedScratchDir(config));
         final Path jobWorkDir = getJobWorkDir(jobId, config, imageName);
         Files.createDirectories(jobWorkDir);
@@ -124,7 +125,7 @@ public abstract class SubsequentCallRunner {
                 .resolve("input.json");
         UObject.getMapper().writeValue(inputFile.toFile(), rpcCallData);
         final Path outputFile = runModule(jobId, inputFile, config,
-                imageName, moduleName, callToken);
+                imageName, moduleName, moduleVersion, callToken);
         if (Files.exists(outputFile)) {
             final Map<String, Object> jsonRpcResponse = UObject.getMapper().readValue(
                     outputFile.toFile(), new TypeReference<Map<String, Object>>() {});
@@ -193,6 +194,7 @@ public abstract class SubsequentCallRunner {
             final CallbackServerConfig config,
             final String imageName,
             final String moduleName,
+            final ModuleVersion moduleVersion,
             final AuthToken token)
             throws IOException,
             InterruptedException;
