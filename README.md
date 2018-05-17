@@ -166,3 +166,10 @@ $ pipenv --python 3.5
 $ pipenv clean
 $ pipenv install --dev
 ```
+
+### Tests
+
+Tests for `kb_sdk` can be run using a Vagrant virtual machine that comes with all dependencies pre-installed.
+
+1. Install [vagrant](https://www.vagrantup.com/docs/installation/)
+2. Run `make test-vagrant` to run the tests
