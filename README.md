@@ -142,3 +142,14 @@ Here are a few modules that demonstrate best practices in code and documentation
 ## Need more?
 
 Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us.
+
+## kb_sdk Codebase Documentation
+
+This section is for developers of the `kb_sdk` codebase itself (ie. the code that lives in this repo), rather than developers of third-party SDK apps.
+
+### Tests
+
+Tests for `kb_sdk` can be run using a Vagrant virtual machine that comes with all dependencies pre-installed.
+
+1. Install [vagrant](https://www.vagrantup.com/docs/installation/)
+2. Run `make test-vagrant` to run the tests
