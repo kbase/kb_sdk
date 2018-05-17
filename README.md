@@ -35,11 +35,6 @@ Python tests should currently pass. Java tests are currently in progress.
 * `src` - The main source code for this project. See below.
 * `submodules` and `submodules_hacks` - jars and other dependencies
 
-questions
-what is `/reports`? I see it getting referenced build.xml related to something with Jenkins
-what is `/submodules_hacks`? Also, doesn't this repo load jars from a sibling repo in build.xml? So why the submodule?
-what is up with the templated test files in `src/java/us/kbase/scripts`?
-
 #### Source code in `/src/java/us/kbase`
 
 * `/catalog` -- Services for managing, registering, and building modules in the catalog. All code here is duplicated in the `njs_wrapper`.
