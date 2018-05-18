@@ -29,7 +29,7 @@ Python tests should currently pass. Java tests are currently in progress.
 * `KBaseJobService.spec` - KIDL spec for a JSON RPC job service
 * `Makefile` - commands for compiling, building docker images, and initializing submodules
 * `Pipfile` and `Pipfile.lock` - python dependencies for pipenv
-* `reports` - ?
+* `reports` - Files generated for JaCoCo test coverage reports.
 * `sdkbase` - Docker files for the image used inside actual SDK apps
 * `lib` - Some generic libraries that get included in SDK apps
 * `src` - The main source code for this project. See below.
@@ -37,18 +37,18 @@ Python tests should currently pass. Java tests are currently in progress.
 
 #### Source code in `/src/java/us/kbase`
 
-* `/catalog` -- Services for managing, registering, and building modules in the catalog. All code here is duplicated in the `njs_wrapper`.
-* `/common/executionengine` -- Code for executing jobs and sub-jobs. All the code here is duplicated in the `njs_wrapper` repo
-* `/common/service` -- Some tuple datatypes
-* `/common/utils` -- NetUtils for working with IP addresses and ports
-* `/jkidl` -- Functionality for parsing KIDL spec files
-* `/kidl` -- KIDL parser syntax types
-* `/kbasejobservice` -- Utils for handling RPC jobs
-* `/mobu` -- Module Builder (see below)
-* `/narrativemethodstore` -- JSON specifications for SDK app configurations (eg spec.json)
-* `/scripts` -- Templates for python, JSON, java etc. that contain tests (?)
-* `/templates` -- Template files for use in generating SDK app codebases on `kb-sdk init`
-* `/tools` -- Some general java utilities
+* `/catalog` - Services for managing, registering, and building modules in the catalog. All code here is duplicated in the `njs_wrapper`.
+* `/common/executionengine` - Code for executing jobs and sub-jobs. All the code here is duplicated in the `njs_wrapper` repo
+* `/common/service` - Some tuple datatypes
+* `/common/utils` - NetUtils for working with IP addresses and ports
+* `/jkidl` - Functionality for parsing KIDL spec files
+* `/kidl` - KIDL parser syntax types
+* `/kbasejobservice` - Utils for handling RPC jobs
+* `/mobu` - Module Builder (see below)
+* `/narrativemethodstore` - JSON specifications for SDK app configurations (eg spec.json)
+* `/scripts` - Various test files - See the TypeGeneratorTest.java class
+* `/templates` - Template files for use in generating SDK app codebases on `kb-sdk init`
+* `/tools` - Some general java utilities
 
 #### Module builder in `src/java/us/kbase/mobu`
 
@@ -64,8 +64,8 @@ Python tests should currently pass. Java tests are currently in progress.
 
 #### Miscellania
 
-* `/src/java/name/fraser/neil/plaintext/diff_match_patch.java` -- A utility computing the difference between two texts to create a patch. This is used in `src/java/us/kbase/mobu/compiler/test/html/HTMLGenTest.java`.
-* `/src/sh/sdk-completion.sh` -- A parameter-completion bash script for the `kb-sdk` CLI.
+* `/src/java/name/fraser/neil/plaintext/diff_match_patch.java` - A utility computing the difference between two texts to create a patch. This is used in `src/java/us/kbase/mobu/compiler/test/html/HTMLGenTest.java`.
+* `/src/sh/sdk-completion.sh` - A parameter-completion bash script for the `kb-sdk` CLI.
 
 ## Notes and references
 
