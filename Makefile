@@ -18,7 +18,7 @@ KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works
-.PHONY : test sdkbase
+.PHONY : test test-vagrant sdkbase
 
 
 default: compile
@@ -107,6 +107,11 @@ sdkbase:
 	# docker rmi -f kbase/deplbase:latest
 	cd sdkbase && ./makeconfig
 	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
+
+test-vagrant:
+	mkdir -p temp_vagrant
+	vagrant up
+	vagrant ssh -c "cd /vagrant/kb_sdk && make test"
 
 test: submodule-init
 	@echo "Running unit tests"

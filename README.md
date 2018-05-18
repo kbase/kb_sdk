@@ -12,9 +12,11 @@ Run `make` or `make compile` to generate the binaries found in `/bin`
 
 ## Running tests
 
-Run `make test` to run the tests.
+You can run the tests using a Vagrant image with `make test-vagrant`. You can enter the Vagrant VM for debugging by doing `vagrant ssh`. [Vagrant installation instructions](https://www.vagrantup.com/docs/installation/).
 
-Python tests should currently pass. Java tests are currently in progress.
+To run the tests directly, run `make test` in the project's root directory.
+
+Python tests should currently pass. Java (and Perl) tests are currently in progress.
 
 ## Project anatomy
 
