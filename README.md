@@ -142,27 +142,3 @@ Here are a few modules that demonstrate best practices in code and documentation
 ## Need more?
 
 Browse through the [doc](doc/) directory of this repo for the latest available documentation.  If you still have questions or comments, please create a GitHub issue or pull request, or contact us through http://kbase.us/contact-us.
-
-# Development
-
-## Python dependencies
-
-To install python dependencies, do:
-
-```sh
-$ pip3 install pipenv
-# In the project's root:
-$ pipenv install --dev
-# To run the python tests:
-$ make test-python
-# To run the linter
-$ pipenv run flake8
-```
-
-You can reset and re-install your environment with:
-
-```sh
-$ pipenv --python 3.5
-$ pipenv clean
-$ pipenv install --dev
-```
