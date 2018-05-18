@@ -6,7 +6,7 @@ The KBase SDK is a set of tools for developing KBase Apps that can be dynamicall
 
 Documentation in this readme is for developing the SDK codebase itself. If you want to develop an app using the SDK, please visit the documentation website linked above.
 
-## Dependencies and compilation
+## Compiling executables
 
 Run `make` or `make compile` to generate the binaries found in `/bin`
 
