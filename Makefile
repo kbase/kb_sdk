@@ -18,7 +18,7 @@ KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works
-.PHONY : test test-vagrant sdkbase
+.PHONY : test test-vagrant test-python test-python2 test-python3 sdkbase
 
 
 default: compile
@@ -108,19 +108,26 @@ sdkbase:
 	cd sdkbase && ./makeconfig
 	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
 
-test-vagrant:
-	mkdir -p temp_vagrant
-	vagrant up
-	vagrant ssh -c "cd /vagrant/kb_sdk && make test"
-
 test: submodule-init
 	@echo "Running unit tests"
 	make test-python
 	@# todo: remove perl typecomp tests and add it as a separate target
 	$(ANT) test -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
 
-test-python:
-	pipenv run nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
+test-vagrant:
+	mkdir -p temp_vagrant
+	vagrant up
+	vagrant ssh -c "cd /vagrant/kb_sdk && make test-python"
+
+test-python: test-python2 test-python3
+
+test-python2:
+	env-py2/bin/python --version
+	env-py2/bin/python -m nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
+
+test-python3:
+	env-py3/bin/python --version
+	env-py3/bin/python -m nose2 -s test_scripts/py_module_tests -t src/java/us/kbase/templates
 
 test-client:
 	@echo "No tests for client - this kbase module is not a service, and has no clients"
