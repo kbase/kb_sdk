@@ -4,24 +4,26 @@ This document describes the the file structure of the `kb_sdk` codebase.
 
 #### Root level
 
-* `bin/` - holds the executable files generated on compilation (most importantly, `kb-sdk`).
+* `build.xml` - main Ant build configuration file for compiling, running tests, etc.
+* `bin/` - holds the executable files generated on compilation (most importantly, `kb-sdk`)
 * `doc/` - additional documentation about this codebase
-* `Dockerfile` - The dockerfile for the container that runs the SDK
+* `Dockerfile` - the docker configuration for the container that runs the SDK
 * `entrypoint` - the entrypoint bash script that is run for the SDK docker container
-* `img/` - a collection of image templates for APP icons
 * `JAR_DEPS` and `JAR_DEPS_BIN` - indexes of java jar dependencies
+* `javacc/` - shell scripts used to generate code related to parsing KIDL specs
 * `KBaseJobService.spec` - KIDL spec for a JSON RPC job service
+* `lib` - some generic libraries that get included in SDK apps
 * `Makefile` - commands for compiling, building docker images, and initializing submodules
 * `Pipfile` and `Pipfile.lock` - python dependencies for pipenv
-* `reports` - Files generated for JaCoCo test coverage reports.
-* `sdkbase` - Docker files for the image used inside actual SDK apps
-* `lib` - Some generic libraries that get included in SDK apps
-* `src` - The main source code for this project. See below.
-* `submodules` and `submodules_hacks` - jars and other dependencies
+* `reports/` - files generated for JaCoCo test coverage reports
+* `sdkbase/` - Docker files for the image used inside actual SDK apps
+* `src/` - the main source code for this project; see below
+* `submodules/` and `submodules_hacks` - jars and other dependencies
+* `test_scripts/` - test helpers in perl, python, and js
 
 #### Source code in `/src/java/us/kbase`
 
-* `catalog/` - Compiled catalog clients. All code here is duplicated in the `njs_wrapper` repo.
+* `catalog/` - Services for managing, registering, and building modules in the catalog. All code here is duplicated in the `njs_wrapper`
 * `common/executionengine/` - Code for executing jobs and sub-jobs. All the code here is duplicated in the `njs_wrapper` repo
 * `common/service/` - Some tuple datatypes
 * `common/utils/` - NetUtils for working with IP addresses and ports
@@ -29,7 +31,7 @@ This document describes the the file structure of the `kb_sdk` codebase.
 * `kidl/` - KIDL parser syntax types
 * `kbasejobservice/` - Utils for handling RPC jobs
 * `mobu/` - Module Builder (see below)
-* `narrativemethodstore/` - Compiled clients for the Narrative Method Store
+* `narrativemethodstore/` - JSON specifications for SDK app configurations (eg spec.json)
 * `scripts/` - Various test files - See the TypeGeneratorTest.java class
 * `templates/` - Template files for use in generating SDK app codebases on `kb-sdk init`
 * `tools/` - Some general java utilities
