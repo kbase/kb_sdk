@@ -23,15 +23,15 @@ This document describes the the file structure of the `kb_sdk` codebase.
 
 #### Source code in `/src/java/us/kbase`
 
-* `catalog/` - Services for managing, registering, and building modules in the catalog. All code here is duplicated in the `njs_wrapper`
+* `catalog/` - A client for the KBase catalog service compiled from the catalog service KIDL specification
 * `common/executionengine/` - Code for executing jobs and sub-jobs. All the code here is duplicated in the `njs_wrapper` repo
 * `common/service/` - Some tuple datatypes
 * `common/utils/` - NetUtils for working with IP addresses and ports
 * `jkidl/` - Functionality for parsing KIDL spec files
 * `kidl/` - KIDL parser syntax types
-* `kbasejobservice/` - Utils for handling RPC jobs
+* `kbasejobservice/` - Mocks used in testing the narrative job service
 * `mobu/` - Module Builder (see below)
-* `narrativemethodstore/` - JSON specifications for SDK app configurations (eg spec.json)
+* `narrativemethodstore/` - A client for the KBase narrative method store service compiled from the NMS service KIDL specification
 * `scripts/` - Various test files - See the TypeGeneratorTest.java class
 * `templates/` - Template files for use in generating SDK app codebases on `kb-sdk init`
 * `tools/` - Some general java utilities
