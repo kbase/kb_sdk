@@ -47,8 +47,8 @@ public class CallbackServerConfigBuilder {
     private URI dockerURI = null;
     final private URL callbackURL;
     final private Path workDir;
-    final private Path refDataBase;
     final private LineLogger logger;
+    final private Path refDataBase;
     
     public CallbackServerConfigBuilder(
             final URL kbaseEndpointURL,
