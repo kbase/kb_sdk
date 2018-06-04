@@ -10,7 +10,10 @@
 /TestAsyncPerl/
 /reports/
 /test_scripts/ee_mock_service/
+<<<<<<< HEAD
 /test_scripts/test.cfg
+=======
+>>>>>>> develop
 *.pyc
 .vagrant
 env-*/
