@@ -10,8 +10,5 @@
 /TestAsyncPerl/
 /reports/
 /test_scripts/ee_mock_service/
-/*/*.pyc
-/*/*/*.pyc
-/*/*/*/*.pyc
-/*/*/*/*/*.pyc
-/*/*/*/*/*/*.pyc
+*.pyc
+.vagrant
