@@ -11,3 +11,4 @@
 /reports/
 /test_scripts/ee_mock_service/
 *.pyc
+.vagrant
