@@ -7,9 +7,13 @@ from __future__ import print_function
 
 import unittest
 
+try:
+    from configparser import ConfigParser as _ConfigParser  # py 3
+except ImportError:
+    from ConfigParser import ConfigParser as _ConfigParser  # py 2
+
 from authclient import KBaseAuth  # @UnresolvedImport
 import os
-from ConfigParser import ConfigParser
 import requests
 from requests import ConnectionError
 
@@ -27,7 +31,7 @@ class TestAuth(unittest.TestCase):
         configfile = os.path.abspath(os.path.dirname(
             os.path.abspath(__file__)) + '/../test.cfg')
         print('Loading test config from ' + configfile)
-        cfg = ConfigParser()
+        cfg = _ConfigParser()
         cfg.read(configfile)
         authurl = cfg.get(cls.CFG_SEC, cls.AUTHURL)
         cls.token1 = cfg.get(cls.CFG_SEC, cls.TOKEN1)
@@ -81,9 +85,9 @@ class TestAuth(unittest.TestCase):
         kba2 = KBaseAuth('https://thisisasuperfakeurlihope.com')
         with self.assertRaises(ConnectionError) as context:
             kba2.get_user(self.token1)
-        self.assertIn('not known', str(context.exception.message))
+        self.assertIn('not known', str(context.exception.args[0]))
 
     def fail_get_user(self, token, error):
         with self.assertRaises(ValueError) as context:
             self.kba.get_user(token)
-        self.assertEqual(error, str(context.exception.message))
+        self.assertEqual(error, str(context.exception.args[0]))

@@ -6,18 +6,23 @@ The KBase SDK is a set of tools for developing KBase Apps that can be dynamicall
 
 Documentation in this readme is for developing the SDK codebase itself. If you want to develop an app using the SDK, please visit the documentation website linked above.
 
-## Running the tests and VM
+## Running the tests
 
-You can run the tests using a [Vagrant](https://www.vagrantup.com/docs/installation/) image with `make test-vagrant`. You can enter the Vagrant VM for debugging by running `vagrant ssh`.
+To run the tests, first make sure [Vagrant](https://www.vagrantup.com/docs/installation/) is installed.
 
-To run the tests directly, run `make test` in the project's root directory. Python tests should currently pass. Java (and Perl) tests are currently in progress.
+* Run all tests with `make test-vagrant`
+* Run just the Python tests with `make test-python`
+* You can SSH into the vagrant machine for debugging with `vagrant ssh`
+* To run the tests directly, without vagrant, do `make test`.
 
-To completely rebuild your vagrant image, run `vagrant halt` and `vagrant up` within this repo's root directory.
+Python tests should currently pass. Java (and Perl) tests are currently in progress.
+
+To rebuild your vagrant image, run `vagrant halt` and `vagrant up` within this repo's root directory.
 
 ## Notes and references
 
-* [Codebase anatomy](doc/codebase_anatomy.md)
 * [Building and compiling the SDK from source](doc/building_sdk.md)
+* [Codebase anatomy](doc/codebase_anatomy.md)
 
 #### Java Versions
 

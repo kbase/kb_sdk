@@ -21,7 +21,15 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "./temp_vagrant", "/vagrant"
   config.vm.synced_folder "./", "/vagrant/kb_sdk"
 
+  config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--uartmode1", "disconnected"]
+  end
+
   config.vm.provision "shell", inline: <<-SHELL
+    virtualenv --python=python3 env-py3
+    virtualenv --python=python2 env-py2
+    env-py3/bin/pip install -r /vagrant/kb_sdk/requirements.txt
+    env-py2/bin/pip install -r /vagrant/kb_sdk/requirements.txt
     # Pull the jars repo
     rm -rf /vagrant/jars
     git clone https://github.com/kbase/jars /vagrant/jars

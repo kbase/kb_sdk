@@ -51,6 +51,32 @@ $ ln -sf /opt/$PHANTOM_JS/bin/phantomjs /usr/local/bin
 ## Python
 
 ```sh
+$ pip3 install pipenv
+# In the project's root:
+$ pipenv install --dev
+```
+
+Reset and re-install the environment with:
+
+```sh
+$ pipenv --python 3.5
+$ pipenv clean
+$ pipenv install --dev
+```
+
+## kb_sdk Codebase Documentation
+
+This section is for developers of the `kb_sdk` codebase itself (ie. the code that lives in this repo), rather than developers of third-party SDK apps.
+
+### Tests
+
+Tests for `kb_sdk` can be run using a Vagrant virtual machine that comes with all dependencies pre-installed.
+
+1. Install [vagrant](https://www.vagrantup.com/docs/installation/)
+2. Run `make test-vagrant` to run the tests
+>>>>>>> develop
+
+```sh
 sudo apt-get install python python-setuptools
 easy_install pip
 pip install requests nose2 jsonrpcbase
