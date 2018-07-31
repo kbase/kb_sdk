@@ -64,7 +64,7 @@ public class ModuleBuilder {
     	InitCommandArgs initArgs = new InitCommandArgs();
     	jc.addCommand(INIT_COMMAND, initArgs);
 
-    	// add the 'compile' command
+    	// add the 'validate' command
     	ValidateCommandArgs validateArgs = new ValidateCommandArgs();
     	jc.addCommand(VALIDATE_COMMAND, validateArgs);
     	
