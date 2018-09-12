@@ -261,6 +261,8 @@ class BaseClient(object):
                 if len(job_state['result']) == 1:
                     return job_state['result'][0]
                 return job_state['result']
+        raise RuntimeError("_check_job failed {} times and exceeded limit".format(
+            check_job_failures))
 
     def call_method(self, service_method, args, service_ver=None,
                     context=None):
