@@ -11,6 +11,8 @@ import json as _json
 import requests as _requests
 import random as _random
 import os as _os
+import traceback as _traceback
+from requests.exceptions import ConnectionError
 
 try:
     from configparser import ConfigParser as _ConfigParser  # py 3
@@ -26,6 +28,7 @@ import time
 _CT = 'content-type'
 _AJ = 'application/json'
 _URL_SCHEME = frozenset(['http', 'https'])
+_CHECK_JOB_RETRYS = 3
 
 
 def _get_token(user_id, password, auth_svc):
@@ -236,20 +239,30 @@ class BaseClient(object):
         mod, _ = service_method.split('.')
         job_id = self._submit_job(service_method, args, service_ver, context)
         async_job_check_time = self.async_job_check_time
-        while True:
+        check_job_failures = 0
+        while check_job_failures < _CHECK_JOB_RETRYS:
             time.sleep(async_job_check_time)
             async_job_check_time = (async_job_check_time *
                                     self.async_job_check_time_scale_percent /
                                     100.0)
             if async_job_check_time > self.async_job_check_max_time:
                 async_job_check_time = self.async_job_check_max_time
-            job_state = self._check_job(mod, job_id)
+
+            try:
+                job_state = self._check_job(mod, job_id)
+            except ConnectionError:
+                _traceback.print_exc()
+                check_job_failures += 1
+                continue
+
             if job_state['finished']:
                 if not job_state['result']:
                     return
                 if len(job_state['result']) == 1:
                     return job_state['result'][0]
                 return job_state['result']
+        raise RuntimeError("_check_job failed {} times and exceeded limit".format(
+            check_job_failures))
 
     def call_method(self, service_method, args, service_ver=None,
                     context=None):
