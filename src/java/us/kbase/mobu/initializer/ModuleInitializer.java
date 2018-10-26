@@ -32,8 +32,7 @@ public class ModuleInitializer {
 										"test",
 										"ui",
 										"ui/narrative",
-										"ui/narrative/methods",
-										"ui/narrative/widgets"};
+										"ui/narrative/methods"};
 	
 	public ModuleInitializer(String moduleName, String userName, boolean verbose) {
 		this(moduleName, userName, DEFAULT_LANGUAGE, verbose);
@@ -83,8 +82,8 @@ public class ModuleInitializer {
 		    }
 		}
 		else {
-			subdirList.add("ui/narrative/methods/example_method");
-			subdirList.add("ui/narrative/methods/example_method/img");
+			subdirList.add("ui/narrative/methods/run_" + this.moduleName);
+			subdirList.add("ui/narrative/methods/run_" + this.moduleName + "/img");
 		}
 	
 		// 1. build dir with moduleName
@@ -214,8 +213,8 @@ public class ModuleInitializer {
 					break;
 			}
 		} else {
-			templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "example_method", "spec.json"));
-			templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "example_method", "display.yaml"));
+			templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "spec.json"));
+			templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "display.yaml"));
 		}
 
 		for (String templateName : templateFiles.keySet()) {
