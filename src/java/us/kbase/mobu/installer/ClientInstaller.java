@@ -291,16 +291,16 @@ public class ClientInstaller {
         } else {
             String perlClientName = null;
             if (isPerl)
-                perlClientName = moduleName + "::" + clientName + "Client";
+                perlClientName = "installed_clients::" + clientName + "Client";
             String pyClientName = null;
             if (isPython)
-                pyClientName = moduleName + "." + clientName + "Client";
+                pyClientName = "installed_clients." + clientName + "Client";
             String rClientName = null;
             if (isR)
-                rClientName = moduleName + "/" + clientName + "Client";
+                rClientName = "installed_clients/" + clientName + "Client";
             String jsClientName = null;
             if (isJS)
-                jsClientName = moduleName + "/" + clientName + "Client";
+                jsClientName = "installed_clients/" + clientName + "Client";
             FileSaver output = new DiskFileSaver(libDir);
             TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl, 
                     perlClientName, false, null, null, null, isPython, pyClientName, false, null,
