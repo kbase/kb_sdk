@@ -13,6 +13,7 @@ import random as _random
 import os as _os
 import traceback as _traceback
 from requests.exceptions import ConnectionError
+from urllib3.exceptions import ProtocolError
 
 try:
     from configparser import ConfigParser as _ConfigParser  # py 3
@@ -250,7 +251,7 @@ class BaseClient(object):
 
             try:
                 job_state = self._check_job(mod, job_id)
-            except ConnectionError:
+            except (ConnectionError, ProtocolError):
                 _traceback.print_exc()
                 check_job_failures += 1
                 continue
