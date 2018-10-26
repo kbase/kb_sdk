@@ -95,8 +95,6 @@ public class TemplateBasedGenerator {
         if (gitCommitHash == null)
             gitCommitHash = "";
         KbService service = srvs.get(0);
-        if (genJs && jsClientName == null)
-            jsClientName = service.getName() + "Client";
         genPerlServer = genPerlServer(genPerlServer, perlServerName, perlImplName, perlPsgiName);
         if (genPerlServer) {
             genPerl = true;
@@ -106,16 +104,12 @@ public class TemplateBasedGenerator {
             	perlPsgiName = service.getName() + ".psgi";
             }
         }
-        if (genPerl && perlClientName == null)
-            perlClientName = service.getName() + "Client";
         genPythonServer = genPythonServer(genPythonServer, pythonServerName, pythonImplName);
         if (genPythonServer) {
             genPython = true;
             if (pythonServerName == null)
                 pythonServerName = service.getName() + "Server";
         }
-        if (genPython && pythonClientName == null)
-            pythonClientName = service.getName() + "Client";
         genRServer = genPythonServer(genRServer, rServerName, rImplName);
         if (genRServer) {
             System.out.println(
@@ -126,8 +120,6 @@ public class TemplateBasedGenerator {
             if (rServerName == null)
                 rServerName = service.getName() + "Server";
         }
-        if (genR && rClientName == null)
-            rClientName = service.getName() + "Client";
         Map<String, Object> context = service.forTemplates(perlImplName, pythonImplName);
         if (defaultUrl != null)
             context.put("default_service_url", defaultUrl);
