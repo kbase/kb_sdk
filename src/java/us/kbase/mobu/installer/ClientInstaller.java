@@ -281,7 +281,7 @@ public class ClientInstaller {
         }
         File libDir = new File(moduleDir, libDirName == null ? "lib" : libDirName);
         if (isJava) {
-            FileSaver javaSrcDir = new DiskFileSaver(new File(libDir, "src"));
+            FileSaver javaSrcDir = new DiskFileSaver(new File(new File(libDir, "src"), "installed_clients"));
             String javaPackageParent = ".";
             String customClientClassName = TextUtils.capitalize(clientName) + "Client";
             URL urlEndpoint = url == null ? null : new URL(url);

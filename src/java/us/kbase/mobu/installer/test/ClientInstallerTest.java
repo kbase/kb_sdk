@@ -44,7 +44,7 @@ public class ClientInstallerTest {
         ClientInstaller ci = new ClientInstaller(moduleDir, true);
         String module2 = "onerepotest";
         ci.install(null, false, false, false, "dev", true, module2, null, null);
-        File dir = new File(moduleDir, "lib/src/" + module2);
+        File dir = new File(moduleDir, "lib/src/installed_clients/" + module2);
         //ProcessHelper.cmd("ls", "-l", dir.getAbsolutePath()).exec(moduleDir);
         Assert.assertTrue(new File(dir, "OnerepotestClient.java").exists());
         Assert.assertTrue(new File(dir, "OnerepotestServiceClient.java").exists());
