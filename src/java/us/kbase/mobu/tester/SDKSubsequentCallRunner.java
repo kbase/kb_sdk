@@ -81,6 +81,7 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
             final CallbackServerConfig config,
             final String imageName,
             final String moduleName,
+            final ModuleVersion moduleVersion,
             final AuthToken token)
             throws IOException, InterruptedException {
         final Path runSubJobsSh = config.getWorkDir().toAbsolutePath()
