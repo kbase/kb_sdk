@@ -175,47 +175,43 @@ public class ModuleInitializer {
                 templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
                 templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
             }
-			//templateFiles.put("module_test_perl_client", Paths.get(moduleDir, "test", "test_perl_client.pl"));
-			//templateFiles.put("module_test_python_client", Paths.get(moduleDir, "test", "test_python_client.py"));
-			//templateFiles.put("module_test_java_client", Paths.get(moduleDir, "test", "test_java_client.java"));
-			//templateFiles.put("module_test_all_clients", Paths.get(moduleDir, "test", "test_all_clients.sh"));
-
-			switch(this.language) {
-				// Perl just needs an impl file and a start server script
-				case "perl":
-					//templateFiles.put("module_start_perl_server", Paths.get(moduleDir, "scripts", "start_server.sh"));
-				    // start_server script is now made in Makefile
-					templateFiles.put("module_perl_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.pm"));
-					break;
-				// Python needs some empty __init__.py files and the impl file (Done, see TemplateBasedGenerator.initPyhtonPackages)
-				case "python":
-					initDirectory(Paths.get(moduleDir, "lib", this.moduleName), false);
-					initFile(Paths.get(moduleDir, "lib", this.moduleName, "__init__.py"), false);
-					templateFiles.put("module_python_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.py"));
-					//templateFiles.put("module_start_python_server", Paths.get(moduleDir, "scripts", "start_server.sh"));
-                    // start_server script is now made in Makefile
-					break;
-				case "r":
-                    templateFiles.put("module_r_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.r"));
-                    break;
-				case "java":
-		            File srcDir = new File(moduleDir, "lib/src");
-		            String modulePackage = (String)moduleContext.get("java_package");
-		            String javaModuleName = (String)moduleContext.get("java_module_name");
-		            String javaPackageParent = (String)moduleContext.get("java_package_parent");
-			        File serverJavaFile = new File(srcDir, modulePackage.replace('.', '/') + "/" + javaModuleName + "Server.java");
-			        fillTemplate(moduleContext, "module_java_impl", serverJavaFile.toPath());
-			        JavaTypeGenerator.processSpec(new File(moduleDir, specFile), srcDir, javaPackageParent, true, null, null, null);
-					//templateFiles.put("module_start_java_server", Paths.get(moduleDir, "scripts", "start_server.sh"));
-                    // start_server script is now made in Makefile
-					break;
-				default:
-					break;
-			}
 		} else {
-			templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "spec.json"));
-			templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "display.yaml"));
-		}
+            templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "spec.json"));
+            templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "display.yaml"));
+        }
+
+        switch(this.language) {
+            // Perl just needs an impl file and a start server script
+            case "perl":
+                //templateFiles.put("module_start_perl_server", Paths.get(moduleDir, "scripts", "start_server.sh"));
+                // start_server script is now made in Makefile
+                templateFiles.put("module_perl_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.pm"));
+                break;
+            // Python needs some empty __init__.py files and the impl file (Done, see TemplateBasedGenerator.initPyhtonPackages)
+            case "python":
+                initDirectory(Paths.get(moduleDir, "lib", this.moduleName), false);
+                initFile(Paths.get(moduleDir, "lib", this.moduleName, "__init__.py"), false);
+                templateFiles.put("module_python_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.py"));
+                //templateFiles.put("module_start_python_server", Paths.get(moduleDir, "scripts", "start_server.sh"));
+                // start_server script is now made in Makefile
+                break;
+            case "r":
+                templateFiles.put("module_r_impl", Paths.get(moduleDir, "lib", this.moduleName, this.moduleName + "Impl.r"));
+                break;
+            case "java":
+                File srcDir = new File(moduleDir, "lib/src");
+                String modulePackage = (String)moduleContext.get("java_package");
+                String javaModuleName = (String)moduleContext.get("java_module_name");
+                String javaPackageParent = (String)moduleContext.get("java_package_parent");
+                File serverJavaFile = new File(srcDir, modulePackage.replace('.', '/') + "/" + javaModuleName + "Server.java");
+                fillTemplate(moduleContext, "module_java_impl", serverJavaFile.toPath());
+                JavaTypeGenerator.processSpec(new File(moduleDir, specFile), srcDir, javaPackageParent, true, null, null, null);
+                //templateFiles.put("module_start_java_server", Paths.get(moduleDir, "scripts", "start_server.sh"));
+                // start_server script is now made in Makefile
+                break;
+            default:
+                break;
+        }
 
 		for (String templateName : templateFiles.keySet()) {
 			fillTemplate(moduleContext, templateName, templateFiles.get(templateName));
@@ -223,21 +219,17 @@ public class ModuleInitializer {
 		
 		if (example) {
 			// Generated examples require some other SDK dependencies
-			List <String> requiredDependantModules = Arrays.asList("KBaseReport","AssemblyUtil");
-			ClientInstaller clientInstaller = new ClientInstaller(new File(moduleDir), false);
-			for(String dependantModuleName : requiredDependantModules) {
-				clientInstaller.install(
-						this.language,
-						true, // async clients
-						false, // core or sync clients
-						false, // dynamic client
-						"release", //tagVer
-						this.verbose,
-						dependantModuleName,
-						null,
-						null // clientName
-					);
-			}
+            new ClientInstaller(new File(moduleDir), false).install(
+                    this.language,
+                    false, // async clients
+                    true, // core or sync clients
+                    false, // dynamic client
+                    null, //tagVer
+                    this.verbose,
+                    "AssemblyUtil",
+                    null,
+                    null // clientName
+            );
 		}
 		// Let's install fresh workspace client in any cases (we need it at least in tests):
 		new ClientInstaller(new File(moduleDir), false).install(
@@ -251,6 +243,17 @@ public class ModuleInitializer {
                 null,
                 null // clientName
             );
+        new ClientInstaller(new File(moduleDir), false).install(
+                this.language,
+                false, // async clients
+                true, // core or sync clients
+                false, // dynamic client
+                null, //tagVer
+                this.verbose,
+                "KBaseReport",
+                null,
+                null // clientName
+        );
 
 		System.out.println("Done! Your module is available in the " + moduleDir + " directory.");
 		if (example) {
