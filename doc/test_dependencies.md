@@ -74,7 +74,6 @@ Tests for `kb_sdk` can be run using a Vagrant virtual machine that comes with al
 
 1. Install [vagrant](https://www.vagrantup.com/docs/installation/)
 2. Run `make test-vagrant` to run the tests
->>>>>>> develop
 
 ```sh
 sudo apt-get install python python-setuptools
