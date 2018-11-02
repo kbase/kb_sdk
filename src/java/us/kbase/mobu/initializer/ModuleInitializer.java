@@ -26,7 +26,6 @@ public class ModuleInitializer {
 	private File dir;
 	
 	private static String[] subdirs = {"data",
-										"docs",
 										"scripts",
 										"lib",
 										"test",
@@ -126,7 +125,6 @@ public class ModuleInitializer {
 		templateFiles.put("module_readme_lib", Paths.get(moduleDir, "lib", "README.md"));
 		templateFiles.put("module_readme_ui", Paths.get(moduleDir, "ui", "README.md"));
 		templateFiles.put("module_readme_test", Paths.get(moduleDir, "test", "README.md"));
-		templateFiles.put("module_readme_docs", Paths.get(moduleDir, "docs", "README.md"));
 		templateFiles.put("module_readme_data", Paths.get(moduleDir, "data", "README.md"));
 		templateFiles.put("module_config_yaml", Paths.get(moduleDir, "kbase.yml"));
         templateFiles.put("module_gitignore", Paths.get(moduleDir, ".gitignore"));
