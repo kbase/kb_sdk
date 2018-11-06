@@ -12,5 +12,4 @@
 /test_scripts/ee_mock_service/
 /test_scripts/test.cfg
 *.pyc
-.vagrant
 env-*/

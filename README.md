@@ -8,16 +8,9 @@ Documentation in this readme is for developing the SDK codebase itself. If you w
 
 ## Running the tests
 
-To run the tests, first make sure [Vagrant](https://www.vagrantup.com/docs/installation/) is installed.
+#### Python tests
 
-* Run all tests with `make test-vagrant`
-* Run just the Python tests with `make test-python`
-* You can SSH into the vagrant machine for debugging with `vagrant ssh`
-* To run the tests directly, without vagrant, do `make test`.
-
-Python tests should currently pass. Java (and Perl) tests are currently in progress.
-
-To rebuild your vagrant image, run `vagrant halt` and `vagrant up` within this repo's root directory.
+Create a virtual environment using virtualenv or conda and run `pip install -r requirements.txt`. Run the tests with `make test-python`.
 
 ## Notes and references
 
@@ -28,6 +21,6 @@ To rebuild your vagrant image, run `vagrant halt` and `vagrant up` within this r
 
 The codebase currently uses Java 8 and is incompatible with Java 9. Details about this incompatibility can be found here: https://blog.codefx.org/java/jsr-305-java-9/. Specifically, the "@Generated" annotation is problematic.
 
-#### Rebuilding the VM
+#### The full build
 
-To rebuild the VM for running tests, follow the steps in this document: [doc/test_dependencies.md](doc/test_dependencies.md)
+See [doc/test_dependencies.md](doc/test_dependencies.md) for some information about how to build all the necessary dependencies to run tests.
