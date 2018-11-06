@@ -13,6 +13,7 @@ import random as _random
 import os as _os
 import traceback as _traceback
 from requests.exceptions import ConnectionError
+from urllib3.exceptions import ProtocolError
 
 try:
     from configparser import ConfigParser as _ConfigParser  # py 3
@@ -124,7 +125,7 @@ class BaseClient(object):
             self, url=None, timeout=30 * 60, user_id=None,
             password=None, token=None, ignore_authrc=False,
             trust_all_ssl_certificates=False,
-            auth_svc='https://kbase.us/services/authorization/Sessions/Login',
+            auth_svc='https://kbase.us/services/auth/api/legacy/KBase/Sessions/Login',
             lookup_url=False,
             async_job_check_time_ms=100,
             async_job_check_time_scale_percent=150,
@@ -250,7 +251,7 @@ class BaseClient(object):
 
             try:
                 job_state = self._check_job(mod, job_id)
-            except ConnectionError:
+            except (ConnectionError, ProtocolError):
                 _traceback.print_exc()
                 check_job_failures += 1
                 continue

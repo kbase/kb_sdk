@@ -146,7 +146,7 @@ public class CallbackServerTest {
         final CallbackServerConfig cbcfg =
                 new CallbackServerConfigBuilder(new URL(TestConfigHelper.getKBaseEndpoint()),
                         null, null, null, null, null, null, authUrl, authUrlInsecure, null,
-                        callbackUrl, temp, log).build();
+                        callbackUrl, temp, null, log).build();
         final DockerMountPoints mounts = new DockerMountPoints(
                 Paths.get("/kb/module/work"), Paths.get("tmp"));
         final CallbackServer callback = new SDKCallbackServer(

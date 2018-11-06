@@ -67,7 +67,7 @@ METHODS
 """
 
 import json as _json
-import urllib2 as _urllib2
+import urllib.request as _urllib
 import syslog as _syslog
 import platform as _platform
 import inspect as _inspect
@@ -116,11 +116,10 @@ _MLOG_TO_SYSLOG = [_syslog.LOG_EMERG, _syslog.LOG_ALERT, _syslog.LOG_CRIT,
                  _syslog.LOG_DEBUG]
 #ALLOWED_LOG_LEVELS = set(_MLOG_TEXT_TO_LEVEL.values())
 _MLOG_LEVEL_TO_TEXT = {}
-for k, v in _MLOG_TEXT_TO_LEVEL.iteritems():
+for k, v in _MLOG_TEXT_TO_LEVEL.items():
     _MLOG_LEVEL_TO_TEXT[v] = k
 LOG_LEVEL_MIN = min(_MLOG_LEVEL_TO_TEXT.keys())
 LOG_LEVEL_MAX = max(_MLOG_LEVEL_TO_TEXT.keys())
-del k, v
 
 
 class log(object):
@@ -220,9 +219,9 @@ class log(object):
         if (api_url):
             subsystem_api_url = api_url + "/" + self._subsystem
             try:
-                data = _json.load(_urllib2.urlopen(subsystem_api_url,
+                data = _json.load(_urllib.urlopen(subsystem_api_url,
                                                    timeout=5))
-            except _urllib2.URLError, e:
+            except _urllib.URLError as e:
                 code_ = None
                 if hasattr(e, 'code'):
                     code_ = ' ' + str(e.code)
@@ -311,7 +310,7 @@ class log(object):
 
     def _syslog(self, facility, level, ident, message):
         _syslog.openlog(ident, facility)
-        if isinstance(message, basestring):
+        if isinstance(message, str):
             _syslog.syslog(_MLOG_TO_SYSLOG[level], message)
         else:
             try:
@@ -327,7 +326,7 @@ class log(object):
                         _platform.node(), ident + ': '])
         try:
             with open(self.get_log_file(), 'a') as log:
-                if isinstance(message, basestring):
+                if isinstance(message, str):
                     log.write(ident + message + '\n')
                 else:
                     try:

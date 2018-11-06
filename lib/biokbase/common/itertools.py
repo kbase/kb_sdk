@@ -19,7 +19,7 @@ def chunkiter(iterable, size):
   """
     def inneriter(first, iterator, size):
         yield first
-        for _ in xrange(size - 1):
+        for _ in range(size - 1):
             yield iterator.next()
     it = iter(iterable)
     while True:

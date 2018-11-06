@@ -81,19 +81,15 @@ public class SDKSubsequentCallRunner extends SubsequentCallRunner {
             final CallbackServerConfig config,
             final String imageName,
             final String moduleName,
+            final ModuleVersion moduleVersion,
             final AuthToken token)
             throws IOException, InterruptedException {
         final Path runSubJobsSh = config.getWorkDir().toAbsolutePath()
                 .resolve("run_subjob.sh");
         if (Files.notExists(runSubJobsSh)) {
-            final boolean isMac = System.getProperty("os.name").toLowerCase()
-                    .contains("mac");
-            final boolean isWin = System.getProperty("os.name").toLowerCase()
-                    .contains("win");
             final String dockerRunCmd = config.getWorkDir().toAbsolutePath() +
-                    "/run_docker.sh run --rm " + (isMac || isWin ? "" : "--user $(id -u) ") +
-                    "-v " + config.getWorkDir().resolve(SUBJOBSDIR)
-                        .toAbsolutePath() + 
+                    "/run_docker.sh run --rm " + "-v " +
+                     config.getWorkDir().resolve(SUBJOBSDIR).toAbsolutePath() +
                     "/$1/" + WORKDIR + ":/kb/module/work -v " +
                     getSharedScratchDir(config).toAbsolutePath() +
                     ":/kb/module/work/tmp $4 -e \"SDK_CALLBACK_URL=$3\" $2 async";

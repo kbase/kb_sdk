@@ -26,7 +26,6 @@ public class InitializerTest {
 	private static final String USER_NAME = "kbasedev";
 	private static final String[] EXPECTED_PATHS = {
 	   "data",
-	   "docs",
 	   "scripts",
 	   "test", 
 	   "ui", 
@@ -35,7 +34,6 @@ public class InitializerTest {
 	   "ui/narrative/methods/",
 	   "ui/narrative/widgets/",
 	   "lib/README.md",
-	   "docs/README.md",
 	   "test/README.md",
 	   "data/README.md",
 	   "scripts/entrypoint.sh",

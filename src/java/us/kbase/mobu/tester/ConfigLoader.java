@@ -158,7 +158,7 @@ public class ConfigLoader {
         return new CallbackServerConfigBuilder(
                 new URL(endPoint), new URL(wsUrl), new URL(shockUrl), new URL(jobSrvUrl),
                 new URL(handleUrl), new URL(srvWizUrl), new URL(njswUrl), new URL(authUrl),
-                authAllowInsecure, new URL(catalogUrl), callbackUrl, workDir, logger).build();
+                authAllowInsecure, new URL(catalogUrl), callbackUrl, workDir, null, logger).build();
     }
     
     private static String getConfigUrl(Properties props, String key, String endPoint, 

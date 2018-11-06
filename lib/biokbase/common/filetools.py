@@ -41,7 +41,7 @@ class ExcelDictReader(object):
                 raise IndexError('Workbook has no sheet for index {}'.format(
                     sheet))
             self._sheet = self._xl.sheet_by_index(sheet)
-        elif isinstance(sheet, basestring):
+        elif isinstance(sheet, str):
             if sheet not in self._xl.sheet_names():
                 raise ValueError('No such sheet name: {}'.format(sheet))
             self._sheet = self._xl.sheet_by_index(sheet)
@@ -60,7 +60,7 @@ class ExcelDictReader(object):
         if not self._sheet:
             raise StopIteration('No sheet set')
         s = self._sheet
-        for i in xrange(1, s.nrows):
+        for i in range(1, s.nrows):
             self._rownum = i + 1
             r = convert_xl_row(self._xl, self._sheet.name, i)
             ret = {n: v for n, v in zip(self._heads, r)}

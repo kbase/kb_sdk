@@ -49,7 +49,7 @@ public class ModuleBuilder {
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
     
-    public static final String VERSION = "1.0.18";
+    public static final String VERSION = "1.2.0";
     
     
     public static void main(String[] args) throws Exception {
@@ -64,7 +64,7 @@ public class ModuleBuilder {
     	InitCommandArgs initArgs = new InitCommandArgs();
     	jc.addCommand(INIT_COMMAND, initArgs);
 
-    	// add the 'compile' command
+    	// add the 'validate' command
     	ValidateCommandArgs validateArgs = new ValidateCommandArgs();
     	jc.addCommand(VALIDATE_COMMAND, validateArgs);
     	

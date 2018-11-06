@@ -34,14 +34,14 @@ class TestTokenCache(unittest.TestCase):
     def test_drop_tokens(self):
         sz = 4
         tc = TokenCache(sz)
-        for x in xrange(1, sz + 1):
+        for x in range(1, sz + 1):
             tc.add_valid_token(str(x), x)
-        for x in xrange(1, sz + 1):
+        for x in range(1, sz + 1):
             self.assertEqual(x, tc.get_user(str(x)))
 
         # shouldn't dump the cache
         tc.add_valid_token('2', 2)
-        for x in xrange(1, sz + 1):
+        for x in range(1, sz + 1):
             self.assertEqual(x, tc.get_user(str(x)))
 
         # should dump the cache
@@ -54,4 +54,4 @@ class TestTokenCache(unittest.TestCase):
     def fail_set(self, token, user, error):
         with self.assertRaises(ValueError) as context:
             TokenCache().add_valid_token(token, user)
-        self.assertEqual(error, str(context.exception.message))
+        self.assertEqual(error, str(context.exception.args[0]))

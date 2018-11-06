@@ -160,8 +160,6 @@ public class ModuleTester {
         ProcessHelper.cmd("chmod", "+x", runDockerSh.getCanonicalPath()).exec(tlDir);
         String moduleName = (String)kbaseYmlConfig.get("module-name");
         String imageName = "test/" + moduleName.toLowerCase() + ":latest";
-        if (!buildNewDockerImageWithCleanup(moduleDir, tlDir, runDockerSh, imageName))
-            return 1;
         File subjobsDir = new File(tlDir, "subjobs");
         if (subjobsDir.exists())
             TextUtils.deleteRecursively(subjobsDir);
@@ -169,6 +167,8 @@ public class ModuleTester {
         if (scratchDir.exists())
             TextUtils.deleteRecursively(scratchDir);
         scratchDir.mkdir();
+        if (!buildNewDockerImageWithCleanup(moduleDir, tlDir, runDockerSh, imageName))
+            return 1;
         ///////////////////////////////////////////////////////////////////////////////////////////
         int callbackPort = NetUtils.findFreePort();
         String[] callbackNetworks = null;
