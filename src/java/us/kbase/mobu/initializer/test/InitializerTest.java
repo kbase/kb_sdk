@@ -32,7 +32,6 @@ public class InitializerTest {
 	   "lib",
 	   "ui/narrative",
 	   "ui/narrative/methods/",
-	   "ui/narrative/widgets/",
 	   "lib/README.md",
 	   "test/README.md",
 	   "data/README.md",
@@ -44,9 +43,6 @@ public class InitializerTest {
 	   "Makefile"
 	};
 	private static final String[] EXPECTED_DEFAULT_PATHS = {
-	   "ui/narrative/methods/example_method/img",
-	   "ui/narrative/methods/example_method/spec.json",
-	   "ui/narrative/methods/example_method/display.yaml"
 	};
 	private static List<String> allExpectedDefaultPaths;
 	private static List<String> allExpectedExamplePaths;
@@ -71,8 +67,9 @@ public class InitializerTest {
 	public boolean checkPaths(List<String> pathList, String moduleName) {
 		for (String p : pathList) {
 			File f = Paths.get(tempDir.getAbsolutePath(), moduleName, p).toFile();
+			System.out.println("testing " + p);
 			if (!f.exists()) {
-				System.out.println("Unable to find path: " + f.toString());
+				System.out.println("Unable to find path: " + p);
 				return false;
 			}
 		}
