@@ -95,7 +95,8 @@ public class ClientInstallerTest {
         String expectedText = "" +
                 "[ {\n" +
                 "  \"module_name\" : \"KBaseReport\",\n" +
-                "  \"type\" : \"core\"\n" +
+                "  \"type\" : \"sdk\",\n" +
+                "  \"version_tag\" : \"release\"\n" +
                 "}, {\n" +
                 "  \"module_name\" : \"onerepotest\",\n" +
                 "  \"type\" : \"sdk\",\n" +

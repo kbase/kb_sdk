@@ -209,8 +209,8 @@ public class ModuleInitializer {
 			// Generated examples require some other SDK dependencies
             new ClientInstaller(new File(moduleDir), false).install(
                     this.language,
-                    false, // async clients
-                    true, // core or sync clients
+                    true, // async clients
+                    false, // core or sync clients
                     false, // dynamic client
                     null, //tagVer
                     this.verbose,
@@ -233,8 +233,8 @@ public class ModuleInitializer {
             );
         new ClientInstaller(new File(moduleDir), false).install(
                 this.language,
-                false, // async clients
-                true, // core or sync clients
+                true, // async clients
+                false, // core or sync clients
                 false, // dynamic client
                 null, //tagVer
                 this.verbose,
