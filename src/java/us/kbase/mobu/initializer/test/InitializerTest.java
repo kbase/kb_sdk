@@ -21,8 +21,8 @@ public class InitializerTest {
     private static File tempDir = null;
 
 	private static final String SIMPLE_MODULE_NAME = "a_simple_module_for_unit_testing";
-	private static final String EXAMPLE_OLD_METHOD_NAME = "count_contigs_in_set"; 
-    private static final String EXAMPLE_METHOD_NAME = "filter_contigs"; 
+	private static final String EXAMPLE_OLD_METHOD_NAME = "count_contigs_in_set";
+    private static final String EXAMPLE_METHOD_NAME = "run_" + SIMPLE_MODULE_NAME;
 	private static final String USER_NAME = "kbasedev";
 	private static final String[] EXPECTED_PATHS = {
 	   "data",
