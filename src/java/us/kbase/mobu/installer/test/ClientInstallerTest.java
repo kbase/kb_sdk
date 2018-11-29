@@ -94,6 +94,9 @@ public class ClientInstallerTest {
         Assert.assertTrue(depsFile.exists());
         String expectedText = "" +
                 "[ {\n" +
+                "  \"module_name\" : \"KBaseReport\",\n" +
+                "  \"type\" : \"core\"\n" +
+                "}, {\n" +
                 "  \"module_name\" : \"onerepotest\",\n" +
                 "  \"type\" : \"sdk\",\n" +
                 "  \"version_tag\" : \"dev\"\n" +

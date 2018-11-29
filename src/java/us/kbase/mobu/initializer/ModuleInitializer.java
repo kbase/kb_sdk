@@ -71,14 +71,9 @@ public class ModuleInitializer {
 		}
 
 		List<String> subdirList = new ArrayList<String>(Arrays.asList(subdirs));
-		if (example) {
-		    if (this.language.equals("python") || this.language.equals("perl") || this.language.equals("java")) {
-	            subdirList.add("ui/narrative/methods/filter_contigs");
-	            subdirList.add("ui/narrative/methods/filter_contigs/img");
-		    } else {
-		        subdirList.add("ui/narrative/methods/count_contigs_in_set");
-		        subdirList.add("ui/narrative/methods/count_contigs_in_set/img");
-		    }
+		if (example && this.language.equals("r")) {
+			subdirList.add("ui/narrative/methods/count_contigs_in_set");
+			subdirList.add("ui/narrative/methods/count_contigs_in_set/img");
 		}
 		else {
 			subdirList.add("ui/narrative/methods/run_" + this.moduleName);
@@ -165,14 +160,9 @@ public class ModuleInitializer {
             break;
 		}
 		
-		if (example) {
-            if (this.language.equals("python") || this.language.equals("perl") || this.language.equals("java")) {
-                templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "filter_contigs", "spec.json"));
-                templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "filter_contigs", "display.yaml"));
-            } else {
-                templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
-                templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
-            }
+		if (example && this.language.equals("r")) {
+			templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "count_contigs_in_set", "spec.json"));
+			templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "count_contigs_in_set", "display.yaml"));
 		} else {
             templateFiles.put("module_method_spec_json", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "spec.json"));
             templateFiles.put("module_method_spec_yaml", Paths.get(moduleDir, "ui", "narrative", "methods", "run_"+this.moduleName, "display.yaml"));
@@ -254,13 +244,11 @@ public class ModuleInitializer {
         );
 
 		System.out.println("Done! Your module is available in the " + moduleDir + " directory.");
-		if (example) {
-			System.out.println("Compile and run the example methods with the following inputs:");
-			System.out.println("  cd " + moduleDir);
-			System.out.println("  make          (required after making changes to " + new File(specFile).getName() + ")");
-			System.out.println("  kb-sdk test   (will require setting test user account credentials in test_local/test.cfg)");
-			System.out.println();
-		}
+		System.out.println("Compile and run the example methods with the following inputs:");
+		System.out.println("  cd " + moduleDir);
+		System.out.println("  make          (required after making changes to " + new File(specFile).getName() + ")");
+		System.out.println("  kb-sdk test   (will require setting test user account credentials in test_local/test.cfg)");
+		System.out.println();
 	}
 	
 	/**

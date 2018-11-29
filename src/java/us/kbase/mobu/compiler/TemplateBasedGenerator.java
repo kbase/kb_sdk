@@ -157,7 +157,7 @@ public class TemplateBasedGenerator {
         }
         if (pythonClientName != null) {
             String pythonClientPath = fixPath(pythonClientName, ".") + ".py";
-            initPythonPackages(pythonClientPath, output);
+            initPythonPackages(pythonClientPath, output, true);
             Writer pythonClient = output.openWriter(pythonClientPath);
             TemplateFormatter.formatTemplate("python_client", context, pythonClient);
             pythonClient.close();
@@ -201,7 +201,7 @@ public class TemplateBasedGenerator {
         }
         if (pythonServerName != null) {
             String pythonServerPath = fixPath(pythonServerName, ".") + ".py";
-            initPythonPackages(pythonServerPath, output);
+            initPythonPackages(pythonServerPath, output, false);
             Writer pythonServer = output.openWriter(pythonServerPath);
             TemplateFormatter.formatTemplate("python_server", context, pythonServer);
             pythonServer.close();
@@ -318,7 +318,7 @@ public class TemplateBasedGenerator {
         }
     }
     
-    private static void initPythonPackages(String relativePyPath, FileSaver output) throws Exception {
+    private static void initPythonPackages(String relativePyPath, FileSaver output, boolean client) throws Exception {
         String path = relativePyPath;
         while (true) {
             int pos = path.lastIndexOf("/");
@@ -333,9 +333,11 @@ public class TemplateBasedGenerator {
                 output.openWriter(initPath).close();
             }
         }
-        
-        copyResourceFile(relativePyPath, output, "authclient.py");
-        copyResourceFile(relativePyPath, output, "baseclient.py");
+
+        if (client) {
+            copyResourceFile(relativePyPath, output, "authclient.py");
+            copyResourceFile(relativePyPath, output, "baseclient.py");
+        }
     }
 
     private static void copyResourceFile(
