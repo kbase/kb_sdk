@@ -6,6 +6,17 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods 
 in the KBase Narrative interface.
 
+VERSION: 1.2.1 (Released 12/04/2018)
+------------------------------------
+CHANGES:
+- Now example modules will also be initialized with a generic KIDL spec rather than one tailored to the example.
+- Python implementation uses "logging" modules and example tests are updated to be more pythonic (no getters)
+
+BUGFIXES:
+- Module specific clients now correctly call baseclient.py for async jobs. This ensures that retry logic is used.
+- Replace "/run" with "/var/run" in generated kb-sdk.sh script because "/run" is missing on some docker installs.
+- KBaseReports and AssemblyUtils clients should be installed as async not core
+
 VERSION: 1.2.0 (Released 11/14/2018)
 ------------------------------------
 NEW FEATURES:
