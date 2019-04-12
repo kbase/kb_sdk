@@ -74,7 +74,10 @@ import inspect as _inspect
 import os as _os
 import getpass as _getpass
 import warnings as _warnings
-from ConfigParser import ConfigParser as _ConfigParser
+try:
+    from ConfigParser import ConfigParser as _ConfigParser
+except ImportError:
+    from configparser import ConfigParser as _ConfigParser
 import time
 
 MLOG_ENV_FILE = 'MLOG_CONFIG_FILE'
