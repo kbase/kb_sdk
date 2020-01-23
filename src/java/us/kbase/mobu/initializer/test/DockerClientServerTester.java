@@ -153,22 +153,22 @@ public class DockerClientServerTester {
     protected File initPython(String moduleName) throws Exception {
         File moduleDir = new File(moduleName);
         String implInit = "" +
-                "# BEGIN_HEADER\n" +
-                "# END_HEADER\n" +
+                "#BEGIN_HEADER\n" +
+                "#END_HEADER\n" +
                 "\n" +
-                "    # BEGIN_CLASS_HEADER\n" +
-                "    # END_CLASS_HEADER\n" +
+                "    #BEGIN_CLASS_HEADER\n" +
+                "    #END_CLASS_HEADER\n" +
                 "\n" +
-                "        # BEGIN_CONSTRUCTOR\n" +
-                "        # END_CONSTRUCTOR\n" +
+                "        #BEGIN_CONSTRUCTOR\n" +
+                "        #END_CONSTRUCTOR\n" +
                 "\n" +
-                "        # BEGIN run_test\n" +
+                "        #BEGIN run_test\n" +
                 "        returnVal = input\n" +
-                "        # END run_test\n" +
+                "        #END run_test\n" +
                 "\n" +
-                "        # BEGIN throw_error\n" +
+                "        #BEGIN throw_error\n" +
                 "        raise ValueError(input)\n" +
-                "        # END throw_error\n";
+                "        #END throw_error\n";
         File implFile = new File(moduleDir, "lib/" + moduleName + "/" + 
                 moduleName + "Impl.py");
         init("python", moduleName, implFile, implInit);
