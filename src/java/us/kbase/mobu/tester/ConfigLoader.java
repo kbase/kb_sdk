@@ -29,7 +29,7 @@ public class ConfigLoader {
     private final String catalogUrl;
     private final Map<String, String> secureCfgParams;
 
-    public ConfigLoader(Properties props, boolean testMode, 
+    public ConfigLoader(Properties props, boolean testMode,
             String configPathInfo, boolean tryHomeCfg) throws Exception {
         if (configPathInfo == null) {
             configPathInfo = "test_local/test.cfg";
@@ -47,7 +47,12 @@ public class ConfigLoader {
         String tokenString = props.getProperty(testPrefix + "token");
         if (tokenString != null && tokenString.trim().isEmpty()) {
             tokenString = null;
+            String test_token = System.getenv("KBASE_TEST_TOKEN");
+            if (test_token != null && !test_token.trim().isEmpty()) {
+                tokenString = test_token;
+            }
         }
+
         if (user == null && tokenString == null) {
             throw new IllegalStateException("Error: KBase account credentials are not set in " +
                     configPathInfo);
@@ -60,7 +65,7 @@ public class ConfigLoader {
             token = auth.validateToken(tokenString);
         } else {
             if (password == null || password.trim().isEmpty()) {
-                System.out.println("You haven't preset your password in " +configPathInfo + 
+                System.out.println("You haven't preset your password in " +configPathInfo +
                         " file. Please enter it now.");
                 password = new String(System.console().readPassword("Password: "));
             }
@@ -86,51 +91,51 @@ public class ConfigLoader {
             }
         }
     }
-    
+
     public String getAuthUrl() {
         return authUrl;
     }
-    
+
     public String getAuthAllowInsecure() {
         return authAllowInsecure;
     }
-    
+
     public AuthToken getToken() {
         return token;
     }
-    
+
     public String getEndPoint() {
         return endPoint;
     }
-    
+
     public String getCatalogUrl() {
         return catalogUrl;
     }
-    
+
     public String getHandleUrl() {
         return handleUrl;
     }
-    
+
     public String getJobSrvUrl() {
         return jobSrvUrl;
     }
-    
+
     public String getNjswUrl() {
         return njswUrl;
     }
-    
+
     public String getShockUrl() {
         return shockUrl;
     }
-    
+
     public String getSrvWizUrl() {
         return srvWizUrl;
     }
-    
+
     public String getWsUrl() {
         return wsUrl;
     }
-    
+
     public void generateConfigProperties(File configPropsFile) throws Exception {
         PrintWriter pw = new PrintWriter(configPropsFile);
         try {
@@ -143,7 +148,7 @@ public class ConfigLoader {
             pw.println("srv_wiz_url = " + srvWizUrl);
             pw.println("njsw_url = " + njswUrl);
             pw.println("auth_service_url = " + authUrl);
-            pw.println("auth_service_url_allow_insecure = " + 
+            pw.println("auth_service_url_allow_insecure = " +
                     (authAllowInsecure == null ? "false" : authAllowInsecure));
             for (String param : secureCfgParams.keySet()) {
                 pw.println(param + " = " + secureCfgParams.get(param));
@@ -152,7 +157,7 @@ public class ConfigLoader {
             pw.close();
         }
     }
-    
+
     public CallbackServerConfig buildCallbackServerConfig(
             URL callbackUrl, Path workDir, LineLogger logger) throws Exception {
         return new CallbackServerConfigBuilder(
@@ -160,8 +165,8 @@ public class ConfigLoader {
                 new URL(handleUrl), new URL(srvWizUrl), new URL(njswUrl), new URL(authUrl),
                 authAllowInsecure, new URL(catalogUrl), callbackUrl, workDir, null, logger).build();
     }
-    
-    private static String getConfigUrl(Properties props, String key, String endPoint, 
+
+    private static String getConfigUrl(Properties props, String key, String endPoint,
             String defaultUrlSuffix) {
         String ret = props.getProperty(key);
         return ret == null ? (endPoint + "/" + defaultUrlSuffix) : ret;
