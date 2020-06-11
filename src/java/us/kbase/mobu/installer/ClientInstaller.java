@@ -328,7 +328,7 @@ public class ClientInstaller {
                     depMap.put(dep.moduleName.toLowerCase(), dep);
                 }
             } catch (Exception ex) {
-                throw new IllegalStateException("Error parsing depedencies file [" + depsFile +
+                throw new IllegalStateException("Error parsing dependencies file [" + depsFile +
                         "]: " + ex.getMessage(), ex);
             }
         }
