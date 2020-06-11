@@ -61,7 +61,7 @@ public class ProcessHelper {
     }
 
     public static ProcessHelper exec(CommandHolder cmd, File workDir, BufferedReader input, boolean saveOutput, boolean saveErrors, boolean waitFor) throws IOException {
-        return new ProcessHelper(cmd, workDir, saveOutput ? OutType.StringOut : OutType.SystemOut, 
+        return new ProcessHelper(cmd, workDir, saveOutput ? OutType.StringOut : OutType.SystemOut,
                 saveErrors ? OutType.StringErr : OutType.SystemErr, input, null, null, waitFor);
     }
 
@@ -108,9 +108,9 @@ public class ProcessHelper {
     }
 
     public Process getProcess() {
-		return process;
-	}
-    
+        return process;
+    }
+
     private Thread readInNewThread(final InputStream is, final OutType outType) {
         Thread ret = new Thread(new Runnable() {
             public void run() {
@@ -189,10 +189,10 @@ public class ProcessHelper {
         }
 
         public CommandHolder dontWaitFor() {
-        	waitFor = false;
-        	return this;
+            waitFor = false;
+            return this;
         }
-        
+
         public ProcessHelper exec(File workDir) throws IOException {
             return ProcessHelper.exec(this, workDir, waitFor);
         }

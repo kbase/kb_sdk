@@ -47,7 +47,7 @@ public class ClientInstaller {
     private final String language;
     private final Properties sdkConfig;
     private final URL catalogUrl;
-    
+
     public ClientInstaller() throws Exception {
         this(null, true);
     }
@@ -84,13 +84,13 @@ public class ClientInstaller {
         catalogUrl = new URL(catalogUrlText);
     }
 
-    public int install(String lang, boolean async, boolean core, boolean dynamic, String tagVer, 
+    public int install(String lang, boolean async, boolean core, boolean dynamic, String tagVer,
             boolean verbose, String moduleName, String libDirName) throws Exception {
         return install(lang, async, core, dynamic, tagVer, verbose, moduleName, libDirName, null);
     }
-    
-    public int install(String lang, boolean async, boolean core, boolean dynamic, String tagVer, 
-            boolean verbose, String moduleName, String libDirName, String clientName) 
+
+    public int install(String lang, boolean async, boolean core, boolean dynamic, String tagVer,
+            boolean verbose, String moduleName, String libDirName, String clientName)
                     throws Exception {
         if (core && (dynamic || async)) {
             throw new IllegalStateException("It's not allowed to set 'core' mode and one " +
@@ -142,7 +142,7 @@ public class ClientInstaller {
                 };
             } else {
                 throw new IllegalStateException("Path " + moduleName + " is not recognized as " +
-                		"existing local file or URL");
+                        "existing local file or URL");
             }
             moduleName = null;
         } else {
@@ -159,11 +159,11 @@ public class ClientInstaller {
             }
             if (modVer.getCompilationReport() == null)
                 throw new IllegalStateException("Compilation report is not found for this " +
-                		"version of [" + moduleName + "] module.");
+                        "version of [" + moduleName + "] module.");
             List<SpecFile> specFiles = modVer.getCompilationReport().getSpecFiles();
             if (specFiles == null)
                 throw new IllegalStateException("Compilation report returned from catalog is " +
-                		"out of date. [" + moduleName + "] module should be reregistered again.");
+                        "out of date. [" + moduleName + "] module should be reregistered again.");
             final List<String> mainSpec = new ArrayList<String>();
             final Map<String, String> deps = new LinkedHashMap<String, String>();
             for (SpecFile spec : specFiles) {
@@ -183,22 +183,22 @@ public class ClientInstaller {
             };
         }
         if (async && dynamic) {
-            compile(lang, async, false, tagVer, verbose, moduleName, libDirName, fp, 
+            compile(lang, async, false, tagVer, verbose, moduleName, libDirName, fp,
                     semanticVersion, gitUrl, gitCommitHash, clientName, filePath);
             if (clientName == null) {
                 clientName = moduleName;
             }
-            compile(lang, false, dynamic, tagVer, verbose, moduleName, libDirName, fp, 
+            compile(lang, false, dynamic, tagVer, verbose, moduleName, libDirName, fp,
                     semanticVersion, gitUrl, gitCommitHash, clientName + "Service", filePath);
         } else {
-            compile(lang, async, dynamic, tagVer, verbose, moduleName, libDirName, fp, 
+            compile(lang, async, dynamic, tagVer, verbose, moduleName, libDirName, fp,
                     semanticVersion, gitUrl, gitCommitHash, clientName, filePath);
         }
         return 0;
     }
 
-    private void compile(String lang, boolean async, boolean dynamic, String tagVer, 
-            boolean verbose, String moduleName, String libDirName, FileProvider fp, 
+    private void compile(String lang, boolean async, boolean dynamic, String tagVer,
+            boolean verbose, String moduleName, String libDirName, FileProvider fp,
             String semanticVersion, String gitUrl, String gitCommitHash,
             String clientName, String filePath) throws Exception {
         String url = null;
@@ -216,7 +216,7 @@ public class ClientInstaller {
         final FileProvider fp2 = fp;
         IncludeProvider ip = new IncludeProvider() {
             @Override
-            public Map<String, KbModule> parseInclude(String includeLine) 
+            public Map<String, KbModule> parseInclude(String includeLine)
                     throws KidlParseException {
                 String specPath = includeLine.trim();
                 if (specPath.startsWith("#include"))
@@ -285,8 +285,8 @@ public class ClientInstaller {
             String javaPackageParent = ".";
             String customClientClassName = TextUtils.capitalize(clientName) + "Client";
             URL urlEndpoint = url == null ? null : new URL(url);
-            JavaTypeGenerator.processSpec(services, javaSrcDir, javaPackageParent, false, null, 
-                    null, urlEndpoint, null, null, clientAsyncVer, dynservVer, semanticVersion, 
+            JavaTypeGenerator.processSpec(services, javaSrcDir, javaPackageParent, false, null,
+                    null, urlEndpoint, null, null, clientAsyncVer, dynservVer, semanticVersion,
                     gitUrl, gitCommitHash, null, customClientClassName);
         } else {
             String perlClientName = null;
@@ -302,9 +302,9 @@ public class ClientInstaller {
             if (isJS)
                 jsClientName = "installed_clients/" + clientName + "Client";
             FileSaver output = new DiskFileSaver(libDir);
-            TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl, 
+            TemplateBasedGenerator.generate(services, url, isJS, jsClientName, isPerl,
                     perlClientName, false, null, null, null, isPython, pyClientName, false, null,
-                    null, isR, rClientName, false, null, null, false, ip, output, null, null, 
+                    null, isR, rClientName, false, null, null, false, ip, output, null, null,
                     async, clientAsyncVer, dynservVer, semanticVersion, gitUrl, gitCommitHash);
         }
         // Now let's add record about this client to dependencies.json file
@@ -313,8 +313,8 @@ public class ClientInstaller {
         FileSaver depsDir = new DiskFileSaver(moduleDir);
         addDependency(moduleName, isSdk, versionTag, filePath, depsDir);
     }
-    
-    public static void addDependency(String moduleName, boolean isSdk, String versionTag, 
+
+    public static void addDependency(String moduleName, boolean isSdk, String versionTag,
             String filePath, FileSaver depsDir) throws Exception {
         Map<String, Dependency> depMap = new TreeMap<String, Dependency>();
         ObjectMapper mapper = new ObjectMapper();
@@ -322,7 +322,7 @@ public class ClientInstaller {
         File depsFile = depsDir.getAsFileOrNull("dependencies.json");
         if (depsFile != null && depsFile.exists()) {
             try {
-                List<Dependency> deps = mapper.readValue(depsFile, 
+                List<Dependency> deps = mapper.readValue(depsFile,
                         new TypeReference<List<Dependency>>() {});
                 for (Dependency dep : deps) {
                     depMap.put(dep.moduleName.toLowerCase(), dep);
@@ -343,7 +343,7 @@ public class ClientInstaller {
             mapper.writeValue(depsWr, deps);
         }
     }
-    
+
     private static boolean isUrl(String url) {
         try {
             new URL(url);
@@ -352,7 +352,7 @@ public class ClientInstaller {
             return false;
         }
     }
-    
+
     private static boolean isLocalFile(String path) {
         try {
             File f = new File(path);
@@ -362,7 +362,7 @@ public class ClientInstaller {
             return false;
         }
     }
-    
+
     private static interface FileProvider {
         public String loadMainSpec() throws Exception;
         public String loadIncludedSpec(String specFileName) throws Exception;
