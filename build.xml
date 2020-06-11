@@ -102,7 +102,7 @@
   </target>
 
 
-
+  <tstamp/>
   <target name="compile" depends="init" description="compile the source">
     <fail message="KBase common jar is not set">
         <condition>
@@ -116,7 +116,8 @@
     <echo file="${src}/us/kbase/mobu/git.properties">### PLEASE DO NOT CHANGE THIS FILE MANUALLY! ###
 giturl=${git.url}
 branch=${git.branch}
-commit=${git.commit}</echo>
+commit=${git.commit}
+build_timestamp=${DSTAMP}-${TSTAMP}</echo>
     <echo>Compiling with jar directory: ${jardir}</echo>
     <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" target="1.7" source="1.7" />
     <!-- Copy resource files-->

@@ -75,8 +75,9 @@ public class ProcessHelper {
             outPw = output;
         if (error != null)
             errPw = error;
-        process = cmd.cmdLine != null ? Runtime.getRuntime().exec(cmd.cmdLine, null, workDir) :
-                Runtime.getRuntime().exec(cmd.cmdParts, null, workDir);
+        process = cmd.cmdLine != null
+          ? Runtime.getRuntime().exec(cmd.cmdLine, null, workDir)
+          : Runtime.getRuntime().exec(cmd.cmdParts, null, workDir);
         Thread outTh = readInNewThread(process.getInputStream(), outType);
         Thread errTh = readInNewThread(process.getErrorStream(), errType);
         if (input != null) {

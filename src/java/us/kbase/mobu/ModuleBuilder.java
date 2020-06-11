@@ -360,7 +360,22 @@ public class ModuleBuilder {
 
     private static void printVersion() {
         String gitCommit = getGitCommit();
-        System.out.println("KBase SDK version " + VERSION + (gitCommit == null ? "" : (" (commit " + gitCommit + ")")));
+        String timestamp = getBuildTimestamp();
+        System.out.println("KBase SDK version " + VERSION
+            + (timestamp == null ? "" : ("_" + timestamp))
+            + (gitCommit == null ? "" : (" (commit " + gitCommit + ")")));
+    }
+
+    public static String getBuildTimestamp() {
+        String buildTimestamp = null;
+        try {
+            Properties gitProps = new Properties();
+            InputStream is = ModuleBuilder.class.getResourceAsStream("git.properties");
+            gitProps.load(is);
+            is.close();
+            buildTimestamp = gitProps.getProperty("build_timestamp");
+        } catch (Exception ignore) {}
+        return buildTimestamp;
     }
 
     public static String getGitCommit() {

@@ -226,9 +226,13 @@ public class ModuleTester {
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runTestsSh),
-                    callbackUrl == null ? "http://fakecallbackurl" :
-                        callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
+            int exitCode = ProcessHelper.cmd(
+                "bash",
+                DirUtils.getFilePath(runTestsSh),
+                callbackUrl == null
+                  ? "http://fakecallbackurl"
+                  : callbackUrl.toExternalForm()
+            ).exec(tlDir).getExitCode();
             return exitCode;
         } finally {
             if (jettyServer != null) {
