@@ -34,12 +34,12 @@ import us.kbase.mobu.util.TextUtils;
 public class CompilationReporter {
 
     public static void prepareCompileReport(File codeDir, List<KbService> services,
-            boolean perlServerSide, String perlImplName, boolean pyServerSide, 
+            boolean perlServerSide, String perlImplName, boolean pyServerSide,
             String pyImplName, boolean rServerSide, String rImplName,
-            boolean javaServerSide, String javaPackageParent, String javaSrcPath, 
+            boolean javaServerSide, String javaPackageParent, String javaSrcPath,
             JavaData javaParsingData, List<SpecFile> specFiles, File reportFile) throws Exception {
         String sdkVersion = ModuleBuilder.VERSION;
-        String sdkGitCommit = ModuleBuilder.getGitCommit();
+        String sdkGitCommit = ModuleBuilder.getGitProp("commit");
         String moduleName = null;
         KbModule module = null;
         for (KbService srv : services)
@@ -74,11 +74,11 @@ public class CompilationReporter {
             FileSaver javaSrcDir = new DiskFileSaver(javaSrc);
             for (JavaModule jmodule : javaParsingData.getModules()) {
                 if (jmodule.getOriginal().getModuleName().equals(moduleName)) {
-                    String moduleDir = JavaTypeGenerator.sub(javaPackageParent, 
+                    String moduleDir = JavaTypeGenerator.sub(javaPackageParent,
                             jmodule.getModulePackage()).replace('.', '/');
-                    String serverClassName = TextUtils.capitalize(jmodule.getModuleName()) + 
+                    String serverClassName = TextUtils.capitalize(jmodule.getModuleName()) +
                             "Server";
-                    implFile = javaSrcDir.getAsFileOrNull(moduleDir + "/" + 
+                    implFile = javaSrcDir.getAsFileOrNull(moduleDir + "/" +
                             serverClassName + ".java");
                 }
             }
@@ -102,7 +102,7 @@ public class CompilationReporter {
 
     public static Report createReport(List<SpecFile> specFiles,
             String sdkVersion, String sdkGitCommit, String moduleName,
-            KbModule module, String implFilePath, String implCommentPrefix, 
+            KbModule module, String implFilePath, String implCommentPrefix,
             String implText) throws Exception, IOException {
         Map<String, FunctionPlace> funcPositions = new LinkedHashMap<String, FunctionPlace>();
         String commentPrefix = Pattern.quote(implCommentPrefix);
@@ -111,8 +111,8 @@ public class CompilationReporter {
             if (comp instanceof KbFuncdef) {
                 KbFuncdef func = (KbFuncdef)comp;
                 String funcName = func.getName();
-                Pattern p = Pattern.compile(MessageFormat.format(".*" + commentPrefix + 
-                        "BEGIN {0}\n(.*\n)?[ \t]*" + commentPrefix + "END {0}\n.*", 
+                Pattern p = Pattern.compile(MessageFormat.format(".*" + commentPrefix +
+                        "BEGIN {0}\n(.*\n)?[ \t]*" + commentPrefix + "END {0}\n.*",
                         funcName), Pattern.DOTALL);
                 FunctionPlace place = checkMatch(funcPositions, p, implText);
                 if (place != null)

@@ -359,36 +359,28 @@ public class ModuleBuilder {
     }
 
     private static void printVersion() {
-        String gitCommit = getGitCommit();
-        String timestamp = getBuildTimestamp();
+        String gitCommit = getGitProp("commit");
+        String timestamp = getGitProp("build_timestamp");
         System.out.println("KBase SDK version " + VERSION
             + (timestamp == null ? "" : ("_" + timestamp))
             + (gitCommit == null ? "" : (" (commit " + gitCommit + ")")));
     }
 
-    public static String getBuildTimestamp() {
-        String buildTimestamp = null;
+
+    public static String getGitProp(String propertyToGet) {
+        String propertyValue = null;
         try {
             Properties gitProps = new Properties();
             InputStream is = ModuleBuilder.class.getResourceAsStream("git.properties");
             gitProps.load(is);
             is.close();
-            buildTimestamp = gitProps.getProperty("build_timestamp");
-        } catch (Exception ignore) {}
-        return buildTimestamp;
+            propertyValue = gitProps.getProperty(propertyToGet);
+        } catch (Exception e) {
+            showError("Error while retrieving version information", e.getMessage());
+        }
+        return propertyValue;
     }
 
-    public static String getGitCommit() {
-        String gitCommit = null;
-        try {
-            Properties gitProps = new Properties();
-            InputStream is = ModuleBuilder.class.getResourceAsStream("git.properties");
-            gitProps.load(is);
-            is.close();
-            gitCommit = gitProps.getProperty("commit");
-        } catch (Exception ignore) {}
-        return gitCommit;
-    }
 
     private static int runVersionCommand(VersionCommandArgs testArgs, JCommander jc) {
         printVersion();

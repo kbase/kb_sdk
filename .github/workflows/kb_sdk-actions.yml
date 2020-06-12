@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  docker_build_and_test:
+  kb_sdk_build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,14 +15,22 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+
       - name: Add bin to $PATH
         run: |
-          env
           echo "::add-path::$GITHUB_WORKSPACE/bin"
+
       - name: Build with Ant
         run: |
           make
           env
+
+      - name: Upload kb-sdk build
+        uses: actions/upload-artifact@v2
+        with:
+          name: kb-sdk_build
+          path: bin/kb-sdk
+
       - name: checking kb-sdk functions
         env:
           KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
@@ -39,8 +47,12 @@ jobs:
           kb-sdk test
           cd ..
           rm -rf PerlExample
-          kb-sdk init -l python -u user --example MyContigFilter
-          cd MyContigFilter
+          kb-sdk init -l python -u user --example PythonExample
+          cd PythonExample
           make
           kb-sdk test
           cd ..
+          rm -rf PythonExample
+          kb-sdk init -l java -u user --example JavaExample
+          cd JavaExample
+          kb-sdk test
