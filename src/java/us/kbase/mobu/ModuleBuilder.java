@@ -49,7 +49,7 @@ public class ModuleBuilder {
     public static final String GLOBAL_SDK_HOME_ENV_VAR = "KB_SDK_HOME";
     public static final String DEFAULT_METHOD_STORE_URL = "https://appdev.kbase.us/services/narrative_method_store/rpc";
 
-    public static final String VERSION = "1.2.0";
+    public static final String VERSION = "1.2.2";
 
     public static void main(String[] args) throws Exception {
 
@@ -57,7 +57,6 @@ public class ModuleBuilder {
         GlobalArgs gArgs = new GlobalArgs();
         JCommander jc = new JCommander(gArgs);
         jc.setProgramName(MODULE_BUILDER_SH_NAME);
-
 
         // add the 'init' command
         InitCommandArgs initArgs = new InitCommandArgs();
@@ -94,6 +93,9 @@ public class ModuleBuilder {
         // add the 'run' command
         RunCommandArgs runArgs = new RunCommandArgs();
         jc.addCommand(RUN_COMMAND, runArgs);
+
+        // print name and version
+        printVersion();
 
         // parse the arguments and gracefully catch any errors
         try {
@@ -383,7 +385,7 @@ public class ModuleBuilder {
 
 
     private static int runVersionCommand(VersionCommandArgs testArgs, JCommander jc) {
-        printVersion();
+        // version was printed at start up, so just exit
         return 0;
     }
 
