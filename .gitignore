@@ -2,8 +2,6 @@
 /temp
 /dist
 /eclipse-classes/
-/sdkbase/ssl
-/sdkbase/cluster.ini
 /classes/
 /temp_*
 /ASimpleModule*

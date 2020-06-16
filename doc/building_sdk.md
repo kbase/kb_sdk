@@ -1,9 +1,9 @@
-#### Building SDK
+## Building the SDK
 
 System Dependencies:
 
  - Mac OS X 10.8+ or Linux. kb-sdk does not run natively in Windows, but see [here](doc/FAQ.md#windows) for more details.
- - Java JRE 7 or 8 (9 is currently incompatible) http://www.oracle.com/technetwork/java/javase/downloads/index.html
+ - Java JRE 8: http://www.oracle.com/technetwork/java/javase/downloads/index.html (9 is currently incompatible; the SDK will run on Java 7, but using the more modern Java 8 is recommended)
  - (Mac only) Xcode https://developer.apple.com/xcode
  - git https://git-scm.com
  - Docker https://www.docker.com (for local testing)
@@ -11,15 +11,12 @@ System Dependencies:
 Get the SDK:
 
     git clone https://github.com/kbase/kb_sdk
+    git clone https://github.com/kbase/jars
 
 Pull dependencies and configure the SDK:
 
     cd kb_sdk
     make bin
-
-Download the local KBase SDK base Docker image:
-
-    docker pull kbase/sdkbase2:latest
 
 Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk directory:
 
@@ -27,8 +24,7 @@ Add the kb-sdk tool to your PATH and enable command completion.  From the kb_sdk
     export PATH=$(pwd)/bin:$PATH
     source src/sh/sdk-completion.sh
 
-
-#### Build from source
+### Build from source
 
 Additional System Dependencies:
 
@@ -39,4 +35,3 @@ Follow basic instructions above.  Instead of running `make bin` you can run `mak
 
     cd kb_sdk
     make
-

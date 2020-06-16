@@ -18,7 +18,7 @@ KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works
-.PHONY : test test-python sdkbase
+.PHONY : test test-python
 
 
 default: compile
@@ -102,11 +102,6 @@ deploy-scripts:
 	  	 exit 1; \
 	fi;
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
-
-sdkbase:
-	# docker rmi -f kbase/deplbase:latest
-	cd sdkbase && ./makeconfig
-	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
 
 test: submodule-init
 	@echo "Running unit tests"
