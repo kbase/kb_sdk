@@ -371,14 +371,15 @@ public class ModuleBuilder {
 
     public static String getGitProp(String propertyToGet) {
         String propertyValue = null;
+        Properties gitProps = new Properties();
         try {
-            Properties gitProps = new Properties();
             InputStream is = ModuleBuilder.class.getResourceAsStream("git.properties");
             gitProps.load(is);
             is.close();
             propertyValue = gitProps.getProperty(propertyToGet);
         } catch (Exception e) {
-            showError("Error while retrieving version information", e.getMessage());
+            showError("Error while retrieving version information from git.properties file: ", e.getMessage());
+            System.exit(1);
         }
         return propertyValue;
     }
