@@ -38,6 +38,11 @@ public class ConfigLoader {
         if (authUrl == null)
             throw new IllegalStateException("Error: 'auth_service_url' parameter is not set in " +
                     configPathInfo);
+        endPoint = props.getProperty("kbase_endpoint");
+        if (endPoint == null)
+            throw new IllegalStateException("Error: KBase services end-point is not set in " +
+                    configPathInfo);
+
         String testPrefix = testMode ? "test_" : "";
         String user = props.getProperty(testPrefix + "user");
         if (user != null && user.trim().isEmpty()) {
@@ -47,9 +52,13 @@ public class ConfigLoader {
         String tokenString = props.getProperty(testPrefix + "token");
         if (tokenString != null && tokenString.trim().isEmpty()) {
             tokenString = null;
+        }
+        if (tokenString == null) {
+            System.out.println("No token found in test.cfg file; checking environment");
             String test_token = System.getenv("KBASE_TEST_TOKEN");
             if (test_token != null && !test_token.trim().isEmpty()) {
                 tokenString = test_token;
+                System.out.println("Using token from KBASE_TEST_TOKEN env var");
             }
         }
 
@@ -71,10 +80,6 @@ public class ConfigLoader {
             }
             token = auth.login(user.trim(), password.trim()).getToken();
         }
-        endPoint = props.getProperty("kbase_endpoint");
-        if (endPoint == null)
-            throw new IllegalStateException("Error: KBase services end-point is not set in " +
-                    configPathInfo);
         jobSrvUrl = getConfigUrl(props, "job_service_url", endPoint, "userandjobstate");
         wsUrl = getConfigUrl(props, "workspace_url", endPoint, "ws");
         shockUrl = getConfigUrl(props, "shock_url", endPoint, "shock-api");

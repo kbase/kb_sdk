@@ -44,5 +44,3 @@ script:
   - cd MyContigFilter
   - make
   - kb-sdk validate
-
-
