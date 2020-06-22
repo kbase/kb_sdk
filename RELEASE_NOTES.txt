@@ -6,7 +6,12 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods
 in the KBase Narrative interface.
 
-VERSION: 1.2.2 (Released 06/xx/2020)
+VERSION: 1.2.3 (Released 06/2020)
+------------------------------------
+NEW FEATURES:
+- updated kb-sdk Dockerfile to use Java 8, the most recent Docker engine, and Ubuntu 20.04.
+
+VERSION: 1.2.2 (Released 06/2020)
 ------------------------------------
 NEW FEATURES:
 - kb-sdk version reports the build time and date of the instance
