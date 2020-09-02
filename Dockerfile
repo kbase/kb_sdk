@@ -1,24 +1,30 @@
-FROM ubuntu:14.04
+FROM ubuntu:20.04
 MAINTAINER Shane Canon <scanon@lbl.gov>
 
 # Update apt and install jdk and docker engine to get docker clients
+# Docker installation instructions from https://docs.docker.com/engine/install/ubuntu/
 RUN apt-get -y update && \
-    apt-get -y install openjdk-7-jdk make git ant && \
-    apt-get -y install apt-transport-https ca-certificates && \
-    apt-key adv \
-               --keyserver hkp://ha.pool.sks-keyservers.net:80 \
-               --recv-keys 58118E89F3A912897C070ADBF76221572C52609D && \
-    echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list && \
-    apt-get -y update && apt-get -y install docker-engine=1.11.2-0~trusty 
+    DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata && \
+    apt-get -y install openjdk-8-jdk make git ant curl gnupg-agent && \
+    apt-get -y install apt-transport-https ca-certificates software-properties-common && \
+    update-java-alternatives -s java-1.8.0-openjdk-amd64
 
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable" && \
+    apt-get -y update && \
+    apt-get -y install docker-ce docker-ce-cli containerd.io
+
+# Add kb-sdk src and fix CallbackServer interface
 ADD . /src
 
-# Add kb_sdk src and fix CallbackServer interface
 RUN \
-   cd /src && \
-   sed -i 's/en0/eth0/' src/java/us/kbase/common/executionengine/CallbackServer.java && \
-   make && \
-   /src/entrypoint prune && rm -rf /src/.git
+    cd /src && \
+    sed -i 's/en0/eth0/' src/java/us/kbase/common/executionengine/CallbackServer.java && \
+    make && \
+    /src/entrypoint prune && rm -rf /src/.git
 
 ENV PATH=$PATH:/src/bin
 
