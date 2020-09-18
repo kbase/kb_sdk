@@ -25,7 +25,7 @@ public class ModuleInitializer {
     private boolean verbose;
     private File dir;
 
-    private static String[] subdirs = {"data",
+    private static String[] subdirs = { "data",
                                         "scripts",
                                         "lib",
                                         "test",

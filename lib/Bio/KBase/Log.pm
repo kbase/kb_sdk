@@ -431,7 +431,7 @@ sub _syslog {
 sub _log {
     my ( $self, $ident, $message ) = @_;
     my $time = POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime );
-    my $msg  = join( " ", $time, hostname(), $ident . ": " );
+    my $msg  = join " ", $time, hostname(), $ident . ": ";
     open LOG, ">>" . $self->get_log_file()
         || warn "Could not print log message $msg to " . $self->get_log_file() . "\n";
     if ( ref( $message ) eq 'ARRAY' ) {

@@ -1,5 +1,8 @@
 package Bio::KBase::Exceptions;
 
+use strict;
+use warnings;
+
 use Exception::Class (
     Bio::KBase::Exceptions::KBaseException => {
         description => 'KBase exception',
@@ -29,6 +32,7 @@ Bio::KBase::Exceptions::KBaseException->Trace( 1 );
 
 package Bio::KBase::Exceptions::HTTP;
 use strict;
+use warnings;
 
 sub full_message {
     my ( $self ) = @_;
@@ -42,6 +46,7 @@ sub full_message {
 
 package Bio::KBase::Exceptions::JSONRPC;
 use strict;
+use warnings;
 
 sub full_message {
     my ( $self ) = @_;

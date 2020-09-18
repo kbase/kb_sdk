@@ -1,6 +1,8 @@
 package Bio::KBase::DeploymentConfig;
 
 use strict;
+use warnings;
+
 use base 'Class::Accessor';
 use Config::Simple;
 
@@ -103,4 +105,3 @@ Return the name of the service currently configured.
 =cut
 
 1;
-
