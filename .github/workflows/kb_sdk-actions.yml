@@ -61,8 +61,6 @@ jobs:
           LANGUAGE_TOKEN: ${{ matrix.language }}
         run: |
           cd SampleApp
-          kb-sdk test || true
-          sed -i "s/test_token=/test_token=$KBASE_TEST_TOKEN/" test_local/test.cfg
           kb-sdk test
 
       - name: make resulting app available as artefact in case of failure
@@ -111,19 +109,9 @@ jobs:
           repository: kbaseapps/${{ matrix.app }}
           path: kbase_app
 
-      - name: prep for repo tests
-        run: |
-          cd kbase_app
-          kb-sdk test || true
-
-      - name: edit test.cfg
+      - name: run repo tests
         env:
           KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
-        run: |
-          cd kbase_app
-          sed -i "s/test_token=/test_token=$KBASE_TEST_TOKEN/" test_local/test.cfg
-
-      - name: run test
         run: |
           cd kbase_app
           kb-sdk test
