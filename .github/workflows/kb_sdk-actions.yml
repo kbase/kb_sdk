@@ -14,6 +14,7 @@ jobs:
         os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
         language: [perl, python, java]
         test_type: [base, example]
+        auth: [token, env_var]
 
     steps:
       - name: Checkout
@@ -55,10 +56,25 @@ jobs:
         run: |
           kb-sdk init -l $LANGUAGE_TOKEN -u user --example SampleApp
 
-      - name: test ${{ matrix.test_type }} repo
+      - name: test ${{ matrix.test_type }} repo, using test.cfg for auth
+        if: matrix.auth == 'token'
+        run: |
+          cd SampleApp
+          kb-sdk test || true
+
+      - name: test ${{ matrix.test_type }} repo, using test.cfg for auth
+        if: matrix.auth == 'token'
         env:
           KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
-          LANGUAGE_TOKEN: ${{ matrix.language }}
+        run: |
+          cd SampleApp
+          sed -i "s/test_token=/test_token=$KBASE_TEST_TOKEN/" test_local/test.cfg
+          kb-sdk test
+
+      - name: test ${{ matrix.test_type }} repo, using env var for auth
+        if: matrix.auth == 'env_var'
+        env:
+          KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
         run: |
           cd SampleApp
           kb-sdk test
