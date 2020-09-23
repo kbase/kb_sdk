@@ -6,6 +6,11 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods
 in the KBase Narrative interface.
 
+VERSION: 1.2.4 (Released 09/2020)
+---------------------------------
+CHANGES:
+- `kb-sdk test` no longer dies on its first run; if the user has the KBASE_TEST_TOKEN environment variable set with their developer token, tests can be run without having to edit the test.cfg file.
+
 VERSION: 1.2.3 (Released 06/2020)
 ------------------------------------
 NEW FEATURES:

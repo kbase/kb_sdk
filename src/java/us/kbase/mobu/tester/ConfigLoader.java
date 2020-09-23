@@ -64,7 +64,7 @@ public class ConfigLoader {
 
         if (user == null && tokenString == null) {
             throw new IllegalStateException("Error: KBase account credentials are not set in " +
-                    configPathInfo);
+                    configPathInfo + " or the KBASE_TEST_TOKEN environment variable");
         }
         authAllowInsecure = props.getProperty("auth_service_url_allow_insecure");
         ConfigurableAuthService auth = new ConfigurableAuthService(
