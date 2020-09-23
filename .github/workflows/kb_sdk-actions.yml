@@ -95,6 +95,7 @@ jobs:
       matrix:
         os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
         app: [WsLargeDataIO, KBaseReport]
+        auth: [token, env_var]
 
     steps:
       - name: Checkout
@@ -125,7 +126,23 @@ jobs:
           repository: kbaseapps/${{ matrix.app }}
           path: kbase_app
 
-      - name: run repo tests
+      - name: run repo tests, using test.cfg for auth
+        if: matrix.auth == 'token'
+        run: |
+          cd kbase_app
+          kb-sdk test || true
+
+      - name: run repo tests, using test.cfg for auth
+        if: matrix.auth == 'token'
+        env:
+          KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
+        run: |
+          cd kbase_app
+          sed -i "s/test_token=/test_token=$KBASE_TEST_TOKEN/" test_local/test.cfg
+          kb-sdk test
+
+      - name: run repo tests, using env var for auth
+        if: matrix.auth == 'env_var'
         env:
           KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
         run: |
