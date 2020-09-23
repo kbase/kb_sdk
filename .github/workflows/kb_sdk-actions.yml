@@ -1,0 +1,166 @@
+name: Basic kb-sdk tests
+
+on:
+  [push, pull_request]
+
+jobs:
+
+  test_kb-sdk_builds:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
+        language: [perl, python, java]
+        test_type: [base, example]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Build with Ant
+        run: |
+          make
+
+      - name: Add bin to $PATH
+        run: |
+          echo "::add-path::$GITHUB_WORKSPACE/bin"
+
+      - name: checking kb-sdk functions
+        env:
+          KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
+          LANGUAGE_TOKEN: ${{ matrix.language }}
+        run: |
+          env
+          kb-sdk help
+          kb-sdk version
+
+      - name: init base repo
+        if: matrix.test_type == 'base'
+        env:
+          LANGUAGE_TOKEN: ${{ matrix.language }}
+        run: |
+          kb-sdk init -l $LANGUAGE_TOKEN -u user SampleApp
+
+      - name: init example repo
+        if: matrix.test_type == 'example'
+        env:
+          LANGUAGE_TOKEN: ${{ matrix.language }}
+        run: |
+          kb-sdk init -l $LANGUAGE_TOKEN -u user --example SampleApp
+
+      - name: test ${{ matrix.test_type }} repo
+        env:
+          KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
+          LANGUAGE_TOKEN: ${{ matrix.language }}
+        run: |
+          cd SampleApp
+          kb-sdk test || true
+          sed -i "s/test_token=/test_token=$KBASE_TEST_TOKEN/" test_local/test.cfg
+          kb-sdk test
+
+      - name: make resulting app available as artefact in case of failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: kbaseapp-${{ matrix.language }}-${{ matrix.test_type }}-${{ matrix.os }}
+          path: SampleApp
+
+
+  test_existing_repos:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
+        app: [WsLargeDataIO, KBaseReport]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Build with Ant
+        run: |
+          make
+
+      - name: Add bin to $PATH
+        run: |
+          echo "::add-path::$GITHUB_WORKSPACE/bin"
+
+      - name: checking basic kb-sdk functions
+        run: |
+          env
+          kb-sdk help
+          kb-sdk version
+
+      - name: Checkout existing kbase module ${{ matrix.app }}
+        uses: actions/checkout@v2
+        with:
+          repository: kbaseapps/${{ matrix.app }}
+          path: kbase_app
+
+      - name: prep for repo tests
+        run: |
+          cd kbase_app
+          kb-sdk test || true
+
+      - name: edit test.cfg
+        env:
+          KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
+        run: |
+          cd kbase_app
+          sed -i "s/test_token=/test_token=$KBASE_TEST_TOKEN/" test_local/test.cfg
+
+      - name: run test
+        run: |
+          cd kbase_app
+          kb-sdk test
+
+      - name: make resulting app available as artefact in case of failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: kbaseapp-${{ matrix.app }}-${{ matrix.os }}
+          path: kbase_app
+
+  dockerhub_upload:
+    runs-on: ubuntu-latest
+    if: |
+      (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/master') &&
+      github.event_name == 'push' &&
+      !contains(github.event.head_commit.message, 'skip docker') &&
+      !contains(github.event.head_commit.message, 'skip ci')
+    needs:
+      - test_existing_repos
+      - test_kb-sdk_builds
+
+    steps:
+    - name: checkout git repo
+      uses: actions/checkout@v2
+
+    - name: set current branch name as TAG_NAME for docker image
+      shell: bash
+      run: echo "::set-env name=TAG_NAME::${GITHUB_REF#refs/heads/}"
+
+    - name: build and push to dockerhub
+      uses: opspresso/action-docker@master
+      with:
+        args: --docker
+      env:
+        USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKERFILE: "Dockerfile"
+        IMAGE_NAME: "kbase/kb-sdk"
+

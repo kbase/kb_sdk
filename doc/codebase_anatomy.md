@@ -16,7 +16,6 @@ This document describes the the file structure of the `kb_sdk` codebase.
 * `Makefile` - commands for compiling, building docker images, and initializing submodules
 * `Pipfile` and `Pipfile.lock` - python dependencies for pipenv
 * `reports/` - files generated for JaCoCo test coverage reports
-* `sdkbase/` - Docker files for the image used inside actual SDK apps
 * `src/` - the main source code for this project; see below
 * `submodules/` and `submodules_hacks` - jars and other dependencies
 * `test_scripts/` - test helpers in perl, python, and js

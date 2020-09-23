@@ -1,10 +1,25 @@
 OVERVIEW
 -----------------------------------------
-The KBase SDK is a set of tools for developing new modules 
-that can be dynamically registered and run on the KBase 
-platform.  Modules include all code, specification files, and 
-documentation needed to define and run a set of methods 
+The KBase SDK is a set of tools for developing new modules
+that can be dynamically registered and run on the KBase
+platform.  Modules include all code, specification files, and
+documentation needed to define and run a set of methods
 in the KBase Narrative interface.
+
+VERSION: 1.2.3 (Released 06/2020)
+------------------------------------
+NEW FEATURES:
+- updated kb-sdk Dockerfile to use Java 8, the most recent Docker engine, and Ubuntu 20.04.
+
+VERSION: 1.2.2 (Released 06/2020)
+------------------------------------
+NEW FEATURES:
+- kb-sdk version reports the build time and date of the instance
+- kb-sdk can use the environment variable KBASE_TEST_TOKEN if a test token is not present in the test.cfg file
+- GitHub Actions now used to run basic tests on initialising and testing new base and sample repos.
+
+BUG FIXES:
+- Corrected a class name in the generated tests for the Java SDK module.
 
 VERSION: 1.2.0 (Released 11/14/2018)
 ------------------------------------
@@ -74,7 +89,7 @@ VERSION: 1.0.0 (Released 11/19/2015)
 ------------------------------------------
 NEW FEATURES:
 - R language is now supported for generation of clients and server stubs.
-- Test sub-command is fully implemented for all 4 languages (perl, 
+- Test sub-command is fully implemented for all 4 languages (perl,
    python, java and R).
 - Version sub-command was added
 

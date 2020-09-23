@@ -35,7 +35,6 @@ install:
 
 script:
   - make
-  - make sdkbase
   - export PATH=$(pwd)/bin:$PATH
   - source src/sh/sdk-completion.sh
   - kb-sdk help
@@ -44,5 +43,3 @@ script:
   - cd MyContigFilter
   - make
   - kb-sdk validate
-
-
