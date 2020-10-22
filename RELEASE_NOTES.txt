@@ -6,6 +6,10 @@ platform.  Modules include all code, specification files, and
 documentation needed to define and run a set of methods
 in the KBase Narrative interface.
 
+VERSION: 1.2.6 (Released 10/2020)
+---------------------------------
+CHANGES:
+- "-t" flag removed from entrypoint commands to enable kb-sdk to be run by github actions.
 
 VERSION: 1.2.5 (Unreleased)
 ---------------------------------
