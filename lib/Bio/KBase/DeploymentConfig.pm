@@ -1,10 +1,12 @@
 package Bio::KBase::DeploymentConfig;
 
 use strict;
+use warnings;
+
 use base 'Class::Accessor';
 use Config::Simple;
 
-__PACKAGE__->mk_accessors(qw(service_name settings));
+__PACKAGE__->mk_accessors( qw( service_name settings ) );
 
 =head1 NAME
 
@@ -13,9 +15,9 @@ Bio::KBase::DeploymentConfig
 =head1 DESCRIPTION
 
 The C<Bio::KBase::DeploymentConfig> class wraps the access to a KBase deployment.cfg
-file. It tests for the existence of the KB_DEPLOYMENT_CONFIG and 
-KB_SERVICE_NAME environment variables; if both are present, the 
-configuration parameters for the given service will be loaded 
+file. It tests for the existence of the KB_DEPLOYMENT_CONFIG and
+KB_SERVICE_NAME environment variables; if both are present, the
+configuration parameters for the given service will be loaded
 from that config file. If they are not present, the module supports
 fallback to defaults as defined by the module.
 
@@ -46,42 +48,36 @@ A hash reference containing the default values for the service parameters.
 =back
 
 =cut
-   
-sub new
-{
-    my($class, $service_name, $defaults) = @_;
 
-    if ((my $n = $ENV{KB_SERVICE_NAME}) ne "")
-    {
-	$service_name = $n;
+sub new {
+    my ( $class, $service_name, $defaults ) = @_;
+
+    if ( ( my $n = $ENV{ KB_SERVICE_NAME } ) ne "" ) {
+        $service_name = $n;
     }
 
     my $settings = {};
-    if (ref($defaults))
-    {
-	%$settings = %$defaults;
+    if ( ref( $defaults ) ) {
+        %$settings = %$defaults;
     }
 
-    my $cfg_file = $ENV{KB_DEPLOYMENT_CONFIG};
-    if (-e $cfg_file)
-    {
-	my $cfg = Config::Simple->new();
-	$cfg->read($cfg_file);
+    my $cfg_file = $ENV{ KB_DEPLOYMENT_CONFIG };
+    if ( -e $cfg_file ) {
+        my $cfg = Config::Simple->new();
+        $cfg->read( $cfg_file );
 
-	my %cfg = $cfg->vars;
+        my %config = $cfg->vars;
 
-	for my $k (keys %cfg)
-	{
-	    if ($k =~ /^$service_name\.(.*)/)
-	    {
-		$settings->{$1} = $cfg{$k};
-	    }
-	}
+        for my $k ( keys %config ) {
+            if ( $k =~ /^$service_name\.(.*)/ ) {
+                $settings->{ $1 } = $config{ $k };
+            }
+        }
     }
 
     my $self = {
-	settings => $settings,
-	service_name => $service_name,
+        settings     => $settings,
+        service_name => $service_name,
     };
 
     return bless $self, $class;
@@ -91,14 +87,13 @@ sub new
 
 Retrieve a setting from the configuration.
 
-   my $value = $obj->setting("key-name");
+   my $value = $obj->setting( "key-name" );
 
 =cut
 
-sub setting
-{
-    my($self, $key) = @_;
-    return $self->{settings}->{$key};
+sub setting {
+    my ( $self, $key ) = @_;
+    return $self->{ settings }->{ $key };
 }
 
 =item C<service_name>

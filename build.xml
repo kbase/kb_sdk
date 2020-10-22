@@ -49,7 +49,7 @@
   </condition>
   <!-- Properties in ant are immutable, so the following assignment will only take place if jardir was not set above. -->
   <property name="jardir" location="${env.JENKINS_JARS_MODULE_PATH}/lib/jars"/>
-  
+
   <!-- KBASE_COMMON_JAR should come from Makefile because of "make bin" mode support -->
   <condition property="commonjar" value="${KBASE_COMMON_JAR}">
     <and>
@@ -102,7 +102,7 @@
   </target>
 
 
-
+  <tstamp/>
   <target name="compile" depends="init" description="compile the source">
     <fail message="KBase common jar is not set">
         <condition>
@@ -116,7 +116,8 @@
     <echo file="${src}/us/kbase/mobu/git.properties">### PLEASE DO NOT CHANGE THIS FILE MANUALLY! ###
 giturl=${git.url}
 branch=${git.branch}
-commit=${git.commit}</echo>
+commit=${git.commit}
+build_timestamp=${DSTAMP}-${TSTAMP}</echo>
     <echo>Compiling with jar directory: ${jardir}</echo>
     <javac destdir="${classes}" srcdir="${src}" includeantruntime="false" debug="true" classpathref="compile.classpath" target="1.7" source="1.7" />
     <!-- Copy resource files-->
@@ -205,7 +206,7 @@ echo $pid > $DIR/pid.txt
     </echo>
     <chmod file="${ee.dir}/${ee.start.script}" perm="a+x"/>
     <echo>Successfully built: ${ee.dir}/${ee.start.script}</echo>
-    
+
     <echo file="${ee.dir}/${ee.stop.script}">#!/bin/bash
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" &amp;&amp; pwd )
 kill $(&lt;"$DIR/pid.txt")

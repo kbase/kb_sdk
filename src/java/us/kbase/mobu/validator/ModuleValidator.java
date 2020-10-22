@@ -39,44 +39,44 @@ import us.kbase.narrativemethodstore.ValidationResults;
 
 
 public class ModuleValidator {
-	
-	
-	private static final String KBASE_YML_FILE = "kbase.yml";
-	
-	
-	protected List<String> modulePaths;
-	protected boolean verbose;
-	protected String methodStoreUrl;
-	protected boolean allowSyncMethods;
-	
-	public ModuleValidator(List<String> modulePaths, boolean verbose, 
-	        String defaultMethodStoreUrl, boolean allowSyncMethods) throws Exception {
-		this.modulePaths = modulePaths;
-		this.verbose = verbose;
-		if (modulePaths.size() == 1) {
-		    File module = new File(modulePaths.get(0));
-		    File testCfg = new File(new File(module, "test_local"), "test.cfg");
-    		if (testCfg.exists()) {
-    	        Properties props = new Properties();
-    	        InputStream is = new FileInputStream(testCfg);
-    	        try {
-    	            props.load(is);
-    	        } finally {
-    	            is.close();
-    	        }
-    	        String endPoint = props.getProperty("kbase_endpoint");
-    	        if (endPoint != null)
-    	            this.methodStoreUrl = endPoint + "/narrative_method_store/rpc";
-    		}
-		}
-		if (this.methodStoreUrl == null) {
-		    this.methodStoreUrl = defaultMethodStoreUrl;
-		    System.out.println("WARNING! 'kbase_endpoint' property was not found in " +
-		    		"<module>/test_local/test.cfg so validation is done against NMS in appdev");
-		}
-		this.allowSyncMethods = allowSyncMethods;
-	}
-	
+
+
+    private static final String KBASE_YML_FILE = "kbase.yml";
+
+
+    protected List<String> modulePaths;
+    protected boolean verbose;
+    protected String methodStoreUrl;
+    protected boolean allowSyncMethods;
+
+    public ModuleValidator(List<String> modulePaths, boolean verbose,
+            String defaultMethodStoreUrl, boolean allowSyncMethods) throws Exception {
+        this.modulePaths = modulePaths;
+        this.verbose = verbose;
+        if (modulePaths.size() == 1) {
+            File module = new File(modulePaths.get(0));
+            File testCfg = new File(new File(module, "test_local"), "test.cfg");
+            if (testCfg.exists()) {
+                Properties props = new Properties();
+                InputStream is = new FileInputStream(testCfg);
+                try {
+                    props.load(is);
+                } finally {
+                    is.close();
+                }
+                String endPoint = props.getProperty("kbase_endpoint");
+                if (endPoint != null)
+                    this.methodStoreUrl = endPoint + "/narrative_method_store/rpc";
+            }
+        }
+        if (this.methodStoreUrl == null) {
+            this.methodStoreUrl = defaultMethodStoreUrl;
+            System.out.println("WARNING! 'kbase_endpoint' property was not found in " +
+                    "<module>/test_local/test.cfg so validation is done against NMS in appdev");
+        }
+        this.allowSyncMethods = allowSyncMethods;
+    }
+
     private static boolean isModuleDir(File dir) {
         return  new File(dir, "Dockerfile").exists() &&
                 new File(dir, "Makefile").exists() &&
@@ -86,52 +86,52 @@ public class ModuleValidator {
                 new File(dir, "test").exists() &&
                 new File(dir, "ui").exists();
     }
-	
-	public int validateAll() {
-		
-		int errors = 0;
-		
-		for(String modulePathString : modulePaths) {
-			File module = new File(modulePathString);
-			System.out.println("\nValidating module in ("+module+")");
-			
-			if(!module.exists()) {
-				System.err.println("  **ERROR** - the module does not exist");
-				errors++; continue;
-			}
-			if(!module.isDirectory()) {
-				System.err.println("  **ERROR** - the module location is not a directory.");
-				errors++; continue;
-			}
-			
-			try {
-				if(verbose) System.out.println("  - canonical path = "+module.getCanonicalPath()+"");
-	            File dir = module.getCanonicalFile();
-	            while (!isModuleDir(dir)) {
-	                dir = dir.getParentFile();
-	                if (dir == null)
-	                    throw new IllegalStateException("  **ERROR** - cannot find folder with module structure");
-	            }
-	            module = dir;
-			} catch (IOException e) {
-				System.err.println("  **ERROR** - unable to extract module canonical path:");
-				System.err.println("                "+e.getMessage());
-			}
+
+    public int validateAll() {
+
+        int errors = 0;
+
+        for(String modulePathString : modulePaths) {
+            File module = new File(modulePathString);
+            System.out.println("\nValidating module in ("+module+")");
+
+            if(!module.exists()) {
+                System.err.println("  **ERROR** - the module does not exist");
+                errors++; continue;
+            }
+            if(!module.isDirectory()) {
+                System.err.println("  **ERROR** - the module location is not a directory.");
+                errors++; continue;
+            }
+
+            try {
+                if(verbose) System.out.println("  - canonical path = "+module.getCanonicalPath()+"");
+                File dir = module.getCanonicalFile();
+                while (!isModuleDir(dir)) {
+                    dir = dir.getParentFile();
+                    if (dir == null)
+                        throw new IllegalStateException("  **ERROR** - cannot find folder with module structure");
+                }
+                module = dir;
+            } catch (IOException e) {
+                System.err.println("  **ERROR** - unable to extract module canonical path:");
+                System.err.println("                "+e.getMessage());
+            }
 
 
-			// 1) Validate the configuration file
-			try {
-				int status = validateKBaseYmlConfig(module);
-				if(status!=0) {
-					errors++; continue;
-				}
-			} catch (Exception e) {
-				System.err.println("  **ERROR** - configuration file validation failed:");
-				System.err.println("                "+e.getMessage());
-				errors++; continue;
-			}
-			
-			KbModule parsedKidl = null;
+            // 1) Validate the configuration file
+            try {
+                int status = validateKBaseYmlConfig(module);
+                if(status!=0) {
+                    errors++; continue;
+                }
+            } catch (Exception e) {
+                System.err.println("  **ERROR** - configuration file validation failed:");
+                System.err.println("                "+e.getMessage());
+                errors++; continue;
+            }
+
+            KbModule parsedKidl = null;
             try {
                 Map<String,Object> config = parseKBaseYaml(new File(module, KBASE_YML_FILE));
                 String moduleName = (String)config.get("module-name");
@@ -153,78 +153,78 @@ public class ModuleValidator {
                 errors++; continue;
             }
 
-			// 2) Validate UI components
-			
-			//     2a) Validate Narrative Methods
-			
-			File uiNarrativeMethodsDir = new File(new File(new File(module, "ui"), "narrative"), "methods");
-			if (uiNarrativeMethodsDir.exists()) {
-			    for (File methodDir : uiNarrativeMethodsDir.listFiles()) {
-			        if (methodDir.isDirectory()) {
-			            System.out.println("\nValidating method in ("+methodDir+")");
-			            try {
-			                int status = validateMethodSpec(methodDir, parsedKidl, this.allowSyncMethods);
-			                if (status != 0) {
-			                    errors++; 
-			                    continue;
-			                }
-			            } catch (Exception e) {
-			                System.err.println("  **ERROR** - method-spec validation failed:");
-			                System.err.println("                "+e.getMessage());
-			                errors++; continue;
-			            }
-			        }
-			    }
-			}
-			
-		}
-		
-		
-		
-		
-		if(errors>0) {
-			if(modulePaths.size()==1) {
-				System.out.println("\n\nThis module contains errors.\n");
-			} else {
-				System.out.println("\n\nErrors detected in "+errors +" of "+modulePaths.size()+" modules.\n");
-			}
-			return 1;
-		}
-		if(modulePaths.size()==1) {
-			System.out.println("\n\nCongrats- this module is valid.\n");
-		} else {
-			System.out.println("\n\nCongrats- all "+modulePaths.size()+" modules are valid.\n");
-		}
-		return 0;
-	}
-	
-	protected int validateKBaseYmlConfig(File module) throws IOException {
-		File kbaseYmlFile = new File(module.getCanonicalPath()+File.separator+KBASE_YML_FILE);
-		if(verbose) System.out.println("  - configuration file = "+kbaseYmlFile);
-		
-		if(!kbaseYmlFile.exists()) {
-			System.err.println("  **ERROR** - "+KBASE_YML_FILE+" configuration file does not exist in module directory.");
-			return 1;
-		}
-		if(kbaseYmlFile.isDirectory()) {
-			System.err.println("  **ERROR** - "+KBASE_YML_FILE+" configuration file location is a directory, not a file.");
-			return 1;
-		}
-		
-		try {
-			parseKBaseYaml(kbaseYmlFile);
-			if(verbose) System.out.println("  - configuration file is valid YAML");
-		} catch(Exception e) {
-			System.err.println("  **ERROR** - "+KBASE_YML_FILE+" configuration file location is invalid:");
-			System.err.println("                "+e.getMessage());
-			return 1;
-			
-		}
-		
-		
-		
-		return 0;
-	}
+            // 2) Validate UI components
+
+            //     2a) Validate Narrative Methods
+
+            File uiNarrativeMethodsDir = new File(new File(new File(module, "ui"), "narrative"), "methods");
+            if (uiNarrativeMethodsDir.exists()) {
+                for (File methodDir : uiNarrativeMethodsDir.listFiles()) {
+                    if (methodDir.isDirectory()) {
+                        System.out.println("\nValidating method in ("+methodDir+")");
+                        try {
+                            int status = validateMethodSpec(methodDir, parsedKidl, this.allowSyncMethods);
+                            if (status != 0) {
+                                errors++;
+                                continue;
+                            }
+                        } catch (Exception e) {
+                            System.err.println("  **ERROR** - method-spec validation failed:");
+                            System.err.println("                "+e.getMessage());
+                            errors++; continue;
+                        }
+                    }
+                }
+            }
+
+        }
+
+
+
+
+        if(errors>0) {
+            if(modulePaths.size()==1) {
+                System.out.println("\n\nThis module contains errors.\n");
+            } else {
+                System.out.println("\n\nErrors detected in "+errors +" of "+modulePaths.size()+" modules.\n");
+            }
+            return 1;
+        }
+        if(modulePaths.size()==1) {
+            System.out.println("\n\nCongrats- this module is valid.\n");
+        } else {
+            System.out.println("\n\nCongrats- all "+modulePaths.size()+" modules are valid.\n");
+        }
+        return 0;
+    }
+
+    protected int validateKBaseYmlConfig(File module) throws IOException {
+        File kbaseYmlFile = new File(module.getCanonicalPath()+File.separator+KBASE_YML_FILE);
+        if(verbose) System.out.println("  - configuration file = "+kbaseYmlFile);
+
+        if(!kbaseYmlFile.exists()) {
+            System.err.println("  **ERROR** - "+KBASE_YML_FILE+" configuration file does not exist in module directory.");
+            return 1;
+        }
+        if(kbaseYmlFile.isDirectory()) {
+            System.err.println("  **ERROR** - "+KBASE_YML_FILE+" configuration file location is a directory, not a file.");
+            return 1;
+        }
+
+        try {
+            parseKBaseYaml(kbaseYmlFile);
+            if(verbose) System.out.println("  - configuration file is valid YAML");
+        } catch(Exception e) {
+            System.err.println("  **ERROR** - "+KBASE_YML_FILE+" configuration file location is invalid:");
+            System.err.println("                "+e.getMessage());
+            return 1;
+
+        }
+
+
+
+        return 0;
+    }
 
     @SuppressWarnings("unchecked")
     public Map<String,Object> parseKBaseYaml(File kbaseYmlFile) throws IOException {
@@ -232,14 +232,14 @@ public class ModuleValidator {
         String kbaseYml = TextUtils.readFileText(kbaseYmlFile);
         return (Map<String, Object>) yaml.load(kbaseYml);
     }
-	
-	
-	protected int validateMethodSpec(File methodDir, KbModule parsedKidl,
-	        boolean allowSyncMethods) throws IOException {
-	    NarrativeMethodStoreClient nms = new NarrativeMethodStoreClient(new URL(methodStoreUrl));
-	    nms.setAllSSLCertificatesTrusted(true);
-	    nms.setIsInsecureHttpConnectionAllowed(true);
-	    String spec = FileUtils.readFileToString(new File(methodDir, "spec.json"));
+
+
+    protected int validateMethodSpec(File methodDir, KbModule parsedKidl,
+            boolean allowSyncMethods) throws IOException {
+        NarrativeMethodStoreClient nms = new NarrativeMethodStoreClient(new URL(methodStoreUrl));
+        nms.setAllSSLCertificatesTrusted(true);
+        nms.setIsInsecureHttpConnectionAllowed(true);
+        String spec = FileUtils.readFileToString(new File(methodDir, "spec.json"));
         String display = FileUtils.readFileToString(new File(methodDir, "display.yaml"));
         Map<String, String> extraFiles = new LinkedHashMap<String, String>();
         for (File f : methodDir.listFiles()) {
@@ -272,11 +272,11 @@ public class ModuleValidator {
             System.err.println("                "+e.getMessage());
             return 1;
         }
-	}
+    }
 
-	public static void validateMethodSpecMapping(String specText, KbModule parsedKidl,
-	        boolean allowSyncMethods) throws IOException {
-	    JsonNode spec = new ObjectMapper().readTree(specText);
+    public static void validateMethodSpecMapping(String specText, KbModule parsedKidl,
+            boolean allowSyncMethods) throws IOException {
+        JsonNode spec = new ObjectMapper().readTree(specText);
         JsonNode behaviorNode = get("/", spec, "behavior");
         if (behaviorNode.get("none") != null)
             return;  // Don't pay attention at viewer methods (since they don't use back-end)
@@ -336,7 +336,7 @@ public class ModuleValidator {
             }
         }
         if (func == null) {
-            throw new IllegalStateException("  **ERROR** - unknown method \"" + 
+            throw new IllegalStateException("  **ERROR** - unknown method \"" +
                     methodName + "\" defined within path " +
                     "[behavior/service-mapping/method] in spec.json");
         }
@@ -361,9 +361,9 @@ public class ModuleValidator {
                 targetArgPos = targetArgPosNode.asInt();
             if (targetArgPos >= func.getParameters().size()) {
                 throw new IllegalStateException("  **ERROR** - value " + targetArgPos + " within " +
-                		"path [" + path + "/target_argument_position] in spec.json is out of " +
-                        "bounds (number of arguments defined for function \"" + methodName + "\" " + 
-                		"is " + func.getParameters().size() + ")");
+                        "path [" + path + "/target_argument_position] in spec.json is out of " +
+                        "bounds (number of arguments defined for function \"" + methodName + "\" " +
+                        "is " + func.getParameters().size() + ")");
             }
             argsUsed.add(targetArgPos);
             KbType argType = func.getParameters().get(targetArgPos).getType();
@@ -378,7 +378,7 @@ public class ModuleValidator {
                         argType instanceof KbTuple) {
                     throw new IllegalStateException("  **ERROR** - value " + targetProp + " within " +
                             "path [" + path + "/target_property] in spec.json can't be applied to " +
-                            "type " + argType.getClass().getSimpleName() + " (defined for argument " + 
+                            "type " + argType.getClass().getSimpleName() + " (defined for argument " +
                             targetArgPos + ")");
                 }
                 if (argType instanceof KbStruct) {
@@ -392,8 +392,8 @@ public class ModuleValidator {
                     }
                     if (!found) {
                         System.err.println("  **WARNINGS** - value \"" + targetProp + "\" within " +
-                        		"path [" + path + "/target_property] in spec.json doesn't match " +
-                        		"any field of structure defined as argument type" + 
+                                "path [" + path + "/target_property] in spec.json doesn't match " +
+                                "any field of structure defined as argument type" +
                                 (struct.getName() != null ? (" (" + struct.getName() + ")") : ""));
                     }
                 }
@@ -411,22 +411,22 @@ public class ModuleValidator {
         }
         if (func.getParameters().size() != argsUsed.size()) {
             throw new IllegalStateException("  **ERROR** - not all arguments are set for function " +
-            		"\"" + func.getName() + "\", list of defined arguments is: " + argsUsed);
+                    "\"" + func.getName() + "\", list of defined arguments is: " + argsUsed);
         }
         if (inputParamIdToType.size() != paramsUsed.size()) {
             Set<String> paramsNotUsed = new TreeSet<String>(inputParamIdToType.keySet());
             paramsNotUsed.removeAll(paramsUsed);
-            System.err.println("  **WARNINGS** - some of input parameters are not used: " + 
+            System.err.println("  **WARNINGS** - some of input parameters are not used: " +
                     paramsNotUsed);
         }
-	}
-	
-	private static JsonNode get(String nodePath, JsonNode node, String childName) {
-	    JsonNode ret = node.get(childName);
-	    if (ret == null)
-	        throw new IllegalStateException("  **ERROR** - can't find sub-node [" + childName + 
-	                "] within path [" + nodePath + "] in spec.json");
-	    return ret;
-	}
+    }
+
+    private static JsonNode get(String nodePath, JsonNode node, String childName) {
+        JsonNode ret = node.get(childName);
+        if (ret == null)
+            throw new IllegalStateException("  **ERROR** - can't find sub-node [" + childName +
+                    "] within path [" + nodePath + "] in spec.json");
+        return ret;
+    }
 
 }

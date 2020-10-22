@@ -18,7 +18,7 @@ KBASE_COMMON_JAR = kbase/common/kbase-common-0.0.23.jar
 QUOTE = '\''
 
 # make sure our make test works
-.PHONY : test test-python sdkbase
+.PHONY : test test-python
 
 
 default: compile
@@ -59,7 +59,7 @@ bin: jars-submodule-init
 	echo '#!/bin/bash' > bin/kb-sdk
 	echo 'DIR=$(DIR)' >> bin/kb-sdk
 	echo 'KBASE_JARS_DIR=$$DIR/submodules/jars/lib/jars' >> bin/kb-sdk
-	@# Next command processes links in JAR_DEPS_BIN file and has 5 parts (one on each line): 
+	@# Next command processes links in JAR_DEPS_BIN file and has 5 parts (one on each line):
 	@#  (1) removing comments
 	@#  (2) trimming each line (picking first word actually)
 	@#  (3) skipping empty lines
@@ -102,11 +102,6 @@ deploy-scripts:
 	  	 exit 1; \
 	fi;
 	$(ANT) deploy_bin -DBIN_TARGET=$(TARGET)/bin -DBIN_LIB_TARGET=$(TARGET)/lib -DKBASE_COMMON_JAR=$(KBASE_COMMON_JAR)
-
-sdkbase:
-	# docker rmi -f kbase/deplbase:latest
-	cd sdkbase && ./makeconfig
-	docker build --no-cache -t kbase/kbase:sdkbase2.latest sdkbase
 
 test: submodule-init
 	@echo "Running unit tests"

@@ -25,7 +25,7 @@ public class PrevCodeParser {
     
     public static HashMap<String, String> parsePrevCode(File implFile, String commentPrefix,
             List<String> funcs, boolean withClassHeader) throws IOException, ParseException {
-        commentPrefix = Pattern.quote(commentPrefix);
+        commentPrefix = Pattern.quote(commentPrefix) + "[ ]?";
         Pattern PAT_HEADER = Pattern.compile(".*" + commentPrefix + 
                 "BEGIN_HEADER\n(.*\n)?[ \t]*" + commentPrefix + "END_HEADER\n.*", Pattern.DOTALL);
         Pattern PAT_CLASS_HEADER = Pattern.compile(".*" + commentPrefix + 
