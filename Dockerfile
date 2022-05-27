@@ -12,7 +12,7 @@ RUN apt-get -y update && \
     $(lsb_release -cs) \
     stable" && \
     apt-get -y update && \
-    apt-get -y install docker-ce docker-ce-cli containerd.io
+    apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 # Add kb-sdk src and fix CallbackServer interface
 ADD . /src
