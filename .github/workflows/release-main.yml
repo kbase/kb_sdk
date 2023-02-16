@@ -1,0 +1,25 @@
+---
+name: Release - Build & Push Image
+on:
+  release:
+    branches:
+      - main
+      - master
+    types: [ published ]
+jobs:
+  check-source-branch:
+    uses: kbase/.github/.github/workflows/reusable_validate-branch.yml@main
+    with:
+      build_branch: '${{ github.event.release.target_commitish }}'
+  validate-release-tag:
+    needs: check-source-branch
+    uses: kbase/.github/.github/workflows/reusable_validate-release-tag.yml@main
+    with:
+      release_tag: '${{ github.event.release.tag_name }}'
+  build-push:
+    needs: validate-release-tag
+    uses: kbase/.github/.github/workflows/reusable_build-push.yml@main
+    with:
+      name: '${{ github.event.repository.name }}'
+      tags: '${{ github.event.release.tag_name }},latest'
+    secrets: inherit
