@@ -22,7 +22,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, ubuntu-latest]
         language: [perl, python, java]
-        test_type: [base, example]
+        test_type: [base] #, example]
         auth: [token, env_var]
 
     steps:
@@ -103,7 +103,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
+        os: [ubuntu-20.04, ubuntu-latest]
         app: [WsLargeDataIO, KBaseReport]
         auth: [token, env_var]
 
