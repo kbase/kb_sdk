@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
+        os: [ubuntu-20.04, ubuntu-latest]
         language: [perl, python, java]
         test_type: [base, example]
         auth: [token, env_var]
@@ -72,7 +72,7 @@ jobs:
           cd SampleApp
           kb-sdk test || true
 
-      - name: test ${{ matrix.test_type }} repo, using test.cfg for auth
+      - name: test ${{ matrix.test_type }} repo, using test.cfg for auth, add env var to test.cfg
         if: matrix.auth == 'token'
         env:
           KBASE_TEST_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
