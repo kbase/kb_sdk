@@ -53,7 +53,7 @@ public class ModuleTester {
     public ModuleTester() throws Exception {
         this(null);
     }
-    
+
     public ModuleTester(File dir) throws Exception {
         moduleDir = dir == null ? DirUtils.findModuleDir() : DirUtils.findModuleDir(dir);
         String kbaseYml = TextUtils.readFileText(new File(moduleDir, "kbase.yml"));
@@ -70,7 +70,7 @@ public class ModuleTester {
         ModuleInitializer.qualifyLanguage((String) kbaseYmlConfig.get("service-language"));
         moduleContext.put("os_name", System.getProperty("os.name"));
     }
-    
+
     private static void checkIgnoreLine(File f, String line) throws IOException {
         List<String> lines = new ArrayList<String>();
         if (f.exists())
@@ -82,18 +82,18 @@ public class ModuleTester {
             FileUtils.writeLines(f, lines);
         }
     }
-    
+
     public int runTests(String methodStoreUrl, boolean skipValidation, boolean allowSyncMethods)
             throws Exception {
         if (skipValidation) {
             System.out.println("Validation step is skipped");
         } else {
-            ModuleValidator mv = new ModuleValidator(Arrays.asList(moduleDir.getCanonicalPath()), 
+            ModuleValidator mv = new ModuleValidator(Arrays.asList(moduleDir.getCanonicalPath()),
                     false, methodStoreUrl, allowSyncMethods);
             int returnCode = mv.validateAll();
             if (returnCode!=0) {
                 System.out.println("You can skip validation step using -s (or --skip_validation)" +
-                		" flag");
+                        " flag");
                 System.exit(returnCode);
             }
         }
@@ -114,7 +114,7 @@ public class ModuleTester {
         if (kbaseYmlConfig.get("data-version") != null) {
             File refDataDir = new File(tlDir, "refdata");
             if (!refDataDir.exists()) {
-                TemplateFormatter.formatTemplate("module_run_tests", moduleContext, 
+                TemplateFormatter.formatTemplate("module_run_tests", moduleContext,
                         runTestsSh);
                 refDataDir.mkdir();
             }
@@ -127,9 +127,6 @@ public class ModuleTester {
             TemplateFormatter.formatTemplate("module_run_docker", moduleContext, runDockerSh);
         if (!testCfg.exists()) {
             TemplateFormatter.formatTemplate("module_test_cfg", moduleContext, testCfg);
-            System.out.println("Set KBase account credentials in test_local/test.cfg and then " +
-            		"test again");
-            return 1;
         }
         Properties props = new Properties();
         InputStream is = new FileInputStream(testCfg);
@@ -138,10 +135,8 @@ public class ModuleTester {
         } finally {
             is.close();
         }
-        
+
         ConfigLoader cfgLoader = new ConfigLoader(props, true, "test_local/test.cfg", true);
-        
-        
         File workDir = new File(tlDir, "workdir");
         workDir.mkdir();
         File tokenFile = new File(workDir, "token");
@@ -175,7 +170,7 @@ public class ModuleTester {
         String callbackNetworksText = props.getProperty("callback_networks");
         if (callbackNetworksText != null) {
             callbackNetworks = callbackNetworksText.trim().split("\\s*,\\s*");
-            System.out.println("Custom network instarface list is defined: " + 
+            System.out.println("Custom network instarface list is defined: " +
                     Arrays.asList(callbackNetworks));
         }
         URL callbackUrl = CallbackServer.getCallbackUrl(callbackPort, callbackNetworks);
@@ -185,7 +180,7 @@ public class ModuleTester {
                 JsonServerSyslog.setStaticUseSyslog(false);
                 JsonServerSyslog.setStaticMlogFile("callback.log");
             }
-            CallbackServerConfig cfg = cfgLoader.buildCallbackServerConfig(callbackUrl, 
+            CallbackServerConfig cfg = cfgLoader.buildCallbackServerConfig(callbackUrl,
                     tlDir.toPath(), new LineLogger() {
                 @Override
                 public void logNextLine(String line, boolean isError) {
@@ -217,7 +212,7 @@ public class ModuleTester {
         } else {
             if (callbackNetworks != null && callbackNetworks.length > 0) {
                 throw new IllegalStateException("No proper callback IP was found, " +
-                		"please check callback_networks parameter in test.cfg");
+                        "please check callback_networks parameter in test.cfg");
             }
             System.out.println("WARNING: No callback URL was received " +
                     "by the job runner. Local callbacks are disabled.");
@@ -226,9 +221,13 @@ public class ModuleTester {
         try {
             System.out.println();
             ProcessHelper.cmd("chmod", "+x", runTestsSh.getCanonicalPath()).exec(tlDir);
-            int exitCode = ProcessHelper.cmd("bash", DirUtils.getFilePath(runTestsSh),
-                    callbackUrl == null ? "http://fakecallbackurl" : 
-                        callbackUrl.toExternalForm()).exec(tlDir).getExitCode();
+            int exitCode = ProcessHelper.cmd(
+                "bash",
+                DirUtils.getFilePath(runTestsSh),
+                callbackUrl == null
+                  ? "http://fakecallbackurl"
+                  : callbackUrl.toExternalForm()
+            ).exec(tlDir).getExitCode();
             return exitCode;
         } finally {
             if (jettyServer != null) {
@@ -251,7 +250,7 @@ public class ModuleTester {
                 ProcessHelper.cmd("bash", runDockerPath, "rm", "-v", "-f", cntId).exec(tlDir);
             }
         }
-        String oldImageId = findImageIdByName(tlDir, imageName, runDockerSh);    
+        String oldImageId = findImageIdByName(tlDir, imageName, runDockerSh);
         System.out.println();
         System.out.println("Build Docker image");
         boolean ok = buildImage(moduleDir, imageName, runDockerSh);
@@ -267,7 +266,7 @@ public class ModuleTester {
         }
         return true;
     }
-    
+
     public static String findImageIdByName(File tlDir, String imageName,
             File runDockerSh) throws Exception {
         List<String> lines;
@@ -295,7 +294,7 @@ public class ModuleTester {
         String[] parts = line.split("\\s+");
         return parts;
     }
-    
+
     private static List<String> exec(File workDir, String... cmd) throws Exception {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -312,13 +311,13 @@ public class ModuleTester {
         br.close();
         return ret;
     }
-    
-    public static boolean buildImage(File repoDir, String targetImageName, 
+
+    public static boolean buildImage(File repoDir, String targetImageName,
             File runDockerSh) throws Exception {
         String scriptPath = DirUtils.getFilePath(runDockerSh);
         String repoPath = DirUtils.getFilePath(repoDir);
-        Process p = Runtime.getRuntime().exec(new String[] {"bash", 
-                scriptPath, "build", "--rm", "-t", 
+        Process p = Runtime.getRuntime().exec(new String[] {"bash",
+                scriptPath, "build", "--rm", "-t",
                 targetImageName, repoPath});
         List<Thread> workers = new ArrayList<Thread>();
         InputStream[] inputStreams = new InputStream[] {p.getInputStream(), p.getErrorStream()};
@@ -358,7 +357,7 @@ public class ModuleTester {
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new IllegalStateException("Error reading data from executed " +
-                        		"container", e);
+                                "container", e);
                     }
                 }
             });
@@ -374,7 +373,7 @@ public class ModuleTester {
                 if (cntIdToDelete[0] != null) {
                     System.out.println("Cleaning up building container: " + cntIdToDelete[0]);
                     Thread.sleep(1000);
-                    ProcessHelper.cmd("bash", scriptPath, 
+                    ProcessHelper.cmd("bash", scriptPath,
                             "rm", "-v", "-f", cntIdToDelete[0]).exec(repoDir);
                 }
             } catch (Exception ex) {
