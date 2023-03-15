@@ -1,15 +1,12 @@
 FROM ubuntu:20.04
-MAINTAINER Shane Canon <scanon@lbl.gov>
+LABEL MAINTAINER KBase developers
 
 # Update apt and install jdk and docker engine to get docker clients
 # Docker installation instructions from https://docs.docker.com/engine/install/ubuntu/
 RUN apt-get -y update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata && \
-    apt-get -y install openjdk-8-jdk make git ant curl gnupg-agent && \
-    apt-get -y install apt-transport-https ca-certificates software-properties-common && \
-    update-java-alternatives -s java-1.8.0-openjdk-amd64
-
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y install tzdata openjdk-8-jdk make git ant curl gnupg-agent apt-transport-https ca-certificates software-properties-common && \
+    update-java-alternatives -s java-1.8.0-openjdk-amd64 && \
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository \
     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
     $(lsb_release -cs) \
