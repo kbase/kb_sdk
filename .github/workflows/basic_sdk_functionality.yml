@@ -104,7 +104,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, ubuntu-latest]
-        app: [WsLargeDataIO, KBaseReport]
+        # TODO: add a Java app. WsLargeDataIO does not currently build as it relies on a Java
+        # repo that no longer exists.
+        app: [KBaseReport]  # , WsLargeDataIO]
         auth: [token, env_var]
 
     steps:
