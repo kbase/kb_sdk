@@ -13,7 +13,6 @@ on:
       - closed
 
 jobs:
-
   test_kb-sdk_builds:
     if: "!contains(github.event.head_commit.message, 'skip ci')"
     runs-on: ${{ matrix.os }}
@@ -29,6 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      # build kb-sdk from source and test basic functions
       - name: Set up JDK 1.8
         uses: actions/setup-java@v3
         with:
@@ -52,6 +52,9 @@ jobs:
           kb-sdk help
           kb-sdk version
 
+      # the following steps create a KBase app using the SDK
+      # and runs some checks to ensure the app generated
+      # is functional and that the SDK can test it.
       - name: init base repo
         if: matrix.test_type == 'base'
         env:
@@ -133,6 +136,7 @@ jobs:
           kb-sdk help
           kb-sdk version
 
+      # the following steps check out and run the tests of an existing KBase app
       - name: Checkout existing kbase module ${{ matrix.app }}
         uses: actions/checkout@v3
         with:
