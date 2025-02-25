@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-latest]
+        os: [ubuntu-22.04, ubuntu-latest]
         language: [perl, python, java]
         test_type: [base] #, example]
         auth: [token, env_var]
